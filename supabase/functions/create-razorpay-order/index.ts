@@ -30,8 +30,8 @@ serve(async (req: Request) => {
         // Default fallback: 1 INR for testing
         let amount = 100;
 
-        if (planId === 'Elite' || planId === 'elite') amount = 4900; // 49 INR for testing
-        if (planId === 'Global' || planId === 'global') amount = 9900; // 99 INR for testing
+        if (planId === 'Elite' || planId === 'elite') amount = 0; // Free for Beta
+        if (planId === 'Global' || planId === 'global') amount = 0; // Free for Beta
 
         const instance = new Razorpay({
             key_id: key_id,

@@ -57,21 +57,21 @@ const plans = [
     {
         id: 'pro',
         name: 'Exam Prep Plan',
-        price: '€25',
+        price: '€0',
         description: 'Everything you need to crack the exam with confidence.',
         icon: Zap,
         color: 'from-indigo-500 to-violet-600',
-        badge: 'POPULAR',
+        badge: 'BETA SPECIAL',
         features: ['Unlimited Practice Exams', 'Detailed Explanations', 'Full Learning Section', 'Mock Simulations', 'Community Discussion', 'Exam Analytics']
     },
     {
         id: 'elite',
         name: 'Global Admission Plan',
-        price: '€50',
+        price: '€0',
         description: 'Complete support from preparation to university admission.',
         icon: Sparkles,
         color: 'from-amber-500 to-orange-600',
-        badge: 'ELITE',
+        badge: 'BETA SPECIAL',
         features: ['Everything in PRO', 'Advanced Simulations', 'Priority Community Access', 'University Shortlisting', 'Visa Process Guidance', 'Elite Badge']
     }
 ];
