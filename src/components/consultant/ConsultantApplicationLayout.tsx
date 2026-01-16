@@ -11,9 +11,12 @@ import {
     ArrowLeft,
     ChevronRight,
     LayoutDashboard,
-    FolderOpen
+    FolderOpen,
+    Menu,
+    X
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 
 interface ConsultantApplicationLayoutProps {
     children: React.ReactNode;
@@ -29,6 +32,7 @@ export default function ConsultantApplicationLayout({ children, activeTab }: Con
     const [isLoading, setIsLoading] = useState(true);
 
     const [unreadMessages, setUnreadMessages] = useState(0);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const fetchUnreadCount = async () => {
         if (!id) return;
@@ -101,7 +105,10 @@ export default function ConsultantApplicationLayout({ children, activeTab }: Con
 
     const SidebarItem = ({ tabId, icon: Icon, label, path, count }: any) => (
         <button
-            onClick={() => navigate(path)}
+            onClick={() => {
+                navigate(path);
+                setIsSidebarOpen(false);
+            }}
             className={`w-full flex items-center gap-4 px-6 py-4 transition-all duration-200 border-l-4 ${activeTab === tabId
                 ? 'bg-indigo-50 border-indigo-600 text-indigo-900 font-bold'
                 : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium'
@@ -121,15 +128,50 @@ export default function ConsultantApplicationLayout({ children, activeTab }: Con
     return (
         <Layout>
             <div className="flex min-h-[calc(100vh-72px)] bg-slate-50/50 relative">
-                {/* Sidebar */}
-                <div className="hidden lg:block lg:w-72 bg-white border-r border-slate-200 z-40 fixed top-[72px] h-[calc(100vh-72px)]">
-                    <div className="p-8">
-                        <button
-                            onClick={() => navigate('/consultant/dashboard')}
-                            className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors mb-6"
+                {/* Mobile Sidebar Toggle - Visible when sidebar is CLOSED */}
+                {!isSidebarOpen && (
+                    <div className="lg:hidden fixed bottom-6 right-6 z-[60]">
+                        <Button
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="rounded-full w-14 h-14 bg-indigo-600 shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center"
                         >
-                            <ArrowLeft className="w-3 h-3" /> Back to Dashboard
-                        </button>
+                            <Menu className="w-6 h-6" />
+                        </Button>
+                    </div>
+                )}
+
+                {/* Sidebar Backdrop */}
+                {isSidebarOpen && (
+                    <div
+                        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden animate-in fade-in duration-300"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                )}
+
+                {/* Sidebar */}
+                <div className={`
+                    fixed inset-y-0 left-0 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    lg:relative lg:translate-x-0 lg:w-72 bg-white border-r border-slate-200 z-50 transition-transform duration-300 ease-in-out
+                    shadow-2xl lg:shadow-none top-[72px] lg:top-0 h-[calc(100vh-72px)]
+                `}>
+                    <div className="p-8">
+                        <div className="flex items-center justify-between mb-6">
+                            <button
+                                onClick={() => navigate('/consultant/dashboard')}
+                                className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors"
+                            >
+                                <ArrowLeft className="w-3 h-3" /> Back to Dashboard
+                            </button>
+                            {/* Close button inside sidebar (mobile only) */}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="lg:hidden text-slate-500 hover:text-slate-900 h-8 w-8"
+                                onClick={() => setIsSidebarOpen(false)}
+                            >
+                                <X className="w-5 h-5" />
+                            </Button>
+                        </div>
 
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 font-bold">
@@ -155,7 +197,7 @@ export default function ConsultantApplicationLayout({ children, activeTab }: Con
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 p-6 lg:p-12 overflow-y-auto lg:ml-72">
+                <div className="flex-1 p-4 sm:p-6 lg:p-12 overflow-y-auto lg:ml-0">
                     {children}
                 </div>
             </div>

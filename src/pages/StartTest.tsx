@@ -17,6 +17,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { useExam } from '@/context/ExamContext';
+import { usePlanAccess } from '@/hooks/usePlanAccess';
 import Layout from '@/components/Layout';
 
 const DIFFICULTIES = [
@@ -32,6 +33,7 @@ export default function StartTest() {
   const { toast } = useToast();
   const { activeExam } = useExam();
   const [searchParams] = useSearchParams();
+  const { hasReachedSubjectLimit, getRemainingQuestions, isExplorer } = usePlanAccess();
 
   const [subject, setSubject] = useState(searchParams.get('subject') || 'Mathematics');
   const [topic, setTopic] = useState('');
@@ -99,6 +101,15 @@ export default function StartTest() {
 
   const handleStartTest = async (isFullMock = false) => {
     if (!user) return;
+
+    if (hasReachedSubjectLimit(isFullMock ? 'Mock Simulation' : subject)) {
+      toast({
+        title: 'Daily Limit Reached',
+        description: `You have reached your 15-question daily limit for ${isFullMock ? 'Mock Simulations' : subject}. Upgrade to PRO for unlimited practice!`,
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setIsGenerating(true);
 
@@ -362,19 +373,32 @@ export default function StartTest() {
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Step 3: Mission Scale</h3>
               </div>
               <div className="flex gap-2 flex-wrap">
-                {[5, 10, 15, 20, 25].map((count) => (
-                  <button
-                    key={count}
-                    onClick={() => setQuestionCount(count)}
-                    className={`w-12 h-12 rounded-xl border-2 font-black text-xs transition-all ${questionCount === count
-                      ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900 shadow-sm'
-                      : 'border-slate-50 bg-slate-50/30 text-slate-400 hover:border-slate-200'
-                      }`}
-                  >
-                    {count}
-                  </button>
-                ))}
+                {[5, 10, 15, 20, 25].map((count) => {
+                  const remaining = getRemainingQuestions(subject);
+                  const isDisabled = isExplorer && count > remaining;
+                  return (
+                    <button
+                      key={count}
+                      type="button"
+                      disabled={isDisabled}
+                      onClick={() => setQuestionCount(count)}
+                      className={`w-12 h-12 rounded-xl border-2 font-black text-xs transition-all ${isDisabled
+                        ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+                        : questionCount === count
+                          ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900 shadow-sm'
+                          : 'border-slate-50 bg-slate-50/30 text-slate-400 hover:border-slate-200'
+                        }`}
+                    >
+                      {count}
+                    </button>
+                  );
+                })}
               </div>
+              {isExplorer && (
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-3">
+                  Remaining Limit: <span className="text-orange-600">{getRemainingQuestions(subject)}</span> / 15 Questions
+                </p>
+              )}
             </section>
 
             {/* Step 4: Difficulty */}

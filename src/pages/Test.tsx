@@ -654,9 +654,6 @@ export default function TestPage() {
       <header className="border-b border-slate-100 dark:border-border bg-white/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-muted flex items-center justify-center border border-slate-100 dark:border-border dark:border-border">
-              <Brain className="w-5 h-5 text-indigo-600" />
-            </div>
             <div>
               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1">Mission Source</p>
               <h1 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">
@@ -735,13 +732,10 @@ export default function TestPage() {
 
             {/* Question (Premium Typography) */}
             <div className="bg-white dark:bg-card p-10 rounded-[2.5rem] border border-slate-100 dark:border-border shadow-sm mb-10 group hover:border-slate-300 transition-colors relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-100 transition-opacity">
-                <Brain className="w-24 h-24" />
-              </div>
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex gap-2">
-                    <div className="px-3 py-1 bg-slate-900 text-white text-[8px] font-black uppercase tracking-widest rounded-lg">Item {currentIndex + 1}</div>
+                    <div className="px-3 py-1 bg-slate-900 text-white text-[8px] font-black uppercase tracking-widest rounded-lg">Question {currentIndex + 1}</div>
                     <div className="px-3 py-1 bg-slate-50 dark:bg-muted text-slate-400 text-[8px] font-black uppercase tracking-widest rounded-lg border border-slate-100 dark:border-border dark:border-border">{currentQuestion.difficulty || 'Standard'} Mode</div>
                   </div>
                 </div>

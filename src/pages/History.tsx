@@ -85,7 +85,7 @@ export default function History() {
     const { data: writingData } = await (supabase as any)
       .from('writing_submissions')
       .select('*, writing_feedback(overall_score)')
-      .order('created_at', { ascending: false });
+      .order('submitted_at', { ascending: false });
 
     // 3. Fetch from 'reading_submissions' and 'listening_submissions'
     const { data: readingData } = await (supabase as any)
@@ -101,7 +101,7 @@ export default function History() {
     const { data: speakingData } = await (supabase as any)
       .from('speaking_sessions')
       .select('*, speaking_scores(overall_score)')
-      .order('created_at', { ascending: false });
+      .order('started_at', { ascending: false });
 
     // 4. Fetch 'mock_exam_submissions'
     const { data: mockData } = await (supabase as any)
@@ -127,7 +127,7 @@ export default function History() {
         type: 'Writing',
         score: w.writing_feedback?.[0]?.overall_score || null,
         status: w.status,
-        date: w.created_at,
+        date: w.submitted_at || w.created_at,
         is_manual: true
       }))];
     }
@@ -163,7 +163,7 @@ export default function History() {
         type: 'Speaking',
         score: s.speaking_scores?.[0]?.overall_score || null,
         status: 'completed',
-        date: s.created_at,
+        date: s.started_at,
         is_manual: true
       }))];
     }
@@ -188,7 +188,20 @@ export default function History() {
     // Apply Free Tier Limitation
     const isExplorer = profile?.selected_plan === 'explorer';
     if (isExplorer) {
-      setTests(unifiedTests.slice(0, 2));
+      if (isIELTS) {
+        // For IELTS, slice each specific skill tab
+        const reading = unifiedTests.filter(t => t.type === 'Reading').slice(0, 2);
+        const listening = unifiedTests.filter(t => t.type === 'Listening').slice(0, 2);
+        const writing = unifiedTests.filter(t => t.type === 'Writing').slice(0, 2);
+        const speaking = unifiedTests.filter(t => t.type === 'Speaking').slice(0, 2);
+        const mocks = unifiedTests.filter(t => t.is_full_mock).slice(0, 2);
+        setTests([...reading, ...listening, ...writing, ...speaking, ...mocks]);
+      } else {
+        // Standard split
+        const practice = unifiedTests.filter(t => t.type !== 'mock' && !t.subject.includes('IELTS')).slice(0, 2);
+        const official = unifiedTests.filter(t => t.type === 'mock' || t.subject.includes('IELTS')).slice(0, 2);
+        setTests([...practice, ...official]);
+      }
     } else {
       setTests(unifiedTests);
     }

@@ -11,7 +11,12 @@ import {
     Bot,
     ArrowRight,
     Sparkles,
-    Brain
+    Brain,
+    Calculator,
+    FileText,
+    Microscope,
+    FlaskConical,
+    Atom
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -33,13 +38,13 @@ import {
 } from 'recharts';
 
 const dailyData = [
-    { day: 'Mon', score: 65 },
-    { day: 'Tue', score: 72 },
-    { day: 'Wed', score: 68 },
-    { day: 'Thu', score: 85 },
-    { day: 'Fri', score: 78 },
-    { day: 'Sat', score: 90 },
-    { day: 'Sun', score: 88 },
+    { day: 'Mon', score: 0 },
+    { day: 'Tue', score: 0 },
+    { day: 'Wed', score: 0 },
+    { day: 'Thu', score: 0 },
+    { day: 'Fri', score: 0 },
+    { day: 'Sat', score: 0 },
+    { day: 'Sun', score: 0 },
 ];
 
 export default function Analytics() {
@@ -110,6 +115,15 @@ export default function Analytics() {
                 ];
             }
 
+            const subjectIcons: Record<string, any> = {
+                'Mathematics': Calculator,
+                'Reasoning on texts and data': FileText,
+                'Biology': Microscope,
+                'Chemistry': FlaskConical,
+                'Physics': Atom,
+                'General': Sparkles
+            };
+
             const dynamicSubjectData = isIELTS ? ieltsData : activeExam.sections.map((section: any, index: number) => {
                 const totalInSubject = totalQuestions?.filter((q: any) => q.subject === section.name).length || 0;
                 const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
@@ -124,6 +138,8 @@ export default function Analytics() {
                     subject: section.name,
                     score: completionPercentage || 0, // Visual progress
                     accuracy: attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0,
+                    solved: attemptsInSubject.length,
+                    icon: subjectIcons[section.name] || Sparkles,
                     color: colors[index % colors.length]
                 };
             });
@@ -223,10 +239,11 @@ export default function Analytics() {
             } else if (solvedBySubject && solvedBySubject.length > 0) {
                 const totalCorrect = solvedBySubject.filter((q: any) => q.is_correct).length;
                 const accuracyNum = Math.round((totalCorrect / solvedBySubject.length) * 100);
+                const masteredModules = dynamicSubjectData.filter(d => d.accuracy >= 70).length;
                 setStats({
                     accuracy: `${accuracyNum}%`,
                     timeSpent: `${Math.round((userTests?.reduce((acc: number, t: any) => acc + (t.time_taken_seconds || 0), 0) || 0) / 3600)}h`,
-                    verifiedSkills: `${Math.round(accuracyNum * 0.9)}%`,
+                    verifiedSkills: `${masteredModules} Subjects Mastered`,
                     percentile: `Top ${Math.max(1, 100 - percentileValue)}%`
                 });
             }
@@ -438,7 +455,10 @@ export default function Analytics() {
                                     </div>
                                 </div>
 
-                                <Button className="w-full h-12 sm:h-14 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] rounded-xl sm:rounded-2xl shadow-xl transition-all active:scale-95 border-none">
+                                <Button
+                                    onClick={() => navigate('/practice')}
+                                    className="w-full h-12 sm:h-14 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] rounded-xl sm:rounded-2xl shadow-xl transition-all active:scale-95 border-none"
+                                >
                                     EXAM SIMULATION
                                 </Button>
                             </div>
@@ -455,7 +475,7 @@ export default function Analytics() {
                                     <Award className="w-5 h-5 text-emerald-600" />
                                 </div>
                                 <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight">
-                                    {activeExam.id === 'ielts-academic' ? 'Module Performance' : 'Focus'}
+                                    {activeExam.id === 'ielts-academic' ? 'Module Proficiency' : 'Proficiency Breakdown'}
                                 </h3>
                             </div>
                             <div className="hidden sm:flex gap-3">
@@ -470,41 +490,29 @@ export default function Analytics() {
                             </div>
                         </div>
 
-                        <div className="h-[300px] sm:h-[400px] w-full mb-8">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={subjectData} margin={{ left: -35, bottom: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis
-                                        dataKey="subject"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#94a3b8', fontWeight: 'bold', fontSize: 10 }}
-                                        interval={0}
-                                        angle={-45}
-                                        textAnchor="end"
-                                    />
-                                    <YAxis
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#cbd5e1', fontWeight: 'bold', fontSize: 10 }}
-                                    />
-                                    <Tooltip
-                                        cursor={{ fill: '#f8fafc' }}
-                                        contentStyle={{
-                                            borderRadius: '1.25rem',
-                                            border: '1px solid #f1f5f9',
-                                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                            fontWeight: 'bold',
-                                            fontSize: '10px'
-                                        }}
-                                    />
-                                    <Bar dataKey="score" radius={[8, 8, 0, 0]} barSize={25}>
-                                        {subjectData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} opacity={0.8} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <div className="space-y-6 mb-8">
+                            <div className="grid grid-cols-12 px-4 py-2 text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50 dark:border-border/50">
+                                <div className="col-span-8">Subject</div>
+                                <div className="col-span-2 text-center">Mastery</div>
+                                <div className="col-span-2 text-right">Solved</div>
+                            </div>
+                            {subjectData.map((item, index) => (
+                                <div key={index} className="grid grid-cols-12 items-center px-4 py-4 rounded-[1.5rem] hover:bg-slate-50 dark:hover:bg-muted/50 transition-all group">
+                                    <div className="col-span-8 flex items-center gap-4 sm:gap-6">
+                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center relative overflow-hidden shrink-0" style={{ backgroundColor: `${item.color}15` }}>
+                                            <item.icon className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" style={{ color: item.color }} />
+                                            <div className="absolute inset-0 opacity-10" style={{ backgroundColor: item.color }} />
+                                        </div>
+                                        <span className="text-sm sm:text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight group-hover:translate-x-1 transition-transform">{item.subject}</span>
+                                    </div>
+                                    <div className="col-span-2 text-center">
+                                        <span className="text-base sm:text-xl font-black text-rose-500 tracking-tighter">{item.accuracy}%</span>
+                                    </div>
+                                    <div className="col-span-2 text-right">
+                                        <span className="text-base sm:text-xl font-black text-slate-300 dark:text-slate-500 tracking-tighter">{item.solved || 0}</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         {profile?.selected_plan === 'explorer' && (

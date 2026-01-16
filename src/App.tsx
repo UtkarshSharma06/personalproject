@@ -14,6 +14,7 @@ import Analytics from "./pages/Analytics";
 import Test from "./pages/Test";
 import Results from "./pages/Results";
 import History from "./pages/History";
+import ResetPassword from "./pages/ResetPassword";
 import Bookmarks from "./pages/Bookmarks";
 import Admin from "./pages/Admin";
 import InternationalMockWaitingRoom from "./pages/InternationalMockWaitingRoom";
@@ -52,6 +53,7 @@ import CommunityUpgrade from "./pages/CommunityUpgrade";
 import ApplicationDetail from "./pages/ApplicationDetail";
 import StudentApplicationStatus from "./pages/StudentApplicationStatus";
 import GetAdmission from "./pages/GetAdmission";
+import SecurityEnforcer from "@/components/SecurityEnforcer";
 
 import { ExamProvider } from "@/context/ExamContext";
 import { AIProvider } from "@/context/AIContext";
@@ -75,6 +77,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <SecurityEnforcer />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
@@ -146,6 +149,7 @@ const App = () => (
                 <Route path="/consultant/application/:id/chat" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationChat /></ProtectedRoute>} />
                 <Route path="/consultant/application/:id/offer" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationOffer /></ProtectedRoute>} />
 
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

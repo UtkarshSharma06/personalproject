@@ -657,7 +657,10 @@ export default function Dashboard() {
                                 </div>
                                 <h3 className="text-2xl font-black mb-1 leading-tight tracking-tight">WhatsApp Community</h3>
                                 <p className="font-bold text-emerald-50 text-[10px] uppercase tracking-[0.2em] mb-8">Join other students</p>
-                                <Button className="w-full bg-slate-900 text-white hover:bg-slate-800 font-black py-4 rounded-xl border border-white/10 shadow-lg active:scale-95 transition-all h-14 text-xs tracking-widest uppercase">
+                                <Button
+                                    onClick={() => window.open('https://chat.whatsapp.com/HMrIISJM6LUEIxgTxSMQp7', '_blank')}
+                                    className="w-full bg-slate-900 text-white hover:bg-slate-800 font-black py-4 rounded-xl border border-white/10 shadow-lg active:scale-95 transition-all h-14 text-xs tracking-widest uppercase"
+                                >
                                     Join Now
                                 </Button>
                             </div>

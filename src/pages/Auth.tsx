@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Brain, Mail, Lock, User, Sparkles, Loader2, ShieldAlert } from 'lucide-react';
+import { Brain, Mail, Lock, User, Sparkles, Loader2, ShieldAlert, Shield } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
@@ -18,9 +24,13 @@ export default function Auth() {
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+    const [requiresMFA, setRequiresMFA] = useState(false);
+    const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+    const [mfaCode, setMfaCode] = useState("");
 
-    const { user, signIn, signUp, signInWithGoogle } = useAuth();
+    const { user, signIn, signUp, signInWithGoogle, resetPassword, mfa } = useAuth();
     const navigate = useNavigate();
     const { toast } = useToast();
 
@@ -36,10 +46,10 @@ export default function Auth() {
     }, [searchParams]);
 
     useEffect(() => {
-        if (user) {
+        if (user && !isLoading && !requiresMFA) {
             navigate('/dashboard');
         }
-    }, [user, navigate]);
+    }, [user, navigate, isLoading, requiresMFA]);
 
     const validateForm = () => {
         const newErrors: { email?: string; password?: string } = {};
@@ -64,6 +74,38 @@ export default function Auth() {
         return Object.keys(newErrors).length === 0;
     };
 
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            emailSchema.parse(email);
+        } catch (e) {
+            if (e instanceof z.ZodError) {
+                setErrors({ email: e.errors[0].message });
+                return;
+            }
+        }
+
+        setIsLoading(true);
+        try {
+            const { error } = await resetPassword(email);
+            if (error) {
+                toast({
+                    title: 'Reset failed',
+                    description: error.message,
+                    variant: 'destructive',
+                });
+            } else {
+                toast({
+                    title: 'Email sent!',
+                    description: 'Check your inbox for the password reset link.',
+                });
+                setIsForgotPassword(false);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -73,7 +115,7 @@ export default function Auth() {
 
         try {
             if (isLogin) {
-                const { error } = await signIn(email, password);
+                const { data, error } = await signIn(email, password);
                 if (error) {
                     toast({
                         title: 'Sign in failed',
@@ -83,6 +125,26 @@ export default function Auth() {
                         variant: 'destructive',
                     });
                 } else {
+                    // Check if user has MFA enabled using the returned session
+                    const session = data?.session;
+
+                    if (session) {
+                        // Check the current assurance level
+                        const currentAAL = session.authenticator_assurance_level;
+
+                        // Get available factors
+                        const { data: factorsData } = await mfa.listFactors();
+                        const totpFactor = factorsData?.all?.find((f: any) => f.factor_type === 'totp' && f.status === 'verified');
+
+                        // If user has MFA enrolled but current AAL is not aal2, require MFA challenge
+                        if (totpFactor && currentAAL !== 'aal2') {
+                            setMfaFactorId(totpFactor.id);
+                            setRequiresMFA(true);
+                            setIsLoading(false);
+                            return;
+                        }
+                    }
+
                     toast({
                         title: 'Welcome back!',
                         description: 'You have successfully signed in.',
@@ -124,6 +186,29 @@ export default function Auth() {
                 description: error.message,
                 variant: 'destructive',
             });
+            setIsLoading(false);
+        }
+    };
+
+    const handleMFAVerify = async () => {
+        if (!mfaFactorId || mfaCode.length !== 6) return;
+        setIsLoading(true);
+        try {
+            const { error } = await mfa.challengeAndVerify(mfaFactorId, mfaCode);
+            if (error) {
+                toast({
+                    title: 'Verification failed',
+                    description: 'Invalid code. Please try again.',
+                    variant: 'destructive',
+                });
+            } else {
+                toast({
+                    title: 'Welcome back!',
+                    description: 'MFA verified successfully.',
+                });
+                navigate('/dashboard');
+            }
+        } finally {
             setIsLoading(false);
         }
     };
@@ -194,22 +279,23 @@ export default function Auth() {
                     <div className="bg-white dark:bg-card rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 lg:p-12 border border-slate-100 dark:border-border shadow-2xl shadow-indigo-100/50 max-h-[95vh] overflow-y-auto no-scrollbar">
                         <div className="text-center mb-10">
                             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 mb-2 tracking-tighter">
-                                {isLogin ? 'Welcome Back' : 'Get Started'}
+                                {requiresMFA ? 'Security Verification' : (isForgotPassword ? 'Reset Password' : (isLogin ? 'Welcome Back' : 'Get Started'))}
                             </h2>
                             <p className="text-slate-400 font-bold uppercase text-[9px] sm:text-[10px] tracking-[0.2em]">
-                                {isLogin ? 'Sign in to your Italostudy account' : 'Join the Italostudy community'}
+                                {requiresMFA ? 'Enter code from your authenticator app' : (isForgotPassword ? 'Enter your email to receive a recovery link' : (isLogin ? 'Sign in to your Italostudy account' : 'Join the Italostudy community'))}
                             </p>
 
-                            {/* Expert Gateway Toggle */}
-                            <div className="mt-6 flex justify-center">
-                                <Link
-                                    to="/consultant/activate"
-                                    className="group flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-2xl transition-all"
-                                >
-                                    <ShieldAlert className="w-3.5 h-3.5 text-indigo-600 group-hover:scale-110 transition-transform" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Certified Expert Gateway</span>
-                                </Link>
-                            </div>
+                            {!isForgotPassword && (
+                                <div className="mt-6 flex justify-center">
+                                    <Link
+                                        to="/consultant/activate"
+                                        className="group flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-2xl transition-all"
+                                    >
+                                        <ShieldAlert className="w-3.5 h-3.5 text-indigo-600 group-hover:scale-110 transition-transform" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Certified Expert Gateway</span>
+                                    </Link>
+                                </div>
+                            )}
                         </div>
 
                         <div className="space-y-6">
@@ -239,6 +325,9 @@ export default function Auth() {
                                 </div>
                             </div>
 
+                        </div>
+
+                        {!isForgotPassword && !requiresMFA && (
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 {!isLogin && (
                                     <div className="space-y-2">
@@ -297,27 +386,132 @@ export default function Auth() {
                                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
                                 </Button>
                             </form>
+                        )}
 
-                            <div className="text-center pt-4">
+                        {isForgotPassword && (
+                            <form onSubmit={handleResetPassword} className="space-y-4">
+                                <div className="space-y-1">
+                                    <div className="relative group">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+                                        <Input
+                                            type="email"
+                                            placeholder="EMAIL ADDRESS"
+                                            value={email}
+                                            onChange={(e) => {
+                                                setEmail(e.target.value);
+                                                setErrors(prev => ({ ...prev, email: undefined }));
+                                            }}
+                                            className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-black text-[11px] uppercase tracking-widest placeholder:text-slate-300"
+                                        />
+                                    </div>
+                                    {errors.email && <p className="text-[9px] font-black text-rose-500 ml-1 uppercase tracking-widest">{errors.email}</p>}
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg active:scale-95 transition-all mt-2"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send Recovery Link'}
+                                </Button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setIsForgotPassword(false)}
+                                    className="w-full text-[9px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest pt-2"
+                                >
+                                    Back to Login
+                                </button>
+                            </form>
+                        )}
+
+                        {requiresMFA && (
+                            <div className="space-y-8">
+                                <div className="flex justify-center p-6 bg-slate-50 dark:bg-muted rounded-2xl border border-slate-100 dark:border-border">
+                                    <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                                        <Shield className="w-6 h-6 text-emerald-600" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="text-center">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Enter 6-Digit Code</p>
+                                        <div className="flex justify-center">
+                                            <InputOTP
+                                                maxLength={6}
+                                                value={mfaCode}
+                                                onChange={setMfaCode}
+                                            >
+                                                <InputOTPGroup className="gap-2">
+                                                    {[0, 1, 2, 3, 4, 5].map((index) => (
+                                                        <InputOTPSlot
+                                                            key={index}
+                                                            index={index}
+                                                            className="w-10 h-12 sm:w-12 sm:h-14 bg-slate-50 dark:bg-muted border-none rounded-xl text-lg font-black text-indigo-600 focus:ring-2 focus:ring-indigo-100"
+                                                        />
+                                                    ))}
+                                                </InputOTPGroup>
+                                            </InputOTP>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        onClick={handleMFAVerify}
+                                        disabled={isLoading || mfaCode.length !== 6}
+                                        className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg active:scale-95 transition-all mt-6"
+                                    >
+                                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify & Continue'}
+                                    </Button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setRequiresMFA(false);
+                                            setMfaCode("");
+                                            setMfaFactorId(null);
+                                        }}
+                                        className="w-full text-[9px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest pt-2"
+                                    >
+                                        Back to Login
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="text-center pt-4">
+                            {!isForgotPassword && !requiresMFA && (
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setIsLogin(!isLogin);
                                         setErrors({});
                                     }}
-                                    className="text-[9px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest"
+                                    className="text-[9px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest block w-full mb-3"
                                 >
                                     {isLogin ? "New to Italostudy? Sign Up" : 'Already have an account? Sign In'}
                                 </button>
-                            </div>
-                        </div>
+                            )}
 
-                        <div className="mt-10 text-center pt-6 border-t border-slate-50 dark:border-border">
-                            <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest leading-relaxed">
-                                By continuing, you agree to our <br />
-                                <span className="text-indigo-600 underline cursor-pointer">Italostudy Protocols</span>
-                            </p>
+                            {isLogin && !isForgotPassword && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsForgotPassword(true);
+                                        setErrors({});
+                                    }}
+                                    className="text-[9px] font-black text-indigo-600 hover:text-indigo-700 transition-all uppercase tracking-widest"
+                                >
+                                    Forgot Password?
+                                </button>
+                            )}
                         </div>
+                    </div>
+
+                    <div className="mt-10 text-center pt-6 border-t border-slate-50 dark:border-border">
+                        <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest leading-relaxed">
+                            By continuing, you agree to our <br />
+                            <span className="text-indigo-600 underline cursor-pointer">Italostudy Protocols</span>
+                        </p>
                     </div>
                 </div>
             </div>

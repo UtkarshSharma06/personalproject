@@ -26,48 +26,36 @@ serve(async (req: Request) => {
     const examName = body.examName || 'ENTRANCE';
     let prompt = "";
 
-    if (body.stats && body.subjectStats) {
-      const { stats, subjectStats, topicStats } = body;
+    const { subject, score, avgTimePerQuestion, topicPerformance, totalQuestions, timeTaken, timeLimit } = body;
 
-      // Extract top 3 weakest topics across all subjects
-      const allTopics = [];
-      Object.entries(topicStats || {}).forEach(([subject, topics]: [string, any]) => {
-        if (Array.isArray(topics)) {
-          topics.forEach(t => allTopics.push({ ...t, subject }));
-        }
-      });
+    // Build a summary of topic performance
+    const topicSummary = Object.entries(topicPerformance || {})
+      .map(([topic, stats]: [string, any]) => {
+        const accuracy = Math.round((stats.correct / stats.total) * 100);
+        return `- ${topic}: ${accuracy}% (${stats.correct}/${stats.total})`;
+      })
+      .join('\n');
 
-      const weakTopics = allTopics
-        .filter(t => t.solved >= 3 && t.accuracy < 65)
-        .sort((a, b) => a.accuracy - b.accuracy)
-        .slice(0, 3);
-
-      const strongSubjects = subjectStats.filter((s: any) => s.accuracy >= 75).map((s: any) => s.subject);
-      const weakSubjects = subjectStats.filter((s: any) => s.accuracy < 60 && s.solved > 0).map((s: any) => s.subject);
-
-      prompt = `
-        User is preparing for ${examName}.
-        Current Overall Stats: ${stats.accuracy}% Accuracy over ${stats.totalQuestions} questions.
-        
-        Subject Performance:
-        - Strong (>=75%): ${strongSubjects.join(', ') || 'None yet'}
-        - Needs Work (<60%): ${weakSubjects.join(', ') || 'None yet'}
-        
-        Most Critical Topic Gaps (Accuracy < 65%):
-        ${weakTopics.map(t => `- ${t.topic} in ${t.subject} (${t.accuracy}% accuracy)`).join('\n') || 'Not enough granular data yet.'}
-        
-        Provide a highly structured, professional study plan in 4 short sections:
-        1. 🚀 **Strategic Overview**: 2 sentences on overall pace and readiness.
-        2. 🎯 **Priority Focus**: Mention the specific topics that need immediate attention.
-        3. 📋 **Strategic Guidance**: Include advice on Target Mastery (70%+ goal), Weekly Mock Exam importance, and time-split between weak/strong areas.
-        4. 📅 **Action Plan**: 2 specific, actionable daily habits to improve.
-        
-        Keep the total length under 180 words. Use Markdown for bolding. Use a motivating, data-driven tone.
-      `;
-    } else {
-      const { subject, score, avgTimePerQuestion } = body;
-      prompt = `Analyze this ${examName} Session: Subject: ${subject}, Score: ${score}%, Avg Time: ${Math.round(avgTimePerQuestion)}s/q. Give a 2-sentence professional summary and 1 'golden rule' for improvement.`;
-    }
+    prompt = `
+      Analyze this ${examName} Session for the subject ${subject}.
+      
+      Performance Matrix:
+      - Overall Score: ${score}%
+      - Efficiency: ${Math.round(avgTimePerQuestion)}s per question
+      - Volume: ${totalQuestions} questions attempted
+      - Time Usage: ${Math.round(timeTaken / 60)}m used out of ${Math.round(timeLimit / 60)}m limit
+      
+      Topic-Wise Accuracy:
+      ${topicSummary || 'General assessment'}
+      
+      Provide a highly structured, professional study plan in 4 short sections:
+      1. 🚀 **Strategic Overview**: 1-2 sentence assessment of their current level.
+      2. 🎯 **Priority Focus**: Identify the specific topics or behaviors (like speed) that need immediate work.
+      3. 📋 **Strategic Guidance**: Advice on how to approach this subject differently (e.g., focus on concepts vs. speed).
+      4. 📅 **Action Plan**: 2 specific, actionable steps to take before the next session.
+      
+      Keep the total length under 200 words. Use Markdown for bolding and structure. Use a motivating, data-driven "Elite Academic Coach" tone.
+    `;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",

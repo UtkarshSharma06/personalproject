@@ -8,10 +8,18 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, displayName?: string) => Promise<{ data: any; error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ data: any; error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
+  mfa: {
+    enroll: () => Promise<{ data: any; error: any }>;
+    challengeAndVerify: (factorId: string, code: string) => Promise<{ error: any }>;
+    unenroll: (factorId: string) => Promise<{ error: any }>;
+    listFactors: () => Promise<{ data: any; error: any }>;
+    getAAL: () => Promise<{ data: any; error: any }>;
+  };
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -126,17 +134,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    return { error: error as Error | null };
+    return { data, error: error as Error | null };
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
     setProfile(null);
+    setUser(null);
+    setSession(null);
   };
 
   const signInWithGoogle = async () => {
@@ -149,8 +159,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error as Error | null };
   };
 
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    return { error: error as Error | null };
+  };
+
+  const mfa = {
+    enroll: async () => {
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: 'totp'
+      });
+      return { data, error };
+    },
+    challengeAndVerify: async (factorId: string, code: string) => {
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId
+      });
+      if (challengeError) return { error: challengeError };
+
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId,
+        challengeId: challengeData.id,
+        code
+      });
+      return { error: verifyError };
+    },
+    unenroll: async (factorId: string) => {
+      const { error } = await supabase.auth.mfa.unenroll({
+        factorId
+      });
+      return { error };
+    },
+    listFactors: async () => {
+      const { data, error } = await supabase.auth.mfa.listFactors();
+      return { data, error };
+    },
+    getAAL: async () => {
+      const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      return { data, error };
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, session, loading, signUp, signIn, signOut, refreshProfile: () => fetchProfile(user?.id ?? ''), signInWithGoogle }}>
+    <AuthContext.Provider value={{
+      user,
+      profile,
+      session,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+      refreshProfile: () => fetchProfile(user?.id ?? ''),
+      signInWithGoogle,
+      resetPassword,
+      mfa
+    }}>
       {children}
     </AuthContext.Provider>
   );

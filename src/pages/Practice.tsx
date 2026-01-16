@@ -19,8 +19,9 @@ export default function Practice() {
     const [userSubmissions, setUserSubmissions] = useState<any[]>([]);
     const [isLoadingTests, setIsLoadingTests] = useState(false);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+    const { hasReachedSubjectLimit, refreshLimit, isExplorer, getRemainingQuestions } = usePlanAccess();
 
-    const { hasReachedPracticeLimit, refreshLimit } = usePlanAccess();
+    const remaining = getRemainingQuestions(selectedSubject);
 
     const handleSubjectSelect = async (subject: string) => {
         setSelectedSubject(subject);
@@ -67,6 +68,10 @@ export default function Practice() {
     };
 
     const handleTestSelect = (testId: string) => {
+        if (hasReachedSubjectLimit(selectedSubject)) {
+            setIsUpgradeModalOpen(true);
+            return;
+        }
         let type = 'reading';
         if (selectedSubject === 'Listening') type = 'listening';
         if (selectedSubject === 'Academic Writing') type = 'writing';
@@ -75,7 +80,7 @@ export default function Practice() {
     };
 
     const handleStartPractice = (count: number) => {
-        if (hasReachedPracticeLimit) {
+        if (hasReachedSubjectLimit(selectedSubject)) {
             setIsUpgradeModalOpen(true);
             return;
         }
@@ -237,21 +242,36 @@ export default function Practice() {
                                 <p className="text-slate-400 font-bold text-[11px] sm:text-sm mt-3 uppercase tracking-widest">Targeting {selectedSubject}</p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 sm:gap-6 max-w-md mx-auto mb-12 sm:mb-16">
-                                {[5, 10, 15, 20].map((count) => (
-                                    <button
-                                        key={count}
-                                        onClick={() => handleStartPractice(count)}
-                                        className="p-6 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] border-2 border-slate-100 dark:border-border border-b-[6px] shadow-lg shadow-slate-200/20 hover:border-slate-900 bg-slate-50/30 hover:bg-white dark:bg-card transition-all duration-300 font-black text-3xl sm:text-4xl group/btn hover:shadow-2xl hover:-translate-y-1 active:border-b-2 active:translate-y-1 overflow-hidden relative"
-                                    >
-                                        <div className="relative z-10">
-                                            {count}
-                                            <span className="block text-[8px] sm:text-[10px] text-slate-300 font-black uppercase tracking-[0.2em] mt-2 group-hover/btn:text-orange-500 transition-colors">Questions</span>
-                                        </div>
-                                        <div className="absolute top-0 right-0 w-12 h-12 bg-orange-50 rounded-bl-[2rem] opacity-0 group-hover/btn:opacity-100 transition-all duration-500 scale-150 rotate-12" />
-                                    </button>
-                                ))}
+                            <div className="grid grid-cols-2 gap-4 sm:gap-6 max-w-md mx-auto mb-12 sm:mb-8">
+                                {[5, 10, 15, 20].map((count) => {
+                                    const isDisabled = isExplorer && count > remaining;
+                                    return (
+                                        <button
+                                            key={count}
+                                            disabled={isDisabled}
+                                            onClick={() => handleStartPractice(count)}
+                                            className={`p-6 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] border-2 border-b-[6px] shadow-lg shadow-slate-200/20 transition-all duration-300 font-black text-3xl sm:text-4xl group/btn overflow-hidden relative ${isDisabled
+                                                ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+                                                : 'border-slate-100 dark:border-border hover:border-slate-900 bg-slate-50/30 hover:bg-white dark:bg-card hover:shadow-2xl hover:-translate-y-1 active:border-b-2 active:translate-y-1'
+                                                }`}
+                                        >
+                                            <div className="relative z-10">
+                                                {count}
+                                                <span className="block text-[8px] sm:text-[10px] text-slate-300 font-black uppercase tracking-[0.2em] mt-2 group-hover/btn:text-orange-500 transition-colors">Questions</span>
+                                            </div>
+                                            {!isDisabled && (
+                                                <div className="absolute top-0 right-0 w-12 h-12 bg-orange-50 rounded-bl-[2rem] opacity-0 group-hover/btn:opacity-100 transition-all duration-500 scale-150 rotate-12" />
+                                            )}
+                                        </button>
+                                    );
+                                })}
                             </div>
+
+                            {isExplorer && (
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-12">
+                                    Remaining Daily Limit: <span className="text-orange-600">{remaining}</span> / 15 Questions
+                                </p>
+                            )}
 
                             <div className="p-4 sm:p-6 bg-slate-50 dark:bg-muted rounded-2xl sm:rounded-3xl border border-slate-100 dark:border-border inline-flex items-center gap-3">
                                 <Clock className="w-4 h-4 text-slate-400" />

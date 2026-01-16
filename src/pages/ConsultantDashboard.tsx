@@ -107,26 +107,48 @@ export default function ConsultantDashboard() {
         <Layout>
             <div className="flex min-h-[calc(100vh-80px)] bg-slate-50/50">
 
-                {/* Mobile Sidebar Toggle */}
-                <div className="lg:hidden fixed bottom-6 right-6 z-50">
-                    <Button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="rounded-full w-12 h-12 bg-indigo-600 shadow-xl"
-                    >
-                        {isSidebarOpen ? <X /> : <Menu />}
-                    </Button>
-                </div>
+                {/* Mobile Sidebar Toggle - Visible when sidebar is CLOSED */}
+                {!isSidebarOpen && (
+                    <div className="lg:hidden fixed bottom-6 right-6 z-[60]">
+                        <Button
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="rounded-full w-14 h-14 bg-indigo-600 shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-2"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </Button>
+                    </div>
+                )}
+
+                {/* Sidebar Backdrop */}
+                {isSidebarOpen && (
+                    <div
+                        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden animate-in fade-in duration-300"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                )}
 
                 {/* Sidebar */}
                 <div className={`
                     fixed inset-y-0 left-0 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                    lg:relative lg:translate-x-0 lg:w-72 bg-white border-r border-slate-200 z-40 transition-transform duration-300 ease-in-out
+                    lg:relative lg:translate-x-0 lg:w-72 bg-white border-r border-slate-200 z-50 transition-transform duration-300 ease-in-out
+                    shadow-2xl lg:shadow-none
                 `}>
-                    <div className="p-8">
-                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                            Consultant<span className="text-indigo-600">.</span>
-                        </h2>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Dashboard</p>
+                    <div className="p-8 flex items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                                Consultant<span className="text-indigo-600">.</span>
+                            </h2>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Dashboard</p>
+                        </div>
+                        {/* Close button inside sidebar (mobile only) */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="lg:hidden text-slate-500 hover:text-slate-900"
+                            onClick={() => setIsSidebarOpen(false)}
+                        >
+                            <X className="w-6 h-6" />
+                        </Button>
                     </div>
 
                     <nav className="space-y-1">
@@ -137,12 +159,12 @@ export default function ConsultantDashboard() {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 p-6 lg:p-12 overflow-y-auto">
+                <div className="flex-1 p-4 sm:p-6 lg:p-12 overflow-y-auto w-full">
 
                     {activeTab === 'applications' && (
-                        <div className="max-w-6xl mx-auto space-y-8">
-                            <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight">
-                                Consultant <span className="text-indigo-600">Dashboard</span>
+                        <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+                            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight">
+                                Consultant <span className="text-indigo-600 block sm:inline">Dashboard</span>
                             </h1>
 
                             {/* MY STUDENTS SECTION */}

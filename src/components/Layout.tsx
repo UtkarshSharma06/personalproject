@@ -249,8 +249,11 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                                             >
                                                 <User className="w-3.5 h-3.5 text-slate-400" /> Account Settings
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="p-2.5 rounded-xl cursor-pointer hover:bg-slate-50 dark:bg-muted font-bold text-xs flex items-center gap-2">
-                                                <Settings className="w-3.5 h-3.5 text-slate-400" /> Study Mode
+                                            <DropdownMenuItem className="p-2.5 rounded-xl cursor-not-allowed opacity-60 font-bold text-xs flex items-center justify-between gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Settings className="w-3.5 h-3.5 text-slate-400" /> Study Mode
+                                                </div>
+                                                <span className="text-[7px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full uppercase tracking-widest">Soon</span>
                                             </DropdownMenuItem>
                                         </>
                                     )}
