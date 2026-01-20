@@ -101,14 +101,14 @@ export default function Index() {
 
     // Redirect logged-in users to dashboard only if fully authenticated
     useEffect(() => {
-        if (!authLoading && user) {
+        if (!authLoading && user && !isAuthModalOpen) {
             // Only redirect if no MFA or AAL is already 2
             const needsMFA = hasMFA && aal !== 'aal2';
             if (!needsMFA) {
                 navigate('/dashboard');
             }
         }
-    }, [user, authLoading, navigate, aal, hasMFA]);
+    }, [user, authLoading, navigate, aal, hasMFA, isAuthModalOpen]);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
