@@ -1,0 +1,342 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    Bell,
+    Plus,
+    Trash2,
+    Eye,
+    Loader2,
+    Calendar,
+    Briefcase,
+    Sparkles
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+interface Notification {
+    id: string;
+    title: string;
+    short_description: string;
+    content_html: string;
+    created_at: string;
+    is_active: boolean;
+    exam_type: string | null;
+}
+
+const EXAM_OPTIONS = [
+    { id: '', name: 'General (All Users)' },
+    { id: 'cent-s-prep', name: 'CENT-S' },
+    { id: 'imat-prep', name: 'IMAT' },
+    { id: 'sat-prep', name: 'SAT' },
+    { id: 'ielts-academic', name: 'IELTS' }
+];
+
+export default function NotificationManager() {
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [previewContent, setPreviewContent] = useState('');
+
+    const [formData, setFormData] = useState({
+        title: '',
+        short_description: '',
+        content_html: '',
+        exam_type: ''
+    });
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('site_notifications')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setNotifications(data || []);
+        } catch (error: any) {
+            toast.error('Error fetching notifications: ' + error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const { error } = await supabase
+                .from('site_notifications')
+                .insert([{
+                    ...formData,
+                    created_by: (await supabase.auth.getUser()).data.user?.id
+                }]);
+
+            if (error) throw error;
+
+            toast.success('Notification created successfully');
+            setFormData({ title: '', short_description: '', content_html: '', exam_type: '' });
+            fetchNotifications();
+        } catch (error: any) {
+            toast.error('Error creating notification: ' + error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this notification?')) return;
+
+        try {
+            const { error } = await supabase
+                .from('site_notifications')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            toast.success('Notification deleted');
+            fetchNotifications();
+        } catch (error: any) {
+            toast.error('Error deleting notification: ' + error.message);
+        }
+    };
+
+    const toggleStatus = async (id: string, currentStatus: boolean) => {
+        try {
+            const { error } = await supabase
+                .from('site_notifications')
+                .update({ is_active: !currentStatus })
+                .eq('id', id);
+
+            if (error) throw error;
+            fetchNotifications();
+        } catch (error: any) {
+            toast.error('Error updating status: ' + error.message);
+        }
+    };
+
+    return (
+        <div className="space-y-8 p-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                        <Bell className="w-6 h-6 text-indigo-600" />
+                        Site Notifications
+                    </h2>
+                    <p className="text-slate-500 font-bold text-sm">Create and manage global site announcements</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Create Form */}
+                <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm space-y-6">
+                    <h3 className="font-black text-slate-900 border-l-4 border-indigo-500 pl-4 uppercase tracking-widest text-xs">Create Announcement</h3>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Title</label>
+                            <Input
+                                placeholder="E.g., New Course Available!"
+                                value={formData.title}
+                                onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                required
+                                className="rounded-xl border-slate-100 focus:border-indigo-500 transition-all font-bold"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Target Dashboard (Exam)</label>
+                            <select
+                                value={formData.exam_type}
+                                onChange={e => setFormData({ ...formData, exam_type: e.target.value })}
+                                className="w-full rounded-xl border-slate-100 border p-2.5 focus:border-indigo-500 transition-all font-bold text-sm bg-white"
+                            >
+                                {EXAM_OPTIONS.map(opt => (
+                                    <option key={opt.id} value={opt.id}>{opt.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Short Description (Dropdown Preview)</label>
+                            <Input
+                                placeholder="A brief summary for the notification bell list"
+                                value={formData.short_description}
+                                onChange={e => setFormData({ ...formData, short_description: e.target.value })}
+                                required
+                                className="rounded-xl border-slate-100 focus:border-indigo-500 transition-all font-bold"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Content (HTML Support)</label>
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFormData({
+                                                ...formData,
+                                                title: 'INTERNATIONAL CENT-S MOCK TEST',
+                                                short_description: 'Global Simulation Arena v4.0 is now live.',
+                                                content_html: `<div class="p-2 [perspective:1000px]">
+    <div class="bg-white/70 backdrop-blur-xl border border-white/40 rounded-[30px] p-8 md:p-10 [transform:rotateX(3deg)_rotateY(-3deg)] shadow-2xl transition-all duration-500 hover:[transform:rotateX(0deg)_rotateY(0deg)_scale(1.01)] hover:bg-white/90 group">
+        <!-- Floating Header -->
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[18px] flex items-center justify-center shadow-lg shadow-indigo-500/30 transform -rotate-6 transition-transform group-hover:rotate-0">
+                <span class="text-2xl">🏆</span>
+            </div>
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tighter leading-none mb-1">INTERNATIONAL CENT-S MOCK TEST</h2>
+                <span class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Global Simulation v5.0</span>
+            </div>
+        </div>
+
+        <p class="text-slate-500 text-sm md:text-base leading-relaxed mb-8 font-medium">
+            Challenge yourself with our most advanced 3D-proctored environment. Test your speed, accuracy, and knowledge against 5,000+ students worldwide.
+        </p>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 gap-4 mb-10">
+            <div class="bg-white/50 p-5 rounded-2xl border border-black/5 hover:border-indigo-100 transition-colors">
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Duration</div>
+                <div class="text-lg font-black text-slate-900">110 Mins</div>
+            </div>
+            <div class="bg-white/50 p-5 rounded-2xl border border-black/5 hover:border-indigo-100 transition-colors">
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Difficulty</div>
+                <div class="text-lg font-black text-slate-900">Advanced</div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <a href="/mock-exams" class="block w-full bg-slate-900 text-white text-center py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl shadow-slate-900/20 transition-all hover:bg-indigo-600 hover:scale-[1.02] active:scale-[0.98]">
+            Enter Simulation Arena &rarr;
+        </a>
+    </div>
+</div>`
+                                            });
+                                        }}
+                                        className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 transition-colors flex items-center gap-1"
+                                    >
+                                        <Sparkles className="w-3 h-3" />
+                                        Use Premium Template
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setPreviewContent(formData.content_html);
+                                            setIsPreviewOpen(true);
+                                        }}
+                                        className="text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-colors"
+                                    >
+                                        Preview HTML
+                                    </button>
+                                </div>
+                            </div>
+                            <Textarea
+                                placeholder="<p>Full HTML content for the notification page...</p>"
+                                value={formData.content_html}
+                                onChange={e => setFormData({ ...formData, content_html: e.target.value })}
+                                required
+                                className="rounded-xl border-slate-100 focus:border-indigo-500 transition-all font-mono text-sm min-h-[200px]"
+                            />
+                        </div>
+                        <Button
+                            disabled={isSubmitting}
+                            className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl h-12 font-black uppercase tracking-widest text-xs gap-2"
+                        >
+                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                            Publish Notification
+                        </Button>
+                    </form>
+                </div>
+
+                {/* List */}
+                <div className="bg-slate-50/50 rounded-3xl p-8 border border-white space-y-6">
+                    <h3 className="font-black text-slate-900 border-l-4 border-indigo-500 pl-4 uppercase tracking-widest text-xs">Recent History</h3>
+                    <div className="space-y-4">
+                        {isLoading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                            </div>
+                        ) : notifications.length === 0 ? (
+                            <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
+                                <p className="text-slate-400 font-bold text-sm italic">No notifications found</p>
+                            </div>
+                        ) : (
+                            notifications.map((notif) => (
+                                <div key={notif.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+                                    <div className="flex items-start justify-between">
+                                        <div className="space-y-1 pr-4">
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="font-black text-slate-900">{notif.title}</h4>
+                                                {!notif.is_active && (
+                                                    <span className="bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">Draft</span>
+                                                )}
+                                                {notif.exam_type && (
+                                                    <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">
+                                                        {EXAM_OPTIONS.find(o => o.id === notif.exam_type)?.name}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-slate-500 font-bold line-clamp-1">{notif.short_description}</p>
+                                            <div className="flex items-center gap-4 pt-2">
+                                                <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {new Date(notif.created_at).toLocaleDateString()}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={() => toggleStatus(notif.id, notif.is_active)}
+                                                className={`p-2 rounded-lg transition-colors ${notif.is_active ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+                                                title={notif.is_active ? "Mark as Inactive" : "Mark as Active"}
+                                            >
+                                                <Eye className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(notif.id)}
+                                                className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Preview Modal */}
+            {isPreviewOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="bg-slate-50 px-8 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h3 className="font-black text-slate-400 text-[10px] uppercase tracking-widest">HTML Preview</h3>
+                            <button
+                                onClick={() => setIsPreviewOpen(false)}
+                                className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+                            >
+                                <Plus className="w-5 h-5 rotate-45 text-slate-400" />
+                            </button>
+                        </div>
+                        <div className="p-8 max-h-[70vh] overflow-y-auto">
+                            <div
+                                className="prose prose-slate max-w-none"
+                                dangerouslySetInnerHTML={{ __html: previewContent || '<p class="text-slate-400 italic">No content to preview</p>' }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

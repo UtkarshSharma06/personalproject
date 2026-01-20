@@ -28,6 +28,19 @@ export default defineConfig(({ mode }) => ({
           'utils': ['date-fns', 'clsx', 'tailwind-merge']
         }
       }
-    }
+    },
+    // Performance optimizations
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.logs in production
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug']
+      }
+    },
+    chunkSizeWarningLimit: 1000,
+    cssCodeSplit: true,
+    sourcemap: false, // Disable sourcemaps for faster builds
+    reportCompressedSize: false // Faster builds
   }
 }));

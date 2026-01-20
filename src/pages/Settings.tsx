@@ -76,6 +76,8 @@ export default function Settings() {
     const [verificationCode, setVerificationCode] = useState("");
     const [isVerifyingMFA, setIsVerifyingMFA] = useState(false);
     const [isMFAGuideOpen, setIsMFAGuideOpen] = useState(false);
+    const [mfaPurpose, setMfaPurpose] = useState<'enroll' | 'unenroll'>('enroll');
+    const [unenrollFactorId, setUnenrollFactorId] = useState<string | null>(null);
 
     useEffect(() => {
         if (profile) {
@@ -204,8 +206,10 @@ export default function Settings() {
     };
 
     const handleEnrollMFA = async () => {
+        setMfaPurpose('enroll');
         setIsEnrollDialogOpen(true);
         const { data, error } = await mfa.enroll();
+        // ... rest of enroll logic
 
         if (error) {
             if (error.message?.includes("A factor with the family name for user already sett up") || error.code === 'factor_type_not_supported') {
@@ -228,6 +232,7 @@ export default function Settings() {
     };
 
     const handleVerifyExisting = (factor: any) => {
+        setMfaPurpose('enroll');
         setEnrollmentData(factor);
         setIsEnrollDialogOpen(true);
     };
@@ -239,9 +244,17 @@ export default function Settings() {
             const { error } = await mfa.challengeAndVerify(enrollmentData.id, verificationCode);
             if (error) throw error;
 
-            toast({ title: "MFA Activated", description: "Your account is now protected." });
+            if (mfaPurpose === 'unenroll' && unenrollFactorId) {
+                const { error: unenrollError } = await mfa.unenroll(unenrollFactorId);
+                if (unenrollError) throw unenrollError;
+                toast({ title: "MFA Disabled", description: "Security factor removed successfully." });
+            } else {
+                toast({ title: "MFA Activated", description: "Your account is now protected." });
+            }
+
             setIsEnrollDialogOpen(false);
             setEnrollmentData(null);
+            setUnenrollFactorId(null);
             setVerificationCode("");
             fetchMFAFactors();
         } catch (error: any) {
@@ -252,13 +265,35 @@ export default function Settings() {
     };
 
     const handleUnenrollMFA = async (factorId: string) => {
+        const factor = factors.find(f => f.id === factorId);
+        if (!factor) return;
+
         if (!confirm("Disable MFA? This reduces your account security.")) return;
-        const { error } = await mfa.unenroll(factorId);
-        if (error) {
-            toast({ title: "Error", description: error.message, variant: "destructive" });
-        } else {
+
+        try {
+            // Check current AAL
+            const { data: aalData } = await mfa.getAAL();
+
+            // If factor is verified and we are at AAL1, we MUST verify first
+            if (factor.status === 'verified' && aalData?.currentLevel === 'aal1') {
+                setMfaPurpose('unenroll');
+                setUnenrollFactorId(factorId);
+                setEnrollmentData(factor);
+                setIsEnrollDialogOpen(true);
+                toast({
+                    title: "Action Required",
+                    description: "Please verify your identity with your MFA code before disabling security."
+                });
+                return;
+            }
+
+            const { error } = await mfa.unenroll(factorId);
+            if (error) throw error;
+
             toast({ title: "MFA Disabled", description: "Security downgraded." });
             fetchMFAFactors();
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" });
         }
     };
 

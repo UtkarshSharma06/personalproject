@@ -81,19 +81,14 @@ export default function Results() {
   const [expandedQuestion, setExpandedQuestion] = useState<string | null>(null);
   const [rawScore, setRawScore] = useState<number | null>(null);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [rankings, setRankings] = useState<{ user_rank: number | null; total_participants: number | null; leaderboard: any[] } | null>(null);
   const { isExplorer } = usePlanAccess();
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
-
-  useEffect(() => {
-    if (testId && user) {
+    if (testId) {
       fetchResults();
     }
-  }, [testId, user]);
+  }, [testId]);
 
   const fetchResults = async () => {
     const { data: testData } = await (supabase as any)
@@ -104,6 +99,20 @@ export default function Results() {
 
     if (testData) {
       setTest(testData as any as TestResult);
+
+      // Fetch rankings if test is ranked
+      if (testData.is_ranked && testData.session_id) {
+        const { data: rankData } = await (supabase as any)
+          .rpc('get_test_rankings', { p_test_id: testId });
+
+        if (rankData && rankData.length > 0) {
+          setRankings({
+            user_rank: rankData[0].user_rank,
+            total_participants: rankData[0].total_participants,
+            leaderboard: rankData[0].leaderboard || []
+          });
+        }
+      }
     }
 
     const { data: questionsData } = await (supabase as any)
@@ -234,6 +243,58 @@ export default function Results() {
             </div>
           ))}
         </div>
+
+        {/* Leaderboard Section */}
+        {test.is_ranked && rankings && (
+          <div className="bg-white dark:bg-card p-12 rounded-[3.5rem] border-2 border-slate-100 dark:border-border border-b-[8px] shadow-xl shadow-slate-200/50 mb-12">
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Live Rankings</h3>
+                <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-1">Global Leaderboard</p>
+              </div>
+              {rankings.user_rank && (
+                <div className="text-right">
+                  <p className="text-3xl font-black text-indigo-600 tracking-tight leading-none">#{rankings.user_rank}</p>
+                  <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1">Your Rank of {rankings.total_participants}</p>
+                </div>
+              )}
+            </div>
+            <div className="space-y-3">
+              {rankings.leaderboard.map((entry: any, idx: number) => (
+                <div key={idx} className={`p-6 rounded-2xl border-2 flex items-center gap-6 transition-all ${entry.user_id === user?.id
+                    ? 'border-indigo-600 bg-indigo-50/50 shadow-lg'
+                    : 'border-slate-100 dark:border-border bg-slate-50/50'
+                  }`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg ${entry.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
+                      entry.rank === 2 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-white' :
+                        entry.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
+                          'bg-slate-50 dark:bg-muted text-slate-400 border border-slate-200 dark:border-border'
+                    }`}>
+                    {entry.rank}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-black text-slate-900 dark:text-slate-100 text-sm">{entry.display_name}</p>
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{entry.correct_answers} Correct • {Math.floor(entry.time_taken_seconds / 60)}m {entry.time_taken_seconds % 60}s</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">{entry.score}%</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Guest Notice */}
+        {test.is_mock && !user && (
+          <div className="mb-12 p-8 rounded-[2rem] bg-indigo-50 border border-indigo-100 flex items-start gap-3 shadow-sm animate-in zoom-in-95 duration-500">
+            <CheckCircle className="w-6 h-6 text-indigo-600 shrink-0" />
+            <div>
+              <h3 className="font-black text-indigo-600 uppercase tracking-widest text-[11px] mb-1">Guest Mode Complete</h3>
+              <p className="text-sm font-bold text-indigo-900/60 leading-relaxed">Login to participate in live rankings and track your progress over time.</p>
+            </div>
+          </div>
+        )}
 
         {/* Section Breakdown (Official Only) */}
         {test.test_type === 'mock' && activeExam && (

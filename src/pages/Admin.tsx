@@ -19,7 +19,8 @@ import {
     CheckCircle2,
     X,
     Zap,
-    Brain
+    Brain,
+    Pencil
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { EXAMS } from '@/config/exams';
@@ -34,7 +35,8 @@ import FeedbackManager from '@/components/admin/FeedbackManager';
 import MockEvaluationManager from '@/components/admin/MockEvaluationManager';
 import UserManager from '@/components/admin/UserManager';
 import ConsultantManager from '@/components/admin/ConsultantManager';
-import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog, Box } from 'lucide-react';
+import NotificationManager from '@/components/admin/NotificationManager';
+import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog, Box, Bell } from 'lucide-react';
 
 interface MockSession {
     id: string;
@@ -67,6 +69,7 @@ export default function Admin() {
     const [sessions, setSessions] = useState<MockSession[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
     const { toast } = useToast();
 
     const [formData, setFormData] = useState({
@@ -295,56 +298,84 @@ export default function Admin() {
         setIsLoading(false);
     };
 
-    const handleCreateSession = async (e: React.FormEvent) => {
+    const handleSaveSession = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        const { error } = await (supabase as any)
-            .from('mock_sessions')
-            .insert([
-                {
-                    title: formData.title,
-                    description: formData.description,
-                    start_time: new Date(formData.start_time).toISOString(),
-                    end_time: new Date(formData.end_time).toISOString(),
-                    exam_type: formData.exam_type,
-                    is_official: formData.is_official,
-                    is_active: true,
-                    config: formData.exam_type === 'ielts-academic' ? {
-                        reading_test_id: formData.reading_test_id,
-                        listening_test_id: formData.listening_test_id,
-                        writing_task1_id: formData.writing_task1_id,
-                        writing_task2_id: formData.writing_task2_id
-                    } : {}
-                }
-            ]);
+        const sessionData = {
+            title: formData.title,
+            description: formData.description,
+            start_time: new Date(formData.start_time).toISOString(),
+            end_time: new Date(formData.end_time).toISOString(),
+            exam_type: formData.exam_type,
+            is_official: formData.is_official,
+            is_active: true,
+            config: formData.exam_type === 'ielts-academic' ? {
+                reading_test_id: formData.reading_test_id,
+                listening_test_id: formData.listening_test_id,
+                writing_task1_id: formData.writing_task1_id,
+                writing_task2_id: formData.writing_task2_id
+            } : {}
+        };
+
+        const { error } = editingSessionId
+            ? await (supabase as any)
+                .from('mock_sessions')
+                .update(sessionData)
+                .eq('id', editingSessionId)
+            : await (supabase as any)
+                .from('mock_sessions')
+                .insert([sessionData]);
 
         if (error) {
             toast({
-                title: "Failed to create session",
+                title: editingSessionId ? "Failed to update session" : "Failed to create session",
                 description: error.message,
                 variant: "destructive",
             });
         } else {
             toast({
-                title: "Session Created",
-                description: "The mock session is now live.",
+                title: editingSessionId ? "Session Updated" : "Session Created",
+                description: editingSessionId ? "The mock session has been updated." : "The mock session is now live.",
             });
-            setFormData({
-                title: '',
-                description: '',
-                start_time: '',
-                end_time: '',
-                exam_type: 'cent-s-prep',
-                is_official: false,
-                reading_test_id: '',
-                listening_test_id: '',
-                writing_task1_id: '',
-                writing_task2_id: ''
-            });
+            handleResetForm();
             fetchSessions();
         }
         setIsSubmitting(false);
+    };
+
+    const handleResetForm = () => {
+        setFormData({
+            title: '',
+            description: '',
+            start_time: '',
+            end_time: '',
+            exam_type: 'cent-s-prep',
+            is_official: false,
+            reading_test_id: '',
+            listening_test_id: '',
+            writing_task1_id: '',
+            writing_task2_id: ''
+        });
+        setEditingSessionId(null);
+    };
+
+    const handleEditClick = (session: MockSession) => {
+        setEditingSessionId(session.id);
+        setFormData({
+            title: session.title,
+            description: session.description,
+            start_time: new Date(session.start_time).toISOString().slice(0, 16),
+            end_time: new Date(session.end_time).toISOString().slice(0, 16),
+            exam_type: session.exam_type,
+            is_official: session.is_official,
+            reading_test_id: (session as any).config?.reading_test_id || '',
+            listening_test_id: (session as any).config?.listening_test_id || '',
+            writing_task1_id: (session as any).config?.writing_task1_id || '',
+            writing_task2_id: (session as any).config?.writing_task2_id || ''
+        });
+        // Scroll to form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleDeleteSession = async (id: string) => {
@@ -419,6 +450,9 @@ export default function Admin() {
                             <TabsTrigger value="3d-labs" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
                                 3D Modules
                             </TabsTrigger>
+                            <TabsTrigger value="notifications" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
+                                Notifications
+                            </TabsTrigger>
                         </TabsList>
                     </div>
 
@@ -458,9 +492,10 @@ export default function Admin() {
                             <div className="lg:col-span-1">
                                 <div className="card-surface p-6 sticky top-8">
                                     <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                        <Plus className="w-5 h-5" /> Schedule New
+                                        {editingSessionId ? <Pencil className="w-5 h-5 text-indigo-500" /> : <Plus className="w-5 h-5" />}
+                                        {editingSessionId ? 'Modify Session' : 'Schedule New'}
                                     </h2>
-                                    <form onSubmit={handleCreateSession} className="space-y-4">
+                                    <form onSubmit={handleSaveSession} className="space-y-4">
                                         <div className="space-y-2">
                                             <Label htmlFor="title">Session Title</Label>
                                             <Input
@@ -597,14 +632,25 @@ export default function Admin() {
                                             />
                                         </div>
 
-                                        <Button
-                                            type="submit"
-                                            className="w-full bg-destructive hover:bg-destructive/90 text-white"
-                                            disabled={isSubmitting}
-                                        >
-                                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-                                            Deploy Session
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                type="submit"
+                                                className={`flex-1 ${editingSessionId ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-destructive hover:bg-destructive/90'} text-white`}
+                                                disabled={isSubmitting}
+                                            >
+                                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : editingSessionId ? <Pencil className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+                                                {editingSessionId ? 'Authorize Update' : 'Deploy Session'}
+                                            </Button>
+                                            {editingSessionId && (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={handleResetForm}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            )}
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -660,6 +706,15 @@ export default function Admin() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="gap-2"
+                                                        onClick={() => handleEditClick(session)}
+                                                    >
+                                                        <Pencil className="w-4 h-4 text-indigo-500" />
+                                                        Edit
+                                                    </Button>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
@@ -794,6 +849,21 @@ export default function Admin() {
                                 </div>
                             </div>
                             <LabManager />
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="notifications">
+                        <div className="card-surface p-8 rounded-[3rem]">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <Bell className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black tracking-tight uppercase">Site Announcements</h2>
+                                    <p className="text-sm text-muted-foreground">Broadcast updates to all users.</p>
+                                </div>
+                            </div>
+                            <NotificationManager />
                         </div>
                     </TabsContent>
                 </Tabs>

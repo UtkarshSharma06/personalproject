@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-    const { user, profile, loading } = useAuth() as any;
+    const { user, profile, loading, aal, hasMFA } = useAuth() as any;
     const location = useLocation();
 
     if (loading) {
@@ -21,6 +21,14 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
 
     if (!user) {
         return <Navigate to="/auth" state={{ from: location }} replace />;
+    }
+
+    // MFA Enforcement: If user has MFA enabled but session is aal1, they must verify
+    if (hasMFA && aal !== 'aal2') {
+        const isAuthPage = location.pathname === '/auth';
+        if (!isAuthPage) {
+            return <Navigate to="/auth" state={{ from: location, mfaRequired: true }} replace />;
+        }
     }
 
     // Role-based protection

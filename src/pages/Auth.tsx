@@ -1,5 +1,5 @@
 import { useState, useEffect, memo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,13 @@ import {
     InputOTPGroup,
     InputOTPSlot,
 } from "@/components/ui/input-otp";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
@@ -48,8 +55,9 @@ export default function Auth() {
     const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
     const [mfaCode, setMfaCode] = useState("");
 
-    const { user, signIn, signUp, signInWithGoogle, resetPassword, mfa } = useAuth();
+    const { user, signIn, signUp, signOut, signInWithGoogle, resetPassword, mfa, aal, hasMFA } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const { toast } = useToast();
 
     useEffect(() => {
@@ -64,10 +72,32 @@ export default function Auth() {
     }, [searchParams]);
 
     useEffect(() => {
-        if (user && !isLoading && !requiresMFA) {
-            navigate('/dashboard');
-        }
-    }, [user, navigate, isLoading, requiresMFA]);
+        const handleInitialRedirect = async () => {
+            if (!user || isLoading) return;
+
+            // Enforcement: If MFA is enabled but AAL is 1, stay here and show MFA
+            if (hasMFA && aal !== 'aal2') {
+                if (!requiresMFA) {
+                    // Try to find the verified factor
+                    const { data } = await mfa.listFactors();
+                    const factor = data?.all?.find((f: any) => f.factor_type === 'totp' && f.status === 'verified');
+                    if (factor) {
+                        setMfaFactorId(factor.id);
+                        setRequiresMFA(true);
+                    }
+                }
+                return;
+            }
+
+            // Normal redirect
+            if (!requiresMFA) {
+                const from = (location.state as any)?.from?.pathname || '/dashboard';
+                navigate(from);
+            }
+        };
+
+        handleInitialRedirect();
+    }, [user, navigate, isLoading, requiresMFA, aal, hasMFA, location.state]);
 
     const validateForm = () => {
         const newErrors: { email?: string; password?: string } = {};
@@ -209,7 +239,17 @@ export default function Auth() {
     };
 
     const handleMFAVerify = async () => {
-        if (!mfaFactorId || mfaCode.length !== 6) return;
+        if (!mfaFactorId) return;
+
+        if (mfaCode.length !== 6) {
+            toast({
+                title: "Incomplete Code",
+                description: "Please enter the full 6-digit security code.",
+                variant: "destructive"
+            });
+            return;
+        }
+
         setIsLoading(true);
         try {
             const { error } = await mfa.challengeAndVerify(mfaFactorId, mfaCode);
@@ -224,7 +264,9 @@ export default function Auth() {
                     title: 'Welcome back!',
                     description: 'MFA verified successfully.',
                 });
-                navigate('/dashboard');
+                setRequiresMFA(false);
+                const from = (location.state as any)?.from?.pathname || '/dashboard';
+                navigate(from);
             }
         } finally {
             setIsLoading(false);
@@ -438,56 +480,69 @@ export default function Auth() {
                         )}
 
                         {requiresMFA && (
-                            <div className="space-y-8">
-                                <div className="flex justify-center p-6 bg-slate-50 dark:bg-muted rounded-2xl border border-slate-100 dark:border-border">
-                                    <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                                        <Shield className="w-6 h-6 text-emerald-600" />
-                                    </div>
-                                </div>
+                            <Dialog open={requiresMFA} onOpenChange={(open) => {
+                                if (!open) {
+                                    signOut();
+                                }
+                            }}>
+                                <DialogContent className="sm:max-w-md bg-white dark:bg-card rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
+                                    <div className="p-8 space-y-8 relative overflow-hidden">
+                                        {/* Background Gradients */}
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-100/30 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-slate-100/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
 
-                                <div className="space-y-4">
-                                    <div className="text-center">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Enter 6-Digit Code</p>
-                                        <div className="flex justify-center">
-                                            <InputOTP
-                                                maxLength={6}
-                                                value={mfaCode}
-                                                onChange={setMfaCode}
-                                            >
-                                                <InputOTPGroup className="gap-2">
-                                                    {[0, 1, 2, 3, 4, 5].map((index) => (
-                                                        <InputOTPSlot
-                                                            key={index}
-                                                            index={index}
-                                                            className="w-10 h-12 sm:w-12 sm:h-14 bg-slate-50 dark:bg-muted border-none rounded-xl text-lg font-black text-indigo-600 focus:ring-2 focus:ring-indigo-100"
-                                                        />
-                                                    ))}
-                                                </InputOTPGroup>
-                                            </InputOTP>
+                                        <div className="relative z-10">
+                                            <DialogHeader className="text-center mb-8">
+                                                <div className="flex justify-center mb-6">
+                                                    <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center border border-indigo-100">
+                                                        <Shield className="w-7 h-7 text-indigo-600" />
+                                                    </div>
+                                                </div>
+                                                <DialogTitle className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-2 tracking-tighter uppercase">Security Check</DialogTitle>
+                                                <DialogDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Enter authentication code</DialogDescription>
+                                            </DialogHeader>
+
+                                            <div className="space-y-6">
+                                                <div className="flex justify-center">
+                                                    <InputOTP
+                                                        maxLength={6}
+                                                        value={mfaCode}
+                                                        onChange={setMfaCode}
+                                                    >
+                                                        <InputOTPGroup className="gap-2">
+                                                            {[0, 1, 2, 3, 4, 5].map((index) => (
+                                                                <InputOTPSlot
+                                                                    key={index}
+                                                                    index={index}
+                                                                    className="w-10 h-12 sm:w-12 sm:h-14 bg-slate-50 dark:bg-muted border-none rounded-xl text-lg font-black text-indigo-600 focus:ring-2 focus:ring-indigo-100 hover:bg-slate-100 transition-colors"
+                                                                />
+                                                            ))}
+                                                        </InputOTPGroup>
+                                                    </InputOTP>
+                                                </div>
+
+                                                <Button
+                                                    onClick={handleMFAVerify}
+                                                    disabled={isLoading}
+                                                    className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg active:scale-95 transition-all mt-6"
+                                                >
+                                                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify & Continue'}
+                                                </Button>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        signOut();
+                                                    }}
+                                                    className="w-full text-[9px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest pt-2"
+                                                >
+                                                    Back to Login
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <Button
-                                        onClick={handleMFAVerify}
-                                        disabled={isLoading || mfaCode.length !== 6}
-                                        className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg active:scale-95 transition-all mt-6"
-                                    >
-                                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify & Continue'}
-                                    </Button>
-
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setRequiresMFA(false);
-                                            setMfaCode("");
-                                            setMfaFactorId(null);
-                                        }}
-                                        className="w-full text-[9px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest pt-2"
-                                    >
-                                        Back to Login
-                                    </button>
-                                </div>
-                            </div>
+                                </DialogContent>
+                            </Dialog>
                         )}
 
                         <div className="text-center pt-4">

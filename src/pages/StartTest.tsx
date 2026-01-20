@@ -91,18 +91,38 @@ export default function StartTest() {
     const fullExam = searchParams.get('full_exam') === 'true';
     const autoLaunch = searchParams.get('auto') === 'true';
 
-    if (user && !loading) {
-      if (fullExam || autoLaunch) {
-        handleStartTest(fullExam);
+    // For full exams (mock), allow auto-start for both authenticated and guest users
+    // For regular practice, wait for authenticated user
+    if (!loading) {
+      if (fullExam) {
+        // Mock tests can auto-start for anyone (guest or authenticated)
+        handleStartTest(true);
+      } else if (user && autoLaunch) {
+        // Regular practice requires authentication
+        handleStartTest(false);
       }
-      // Practice mode不再自动开始，允许用户在Custom Practice页面进行二次筛选
     }
-  }, [user, loading, searchParams]); // Run when user is ready or params change
+  }, [loading, searchParams]); // Removed user dependency to allow guest auto-start
 
   const handleStartTest = async (isFullMock = false) => {
-    if (!user) return;
+    const sessionId = searchParams.get('session_id');
+    const isPracticeMode = searchParams.get('practice_mode') === 'true';
 
-    if (hasReachedSubjectLimit(isFullMock ? 'Mock Simulation' : subject)) {
+    // For mock tests, check if we should allow guest access
+    const isGuestAllowed = isFullMock;
+
+    if (!user && !isGuestAllowed) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to access this feature.',
+        variant: 'destructive',
+      });
+      navigate('/auth');
+      return;
+    }
+
+    // Only check limits for authenticated users
+    if (user && hasReachedSubjectLimit(isFullMock ? 'Mock Simulation' : subject)) {
       toast({
         title: 'Daily Limit Reached',
         description: `You have reached your 15-question daily limit for ${isFullMock ? 'Mock Simulations' : subject}. Upgrade to PRO for unlimited practice!`,
@@ -120,25 +140,31 @@ export default function StartTest() {
 
       let questions: any[] = [];
 
-      // 0. Fetch solved question IDs to avoid repeats
-      const { data: solvedData } = await (supabase as any)
-        .from('user_practice_responses')
-        .select('question_id')
-        .eq('user_id', user.id);
-
-      const solvedIds = solvedData?.map((r: any) => r.question_id) || [];
+      // 0. Fetch solved question IDs to avoid repeats (only for authenticated users)
+      const solvedIds: string[] = [];
+      if (user) {
+        const { data: solvedData } = await (supabase as any)
+          .from('user_practice_responses')
+          .select('question_id')
+          .eq('user_id', user.id);
+        solvedIds.push(...(solvedData?.map((r: any) => r.question_id) || []));
+      }
 
       // 1. Fetch from Manual Practice Bank
       if (isFullMock) {
         // Assembling Full Mock from Manual Bank
         for (const section of activeExam.sections) {
-          const { data: sectionQuestions, error: sectionError } = await (supabase as any)
+          let query = (supabase as any)
             .from('practice_questions')
             .select('*')
             .eq('exam_type', activeExam.id)
-            .eq('subject', section.name)
-            .not('id', 'in', `(${solvedIds.join(',')})`)
-            .limit(section.questionCount);
+            .eq('subject', section.name);
+
+          if (solvedIds.length > 0) {
+            query = query.not('id', 'in', `(${solvedIds.join(',')})`);
+          }
+
+          const { data: sectionQuestions, error: sectionError } = await query.limit(section.questionCount);
 
           if (sectionError) throw sectionError;
 
@@ -202,20 +228,47 @@ export default function StartTest() {
 
       if (!questions || questions.length === 0) throw new Error('No questions available in the manual bank.');
 
-      // Create test record
+      // Determine if test should be ranked
+      // Ranked only if: authenticated user + live session (not practice mode)
+      let isRanked = false;
+      if (user && sessionId && !isPracticeMode) {
+        // Check if session is currently live
+        const { data: sessionData } = await (supabase as any)
+          .from('mock_sessions')
+          .select('start_time, end_time')
+          .eq('id', sessionId)
+          .single();
+
+        if (sessionData) {
+          const now = new Date();
+          const startTime = new Date(sessionData.start_time);
+          const endTime = new Date(sessionData.end_time);
+          isRanked = now >= startTime && now <= endTime;
+        }
+      }
+
+      // Create test record - support both authenticated and guest users
+      const testInsert: any = {
+        subject: finalSubject,
+        topic: topic && topic !== 'all' ? topic : null,
+        difficulty: isFullMock ? 'mixed' : (difficulty === 'all' ? 'mixed' : difficulty),
+        total_questions: questions.length,
+        time_limit_minutes: finalTime,
+        status: 'in_progress',
+        exam_type: activeExam.id,
+        is_mock: isFullMock,
+        is_ranked: isRanked,
+        session_id: sessionId || null
+      };
+
+      // Only add user_id if user is authenticated
+      if (user) {
+        testInsert.user_id = user.id;
+      }
+
       const { data: test, error: testError } = await supabase
         .from('tests')
-        .insert({
-          user_id: user.id,
-          subject: finalSubject,
-          topic: topic && topic !== 'all' ? topic : null,
-          difficulty: isFullMock ? 'mixed' : (difficulty === 'all' ? 'mixed' : difficulty),
-          total_questions: questions.length,
-          time_limit_minutes: finalTime,
-          status: 'in_progress',
-          exam_type: activeExam.id,
-          is_mock: isFullMock
-        })
+        .insert(testInsert)
         .select()
         .single();
 
@@ -247,8 +300,8 @@ export default function StartTest() {
       }
 
       toast({
-        title: isFullMock ? 'Simulation Initialized!' : 'Practice Ready!',
-        description: `Preparing ${questions.length} refined questions. Good luck!`,
+        title: isFullMock ? (isRanked ? 'Live Simulation Started!' : 'Practice Simulation Started!') : 'Practice Ready!',
+        description: `Preparing ${questions.length} refined questions. ${!user ? 'Login to track your progress!' : 'Good luck!'}`,
       });
 
       navigate(`/test/${test.id}`);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo, useCallback } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAuth } from '@/lib/auth';
@@ -42,7 +42,94 @@ interface TopStudent {
     total_score: number;
     tests_taken: number;
     avatar_url?: string | null;
+    accuracy?: number;
 }
+
+// --- Memoized Sub-Components ---
+
+const StatCard = memo(({ label, value, icon: Icon, color, bg, border }: any) => (
+    <div className={`relative group overflow-hidden ${bg} ${border} backdrop-blur-xl border-2 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500 hover:-translate-y-1 h-full flex flex-col justify-center`}>
+        <div className="relative z-10">
+            <div className="flex items-center justify-center mb-3">
+                <p className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">{label}</p>
+                <Icon className={`w-4 h-4 ${color} opacity-80`} />
+            </div>
+            <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter text-center">{value}</p>
+        </div>
+    </div>
+));
+
+const SubjectMasteryItem = memo(({ subject }: { subject: SubjectMastery }) => (
+    <div className="group relative">
+        <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    {subject.subject === 'Mathematics' ? '📐' :
+                        subject.subject === 'Biology' ? '🧬' :
+                            subject.subject === 'Chemistry' ? '⚗️' :
+                                subject.subject.includes('Reasoning') ? '🧠' : '⚛️'}
+                </div>
+                <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{subject.subject}</span>
+            </div>
+            <div className="text-right">
+                <span className="text-base font-black text-slate-900 dark:text-white leading-none">{subject.accuracy}%</span>
+                <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Stability</p>
+            </div>
+        </div>
+        <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-50 dark:border-white/5 relative">
+            <div
+                className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                style={{ width: `${subject.accuracy}%` }}
+            />
+        </div>
+    </div>
+));
+
+const ChampionItem = memo(({ student, index }: { student: TopStudent, index: number }) => (
+    <div
+        className={`group flex items-center gap-3 p-3.5 rounded-3xl transition-all duration-300 hover:-translate-y-1 ${index === 0
+            ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800 shadow-xl shadow-amber-200/20'
+            : 'bg-white/50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-700/50 hover:shadow-lg'
+            }`}
+    >
+        <div className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs shadow-md ring-1 ring-white/20 transition-transform group-hover:scale-110 ${index === 0 ? 'bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-600 text-white' :
+            index === 1 ? 'bg-gradient-to-br from-slate-300 via-slate-400 to-slate-500 text-slate-800' :
+                index === 2 ? 'bg-gradient-to-br from-amber-700 via-amber-800 to-orange-900 text-white' :
+                    'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300'
+            }`}>
+            {index === 0 ? '👑' : index + 1}
+        </div>
+        <div className="shrink-0 relative">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden border transition-all ${index === 0 ? 'border-amber-400 shadow-md ring-2 ring-amber-100 dark:ring-amber-900/40' : 'border-slate-200 dark:border-slate-700'
+                }`}>
+                {student.avatar_url ? (
+                    <img src={student.avatar_url} alt={student.display_name} className="w-full h-full object-cover" loading="lazy" />
+                ) : (
+                    <div className={`w-full h-full flex items-center justify-center text-sm font-black ${index === 0 ? 'bg-gradient-to-br from-amber-100 to-orange-100 text-amber-700' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500'
+                        }`}>
+                        {student.display_name.slice(0, 1).toUpperCase()}
+                    </div>
+                )}
+            </div>
+        </div>
+        <div className="flex-1 min-w-0">
+            <h4 className="text-sm font-black text-slate-900 dark:text-white truncate tracking-tight">{student.display_name}</h4>
+            <p className="text-[10px] font-bold text-slate-400 truncate uppercase tracking-widest opacity-60">
+                @{student.display_name.toLowerCase().replace(/\s+/g, '')}
+            </p>
+        </div>
+        <div className="text-right shrink-0">
+            <div className={`text-base font-black ${index === 0 ? 'text-amber-600 dark:text-amber-400' :
+                (student.accuracy || 0) > 80 ? 'text-emerald-500' : 'text-slate-700 dark:text-slate-300'
+                }`}>
+                {student.accuracy ? `${student.accuracy}%` : '0%'}
+            </div>
+            <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter opacity-70">
+                {student.total_score}/{student.tests_taken || 0}
+            </p>
+        </div>
+    </div>
+));
 
 export default function Dashboard() {
     const { user, loading, profile } = useAuth();
@@ -84,44 +171,56 @@ export default function Dashboard() {
     const loadAllDashboardData = async () => {
         setIsDashboardLoading(true);
         try {
-            // Run all independent fetches
-            await Promise.all([
-                fetchDashboardData(),
-                fetchTopStudents(),
-                fetchLastProgress()
-            ]);
+            // 1. Critical data first (User Stats)
+            await fetchDashboardData();
+
+            // 2. Secondary data staggered to improve INP
+            setTimeout(async () => {
+                await Promise.all([
+                    fetchTopStudents(),
+                    fetchLastProgress()
+                ]);
+            }, 100);
+
         } catch (error) {
             console.error("Dashboard Sync Error:", error);
         } finally {
             // Slight delay for smooth transition
-            setTimeout(() => setIsDashboardLoading(false), 500);
+            setTimeout(() => setIsDashboardLoading(false), 300);
         }
     };
 
     const fetchTopStudents = async () => {
         try {
-            const { data: leaderboardData, error } = await supabase
-                .rpc('get_leaderboard', { p_exam_id: activeExam.id });
+            const { data: championsData, error } = await supabase
+                .rpc('get_champions_by_questions_solved');
 
             if (error) {
-                console.error("Error fetching leaderboard:", error);
+                console.error("Error fetching champions:", error);
                 return;
             }
 
-            if (!leaderboardData) return;
+            console.log("Champions data received:", championsData);
 
-            const studentsWithScores: TopStudent[] = leaderboardData.map((student: any) => ({
-                id: student.user_id,
-                display_name: student.display_name,
-                email: null, // Privacy: don't expose emails of others
-                avatar_url: student.avatar_url,
-                total_score: student.total_score,
-                tests_taken: student.tests_taken,
+            if (!championsData || championsData.length === 0) {
+                console.log("No champions data available");
+                setTopStudents([]);
+                return;
+            }
+
+            const studentsWithScores: TopStudent[] = championsData.map((champion: any) => ({
+                id: champion.user_id,
+                display_name: champion.display_name,
+                email: null,
+                avatar_url: champion.avatar_url,
+                total_score: champion.questions_solved, // Questions solved
+                tests_taken: champion.total_questions, // Total available questions
+                accuracy: champion.accuracy, // Real accuracy percentage
             }));
 
             setTopStudents(studentsWithScores);
         } catch (err) {
-            console.error("Failed to load leaderboard", err);
+            console.error("Failed to load champions", err);
         }
     };
 
@@ -251,34 +350,6 @@ export default function Dashboard() {
         fetchLastProgress();
     };
 
-    const handleConsultMission = () => {
-        if (!weakestSubject) return;
-
-        const params = new URLSearchParams({
-            subject: weakestSubject.subject,
-            count: '10',
-            mode: 'practice',
-            auto: 'true'
-        });
-
-        const url = `/start-test?${params.toString()}`;
-        const width = 1200;
-        const height = 800;
-        const left = (window.screen.width - width) / 2;
-        const top = (window.screen.height - height) / 2;
-
-        window.open(
-            url,
-            'ItalostudyMissionWindow',
-            `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
-        );
-
-        toast({
-            title: 'Italostudy Mission Initialization',
-            description: `Initializing targeted remediation for ${weakestSubject.subject}.`,
-        });
-    };
-
     const [lastProgress, setLastProgress] = useState<any>(null);
 
     const fetchLastProgress = async () => {
@@ -366,17 +437,70 @@ export default function Dashboard() {
             "Complete 3 practice missions to unlock advanced performance insights."
         );
 
+    const handleConsultMission = useCallback(() => {
+        if (!weakestSubject) return;
+
+        const params = new URLSearchParams({
+            subject: weakestSubject.subject,
+            count: '10',
+            mode: 'practice',
+            auto: 'true'
+        });
+
+        const url = `/start-test?${params.toString()}`;
+        const width = 1200;
+        const height = 800;
+        const left = (window.screen.width - width) / 2;
+        const top = (window.screen.height - height) / 2;
+
+        window.open(
+            url,
+            'ItalostudyMissionWindow',
+            `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
+        );
+
+        toast({
+            title: 'Italostudy Mission Initialization',
+            description: `Initializing targeted remediation for ${weakestSubject.subject}.`,
+        });
+    }, [weakestSubject, toast]);
+
     if (loading || isDashboardLoading) {
         return (
             <Layout>
-                <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center">
-                    <img
-                        src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDE3NnNjdGNiODdiNWNsYmUyNnRudHFtdWllaDEzM3NtdnpxZzY4NiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fhAwk4DnqNgw8/giphy.gif"
-                        alt="Syncing..."
-                        className="w-32 h-32 mb-8 rounded-full object-cover"
-                    />
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-2">Syncing ITALOSTUDY Data</h2>
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Optimizing your personalized curriculum...</p>
+                <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-7xl animate-pulse">
+                    <div className="grid lg:grid-cols-12 gap-8">
+                        <div className="lg:col-span-8 space-y-12">
+                            {/* Hero Skeleton */}
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-100 dark:border-border">
+                                <div className="space-y-4">
+                                    <div className="h-12 w-64 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+                                    <div className="h-6 w-48 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                                </div>
+                                <div className="h-16 w-48 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+                            </div>
+
+                            {/* Stats Skeleton */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="h-32 bg-slate-200 dark:bg-slate-800/40 rounded-[2rem]" />
+                                ))}
+                            </div>
+
+                            {/* Main Content Skeleton */}
+                            <div className="grid md:grid-cols-2 gap-8">
+                                <div className="h-[400px] bg-slate-100 dark:bg-slate-800/40 rounded-[2.5rem]" />
+                                <div className="h-[400px] bg-slate-100 dark:bg-slate-800/40 rounded-[2.5rem]" />
+                            </div>
+                        </div>
+
+                        {/* Sidebar Skeleton */}
+                        <div className="lg:col-span-4 space-y-8">
+                            <div className="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+                            <div className="h-64 bg-slate-100 dark:bg-slate-800/40 rounded-[2.5rem]" />
+                            <div className="h-64 bg-slate-100 dark:bg-slate-800/40 rounded-[2.5rem]" />
+                        </div>
+                    </div>
                 </div>
             </Layout>
         );
@@ -446,18 +570,10 @@ export default function Dashboard() {
                             {[
                                 { label: 'TOTAL QUESTIONS', value: stats.totalQuestions, icon: Search, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-100/50 dark:border-indigo-500/20' },
                                 { label: 'STREAK', value: `${stats.streak} days`, icon: Zap, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-100/50 dark:border-orange-500/20' },
-                                { label: 'AVG TIME', value: `${stats.avgTime}s`, icon: Clock, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-900/20', border: 'border-cyan-100/50 dark:border-cyan-500/20' },
+                                { label: 'AVG TIME', value: `${stats.avgTime} s`, icon: Clock, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-900/20', border: 'border-cyan-100/50 dark:border-cyan-500/20' },
                                 { label: 'ACCURACY', value: `${oracleProjection}%`, icon: Trophy, color: 'text-pink-600 dark:text-pink-400', bg: 'bg-pink-50 dark:bg-pink-900/20', border: 'border-pink-100/50 dark:border-pink-500/20' },
                             ].map((stat, i) => (
-                                <div key={i} className={`relative group overflow-hidden ${stat.bg} ${stat.border} backdrop-blur-xl border-2 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500 hover:-translate-y-1 h-full flex flex-col justify-center`}>
-                                    <div className="relative z-10">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <p className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">{stat.label}</p>
-                                            <stat.icon className={`w-4 h-4 ${stat.color} opacity-80`} />
-                                        </div>
-                                        <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">{stat.value}</p>
-                                    </div>
-                                </div>
+                                <StatCard key={i} {...stat} />
                             ))}
                         </div>
 
@@ -526,81 +642,35 @@ export default function Dashboard() {
 
                                 <div className="flex-1 space-y-8">
                                     {subjectMastery.slice(0, 4).map((subject, i) => (
-                                        <div key={i} className="group relative">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                                                        {subject.subject === 'Mathematics' ? '📐' :
-                                                            subject.subject === 'Biology' ? '🧬' :
-                                                                subject.subject === 'Chemistry' ? '⚗️' :
-                                                                    subject.subject.includes('Reasoning') ? '🧠' : '⚛️'}
-                                                    </div>
-                                                    <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{subject.subject}</span>
-                                                </div>
-                                                <div className="text-right">
-                                                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">{subject.accuracy}%</span>
-                                                    <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Stability</p>
-                                                </div>
-                                            </div>
-                                            <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-50 dark:border-white/5 relative">
-                                                <div
-                                                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(99,102,241,0.4)]"
-                                                    style={{ width: `${subject.accuracy}%` }}
-                                                />
-                                            </div>
-                                        </div>
+                                        <SubjectMasteryItem key={i} subject={subject} />
                                     ))}
                                 </div>
                             </div>
 
                             {/* Top Champions Card */}
-                            <div className="bg-slate-50/80 dark:bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl flex flex-col h-full">
+                            <div className="bg-white/90 dark:bg-slate-900/60 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-2xl flex flex-col h-full ring-1 ring-slate-900/5 transition-all">
+                                {/* Header */}
                                 <div className="flex items-center gap-4 mb-10">
-                                    <div className="w-10 h-10 rounded-2xl bg-amber-400 flex items-center justify-center shadow-lg shadow-amber-200/50">
-                                        <Trophy className="w-5 h-5 text-white" />
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30 transform hover:rotate-3 transition-transform">
+                                        <Trophy className="w-8 h-8 text-white drop-shadow-md" />
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">Champions</h3>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">Top Performers</p>
+                                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Top Students</h3>
+                                        <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.2em] opacity-80">Champions League</p>
                                     </div>
                                 </div>
 
-                                <div className="flex-1 flex flex-col justify-between space-y-6">
-                                    {topStudents.slice(0, 5).map((student, i) => (
-                                        <div key={student.id} className="flex items-center gap-4 group transition-transform hover:translate-x-1">
-                                            <div className="relative">
-                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-[10px] overflow-hidden border-2 ${i === 0 ? 'border-amber-400 shadow-amber-200/50 shadow-lg' : 'border-slate-100 dark:border-slate-800'}`}>
-                                                    {student.avatar_url ? (
-                                                        <img src={student.avatar_url} alt={student.display_name} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <div className={`w-full h-full flex items-center justify-center ${i === 0 ? 'bg-amber-400 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
-                                                            {student.display_name.slice(0, 2).toUpperCase()}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                {i < 3 && (
-                                                    <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] border-2 border-white dark:border-slate-900 ${i === 0 ? 'bg-yellow-400 text-yellow-900' :
-                                                        i === 1 ? 'bg-slate-300 text-slate-800' :
-                                                            'bg-amber-700 text-amber-100'
-                                                        }`}>
-                                                        {i === 0 ? '👑' : i + 1}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-[11px] font-black text-slate-900 dark:text-slate-100 truncate uppercase tracking-tight">{student.display_name}</p>
-                                                <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-1.5 overflow-hidden">
-                                                    <div className="h-full bg-emerald-500" style={{ width: `${(student.total_score / (student.tests_taken * 10 || 1)) * 100}%` }} />
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-xs font-black text-indigo-600 leading-none">{((student.total_score / (student.tests_taken * 10 || 1)) * 100).toFixed(0)}%</p>
-                                            </div>
-                                        </div>
+                                {/* Champions List */}
+                                <div className="flex-1 space-y-3">
+                                    {topStudents.slice(0, 4).map((student, i) => (
+                                        <ChampionItem key={student.id} student={student} index={i} />
                                     ))}
+
                                     {topStudents.length === 0 && (
-                                        <div className="flex-1 flex items-center justify-center text-slate-400 italic text-xs">
-                                            Waiting for data...
+                                        <div className="flex-1 flex flex-col items-center justify-center text-center py-20 grayscale opacity-50">
+                                            <Trophy className="w-24 h-24 text-slate-200 dark:text-slate-800 mb-6" />
+                                            <h4 className="text-lg font-black text-slate-400 uppercase tracking-widest">No Champions Yet</h4>
+                                            <p className="text-sm text-slate-400/80 mt-2">Solve practice questions to claim the throne!</p>
                                         </div>
                                     )}
                                 </div>
@@ -657,7 +727,7 @@ export default function Dashboard() {
                                             className="group flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-card hover:bg-slate-900 hover:text-white transition-all border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:-translate-y-1"
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center ${item.color} group-hover:bg-white/10 group-hover:text-white transition-colors border ${item.border}`}>
+                                                <div className={`w - 10 h - 10 rounded - xl ${item.bg} flex items - center justify - center ${item.color} group - hover: bg - white / 10 group - hover: text - white transition - colors border ${item.border} `}>
                                                     <item.icon className="w-5 h-5" />
                                                 </div>
                                                 <span className="text-sm font-black uppercase tracking-tight">{item.label}</span>
@@ -692,7 +762,7 @@ export default function Dashboard() {
                                         <div
                                             key={evalItem.id}
                                             className="group p-4 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-indigo-200 transition-all cursor-pointer flex items-center gap-4"
-                                            onClick={() => navigate(`/writing/results/${evalItem.id}`)}
+                                            onClick={() => navigate(`/ writing / results / ${evalItem.id} `)}
                                         >
                                             <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0 group-hover:rotate-6 transition-transform">
                                                 ✍️
@@ -700,7 +770,7 @@ export default function Dashboard() {
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-[11px] font-black text-slate-900 dark:text-white truncate uppercase mb-0.5">Writing Task</p>
                                                 <div className="flex items-center gap-2">
-                                                    <div className={`h-1.5 w-1.5 rounded-full ${evalItem.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                                    <div className={`h - 1.5 w - 1.5 rounded - full ${evalItem.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-500'} `} />
                                                     <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{evalItem.status}</p>
                                                 </div>
                                             </div>

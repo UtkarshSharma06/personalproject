@@ -93,15 +93,37 @@ const GlassCard = memo(({ children, className, delay = 0, x = 0, y = 0 }: { chil
 GlassCard.displayName = 'GlassCard';
 
 export default function Index() {
+    const navigate = useNavigate();
+    const { user, loading: authLoading, aal, hasMFA } = useAuth();
     const [scrolled, setScrolled] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Redirect logged-in users to dashboard only if fully authenticated
+    useEffect(() => {
+        if (!authLoading && user) {
+            // Only redirect if no MFA or AAL is already 2
+            const needsMFA = hasMFA && aal !== 'aal2';
+            if (!needsMFA) {
+                navigate('/dashboard');
+            }
+        }
+    }, [user, authLoading, navigate, aal, hasMFA]);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Show loading state while checking authentication
+    if (authLoading) {
+        return (
+            <div className="min-h-screen bg-[#030014] flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-white/10 border-t-indigo-500 rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen font-sans selection:bg-violet-100 selection:text-violet-900 overflow-x-hidden relative">

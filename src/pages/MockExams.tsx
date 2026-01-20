@@ -28,20 +28,28 @@ export default function MockExams() {
     }, [user, activeExam.id]);
 
     const fetchSessions = async () => {
-        const now = new Date().toISOString();
+        const now = new Date();
         const { data } = await (supabase as any)
             .from('mock_sessions')
             .select('*')
             .eq('is_active', true)
             .eq('exam_type', activeExam.id)
-            .gt('end_time', now)
             .order('start_time', { ascending: true });
 
         if (data) {
-            const processedSessions = data.map((s: any) => ({
-                ...s,
-                isLive: isBefore(new Date(s.start_time), new Date()) && isAfter(new Date(s.end_time), new Date())
-            }));
+            const processedSessions = data.map((s: any) => {
+                const startTime = new Date(s.start_time);
+                const endTime = new Date(s.end_time);
+                const isLive = isBefore(startTime, now) && isAfter(endTime, now);
+                const isPast = isAfter(now, endTime);
+
+                return {
+                    ...s,
+                    isLive,
+                    isPast,
+                    isUpcoming: !isLive && !isPast
+                };
+            });
             setSessions(processedSessions);
         }
         setLoading(false);
@@ -85,7 +93,8 @@ export default function MockExams() {
         }
         const params = new URLSearchParams({
             mode: 'mock',
-            full_exam: 'true'
+            full_exam: 'true',
+            auto: 'true'  // Added to trigger auto-start
         });
         navigate(`/start-test?${params.toString()}`);
     };
@@ -105,7 +114,7 @@ export default function MockExams() {
                     </p>
                 </div>
 
-                {/* Main Simulation Section */}
+                {/* Official Simulation Section - REMOVED per user request
                 <div className="mb-12 sm:mb-16">
                     <div className="bg-white dark:bg-card p-6 sm:p-10 rounded-[2rem] sm:rounded-[3.5rem] border-2 border-slate-100 dark:border-border border-b-[8px] shadow-2xl shadow-indigo-100/50 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-30 -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-1000" />
@@ -166,6 +175,7 @@ export default function MockExams() {
                         </div>
                     </div>
                 </div>
+                */}
 
                 {/* Global Sessions Section */}
                 <div className="space-y-8">
@@ -195,23 +205,29 @@ export default function MockExams() {
                                     className="bg-white dark:bg-card p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-slate-100 dark:border-border border-b-[6px] shadow-xl shadow-slate-200/50 hover:border-slate-300 hover:-translate-y-1 hover:shadow-2xl active:border-b-2 active:translate-y-1 transition-all duration-300 group"
                                 >
                                     <div className="flex flex-wrap items-start justify-between gap-4 mb-6 sm:mb-8">
-                                        <div className={`px-3 py-1.5 rounded-full border text-[8px] sm:text-[9px] font-black uppercase tracking-widest leading-none ${session.isLive ? 'bg-red-50 border-red-100 text-red-600 animate-pulse' : 'bg-slate-50 dark:bg-muted border-slate-100 dark:border-border text-slate-400'
+                                        <div className={`px-3 py-1.5 rounded-full border text-[8px] sm:text-[9px] font-black uppercase tracking-widest leading-none ${session.isLive
+                                            ? 'bg-red-50 border-red-100 text-red-600 animate-pulse'
+                                            : session.isPast
+                                                ? 'bg-slate-50 dark:bg-muted border-slate-200 dark:border-border text-slate-500'
+                                                : 'bg-slate-50 dark:bg-muted border-slate-100 dark:border-border text-slate-400'
                                             }`}>
-                                            {session.isLive ? '🔴 Live Mission' : '📅 Scheduled'}
+                                            {session.isLive ? '🔴 Live Mission' : session.isPast ? '📝 Practice Mode' : '📅 Scheduled'}
                                         </div>
-                                        <div className="text-right ml-auto">
-                                            <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">
-                                                {session.isLive ? 'Closes In' : 'Starts In'}
-                                            </p>
-                                            <p className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
-                                                {(() => {
-                                                    const targetDate = session.isLive ? new Date(session.end_time) : new Date(session.start_time);
-                                                    const h = Math.max(0, differenceInHours(targetDate, new Date()));
-                                                    const m = Math.max(0, differenceInMinutes(targetDate, new Date()) % 60);
-                                                    return `${h}h ${m}m`;
-                                                })()}
-                                            </p>
-                                        </div>
+                                        {!session.isPast && (
+                                            <div className="text-right ml-auto">
+                                                <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">
+                                                    {session.isLive ? 'Closes In' : 'Starts In'}
+                                                </p>
+                                                <p className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
+                                                    {(() => {
+                                                        const targetDate = session.isLive ? new Date(session.end_time) : new Date(session.start_time);
+                                                        const h = Math.max(0, differenceInHours(targetDate, new Date()));
+                                                        const m = Math.max(0, differenceInMinutes(targetDate, new Date()) % 60);
+                                                        return `${h}h ${m}m`;
+                                                    })()}
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 mb-6 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-tight">{session.title}</h3>
@@ -229,18 +245,29 @@ export default function MockExams() {
 
                                     <Button
                                         onClick={() => {
-                                            if (registrations.includes(session.id)) {
+                                            if (session.isPast) {
+                                                // Past sessions: direct to test start with session context
+                                                const params = new URLSearchParams({
+                                                    mode: 'mock',
+                                                    full_exam: 'true',
+                                                    session_id: session.id,
+                                                    practice_mode: 'true'
+                                                });
+                                                navigate(`/start-test?${params.toString()}`);
+                                            } else if (registrations.includes(session.id)) {
                                                 navigate(`/waiting-room/${session.id}`);
                                             } else {
                                                 handleRegister(session.id);
                                             }
                                         }}
-                                        className={`w-full h-12 sm:h-14 font-black rounded-2xl text-[9px] sm:text-[10px] uppercase tracking-[0.15em] transition-all shadow-sm flex items-center justify-center gap-2 ${registrations.includes(session.id)
-                                            ? 'bg-slate-900 text-white hover:bg-slate-800'
-                                            : 'bg-white dark:bg-card text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-border hover:border-slate-900'
+                                        className={`w-full h-12 sm:h-14 font-black rounded-2xl text-[9px] sm:text-[10px] uppercase tracking-[0.15em] transition-all shadow-sm flex items-center justify-center gap-2 ${session.isPast
+                                            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                                            : registrations.includes(session.id)
+                                                ? 'bg-slate-900 text-white hover:bg-slate-800'
+                                                : 'bg-white dark:bg-card text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-border hover:border-slate-900'
                                             }`}
                                     >
-                                        <span>{registrations.includes(session.id) ? 'Enter Command Room' : 'Request Access'}</span>
+                                        <span>{session.isPast ? 'Start Practice' : registrations.includes(session.id) ? 'Enter Command Room' : 'Request Access'}</span>
                                         <ChevronRight className="w-4 h-4 shrink-0" />
                                     </Button>
                                 </div>

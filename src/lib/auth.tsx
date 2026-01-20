@@ -20,6 +20,8 @@ interface AuthContextType {
     listFactors: () => Promise<{ data: any; error: any }>;
     getAAL: () => Promise<{ data: any; error: any }>;
   };
+  aal: string | null;
+  hasMFA: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,6 +31,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<any | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [aal, setAal] = useState<string | null>(null);
+  const [hasMFA, setHasMFA] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -39,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           fetchProfile(session.user.id);
+          updateAALStatus();
         } else {
           setProfile(null);
           setLoading(false);
@@ -52,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         await fetchProfile(session.user.id);
+        await updateAALStatus();
       }
       setLoading(false);
     });
@@ -115,6 +121,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       supabase.removeChannel(channel);
     };
   }, [user]);
+
+  const updateAALStatus = async () => {
+    const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    const { data: factorsData } = await supabase.auth.mfa.listFactors();
+
+    setAal(aalData?.currentLevel ?? null);
+    setHasMFA(factorsData?.all?.some(f => f.status === 'verified') ?? false);
+  };
 
   const signUp = async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -214,7 +228,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshProfile: () => fetchProfile(user?.id ?? ''),
       signInWithGoogle,
       resetPassword,
-      mfa
+      mfa,
+      aal,
+      hasMFA
     }}>
       {children}
     </AuthContext.Provider>

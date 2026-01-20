@@ -131,7 +131,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
     const [mfaCode, setMfaCode] = useState("");
 
-    const { signIn, signUp, resetPassword, signInWithGoogle, mfa } = useAuth();
+    const { signIn, signUp, signOut, resetPassword, signInWithGoogle, mfa } = useAuth();
     const navigate = useNavigate();
     const { toast } = useToast();
 
@@ -144,12 +144,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             setDisplayName('');
             setIsForgotPassword(false);
             setErrors({});
-            setRequiresMFA(false);
-            setMfaFactorId(null);
-            setMfaCode("");
             setIsSuccess(false);
+            if (requiresMFA) {
+                signOut();
+            }
         }
-    }, [isOpen]);
+    }, [isOpen, requiresMFA, signOut]);
 
     const validateForm = () => {
         const newErrors: { email?: string; password?: string } = {};
@@ -284,7 +284,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     };
 
     const handleMFAVerify = async () => {
-        if (!mfaFactorId || mfaCode.length !== 6) return;
+        if (!mfaFactorId) return;
+
+        if (mfaCode.length !== 6) {
+            toast({
+                title: 'Incomplete Code',
+                description: 'Please enter the full 6-digit security code.',
+                variant: 'destructive',
+            });
+            return;
+        }
+
         setIsLoading(true);
         try {
             const { error } = await mfa.challengeAndVerify(mfaFactorId, mfaCode);
@@ -303,7 +313,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+        <Dialog open={isOpen} onOpenChange={(open) => {
+            if (!open) {
+                onClose();
+            }
+        }}>
             <DialogContent className="sm:max-w-md bg-transparent border-none shadow-none p-0 overflow-visible">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
@@ -441,7 +455,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                                                 <InputOTPSlot
                                                                     key={index}
                                                                     index={index}
-                                                                    className="w-10 h-12 bg-slate-50 dark:bg-muted border rounded-xl text-lg font-black text-indigo-600 focus:ring-2 focus:ring-indigo-100"
+                                                                    className="w-10 h-12 bg-slate-50 dark:bg-muted border rounded-xl text-lg font-black text-indigo-600 focus:ring-2 focus:ring-indigo-100 hover:bg-slate-100 transition-colors"
                                                                 />
                                                             ))}
                                                         </InputOTPGroup>
@@ -449,11 +463,21 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                                 </div>
                                                 <Button
                                                     onClick={handleMFAVerify}
-                                                    disabled={isLoading || mfaCode.length !== 6}
-                                                    className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+                                                    disabled={isLoading}
+                                                    className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
                                                 >
                                                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify & Continue'}
                                                 </Button>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        signOut();
+                                                    }}
+                                                    className="w-full text-[9px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest pt-2"
+                                                >
+                                                    Back to Login
+                                                </button>
                                             </div>
                                         ) : (
                                             <>

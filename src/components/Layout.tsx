@@ -25,6 +25,7 @@ import {
     Bookmark,
     Hash
 } from 'lucide-react';
+import NotificationDropdown from './NotificationDropdown';
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -317,65 +318,71 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                                 </button>
                             )}
 
-                            {/* Profile Dropdown */}
-                            {user && (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="flex items-center gap-3 pl-1 pr-1 py-1 rounded-full border border-slate-200 dark:border-border hover:border-indigo-200 hover:shadow-md transition-all duration-300 group bg-white dark:bg-card shadow-sm hover:scale-105">
-                                            <div className="w-8 h-8 rounded-full bg-indigo-600 border border-slate-100 flex items-center justify-center text-white font-black text-xs shadow-sm group-hover:rotate-12 transition-transform overflow-hidden">
-                                                {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
-                                                    <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="profile" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    displayName.charAt(0).toUpperCase()
+                            {/* Right Actions: Notifications, Profile, Mobile Menu */}
+                            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 ml-auto">
+                                {/* Notifications */}
+                                {user && <NotificationDropdown />}
+
+                                {/* Profile Dropdown */}
+                                {user && (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="flex items-center gap-3 pl-1 pr-1 py-1 rounded-full border border-slate-200 dark:border-border hover:border-indigo-200 hover:shadow-md transition-all duration-300 group bg-white dark:bg-card shadow-sm hover:scale-105 active:scale-95">
+                                                <div className="w-8 h-8 rounded-full bg-indigo-600 border border-slate-100 flex items-center justify-center text-white font-black text-xs shadow-sm group-hover:rotate-12 transition-transform overflow-hidden">
+                                                    {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
+                                                        <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="profile" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        displayName.charAt(0).toUpperCase()
+                                                    )}
+                                                </div>
+                                                <ChevronDown className="w-3.5 h-3.5 mr-2 opacity-30 group-hover:opacity-100 transition-opacity hidden sm:block" />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-60 bg-white dark:bg-card border border-slate-200 dark:border-border rounded-2xl shadow-2xl p-2 animate-in zoom-in-95 duration-200">
+                                            <div className="p-4 border-b border-slate-50 mb-2 bg-slate-50/50 rounded-xl">
+                                                <p className="font-black text-slate-900 dark:text-slate-100 text-sm">{displayName}</p>
+                                                <p className="text-[10px] font-bold text-slate-400 truncate">{user?.email}</p>
+                                                {profile?.role === 'consultant' && (
+                                                    <div className="mt-2 py-0.5 px-2 bg-indigo-600 text-white text-[8px] font-black uppercase tracking-widest rounded-full inline-block">
+                                                        Certified Expert
+                                                    </div>
                                                 )}
                                             </div>
-                                            <ChevronDown className="w-3.5 h-3.5 mr-2 opacity-30 group-hover:opacity-100 transition-opacity" />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-60 bg-white dark:bg-card border border-slate-200 dark:border-border rounded-2xl shadow-2xl p-2 animate-in zoom-in-95 duration-200">
-                                        <div className="p-4 border-b border-slate-50 mb-2 bg-slate-50/50 rounded-xl">
-                                            <p className="font-black text-slate-900 dark:text-slate-100 text-sm">{displayName}</p>
-                                            <p className="text-[10px] font-bold text-slate-400 truncate">{user?.email}</p>
-                                            {profile?.role === 'consultant' && (
-                                                <div className="mt-2 py-0.5 px-2 bg-indigo-600 text-white text-[8px] font-black uppercase tracking-widest rounded-full inline-block">
-                                                    Certified Expert
-                                                </div>
+                                            {profile?.role !== 'consultant' && (
+                                                <>
+                                                    <DropdownMenuItem
+                                                        onClick={() => navigate('/settings')}
+                                                        className="p-2.5 rounded-xl cursor-pointer hover:bg-slate-50 dark:bg-muted font-bold text-xs flex items-center gap-2"
+                                                    >
+                                                        <User className="w-3.5 h-3.5 text-slate-400" /> Account Settings
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="p-2.5 rounded-xl cursor-not-allowed opacity-60 font-bold text-xs flex items-center justify-between gap-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <Settings className="w-3.5 h-3.5 text-slate-400" /> Study Mode
+                                                        </div>
+                                                        <span className="text-[7px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full uppercase tracking-widest">Soon</span>
+                                                    </DropdownMenuItem>
+                                                </>
                                             )}
-                                        </div>
-                                        {profile?.role !== 'consultant' && (
-                                            <>
-                                                <DropdownMenuItem
-                                                    onClick={() => navigate('/settings')}
-                                                    className="p-2.5 rounded-xl cursor-pointer hover:bg-slate-50 dark:bg-muted font-bold text-xs flex items-center gap-2"
-                                                >
-                                                    <User className="w-3.5 h-3.5 text-slate-400" /> Account Settings
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem className="p-2.5 rounded-xl cursor-not-allowed opacity-60 font-bold text-xs flex items-center justify-between gap-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <Settings className="w-3.5 h-3.5 text-slate-400" /> Study Mode
-                                                    </div>
-                                                    <span className="text-[7px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full uppercase tracking-widest">Soon</span>
-                                                </DropdownMenuItem>
-                                            </>
-                                        )}
-                                        <div className="h-px bg-slate-50 dark:bg-muted my-1.5" />
-                                        <DropdownMenuItem
-                                            onClick={handleSignOut}
-                                            className="p-2.5 rounded-xl cursor-pointer hover:bg-red-50 text-red-600 font-bold text-xs flex items-center gap-2"
-                                        >
-                                            <LogOut className="w-3.5 h-3.5" /> Sign Out
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            )}
+                                            <div className="h-px bg-slate-50 dark:bg-muted my-1.5" />
+                                            <DropdownMenuItem
+                                                onClick={handleSignOut}
+                                                className="p-2.5 rounded-xl cursor-pointer hover:bg-red-50 text-red-600 font-bold text-xs flex items-center gap-2"
+                                            >
+                                                <LogOut className="w-3.5 h-3.5" /> Sign Out
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                )}
 
-                            {/* Mobile Menu Button */}
-                            <button
-                                className="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-border bg-white dark:bg-card shadow-sm active:scale-95 transition-all"
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            >
-                                {isMobileMenuOpen ? <X className="w-5 h-5 text-slate-900 dark:text-slate-100" /> : <Menu className="w-5 h-5 text-slate-900 dark:text-slate-100" />}
-                            </button>
+                                {/* Mobile Menu Button */}
+                                <button
+                                    className="lg:hidden p-2.5 rounded-xl border border-slate-200 dark:border-border bg-white dark:bg-card shadow-sm active:scale-95 transition-all text-slate-900 dark:text-slate-100"
+                                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                >
+                                    {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                                </button>
+                            </div>
                         </div>
                     </div>
 

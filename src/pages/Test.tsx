@@ -144,16 +144,17 @@ export default function TestPage() {
   const currentSection = sections[currentSectionIndex];
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
-
-  useEffect(() => {
-    if (testId && user) {
+    if (testId && (user || test?.is_mock)) {
       fetchTestData();
     }
   }, [testId, user]);
+
+  useEffect(() => {
+    // Only require auth for non-mock tests
+    if (!loading && !user && test && !test.is_mock) {
+      navigate('/auth');
+    }
+  }, [user, loading, test, navigate]);
 
   const fetchTestData = async () => {
     const { data: testData, error: testError } = await supabase
