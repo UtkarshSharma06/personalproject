@@ -587,128 +587,139 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
     }, [communityId, user]);
 
 
-    const handleSend = async (content: string | null, file: File | null) => {
+    const handleSend = async (content: string | null, files: File[]) => {
         if (!user) return;
 
-        // Detect mentions
+        // Detect mentions (caption applies to the whole group or first message)
         const mentionedIds: string[] = [];
         if (content) {
             const words = content.split(/\s+/);
             words.forEach(word => {
                 if (word.startsWith('@')) {
-                    const username = word.slice(1).toLowerCase().replace(/[^a-z0-9_]/g, ''); // Clean basic punctuation
+                    const username = word.slice(1).toLowerCase().replace(/[^a-z0-9_]/g, '');
                     const userId = userMap.get(username);
                     if (userId) mentionedIds.push(userId);
                 }
             });
         }
 
-        // Optimistically add message
-        const tempId = `temp-${Date.now()}`;
-        const optimisticMessage: Message = {
-            id: tempId,
-            content: content,
-            file_url: file ? URL.createObjectURL(file) : null,
-            file_type: file?.type || null,
-            file_name: file?.name || null,
-            created_at: new Date().toISOString(),
-            user_id: user.id,
-            reply_to_id: replyTo?.id || null,
-            is_deleted: false,
-            // @ts-ignore
-            community_id: communityId,
-            profiles: {
-                display_name: profile?.display_name || user.email?.split('@')[0] || 'Me',
-                email: user.email || '',
-                avatar_url: (user.user_metadata?.avatar_url as string) || null,
+        const batchId = files.length > 1 ? crypto.randomUUID() : null;
+
+        const sendSingleMessage = async (msgContent: string | null, file: File | null, isFirst: boolean) => {
+            const tempId = `temp-${Date.now()}-${Math.random()}`;
+            const optimisticMessage: Message = {
+                id: tempId,
+                content: msgContent,
+                file_url: file ? URL.createObjectURL(file) : null,
+                file_type: file?.type || null,
+                file_name: file?.name || null,
+                created_at: new Date().toISOString(),
+                user_id: user.id,
+                reply_to_id: isFirst ? (replyTo?.id || null) : null,
+                is_deleted: false,
                 // @ts-ignore
-                username: profile?.username
-            },
-            reply_to: replyTo ? {
-                profiles: { display_name: replyTo.profiles.display_name },
-                content: replyTo.content
-            } : undefined
-        };
+                community_id: communityId,
+                batch_id: batchId,
+                profiles: {
+                    display_name: profile?.display_name || user.email?.split('@')[0] || 'Me',
+                    email: user.email || '',
+                    avatar_url: (user.user_metadata?.avatar_url as string) || null,
+                    // @ts-ignore
+                    username: profile?.username
+                },
+                reply_to: (isFirst && replyTo) ? {
+                    profiles: { display_name: replyTo.profiles.display_name },
+                    content: replyTo.content
+                } : undefined
+            };
 
-        setMessages(prev => [...prev, optimisticMessage]);
-        setTimeout(() => scrollToBottom(), 0);
-        setReplyTo(null);
+            setMessages(prev => [...prev, optimisticMessage]);
+            setTimeout(() => scrollToBottom(), 0);
 
-        try {
-            let fileUrl = null;
-            let fileType = null;
-            let fileName = null;
+            try {
+                let fileUrl = null;
+                let fileType = null;
+                let fileName = null;
 
-            // 1. Parallelize File Upload and Link Preview Fetch
-            const [fileResult, linkPreviewResult] = await Promise.all([
-                (async () => {
-                    if (!file) return null;
-                    const fileExt = file.name.split('.').pop();
-                    const filePath = `${user.id}/${Date.now()}.${fileExt}`;
-                    const { error: uploadError } = await supabase.storage.from('community-uploads').upload(filePath, file);
-                    if (uploadError) throw uploadError;
-                    const { data: { publicUrl } } = supabase.storage.from('community-uploads').getPublicUrl(filePath);
-                    return { url: publicUrl, type: file.type, name: file.name };
-                })(),
-                (async () => {
-                    const urlMatch = content?.match(/(https?:\/\/[^\s]+|www\.[^\s]+)/);
-                    if (!urlMatch) return null;
-                    try {
-                        const url = urlMatch[0].startsWith('www.') ? `https://${urlMatch[0]}` : urlMatch[0];
-                        const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
-                        const data = await res.json();
-                        if (data.status === 'success') {
-                            const preview = {
-                                title: data.data.title,
-                                description: data.data.description,
-                                image_url: data.data.image?.url,
-                                url: data.data.url
-                            };
-                            // Update optimistic message locally for "instant" feel
-                            setMessages(prev => prev.map(m => m.id === tempId ? { ...m, link_preview: preview } : m));
-                            return preview;
-                        }
-                    } catch (e) { /* silent fail */ }
-                    return null;
-                })()
-            ]);
+                const [fileResult, linkPreviewResult] = await Promise.all([
+                    (async () => {
+                        if (!file) return null;
+                        const fileExt = file.name.split('.').pop() || 'jpg';
+                        const filePath = `${user.id}/${Date.now()}-${Math.random()}.${fileExt}`;
+                        const { error: uploadError } = await supabase.storage.from('community-uploads').upload(filePath, file);
+                        if (uploadError) throw uploadError;
+                        const { data: { publicUrl } } = supabase.storage.from('community-uploads').getPublicUrl(filePath);
+                        return { url: publicUrl, type: file.type, name: file.name };
+                    })(),
+                    (async () => {
+                        if (!isFirst || !msgContent) return null;
+                        const urlMatch = msgContent.match(/(https?:\/\/[^\s]+|www\.[^\s]+)/);
+                        if (!urlMatch) return null;
+                        try {
+                            const url = urlMatch[0].startsWith('www.') ? `https://${urlMatch[0]}` : urlMatch[0];
+                            const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+                            const data = await res.json();
+                            if (data.status === 'success') {
+                                const preview = {
+                                    title: data.data.title,
+                                    description: data.data.description,
+                                    image_url: data.data.image?.url,
+                                    url: data.data.url
+                                };
+                                setMessages(prev => prev.map(m => m.id === tempId ? { ...m, link_preview: preview } : m));
+                                return preview;
+                            }
+                        } catch (e) { /* silent fail */ }
+                        return null;
+                    })()
+                ]);
 
-            fileUrl = fileResult?.url;
-            fileType = fileResult?.type;
-            fileName = fileResult?.name;
-            const linkPreview = linkPreviewResult;
+                fileUrl = fileResult?.url;
+                fileType = fileResult?.type;
+                fileName = fileResult?.name;
+                const linkPreview = linkPreviewResult;
 
-            // 3. Call RPC to insert message and mentions atomically
-            const { data: messageId, error: insertError } = await (supabase as any)
-                .rpc('send_community_message', {
-                    p_community_id: communityId,
-                    p_content: content,
-                    p_file_url: fileUrl,
-                    p_file_type: fileType,
-                    p_file_name: fileName,
-                    p_reply_to_id: optimisticMessage.reply_to_id,
-                    p_mentioned_user_ids: mentionedIds,
-                    p_link_preview: linkPreview
+                const { data: messageId, error: insertError } = await (supabase as any)
+                    .rpc('send_community_message', {
+                        p_community_id: communityId,
+                        p_content: msgContent,
+                        p_file_url: fileUrl,
+                        p_file_type: fileType,
+                        p_file_name: fileName,
+                        p_reply_to_id: optimisticMessage.reply_to_id,
+                        p_mentioned_user_ids: isFirst ? mentionedIds : [],
+                        p_link_preview: linkPreview,
+                        p_batch_id: batchId
+                    });
+
+                if (insertError) throw insertError;
+
+                processedMessageIds.current.add(messageId);
+                setMessages(prev => {
+                    if (prev.some(m => m.id === messageId)) {
+                        return prev.filter(m => m.id !== tempId);
+                    }
+                    return prev.map(msg => msg.id === tempId ? { ...msg, id: messageId, file_url: fileUrl } : msg);
                 });
 
-            if (insertError) throw insertError;
+            } catch (error: any) {
+                console.error('Send error:', error);
+                toast({ title: "Error", description: error.message || "Failed to send message.", variant: "destructive" });
+                setMessages(prev => prev.filter(msg => msg.id !== tempId));
+            }
+        };
 
-            // Replace temp message with real one & prevent duplicates
-            processedMessageIds.current.add(messageId);
-            setMessages(prev => {
-                // If message already exists (e.g. from polling), remove temp one to avoid duplicate
-                if (prev.some(m => m.id === messageId)) {
-                    return prev.filter(m => m.id !== tempId);
-                }
-                // Otherwise update temp id to real id
-                return prev.map(msg => msg.id === tempId ? { ...msg, id: messageId, file_url: fileUrl } : msg);
-            });
+        setReplyTo(null);
 
-        } catch (error: any) {
-            console.error('Send error:', error);
-            toast({ title: "Error", description: error.message || "Failed to send message.", variant: "destructive" });
-            // Remove optimistic message on error
-            setMessages(prev => prev.filter(msg => msg.id !== tempId));
+        if (files.length > 0) {
+            // Process files
+            for (let i = 0; i < files.length; i++) {
+                // Send the text content (caption) only with the first file
+                await sendSingleMessage(i === 0 ? content : null, files[i], i === 0);
+            }
+        } else {
+            // Just text
+            await sendSingleMessage(content, null, true);
         }
     };
 
@@ -1179,12 +1190,38 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
                                 );
                             }
 
+                            const groupedMessages: (Message & { batchMessages?: Message[] })[] = [];
+                            const batchMap = new Map<string, Message[]>();
+
+                            // Pre-group batches for O(N) efficiency
+                            filteredMessages.forEach(m => {
+                                if (m.batch_id) {
+                                    if (!batchMap.has(m.batch_id)) batchMap.set(m.batch_id, []);
+                                    batchMap.get(m.batch_id)!.push(m);
+                                }
+                            });
+
+                            const seenBatches = new Set<string>();
+
+                            filteredMessages.forEach((msg) => {
+                                if (msg.batch_id && seenBatches.has(msg.batch_id)) {
+                                    return;
+                                }
+                                if (msg.batch_id) {
+                                    seenBatches.add(msg.batch_id);
+                                    groupedMessages.push({ ...msg, batchMessages: batchMap.get(msg.batch_id) });
+                                } else {
+                                    groupedMessages.push(msg);
+                                }
+                            });
+
                             return (
                                 <div className="space-y-1 pb-2">
-                                    {filteredMessages.map((msg) => (
+                                    {groupedMessages.map((msg) => (
                                         <div key={msg.id} id={`msg-${msg.id}`} className="transition-all duration-500 rounded-lg">
                                             <MessageItem
                                                 message={msg}
+                                                batchMessages={msg.batchMessages}
                                                 reactions={reactions[msg.id] || []}
                                                 onReply={(m) => setReplyTo(m)}
                                                 onDelete={handleDeleteMessage}

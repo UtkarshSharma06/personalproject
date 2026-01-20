@@ -1,9 +1,10 @@
 import { format } from "date-fns";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { FileIcon, Trash2, Reply, Download, MoreHorizontal, Ban, ShieldAlert, Pin, Eye, Sparkles } from "lucide-react";
+import { FileIcon, Trash2, Reply, Download, MoreHorizontal, Ban, ShieldAlert, Pin, Eye, Sparkles, Video, CornerUpRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -41,6 +42,7 @@ export interface Message {
         image_url: string;
         url: string;
     } | null;
+    batch_id?: string | null;
 }
 
 interface MessageItemProps {
@@ -56,6 +58,7 @@ interface MessageItemProps {
     onImageClick?: (imageUrl: string) => void;
     searchQuery?: string;
     reactions?: any[];
+    batchMessages?: Message[];
 }
 
 const REACTION_OPTIONS = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
@@ -109,7 +112,7 @@ const renderContent = (content: string, isOwn: boolean, searchQuery?: string) =>
     });
 };
 
-export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isAdmin, isPinned, onPin, onUnpin, onImageClick, searchQuery, reactions = [] }: MessageItemProps) {
+export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isAdmin, isPinned, onPin, onUnpin, onImageClick, searchQuery, reactions = [], batchMessages }: MessageItemProps) {
     const { user } = useAuth();
     const isOwn = user?.id === message.user_id;
     const [showReactionPicker, setShowReactionPicker] = useState(false);
@@ -183,6 +186,15 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
             onTouchStart={startLongPress}
             onTouchEnd={endLongPress}
         >
+            {/* Forward Action (Outside Bubble) */}
+            {(message.file_url || (batchMessages && batchMessages.length > 0)) && (
+                <div className={`absolute top-1/2 -translate-y-1/2 ${isOwn ? 'left-[-40px]' : 'right-[-40px]'} opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex`}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500">
+                        <CornerUpRight className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
+
             <div className={`flex gap-2 max-w-[85%] sm:max-w-[70%] md:max-w-[60%] ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
                 <Avatar className="w-8 h-8 hidden sm:block">
                     <AvatarImage src={message.profiles?.avatar_url || ''} />
@@ -201,8 +213,9 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
                             }`}
                         style={{
                             clipPath: isOwn
-                                ? 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' // Simplification, CSS pseudo-elements better for tails usually but this is clean
-                                : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
+                                ? 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
+                                : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+                            padding: (message.file_url || (batchMessages && batchMessages.length > 0)) && !message.content ? '3px' : undefined
                         }}
                     >
                         {/* Tail SVG for visual flair (simulated) */}
@@ -237,35 +250,83 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
                         )}
 
                         <div className="flex flex-col">
-                            {/* File Attachment */}
-                            {message.file_url && (
-                                <div className="mb-1">
-                                    {message.file_type?.startsWith('image/') ? (
-                                        <div className="group/image relative rounded-lg overflow-hidden bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
-                                            <img
-                                                src={message.file_url}
-                                                alt="attachment"
-                                                className="w-full h-auto max-h-[300px] object-cover cursor-pointer hover:scale-[1.02] transition-transform duration-300"
-                                                onClick={() => onImageClick?.(message.file_url!)}
-                                            />
+                            {/* File Attachment / Grid */}
+                            {(message.file_url || (batchMessages && batchMessages.length > 0)) && (
+                                <div className="mb-1 relative">
+                                    {batchMessages && batchMessages.length > 1 ? (
+                                        <div className={`grid gap-0.5 rounded-lg overflow-hidden border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 ${batchMessages.length === 2 ? 'grid-cols-2' :
+                                            batchMessages.length === 3 ? 'grid-cols-2' :
+                                                'grid-cols-2'
+                                            }`}>
+                                            {batchMessages.slice(0, 4).map((m, i) => {
+                                                const isLast = i === 3 && batchMessages.length > 4;
+                                                const isThirdAndOnlyThree = i === 2 && batchMessages.length === 3;
+
+                                                return (
+                                                    <div
+                                                        key={m.id}
+                                                        className={`relative overflow-hidden group/image cursor-pointer ${isThirdAndOnlyThree ? 'col-span-2 aspect-[2/1]' : 'aspect-square'
+                                                            }`}
+                                                        onClick={() => onImageClick?.(m.file_url!)}
+                                                    >
+                                                        <img
+                                                            src={m.file_url!}
+                                                            alt="attachment"
+                                                            className="w-full h-full object-cover hover:brightness-90 transition-all duration-300"
+                                                        />
+
+                                                        {/* Video Indicator */}
+                                                        {m.file_type?.startsWith('video/') && (
+                                                            <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 text-white bg-black/40 px-1.5 py-0.5 rounded-md text-[10px] backdrop-blur-sm">
+                                                                <Video className="w-3.5 h-3.5" />
+                                                                <span>0:30</span>
+                                                            </div>
+                                                        )}
+
+                                                        {isLast && (
+                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px]">
+                                                                <span className="text-white text-3xl font-light">+{batchMessages.length - 3}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
-                                    ) : (
-                                        <a
-                                            href={message.file_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className={`flex items-center gap-3 p-3 rounded-lg border ${isOwn ? 'bg-[#cbf5c4]/50 dark:bg-[#025043]/50 border-[#06cf9c]/20' : 'bg-slate-50 dark:bg-[#2a3942] border-slate-100 dark:border-slate-700'}`}
-                                        >
-                                            <div className="h-10 w-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center text-red-500 shrink-0">
-                                                <FileIcon className="h-5 w-5" />
+                                    ) : (message.file_url && (
+                                        message.file_type?.startsWith('image/') || message.file_type?.startsWith('video/') ? (
+                                            <div className="group/image relative rounded-lg overflow-hidden bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                                                <img
+                                                    src={message.file_url}
+                                                    alt="attachment"
+                                                    className="w-full h-auto max-h-[350px] object-cover cursor-pointer hover:scale-[1.01] transition-transform duration-300"
+                                                    onClick={() => onImageClick?.(message.file_url!)}
+                                                />
+                                                {message.file_type?.startsWith('video/') && (
+                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30">
+                                                            <Video className="w-6 h-6 fill-current" />
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate opacity-90">{message.file_name || 'Attachment'}</p>
-                                                <p className="text-[10px] opacity-60">Click to download</p>
-                                            </div>
-                                            <Download className="h-4 w-4 opacity-50" />
-                                        </a>
-                                    )}
+                                        ) : (
+                                            <a
+                                                href={message.file_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={`flex items-center gap-3 p-3 rounded-lg border ${isOwn ? 'bg-[#cbf5c4]/50 dark:bg-[#025043]/50 border-[#06cf9c]/20' : 'bg-slate-50 dark:bg-[#2a3942] border-slate-100 dark:border-slate-700'}`}
+                                            >
+                                                <div className="h-10 w-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center text-red-500 shrink-0">
+                                                    <FileIcon className="h-5 w-5" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium truncate opacity-90">{message.file_name || 'Attachment'}</p>
+                                                    <p className="text-[10px] opacity-60">Click to download</p>
+                                                </div>
+                                                <Download className="h-4 w-4 opacity-50" />
+                                            </a>
+                                        )
+                                    ))}
                                 </div>
                             )}
 
@@ -312,12 +373,12 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
                             )}
 
                             {/* Timestamp & Status */}
-                            <div className={`flex items-center justify-end gap-1.5 mt-[-6px] ${message.content ? 'float-right' : 'w-full'}`}>
-                                <span className={`text-[10px] ${isOwn ? 'text-slate-500 dark:text-[#8696a0]' : 'text-slate-400 dark:text-[#8696a0]'} flex items-center gap-1`}>
+                            <div className={`${(message.file_url || (batchMessages && batchMessages.length > 0)) && !message.content ? 'absolute bottom-1.5 right-1.5 bg-black/30 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-white' : 'flex items-center justify-end gap-1.5 mt-[-6px]'} ${message.content ? 'float-right' : 'w-full'} z-20`}>
+                                <span className={`text-[10px] ${((message.file_url || (batchMessages && batchMessages.length > 0)) && !message.content) ? 'text-white' : (isOwn ? 'text-slate-500 dark:text-[#8696a0]' : 'text-slate-400 dark:text-[#8696a0]')} flex items-center gap-1`}>
                                     <Eye className="h-3 w-3 opacity-70" />
                                     {message.view_count || 0}
                                 </span>
-                                <span className={`text-[10px] ${isOwn ? 'text-slate-500 dark:text-[#8696a0]' : 'text-slate-400 dark:text-[#8696a0]'} min-w-[45px] text-right`}>
+                                <span className={`text-[10px] ${((message.file_url || (batchMessages && batchMessages.length > 0)) && !message.content) ? 'text-white' : (isOwn ? 'text-slate-500 dark:text-[#8696a0]' : 'text-slate-400 dark:text-[#8696a0]')} min-w-[45px] text-right`}>
                                     {format(new Date(message.created_at), 'HH:mm')}
                                 </span>
                             </div>
