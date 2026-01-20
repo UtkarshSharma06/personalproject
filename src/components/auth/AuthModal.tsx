@@ -450,12 +450,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                                 </div>
                                                 <div className="flex justify-center">
                                                     <InputOTP maxLength={6} value={mfaCode} onChange={setMfaCode}>
-                                                        <InputOTPGroup className="gap-2">
+                                                        <InputOTPGroup className="gap-2.5">
                                                             {[0, 1, 2, 3, 4, 5].map((index) => (
                                                                 <InputOTPSlot
                                                                     key={index}
                                                                     index={index}
-                                                                    className="w-10 h-12 bg-slate-50 dark:bg-muted border rounded-xl text-lg font-black text-indigo-600 focus:ring-2 focus:ring-indigo-100 hover:bg-slate-100 transition-colors"
+                                                                    className="w-11 h-14 bg-white dark:bg-slate-800/50 border-2 border-slate-100 dark:border-white/10 rounded-2xl text-xl font-black text-indigo-600 shadow-sm focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500 transition-all hover:border-indigo-200"
                                                                 />
                                                             ))}
                                                         </InputOTPGroup>
