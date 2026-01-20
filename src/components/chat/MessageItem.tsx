@@ -1,5 +1,7 @@
 import { format } from "date-fns";
-import { FileIcon, Trash2, Reply, Download, MoreHorizontal, Ban, ShieldAlert } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { FileIcon, Trash2, Reply, Download, MoreHorizontal, Ban, ShieldAlert, Pin, Eye, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth";
 import {
@@ -18,7 +20,9 @@ export interface Message {
     created_at: string;
     user_id: string;
     reply_to_id: string | null;
+    recipient_id: string | null;
     is_deleted: boolean;
+    view_count: number;
     profiles: {
         display_name: string | null;
         email: string | null;
@@ -31,6 +35,12 @@ export interface Message {
         };
         content: string | null;
     };
+    link_preview?: {
+        title: string;
+        description: string;
+        image_url: string;
+        url: string;
+    } | null;
 }
 
 interface MessageItemProps {
@@ -40,11 +50,19 @@ interface MessageItemProps {
     onBan?: (userId: string, username: string) => void;
     onRestrict?: (userId: string, username: string) => void;
     isAdmin: boolean;
+    isPinned?: boolean;
+    onPin?: (messageId: string) => void;
+    onUnpin?: () => void;
+    onImageClick?: (imageUrl: string) => void;
+    searchQuery?: string;
+    reactions?: any[];
 }
 
-const renderContent = (content: string, isOwn: boolean) => {
-    // Regex to match @username (basic alphanumeric + underscore)
-    const parts = content.split(/(@[a-zA-Z0-9_]+)/g);
+const REACTION_OPTIONS = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
+
+const renderContent = (content: string, isOwn: boolean, searchQuery?: string) => {
+    // Split by @mentions and URLs
+    const parts = content.split(/(@[a-zA-Z0-9_]+|https?:\/\/[^\s]+|www\.[^\s]+)/g);
 
     return parts.map((part, i) => {
         if (part.startsWith('@')) {
@@ -54,13 +72,87 @@ const renderContent = (content: string, isOwn: boolean) => {
                 </span>
             );
         }
+
+        if (part.match(/^https?:\/\//) || part.startsWith('www.')) {
+            const href = part.startsWith('www.') ? `https://${part}` : part;
+            return (
+                <a
+                    key={i}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`underline hover:no-underline break-all font-medium ${isOwn ? 'text-blue-700 dark:text-blue-300' : 'text-blue-600 dark:text-blue-400'}`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {part}
+                </a>
+            );
+        }
+
+        // Highlight text if searchQuery exists
+        if (searchQuery && part.toLowerCase().includes(searchQuery.toLowerCase())) {
+            const subParts = part.split(new RegExp(`(${searchQuery})`, 'gi'));
+            return (
+                <span key={i}>
+                    {subParts.map((subPart, j) =>
+                        subPart.toLowerCase() === searchQuery.toLowerCase() ? (
+                            <mark key={j} className="bg-yellow-200 dark:bg-yellow-500/50 text-black dark:text-white rounded-sm px-0.5">
+                                {subPart}
+                            </mark>
+                        ) : subPart
+                    )}
+                </span>
+            );
+        }
+
         return part;
     });
 };
 
-export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isAdmin }: MessageItemProps) {
+export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isAdmin, isPinned, onPin, onUnpin, onImageClick, searchQuery, reactions = [] }: MessageItemProps) {
     const { user } = useAuth();
     const isOwn = user?.id === message.user_id;
+    const [showReactionPicker, setShowReactionPicker] = useState(false);
+    const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+
+    const handleReaction = async (emoji: string) => {
+        try {
+            const { error } = await supabase.rpc('toggle_message_reaction', {
+                p_message_id: message.id,
+                p_emoji: emoji
+            });
+            if (error) throw error;
+            setShowReactionPicker(false);
+        } catch (err) {
+            console.error('Error toggling reaction:', err);
+        }
+    };
+
+    // Mobile Long Press Handling
+    const startLongPress = (e: React.MouseEvent | React.TouchEvent) => {
+        if ('button' in e && e.button !== 0) return; // Only left click
+        longPressTimer.current = setTimeout(() => {
+            setShowReactionPicker(true);
+        }, 500);
+    };
+
+    const endLongPress = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
+    };
+
+    // Group reactions by emoji
+    const groupedReactions = reactions.reduce((acc: Record<string, { count: number, users: string[], hasReacted: boolean }>, curr) => {
+        if (!acc[curr.emoji]) {
+            acc[curr.emoji] = { count: 0, users: [], hasReacted: false };
+        }
+        acc[curr.emoji].count++;
+        acc[curr.emoji].users.push(curr.user_id);
+        if (curr.user_id === user?.id) acc[curr.emoji].hasReacted = true;
+        return acc;
+    }, {});
 
     if (message.is_deleted) {
         return (
@@ -72,135 +164,257 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
         );
     }
 
+    if (message.recipient_id) {
+        return (
+            <div className="flex justify-center my-4 w-full">
+                <span className="text-[12px] text-slate-500 dark:text-slate-400 bg-amber-50/80 dark:bg-amber-900/20 px-4 py-1.5 rounded-lg border border-amber-100/50 dark:border-amber-800/30 shadow-sm max-w-[80%] text-center leading-relaxed">
+                    {message.content?.includes('Welcome to community') ? 'Welcome to community, You' : message.content}
+                </span>
+            </div>
+        );
+    }
+
     return (
         <div
-            className={`group flex w-full animate-in fade-in slide-in-from-bottom-2 duration-300 ${isOwn ? 'justify-end' : 'justify-start'} mb-4`}
+            className={`group flex w-full animate-in fade-in slide-in-from-bottom-1 duration-200 ${isOwn ? 'justify-end' : 'justify-start'} mb-1 relative`}
+            onMouseDown={startLongPress}
+            onMouseUp={endLongPress}
+            onMouseLeave={endLongPress}
+            onTouchStart={startLongPress}
+            onTouchEnd={endLongPress}
         >
-            <div className={`flex max-w-[90%] sm:max-w-[80%] md:max-w-[70%] gap-3 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
-
-                {/* Avatar */}
-                <Avatar className={`h-8 w-8 mt-auto shrink-0 border-2 border-white dark:border-slate-950 shadow-sm ${isOwn ? 'hidden' : 'block'}`}>
-                    <AvatarImage src={message.profiles?.avatar_url || undefined} />
-                    <AvatarFallback className="bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 text-[10px] font-bold">
-                        {(message.profiles?.display_name || message.profiles?.username || '?')[0]?.toUpperCase()}
+            <div className={`flex gap-2 max-w-[85%] sm:max-w-[70%] md:max-w-[60%] ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
+                <Avatar className="w-8 h-8 hidden sm:block">
+                    <AvatarImage src={message.profiles?.avatar_url || ''} />
+                    <AvatarFallback className="bg-indigo-100 text-indigo-600 text-[10px] font-bold">
+                        {message.profiles?.display_name?.substring(0, 2).toUpperCase() || 'U'}
                     </AvatarFallback>
                 </Avatar>
 
-                <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
-
-                    {/* Metadata (Name) - only for others */}
-                    {!isOwn && (
-                        <span className="text-[10px] font-bold text-slate-400 mb-1 ml-1">
-                            {message.profiles?.display_name || message.profiles?.username || 'Unknown'}
-                        </span>
-                    )}
-
-                    {/* Bubble */}
+                {/* Message Bubble Wrapper */}
+                <div className="relative">
                     <div
-                        className={`relative px-5 py-3 shadow-sm text-[14px] leading-relaxed break-words overflow-hidden
-                ${isOwn
-                                ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-2xl rounded-tr-sm'
-                                : 'bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-2xl rounded-tl-sm'}
-                `}
+                        className={`relative px-3 py-2 shadow-[0_1px_0.5px_rgba(0,0,0,0.13)] text-[14.2px] leading-[19px] break-words
+                        ${isOwn
+                                ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-slate-900 dark:text-slate-100 rounded-tr-none rounded-tl-lg rounded-bl-lg rounded-br-lg'
+                                : 'bg-white dark:bg-[#202c33] text-slate-900 dark:text-slate-100 rounded-tl-none rounded-tr-lg rounded-bl-lg rounded-br-lg'
+                            }`}
+                        style={{
+                            clipPath: isOwn
+                                ? 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' // Simplification, CSS pseudo-elements better for tails usually but this is clean
+                                : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
+                        }}
                     >
-                        {/* Reply Context */}
-                        {message.reply_to && (
-                            <div className={`mb-2 text-xs rounded-lg p-2 flex items-center gap-2 ${isOwn ? 'bg-white/10 text-indigo-50' : 'bg-slate-50 dark:bg-slate-800 text-slate-500'}`}>
-                                <div className={`w-0.5 h-full self-stretch rounded-full ${isOwn ? 'bg-indigo-300' : 'bg-slate-300'}`} />
-                                <div className="flex-1 min-w-0">
-                                    <span className="block font-bold text-[10px] opacity-75">{message.reply_to.profiles?.display_name}</span>
-                                    <span className="block truncate opacity-90">{message.reply_to.content || 'Attached File'}</span>
-                                </div>
+                        {/* Tail SVG for visual flair (simulated) */}
+                        {isOwn && (
+                            <span className="absolute top-0 right-[-8px] w-0 h-0 border-[8px] border-transparent border-t-[#d9fdd3] dark:border-t-[#005c4b] border-l-[#d9fdd3] dark:border-l-[#005c4b] hidden md:block" />
+                        )}
+                        {!isOwn && (
+                            <span className="absolute top-0 left-[-8px] w-0 h-0 border-[8px] border-transparent border-t-white dark:border-t-[#202c33] border-r-white dark:border-r-[#202c33] hidden md:block" />
+                        )}
+
+                        {/* Metadata (Name) - only for others in groups */}
+                        {!isOwn && (
+                            <div className="text-[12.5px] font-bold text-[#e542a3] mb-0.5 leading-4 cursor-pointer hover:underline">
+                                {message.profiles?.display_name || message.profiles?.username || 'Unknown'}
                             </div>
                         )}
 
-                        {/* Text */}
-                        {message.content && <p className="whitespace-pre-wrap">{renderContent(message.content, isOwn || false)}</p>}
+                        {/* Reply Context */}
+                        {message.reply_to && (
+                            <div
+                                className={`mb-1 rounded-[4px] border-l-[4px] px-2 py-1 flex flex-col cursor-pointer transition-colors
+                                ${isOwn ? 'bg-[#cbf5c4] dark:bg-[#025043] border-[#06cf9c]' : 'bg-slate-100 dark:bg-[#35424b] border-[#aebac1]'}`}
+                                onClick={() => onReply(message.reply_to as unknown as Message)}
+                            >
+                                <span className={`text-[11px] font-bold ${isOwn ? 'text-[#008069] dark:text-[#00a884]' : 'text-[#e542a3]'}`}>
+                                    {message.reply_to.profiles?.display_name || 'Unknown'}
+                                </span>
+                                <span className="text-[11px] truncate text-slate-600 dark:text-slate-300 opacity-80 line-clamp-1">
+                                    {message.reply_to.content || 'Media'}
+                                </span>
+                            </div>
+                        )}
 
-                        {/* Attachments */}
-                        {message.file_url && (
-                            <div className={`mt-3 ${message.content ? 'pt-3 border-t ' + (isOwn ? 'border-white/10' : 'border-slate-100 dark:border-slate-800') : ''}`}>
-                                {message.file_type?.startsWith('image/') ? (
-                                    <div className="relative rounded-xl overflow-hidden group/image">
-                                        <img
-                                            src={message.file_url}
-                                            alt="attachment"
-                                            className="max-w-full w-full rounded-lg object-cover max-h-[300px]"
-                                        />
+                        <div className="flex flex-col">
+                            {/* File Attachment */}
+                            {message.file_url && (
+                                <div className="mb-1">
+                                    {message.file_type?.startsWith('image/') ? (
+                                        <div className="group/image relative rounded-lg overflow-hidden bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                                            <img
+                                                src={message.file_url}
+                                                alt="attachment"
+                                                className="w-full h-auto max-h-[300px] object-cover cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+                                                onClick={() => onImageClick?.(message.file_url!)}
+                                            />
+                                        </div>
+                                    ) : (
                                         <a
                                             href={message.file_url}
                                             target="_blank"
-                                            rel="noreferrer"
-                                            className="absolute inset-0 bg-black/0 group-hover/image:bg-black/20 transition-colors flex items-center justify-center pointer-events-none group-hover/image:pointer-events-auto"
+                                            rel="noopener noreferrer"
+                                            className={`flex items-center gap-3 p-3 rounded-lg border ${isOwn ? 'bg-[#cbf5c4]/50 dark:bg-[#025043]/50 border-[#06cf9c]/20' : 'bg-slate-50 dark:bg-[#2a3942] border-slate-100 dark:border-slate-700'}`}
                                         >
-                                            <div className="opacity-0 group-hover/image:opacity-100 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-opacity">
-                                                View Full
+                                            <div className="h-10 w-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center text-red-500 shrink-0">
+                                                <FileIcon className="h-5 w-5" />
                                             </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate opacity-90">{message.file_name || 'Attachment'}</p>
+                                                <p className="text-[10px] opacity-60">Click to download</p>
+                                            </div>
+                                            <Download className="h-4 w-4 opacity-50" />
                                         </a>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Link Preview */}
+                            {message.link_preview && (
+                                <a
+                                    href={message.link_preview.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`mt-1 mb-2 flex flex-col rounded-lg overflow-hidden border transition-colors hover:opacity-90 max-w-[240px] shadow-sm
+                                    ${isOwn ? 'bg-[#cbf5c4] border-[#06cf9c]/30' : 'bg-slate-50 dark:bg-[#35424b] border-slate-200 dark:border-slate-700'}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {message.link_preview.image_url && (
+                                        <div className="w-full h-24 overflow-hidden border-b border-inherit">
+                                            <img
+                                                src={message.link_preview.image_url}
+                                                alt="Preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                    <div className="p-2 space-y-0.5">
+                                        <h4 className={`text-[12px] font-bold truncate ${isOwn ? 'text-[#008069] dark:text-[#00a884]' : 'text-indigo-600 dark:text-indigo-400'}`}>
+                                            {message.link_preview.title}
+                                        </h4>
+                                        {message.link_preview.description && (
+                                            <p className="text-[10px] leading-[13px] opacity-70 line-clamp-2">
+                                                {message.link_preview.description}
+                                            </p>
+                                        )}
+                                        <span className="text-[9px] opacity-50 block truncate lowercase font-medium">
+                                            {new URL(message.link_preview.url).hostname}
+                                        </span>
                                     </div>
-                                ) : (
-                                    <a
-                                        href={message.file_url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className={`flex items-center gap-3 p-3 rounded-xl transition-all ${isOwn ? 'bg-white/10 hover:bg-white/20' : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100'}`}
+                                </a>
+                            )}
+
+                            {/* Text Content */}
+                            {message.content && (
+                                <div className="pr-16 relative z-10 whitespace-pre-wrap text-[13.5px] leading-relaxed">
+                                    {renderContent(message.content, isOwn, searchQuery)}
+                                </div>
+                            )}
+
+                            {/* Timestamp & Status */}
+                            <div className={`flex items-center justify-end gap-1.5 mt-[-6px] ${message.content ? 'float-right' : 'w-full'}`}>
+                                <span className={`text-[10px] ${isOwn ? 'text-slate-500 dark:text-[#8696a0]' : 'text-slate-400 dark:text-[#8696a0]'} flex items-center gap-1`}>
+                                    <Eye className="h-3 w-3 opacity-70" />
+                                    {message.view_count || 0}
+                                </span>
+                                <span className={`text-[10px] ${isOwn ? 'text-slate-500 dark:text-[#8696a0]' : 'text-slate-400 dark:text-[#8696a0]'} min-w-[45px] text-right`}>
+                                    {format(new Date(message.created_at), 'HH:mm')}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Reactions Display - Outside overflow-hidden bubble */}
+                    {Object.keys(groupedReactions).length > 0 && (
+                        <div className={`absolute -bottom-3 ${isOwn ? 'right-2' : 'left-2'} flex items-center gap-0.5 z-20`}>
+                            <div className="flex -space-x-1 items-center bg-white dark:bg-[#202c33] rounded-full px-1.5 py-0.5 shadow-sm border border-slate-100 dark:border-slate-800">
+                                {Object.keys(groupedReactions).map(emoji => (
+                                    <button
+                                        key={emoji}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleReaction(emoji);
+                                        }}
+                                        className={`text-[12px] hover:scale-110 transition-transform ${groupedReactions[emoji].hasReacted ? 'grayscale-0' : 'grayscale-[0.5]'}`}
+                                        title={groupedReactions[emoji].users.length.toString()}
                                     >
-                                        <div className={`p-2 rounded-lg ${isOwn ? 'bg-indigo-500/20 text-indigo-100' : 'bg-indigo-50 text-indigo-600'}`}>
-                                            <FileIcon className="h-4 w-4" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-bold truncate">{message.file_name || 'Document'}</p>
-                                            <p className="text-[10px] opacity-70 uppercase">{message.file_type?.split('/')[1] || 'FILE'} • Download</p>
-                                        </div>
-                                        <Download className="h-4 w-4 opacity-70" />
-                                    </a>
+                                        {emoji}
+                                    </button>
+                                ))}
+                                {reactions.length > 1 && (
+                                    <span className="text-[9px] font-bold text-slate-500 ml-1">
+                                        {reactions.length}
+                                    </span>
                                 )}
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
 
-                    {/* Footer / Actions */}
-                    <div className={`flex items-center gap-2 mt-1 px-1 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
-                        <span className="text-[10px] text-slate-300 dark:text-slate-600 font-medium">
-                            {format(new Date(message.created_at), "h:mm a")}
-                        </span>
+                    {/* Reaction Picker Overlay - Outside overflow-hidden bubble */}
+                    {showReactionPicker && (
+                        <div className={`absolute top-[-44px] ${isOwn ? 'right-0' : 'left-0'} z-50 animate-in zoom-in duration-200`}>
+                            <div className="flex items-center gap-1 bg-white dark:bg-[#202c33] p-1.5 rounded-full shadow-xl border border-slate-200 dark:border-slate-700">
+                                {REACTION_OPTIONS.map(emoji => (
+                                    <button
+                                        key={emoji}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleReaction(emoji);
+                                        }}
+                                        className="text-lg hover:scale-125 transition-transform px-1"
+                                    >
+                                        {emoji}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="fixed inset-0 z-[-1]" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowReactionPicker(false);
+                            }} />
+                        </div>
+                    )}
+                </div>
 
-                        {/* Actions Dropdown (Only visible on hover) */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-indigo-500">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align={isOwn ? "end" : "start"} className="w-32">
-                                <DropdownMenuItem onClick={() => onReply(message)}>
-                                    <Reply className="h-3.5 w-3.5 mr-2" /> Reply
+                {/* Dropdown Options */}
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity self-start mt-2 px-1 relative">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="focus:outline-none">
+                            <div className="w-6 h-6 rounded-full bg-slate-200/50 hover:bg-slate-300 dark:bg-slate-700/50 dark:hover:bg-slate-600 flex items-center justify-center text-slate-500 dark:text-slate-300">
+                                <MoreHorizontal className="w-3 h-3" />
+                            </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align={isOwn ? "end" : "start"}>
+                            <DropdownMenuItem onClick={() => setShowReactionPicker(true)}>
+                                <Sparkles className="w-3 h-3 mr-2 text-amber-500" /> React
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onReply(message)}>
+                                <Reply className="w-3 h-3 mr-2" /> Reply
+                            </DropdownMenuItem>
+                            {(isAdmin || onPin) && (
+                                <DropdownMenuItem onClick={() => onPin?.(message.id)}>
+                                    <Pin className="w-3 h-3 mr-2" /> Pin Message
                                 </DropdownMenuItem>
-                                {(isOwn || isAdmin) && (
-                                    <DropdownMenuItem onClick={() => onDelete(message.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
-                                        <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete
+                            )}
+                            {isOwn && (
+                                <DropdownMenuItem onClick={() => onDelete(message.id)} className="text-red-500 focus:text-red-500">
+                                    <Trash2 className="w-3 h-3 mr-2" /> Delete
+                                </DropdownMenuItem>
+                            )}
+                            {isAdmin && !isOwn && (
+                                <>
+                                    <DropdownMenuItem onClick={() => onDelete(message.id)} className="text-red-500 focus:text-red-500">
+                                        <Trash2 className="w-3 h-3 mr-2" /> Delete (Admin)
                                     </DropdownMenuItem>
-                                )}
-                                {isAdmin && !isOwn && onBan && onRestrict && (
-                                    <>
-                                        <DropdownMenuItem
-                                            onClick={() => onRestrict(message.user_id, message.profiles?.username || 'user')}
-                                            className="text-amber-600 focus:text-amber-600 focus:bg-amber-50"
-                                        >
-                                            <ShieldAlert className="h-3.5 w-3.5 mr-2" /> Restrict Access
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => onBan(message.user_id, message.profiles?.username || 'user')}
-                                            className="text-red-700 focus:text-red-700 focus:bg-red-50"
-                                        >
-                                            <Ban className="h-3.5 w-3.5 mr-2" /> Ban User
-                                        </DropdownMenuItem>
-                                    </>
-                                )}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-
+                                    <DropdownMenuItem onClick={() => onBan?.(message.user_id, message.profiles?.username || 'user')} className="text-red-500 focus:text-red-500">
+                                        <Ban className="w-3 h-3 mr-2" /> Ban User
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => onRestrict?.(message.user_id, message.profiles?.username || 'user')} className="text-amber-500 focus:text-amber-500">
+                                        <ShieldAlert className="w-3 h-3 mr-2" /> Restrict
+                                    </DropdownMenuItem>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
         </div>

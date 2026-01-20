@@ -66,7 +66,7 @@ export default function CommunityUpgrade() {
                     </h1>
 
                     <p className="text-xl text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed mb-12">
-                        Unlock the power of peer collaboration. Join specialized study communities and accelerate your learning journey with Study Buddy AI.
+                        Unlock the power of peer collaboration. Join specialized study communities and accelerate your learning journey with ITALOSTUDY AI.
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-6">

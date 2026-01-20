@@ -501,7 +501,7 @@ export default function Concierge() {
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Application to Visa</span>
                                 </h1>
                                 <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
-                                    Study Buddy is an AI-powered consultancy dedicated to making your study abroad dreams a reality. We combine human expertise with smart technology to simplify every step of your journey.
+                                    ITALOSTUDY is an AI-powered consultancy dedicated to making your study abroad dreams a reality. We combine human expertise with smart technology to simplify every step of your journey.
                                 </p>
                             </div>
 
@@ -586,8 +586,8 @@ export default function Concierge() {
 
                                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 inline-block w-full">
                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Support Email</p>
-                                    <a href="mailto:05sharmautkarsh@gmail.com" className="text-xl md:text-2xl font-black text-indigo-600 hover:underline break-all">
-                                        05sharmautkarsh@gmail.com
+                                    <a href="mailto:info.italostudy@gmail.com" className="text-xl md:text-2xl font-black text-indigo-600 hover:underline break-all">
+                                        info.italostudy@gmail.com
                                     </a>
                                 </div>
 
@@ -1129,7 +1129,7 @@ export default function Concierge() {
 
                         <div className="p-8 space-y-8">
                             <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Message from ITALO STUDY</h4>
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Message from ITALOSTUDY</h4>
                                 <div className="prose prose-slate max-w-none">
                                     <p className="text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
                                         {selectedOffer?.message || "No message provided."}

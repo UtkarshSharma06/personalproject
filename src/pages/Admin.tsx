@@ -29,11 +29,12 @@ import ReadingManager from '@/components/admin/ReadingManager';
 import ListeningManager from '@/components/admin/ListeningManager';
 import WritingManager from '@/components/admin/WritingManager';
 import PracticeManager from '@/components/admin/PracticeManager';
+import LabManager from '@/components/admin/LabManager';
 import FeedbackManager from '@/components/admin/FeedbackManager';
 import MockEvaluationManager from '@/components/admin/MockEvaluationManager';
 import UserManager from '@/components/admin/UserManager';
 import ConsultantManager from '@/components/admin/ConsultantManager';
-import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog } from 'lucide-react';
+import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog, Box } from 'lucide-react';
 
 interface MockSession {
     id: string;
@@ -415,6 +416,9 @@ export default function Admin() {
                             <TabsTrigger value="feedback" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
                                 User Feedback
                             </TabsTrigger>
+                            <TabsTrigger value="3d-labs" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
+                                3D Modules
+                            </TabsTrigger>
                         </TabsList>
                     </div>
 
@@ -775,6 +779,21 @@ export default function Admin() {
                                 <h2 className="text-xl font-black tracking-tight uppercase">Feedback Manager</h2>
                             </div>
                             <FeedbackManager />
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="3d-labs">
+                        <div className="card-surface p-8 rounded-[3rem]">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <Box className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black tracking-tight uppercase">3D Lab Management</h2>
+                                    <p className="text-sm text-muted-foreground">Map 3D components to subjects and topics.</p>
+                                </div>
+                            </div>
+                            <LabManager />
                         </div>
                     </TabsContent>
                 </Tabs>

@@ -24,7 +24,7 @@ export default function ConsultantDashboard() {
             // 1. Fetch unassigned pool
             const { data: poolData, error: poolError } = await supabase
                 .from('admission_applications')
-                .select('*')
+                .select('*, profiles:user_id(avatar_url)')
                 .in('status', ['submitted'])
                 .order('created_at', { ascending: false });
 
@@ -38,7 +38,7 @@ export default function ConsultantDashboard() {
             if (user) {
                 const { data: myData, error: myError } = await supabase
                     .from('admission_applications')
-                    .select('*')
+                    .select('*, profiles:user_id(avatar_url)')
                     .eq('consultant_id', user.id)
                     .order('updated_at', { ascending: false });
 
@@ -186,8 +186,12 @@ export default function ConsultantDashboard() {
                                             <div key={app.id} className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 flex flex-col justify-between h-full">
                                                 <div>
                                                     <div className="flex items-center gap-3 mb-4">
-                                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-indigo-100 shadow-sm">
-                                                            <User className="w-5 h-5 text-indigo-500" />
+                                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-indigo-100 shadow-sm overflow-hidden">
+                                                            {(app as any).profiles?.avatar_url ? (
+                                                                <img src={(app as any).profiles.avatar_url} alt="Avg" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <User className="w-5 h-5 text-indigo-500" />
+                                                            )}
                                                         </div>
                                                         <div>
                                                             <p className="font-bold text-slate-900 text-sm">
@@ -244,8 +248,12 @@ export default function ConsultantDashboard() {
                                             <div key={app.id} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col justify-between h-full">
                                                 <div>
                                                     <div className="flex items-center gap-3 mb-4">
-                                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-slate-100 shadow-sm">
-                                                            <User className="w-5 h-5 text-indigo-500" />
+                                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-slate-100 shadow-sm overflow-hidden">
+                                                            {(app as any).profiles?.avatar_url ? (
+                                                                <img src={(app as any).profiles.avatar_url} alt="Av" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <User className="w-5 h-5 text-indigo-500" />
+                                                            )}
                                                         </div>
                                                         <div>
                                                             <p className="font-bold text-slate-900 text-sm">
@@ -301,8 +309,12 @@ export default function ConsultantDashboard() {
                                             className="bg-white p-5 rounded-2xl border border-slate-100 hover:border-indigo-300 transition-all cursor-pointer flex items-center justify-between group shadow-sm"
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                                                    <User className="w-6 h-6" />
+                                                <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors overflow-hidden">
+                                                    {(app as any).profiles?.avatar_url ? (
+                                                        <img src={(app as any).profiles.avatar_url} alt="Av" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <User className="w-6 h-6" />
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <h3 className="font-bold text-slate-900">
@@ -339,8 +351,12 @@ export default function ConsultantDashboard() {
                                             className="bg-white p-5 rounded-2xl border border-slate-100 hover:border-emerald-300 transition-all cursor-pointer flex items-center justify-between group shadow-sm"
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                                                    <User className="w-6 h-6" />
+                                                <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors overflow-hidden">
+                                                    {(app as any).profiles?.avatar_url ? (
+                                                        <img src={(app as any).profiles.avatar_url} alt="Av" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <User className="w-6 h-6" />
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <h3 className="font-bold text-slate-900">

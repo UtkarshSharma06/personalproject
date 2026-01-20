@@ -59,7 +59,7 @@ export default function Method() {
                 </div>
 
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-slate-100 mb-8 tracking-tighter leading-tight animate-in slide-in-from-bottom-8 duration-1000 uppercase">
-                    The StudyBuddy <span className="text-indigo-600">Standard</span>
+                    The ITALOSTUDY <span className="text-indigo-600">Standard</span>
                 </h1>
                 <p className="text-xl text-slate-400 font-bold max-w-2xl mx-auto mb-6 tracking-tight leading-relaxed animate-in slide-in-from-bottom-12 duration-1000">
                     A multi-layered cognitive framework engineered to accelerate expertise in medical sciences.
@@ -111,7 +111,7 @@ export default function Method() {
 
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-8 tracking-tighter leading-none relative z-10 uppercase">Experience <br />The protocol</h2>
                     <p className="text-xl text-indigo-200/50 font-bold mb-12 max-w-2xl mx-auto uppercase tracking-widest text-sm relative z-10">
-                        Join the elite tier of students using studybuddy.
+                        Join the elite tier of students using ITALOSTUDY.
                     </p>
                     <Link to="/auth" className="relative z-10">
                         <Button className="h-20 px-12 text-[11px] font-black bg-white dark:bg-card text-slate-900 dark:text-slate-100 rounded-2xl uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-indigo-500/10">

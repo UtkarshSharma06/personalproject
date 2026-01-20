@@ -2,6 +2,7 @@ import { useState, useRef, ChangeEvent } from "react";
 import { Send, Paperclip, X, Loader2, FileIcon, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageCropper } from "@/components/ui/ImageCropper";
 
 interface MessageInputProps {
     onSend: (content: string | null, file: File | null) => Promise<void>;
@@ -16,10 +17,31 @@ export function MessageInput({ onSend, replyTo, onCancelReply, disabled }: Messa
     const [isSending, setIsSending] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Cropper State
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
+
     const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            if (selectedFile.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    setSelectedImage(reader.result as string);
+                    setIsCropperOpen(true);
+                };
+                reader.readAsDataURL(selectedFile);
+            } else {
+                setFile(selectedFile);
+            }
         }
+    };
+
+    const handleCropComplete = (croppedBlob: Blob) => {
+        const croppedFile = new File([croppedBlob], "cropped_image.jpg", { type: "image/jpeg" });
+        setFile(croppedFile);
+        setIsCropperOpen(false);
+        setSelectedImage(null);
     };
 
     const handleSend = async () => {
@@ -44,89 +66,97 @@ export function MessageInput({ onSend, replyTo, onCancelReply, disabled }: Messa
     };
 
     return (
-        <div className="p-4 pb-6">
-            <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-indigo-500/5 border border-slate-200 dark:border-slate-800 p-2 transition-all focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500/50">
-
-                {/* Reply Context (Floating above) */}
-                {replyTo && (
-                    <div className="absolute -top-12 left-0 right-0 mx-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-xl border border-indigo-100 dark:border-indigo-900 shadow-sm p-2 flex items-center justify-between animate-in slide-in-from-bottom-2">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                            <div className="w-1 h-8 rounded-full bg-indigo-500 shrink-0" />
-                            <div className="flex flex-col text-xs min-w-0">
-                                <span className="font-bold text-indigo-600">Replying to {replyTo.user}</span>
-                                <span className="truncate text-slate-500">{replyTo.content}</span>
-                            </div>
-                        </div>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-slate-100" onClick={onCancelReply}>
-                            <X className="h-3 w-3" />
-                        </Button>
+        <div className="w-full">
+            {/* Reply Context */}
+            {replyTo && (
+                <div className="mx-2 mb-2 p-2 bg-white dark:bg-slate-900 rounded-lg border-l-4 border-indigo-500 shadow-sm flex items-center justify-between animate-in slide-in-from-bottom-2">
+                    <div className="flex flex-col text-xs min-w-0 px-2">
+                        <span className="font-bold text-indigo-600">{replyTo.user}</span>
+                        <span className="truncate text-slate-500">{replyTo.content}</span>
                     </div>
-                )}
+                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" onClick={onCancelReply}>
+                        <X className="h-3 w-3" />
+                    </Button>
+                </div>
+            )}
 
-                {/* File Preview (Inset) */}
-                {file && (
-                    <div className="flex items-center gap-3 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-2xl mb-2 mx-1 border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in-95">
-                        <div className="h-10 w-10 bg-indigo-100 dark:bg-indigo-900 rounded-xl flex items-center justify-center text-indigo-600">
-                            {file.type.startsWith('image/') ? <ImageIcon className="h-5 w-5" /> : <FileIcon className="h-5 w-5" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold truncate text-slate-700 dark:text-slate-200">{file.name}</p>
-                            <p className="text-[10px] font-medium text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
-                            onClick={() => {
-                                setFile(null);
-                                if (fileInputRef.current) fileInputRef.current.value = "";
-                            }}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
+            {/* File Preview */}
+            {file && (
+                <div className="mx-2 mb-2 p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
+                    <div className="h-10 w-10 bg-indigo-50 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center text-indigo-600">
+                        {file.type.startsWith('image/') ? <ImageIcon className="h-5 w-5" /> : <FileIcon className="h-5 w-5" />}
                     </div>
-                )}
-
-                <div className="flex items-end gap-2">
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        onChange={handleFileSelect}
-                        accept="image/*,.pdf,.doc,.docx"
-                    />
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate text-slate-700 dark:text-slate-200">{file.name}</p>
+                        <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
+                    </div>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="shrink-0 rounded-full h-10 w-10 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={disabled || isSending}
-                        title="Attach file"
+                        className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                        onClick={() => {
+                            setFile(null);
+                            if (fileInputRef.current) fileInputRef.current.value = "";
+                        }}
                     >
-                        <Paperclip className="h-5 w-5 rotate-45" />
+                        <X className="h-4 w-4" />
                     </Button>
+                </div>
+            )}
 
+            <div className="flex items-end gap-2 px-2 py-1">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileSelect}
+                    accept="image/*,.pdf,.doc,.docx"
+                />
+
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 h-10 w-10 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={disabled || isSending}
+                >
+                    <Paperclip className="h-5 w-5" />
+                </Button>
+
+                <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-white dark:border-slate-800 shadow-sm focus-within:ring-1 focus-within:ring-indigo-500/30 flex items-center min-h-[40px]">
                     <Textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder={file ? "Add a caption..." : "Type a message..."}
-                        className="min-h-[44px] max-h-32 py-3 px-2 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-slate-800 dark:text-slate-100 placeholder:text-slate-400 font-medium"
+                        className="flex-1 min-h-[40px] max-h-32 py-2.5 px-4 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-slate-800 dark:text-slate-100 placeholder:text-slate-400 text-[15px] leading-6"
                         disabled={disabled || isSending}
                         rows={1}
                     />
-
-                    <Button
-                        onClick={handleSend}
-                        disabled={(!content.trim() && !file) || isSending || disabled}
-                        className={`shrink-0 rounded-xl h-10 w-10 shadow-lg transition-all duration-300 ${(!content.trim() && !file)
-                            ? 'bg-slate-100 text-slate-300 shadow-none'
-                            : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105 active:scale-95'}`}
-                    >
-                        {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-0.5" />}
-                    </Button>
                 </div>
+
+                <Button
+                    onClick={handleSend}
+                    disabled={(!content.trim() && !file) || isSending || disabled}
+                    className={`shrink-0 h-10 w-10 rounded-full transition-all duration-200 ${(!content.trim() && !file)
+                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-400'
+                        : 'bg-[#00a884] hover:bg-[#008f6f] text-white shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95'}`}
+                >
+                    {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-0.5" />}
+                </Button>
             </div>
+
+            {isCropperOpen && selectedImage && (
+                <ImageCropper
+                    image={selectedImage}
+                    onCropComplete={handleCropComplete}
+                    onCancel={() => {
+                        setIsCropperOpen(false);
+                        setSelectedImage(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                />
+            )}
         </div>
     );
 }

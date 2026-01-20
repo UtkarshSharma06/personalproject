@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +16,24 @@ import {
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
+
+const AuthBackground = memo(() => (
+    <>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#f1f5f9_0%,transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,#eef2ff_0%,transparent_50%)]" />
+    </>
+));
+AuthBackground.displayName = 'AuthBackground';
+
+const FeatureItem = memo(({ feature }: { feature: { text: string; color: string; textCol: string } }) => (
+    <div className={`flex items-center gap-4 p-5 rounded-3xl border border-slate-50 bg-white dark:bg-card shadow-sm hover:border-slate-200 dark:border-border transition-all w-fit cursor-default group`}>
+        <div className={`p-2.5 rounded-2xl ${feature.color} border border-transparent group-hover:border-slate-100 dark:border-border transition-all`}>
+            <Sparkles className={`w-4 h-4 ${feature.textCol}`} />
+        </div>
+        <span className="font-black text-slate-900 dark:text-slate-100 text-[11px] uppercase tracking-widest">{feature.text}</span>
+    </div>
+));
+FeatureItem.displayName = 'FeatureItem';
 
 export default function Auth() {
     const [searchParams] = useSearchParams();
@@ -38,7 +56,7 @@ export default function Auth() {
         if (searchParams.get('banned') === 'true') {
             toast({
                 title: "Access Denied",
-                description: "you are banned contact- 05sharmautkarsh@gmail.com",
+                description: "you are banned contact- info.italostudy@gmail.com",
                 variant: "destructive",
                 duration: Infinity,
             });
@@ -217,12 +235,11 @@ export default function Auth() {
         <div className="h-screen lg:overflow-hidden bg-slate-50 dark:bg-muted flex selection:bg-indigo-100 selection:text-indigo-900 font-sans overflow-y-auto lg:overflow-y-hidden">
             {/* Left side - Branding (Sleek Modern) */}
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-white dark:bg-card border-r border-slate-100 dark:border-border justify-center items-center h-full">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#f1f5f9_0%,transparent_50%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,#eef2ff_0%,transparent_50%)]" />
+                <AuthBackground />
 
                 <div className="relative z-10 flex flex-col justify-center px-24 max-w-2xl">
                     <div className="flex items-center gap-4 mb-12">
-                        <img src="/logo.png" alt="Italostudy Logo" className="h-12 w-auto object-contain" />
+                        <img src="/logo.png" alt="Italostudy Logo" className="h-16 w-auto object-contain" />
                     </div>
 
                     <h1 className="text-7xl font-black text-slate-900 dark:text-slate-100 mb-10 leading-[0.9] tracking-tighter uppercase">
@@ -240,12 +257,7 @@ export default function Auth() {
                             { text: 'Live AI Proctoring System', color: 'bg-slate-50', textCol: 'text-slate-600' },
                             { text: 'Deep Performance Analytics', color: 'bg-indigo-50', textCol: 'text-indigo-600' },
                         ].map((feature, i) => (
-                            <div key={i} className={`flex items-center gap-4 p-5 rounded-3xl border border-slate-50 bg-white dark:bg-card shadow-sm hover:border-slate-200 dark:border-border transition-all w-fit cursor-default group`}>
-                                <div className={`p-2.5 rounded-2xl ${feature.color} border border-transparent group-hover:border-slate-100 dark:border-border transition-all`}>
-                                    <Sparkles className={`w-4 h-4 ${feature.textCol}`} />
-                                </div>
-                                <span className="font-black text-slate-900 dark:text-slate-100 text-[11px] uppercase tracking-widest">{feature.text}</span>
-                            </div>
+                            <FeatureItem key={i} feature={feature} />
                         ))}
                     </div>
                 </div>
@@ -259,7 +271,7 @@ export default function Auth() {
                 <div className="w-full max-w-md relative z-10">
                     {/* Mobile Logo Branding */}
                     <div className="flex lg:hidden items-center justify-center gap-3 mb-8">
-                        <img src="/logo.png" alt="Italostudy Logo" className="h-10 w-auto object-contain" />
+                        <img src="/logo.png" alt="Italostudy Logo" className="h-12 w-auto object-contain" />
                     </div>
 
                     {searchParams.get('banned') === 'true' && (
@@ -269,7 +281,7 @@ export default function Auth() {
                                 <div>
                                     <h3 className="font-black uppercase tracking-widest text-[10px] sm:text-xs mb-0.5 sm:mb-1">Access Suspended</h3>
                                     <p className="text-[10px] sm:text-xs font-medium opacity-90 leading-relaxed">
-                                        Account restricted. Contact support: 05sharmautkarsh@gmail.com
+                                        Account restricted. Contact support: info.italostudy@gmail.com
                                     </p>
                                 </div>
                             </div>
@@ -338,7 +350,7 @@ export default function Auth() {
                                                 placeholder="FULL NAME"
                                                 value={displayName}
                                                 onChange={(e) => setDisplayName(e.target.value)}
-                                                className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-black text-[11px] uppercase tracking-widest placeholder:text-slate-300"
+                                                className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-black text-base md:text-[11px] uppercase tracking-widest placeholder:text-slate-300"
                                             />
                                         </div>
                                     </div>
@@ -355,7 +367,7 @@ export default function Auth() {
                                                 setEmail(e.target.value);
                                                 setErrors(prev => ({ ...prev, email: undefined }));
                                             }}
-                                            className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-black text-[11px] uppercase tracking-widest placeholder:text-slate-300"
+                                            className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-black text-base md:text-[11px] uppercase tracking-widest placeholder:text-slate-300"
                                         />
                                     </div>
                                     {errors.email && <p className="text-[9px] font-black text-rose-500 ml-1 uppercase tracking-widest">{errors.email}</p>}
@@ -372,7 +384,7 @@ export default function Auth() {
                                                 setPassword(e.target.value);
                                                 setErrors(prev => ({ ...prev, password: undefined }));
                                             }}
-                                            className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-bold text-[11px] placeholder:text-slate-300"
+                                            className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-bold text-base md:text-[11px] placeholder:text-slate-300"
                                         />
                                     </div>
                                     {errors.password && <p className="text-[9px] font-black text-rose-500 ml-1 uppercase tracking-widest">{errors.password}</p>}
@@ -401,7 +413,7 @@ export default function Auth() {
                                                 setEmail(e.target.value);
                                                 setErrors(prev => ({ ...prev, email: undefined }));
                                             }}
-                                            className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-black text-[11px] uppercase tracking-widest placeholder:text-slate-300"
+                                            className="pl-12 h-12 bg-slate-50 dark:bg-muted border-none rounded-xl focus:ring-2 focus:ring-indigo-100 font-black text-base md:text-[11px] uppercase tracking-widest placeholder:text-slate-300"
                                         />
                                     </div>
                                     {errors.email && <p className="text-[9px] font-black text-rose-500 ml-1 uppercase tracking-widest">{errors.email}</p>}

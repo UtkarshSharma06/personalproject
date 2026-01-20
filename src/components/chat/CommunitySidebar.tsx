@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Plus, Hash, Users, Search, MoreVertical, Pencil, Trash, Sparkles, Zap, Shield, ArrowRight } from "lucide-react";
+import { Plus, Hash, Users, Search, MoreVertical, Pencil, Trash, Sparkles, Zap, Shield, ArrowRight, Pin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,6 +21,7 @@ interface Community {
     description: string | null;
     image_url: string | null;
     created_by: string;
+    member_count: number;
 }
 
 interface CommunitySidebarProps {
@@ -31,37 +33,57 @@ export function CommunitySidebar({ activeCommunityId, onSelectCommunity }: Commu
     const { user, profile } = useAuth() as any;
     const { toast } = useToast();
     const [communities, setCommunities] = useState<Community[]>([]);
-    const [unreadMentions, setUnreadMentions] = useState<Record<string, number>>({});
+    const [unreadCounts, setUnreadCounts] = useState<Record<string, { count: number, hasMention: boolean }>>({});
     const [newCommunityName, setNewCommunityName] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [editingCommunity, setEditingCommunity] = useState<Community | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
+    const [requests, setRequests] = useState<any[]>([]);
+    const [viewMode, setViewMode] = useState<'chats' | 'requests' | 'new'>('chats');
+    const [joinedCommunityIds, setJoinedCommunityIds] = useState<Set<string>>(new Set());
+    const [pinnedCommunityIds, setPinnedCommunityIds] = useState<Set<string>>(new Set());
+    const [activeCalls, setActiveCalls] = useState<Record<string, boolean>>({});
+    const [isPrivate, setIsPrivate] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchCommunities();
-        fetchUnreadMentions();
+        if (!user?.id) return;
 
-        // Subscribe to new mentions
-        const channel = supabase
-            .channel('mention_notifications')
+        fetchCommunities();
+
+        // Subscribe to read status changes (Stable - only depends on user ID)
+        const readStatusChannel = supabase
+            .channel(`read_status_${user.id}`)
             .on(
                 'postgres_changes',
                 {
-                    event: 'INSERT',
+                    event: '*',
                     schema: 'public',
-                    table: 'chat_mentions',
-                    filter: `user_id=eq.${user?.id}`
+                    table: 'community_read_status',
+                    filter: `user_id=eq.${user.id}`
                 },
-                () => {
-                    fetchUnreadMentions();
-                }
+                () => fetchUnreadCounts()
             )
             .subscribe();
 
-        // Subscribe to Community Updates (Create/Delete/Update)
+        // Subscribe to messages (Stable)
+        const messageChannel = supabase
+            .channel('sidebar_unread_messages')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*', // Listen to all events to be safe
+                    schema: 'public',
+                    table: 'community_messages'
+                },
+                () => fetchUnreadCounts()
+            )
+            .subscribe();
+
+        // Subscribe to Community Updates
         const communityChannel = supabase
             .channel('communities_sidebar')
             .on(
@@ -76,19 +98,49 @@ export function CommunitySidebar({ activeCommunityId, onSelectCommunity }: Commu
                         setCommunities(prev => [...prev, payload.new as Community]);
                     } else if (payload.eventType === 'DELETE') {
                         setCommunities(prev => prev.filter(c => c.id !== payload.old.id));
-                        if (activeCommunityId === payload.old.id) onSelectCommunity(null as any);
                     } else if (payload.eventType === 'UPDATE') {
                         setCommunities(prev => prev.map(c => c.id === payload.new.id ? payload.new as Community : c));
                     }
+                    fetchUnreadCounts();
                 }
             )
             .subscribe();
 
+        // Global Call Status Subscription
+        const callChannel = supabase
+            .channel('global_calls')
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'community_calls'
+            }, (payload: any) => {
+                if (payload.eventType === 'INSERT' || (payload.eventType === 'UPDATE' && payload.new.is_active)) {
+                    setActiveCalls(prev => ({ ...prev, [payload.new.community_id]: true }));
+                } else if (payload.eventType === 'UPDATE' && !payload.new.is_active) {
+                    setActiveCalls(prev => {
+                        const next = { ...prev };
+                        delete next[payload.new.community_id];
+                        return next;
+                    });
+                } else if (payload.eventType === 'DELETE') {
+                    setActiveCalls(prev => {
+                        const next = { ...prev };
+                        delete next[payload.old.community_id]; // payload.old contains the deleted record's ID/keys
+                        return next;
+                    });
+                }
+            })
+            .subscribe();
+
+        fetchRequests();
+
         return () => {
-            supabase.removeChannel(channel);
+            supabase.removeChannel(readStatusChannel);
+            supabase.removeChannel(messageChannel);
             supabase.removeChannel(communityChannel);
+            supabase.removeChannel(callChannel);
         };
-    }, [user?.id, activeCommunityId, onSelectCommunity]);
+    }, [user?.id]); // Only re-subscribe if user ID changes
 
     const fetchCommunities = async () => {
         const { data, error } = await (supabase as any)
@@ -98,24 +150,141 @@ export function CommunitySidebar({ activeCommunityId, onSelectCommunity }: Commu
 
         if (data) {
             setCommunities(data);
-            // Don't auto-select on mobile - let user choose
+        }
+
+        if (user) {
+            const { data: members } = await (supabase as any)
+                .from('community_members')
+                .select('community_id, is_pinned')
+                .eq('user_id', user.id)
+                .in('status', ['approved', 'member']);
+
+            // Fetch active calls
+            const { data: calls } = await (supabase as any)
+                .from('community_calls')
+                .select('community_id')
+                .eq('is_active', true);
+
+            if (calls) {
+                const callMap: Record<string, boolean> = {};
+                calls.forEach((c: any) => callMap[c.community_id] = true);
+                setActiveCalls(callMap);
+            }
+
+            if (members) {
+                const joinedIds: Set<string> = new Set(members.map((m: any) => m.community_id as string));
+                const pinnedIds: Set<string> = new Set(members.filter((m: any) => m.is_pinned).map((m: any) => m.community_id as string));
+
+                // Users are implicitly members of communities they created
+                data?.forEach((c: any) => {
+                    if (c.created_by === user.id) joinedIds.add(c.id);
+                });
+
+                setJoinedCommunityIds(joinedIds);
+                setPinnedCommunityIds(pinnedIds);
+
+                await fetchUnreadCounts();
+
+                // Auto-join General if not joined
+                const general = data?.find((c: any) => c.name === 'General');
+                if (general && user && !joinedIds.has(general.id)) {
+                    console.log("Auto-joining General community...");
+                    const { error: joinError } = await (supabase as any)
+                        .from('community_members')
+                        .insert({
+                            community_id: general.id,
+                            user_id: user.id,
+                            status: 'approved'
+                        });
+
+                    if (!joinError) {
+                        // Send private join message
+                        await (supabase as any).from('community_messages').insert({
+                            community_id: general.id,
+                            user_id: user.id,
+                            content: `Welcome to community, ${profile?.display_name || 'User'}`,
+                            recipient_id: user.id
+                        });
+
+                        joinedIds.add(general.id);
+                        setJoinedCommunityIds(new Set<string>(Array.from(joinedIds)));
+                    }
+                }
+            }
         }
     };
 
-    const fetchUnreadMentions = async () => {
+    const handleTogglePin = async (e: React.MouseEvent, communityId: string) => {
+        e.stopPropagation();
         if (!user) return;
-        const { data } = await (supabase as any)
-            .from('chat_mentions')
-            .select('community_id')
-            .eq('user_id', user.id)
-            .eq('is_read', false);
 
-        if (data) {
-            const counts: Record<string, number> = {};
-            data.forEach((m: any) => {
-                counts[m.community_id] = (counts[m.community_id] || 0) + 1;
+        const isPinned = pinnedCommunityIds.has(communityId);
+        const { error } = await (supabase as any)
+            .from('community_members')
+            .update({ is_pinned: !isPinned })
+            .eq('user_id', user.id)
+            .eq('community_id', communityId);
+
+        if (error) {
+            toast({ title: "Error", description: "Failed to pin chat", variant: "destructive" });
+            return;
+        }
+
+        const newPinned = new Set(pinnedCommunityIds);
+        if (isPinned) newPinned.delete(communityId);
+        else newPinned.add(communityId);
+        setPinnedCommunityIds(newPinned);
+
+        toast({
+            title: isPinned ? "Unpinned" : "Pinned",
+            description: `Chat ${isPinned ? 'removed from' : 'pinned to'} top.`
+        });
+    };
+
+    const fetchRequests = async () => {
+        if (!user) return;
+        // Get communities owned by user
+        const { data: myCommunities } = await (supabase as any)
+            .from('communities')
+            .select('id')
+            .eq('created_by', user.id);
+
+        if (myCommunities && myCommunities.length > 0) {
+            const communityIds = myCommunities.map((c: any) => c.id);
+            const { data: pending } = await (supabase as any)
+                .from('community_members')
+                .select('*, profiles:user_id(display_name, avatar_url, username), communities:community_id(name)')
+                .in('community_id', communityIds)
+                .eq('status', 'pending');
+
+            if (pending) setRequests(pending);
+        }
+    };
+
+    const fetchUnreadCounts = async () => {
+        if (!user) return;
+
+        try {
+            const { data, error } = await supabase.rpc('get_unread_counts', { p_user_id: user.id });
+            if (error) throw error;
+
+            const counts: Record<string, { count: number, hasMention: boolean }> = {};
+            // Initialize with 0s for communities to avoid undefined issues
+            communities.forEach(c => {
+                counts[c.id] = { count: 0, hasMention: false };
             });
-            setUnreadMentions(counts);
+
+            // Fill with real data from RPC
+            data?.forEach((row: any) => {
+                counts[row.comm_id] = {
+                    count: parseInt(row.unread_count) || 0,
+                    hasMention: row.mention_status || false
+                };
+            });
+
+            setUnreadCounts(counts);
+        } catch (err) {
+            console.error('Error fetching unread counts:', err);
         }
     };
 
@@ -161,7 +330,8 @@ export function CommunitySidebar({ activeCommunityId, onSelectCommunity }: Commu
                     .insert({
                         name: newCommunityName.trim(),
                         created_by: user.id,
-                        image_url: imageUrl
+                        image_url: imageUrl,
+                        is_private: isPrivate
                     })
                     .select()
                     .single();
@@ -199,200 +369,331 @@ export function CommunitySidebar({ activeCommunityId, onSelectCommunity }: Commu
         }
     };
 
+    const handleRequestAction = async (requestId: string, action: 'approved' | 'rejected', requestData?: any) => {
+        try {
+            if (action === 'rejected') {
+                await (supabase as any).from('community_members').delete().eq('id', requestId);
+                toast({ title: "Rejected", description: "Request has been rejected." });
+            } else {
+                await (supabase as any).from('community_members').update({ status: 'approved' }).eq('id', requestId);
+
+                // Send Welcome Message
+                if (requestData) {
+                    await (supabase as any).from('community_messages').insert({
+                        community_id: requestData.community_id,
+                        user_id: user.id,
+                        content: `Welcome to community, ${requestData.profiles?.display_name || 'User'}`,
+                        recipient_id: requestData.user_id
+                    });
+                }
+                toast({ title: "Approved", description: "User added to community." });
+            }
+            setRequests(prev => prev.filter(r => r.id !== requestId));
+        } catch (error) {
+            toast({ title: "Error", description: "Failed to update request", variant: "destructive" });
+        }
+    };
+
+    const handleCreateButton = () => {
+        const canCreate = ['elite', 'global', 'admin', 'consultant'].includes(profile?.subscription_tier || profile?.role);
+        if (isPrivate && !canCreate) {
+            toast({ title: "Restricted", description: "Only Elite & Global users can create private communities.", variant: "destructive" });
+            return;
+        }
+        handleSaveCommunity();
+    };
+
     return (
-        <div className="w-80 h-full border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-black/20 flex flex-col">
-            {/* Header */}
-            <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800">
-                <h2 className="font-black text-xl text-slate-900 dark:text-slate-100 tracking-tight">Chats</h2>
-                <Dialog open={isDialogOpen} onOpenChange={(open) => {
-                    if (open) {
-                        // Check subscription tier
-                        const tier = profile?.subscription_tier?.toLowerCase();
-                        const isPremium = tier === 'elite' || tier === 'global' || profile?.role === 'admin' || profile?.role === 'consultant';
-
-                        if (!isPremium) {
-                            setIsUpgradeDialogOpen(true);
-                            return;
-                        }
-                    }
-                    setIsDialogOpen(open);
-                    if (!open) {
-                        setEditingCommunity(null);
-                        setNewCommunityName("");
-                        setSelectedImage(null);
-                    }
-                }}>
-                    <DialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700">
-                            <Plus className="h-4 w-4" />
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>{editingCommunity ? "Edit Community" : "Create New Community"}</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Community Name</label>
-                                <Input
-                                    placeholder="e.g. IELTS Study Group"
-                                    value={newCommunityName}
-                                    onChange={(e) => setNewCommunityName(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Cover Image (Optional)</label>
-                                <Input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
-                                />
-                            </div>
-                            <Button
-                                onClick={handleSaveCommunity}
-                                className="w-full bg-indigo-600 hover:bg-indigo-700"
-                                disabled={isCreating || !newCommunityName.trim()}
-                            >
-                                {isCreating ? "Saving..." : (editingCommunity ? "Save Changes" : "Create Community")}
-                            </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-
-                {/* Refined Upgrade Dialog */}
-                <Dialog open={isUpgradeDialogOpen} onOpenChange={setIsUpgradeDialogOpen}>
-                    <DialogContent className="p-0 overflow-hidden border-none max-w-lg rounded-[2rem] bg-transparent">
-                        <div className="relative w-full bg-slate-950 p-10 overflow-hidden border border-white/10 rounded-[2rem]">
-                            {/* Animated Background Orbs */}
-                            <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-indigo-600/20 rounded-full blur-[80px]" />
-                            <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] bg-purple-600/20 rounded-full blur-[80px]" />
-
-                            <div className="relative z-10 text-center">
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 backdrop-blur-md rounded-full border border-indigo-500/20 mb-6">
-                                    <Sparkles className="w-4 h-4 text-indigo-400" />
-                                    <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest leading-none">Premium Feature</span>
-                                </div>
-
-                                <h2 className="text-4xl font-black text-white mb-4 tracking-tighter leading-tight italic uppercase">
-                                    BUILD YOUR <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">COMMUNITY.</span>
-                                </h2>
-
-                                <p className="text-slate-400 text-sm font-medium leading-relaxed mb-8 max-w-[280px] mx-auto">
-                                    Creating study groups and specialized chats is exclusive to Exam Prep & Global plans.
-                                </p>
-
-                                <div className="grid grid-cols-2 gap-4 mb-8">
-                                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center gap-2">
-                                        <Zap className="w-5 h-5 text-amber-400" />
-                                        <span className="text-[10px] font-black text-white/70 uppercase">Instant Chat</span>
+        <div className="w-80 h-full border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-black/40 flex flex-col md:w-96">
+            {/* Header with Tabs */}
+            <div className="flex-none p-3 bg-[#f0f2f5] dark:bg-[#202c33] border-r border-[#e9edef] dark:border-[#2f3b43]">
+                <div className="flex items-center justify-between mb-3 px-1">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Communities</h2>
+                    <div className="flex gap-2">
+                        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                            if (open) {
+                                const tier = profile?.subscription_tier?.toLowerCase();
+                                const isPremium = tier === 'elite' || tier === 'global' || profile?.role === 'admin' || profile?.role === 'consultant';
+                                if (!isPremium) {
+                                    setIsUpgradeDialogOpen(true);
+                                    return;
+                                }
+                            }
+                            setIsDialogOpen(open);
+                            if (!open) {
+                                setEditingCommunity(null);
+                                setNewCommunityName("");
+                                setSelectedImage(null);
+                            }
+                        }}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                    <Plus className="h-5 w-5" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>{editingCommunity ? "Edit Community" : "Create New Community"}</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4 py-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Community Name</label>
+                                        <Input
+                                            placeholder="e.g. IELTS Study Group"
+                                            value={newCommunityName}
+                                            onChange={(e) => setNewCommunityName(e.target.value)}
+                                            className="bg-slate-50 border-slate-200"
+                                        />
                                     </div>
-                                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center gap-2">
-                                        <Shield className="w-5 h-5 text-indigo-400" />
-                                        <span className="text-[10px] font-black text-white/70 uppercase">Study Groups</span>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Cover Image (Optional)</label>
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
+                                            className="cursor-pointer"
+                                        />
                                     </div>
-                                </div>
 
-                                <div className="flex flex-col gap-3">
+                                    {/* Privacy Option for Elite/Global */}
+                                    {(['elite', 'global', 'admin', 'consultant'].includes(profile?.subscription_tier?.toLowerCase() || '') || profile?.role === 'admin') && (
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                id="isPrivate"
+                                                checked={isPrivate}
+                                                onChange={(e) => setIsPrivate(e.target.checked)}
+                                                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                            />
+                                            <label htmlFor="isPrivate" className="text-sm font-medium cursor-pointer">Private Community (Approval Required)</label>
+                                        </div>
+                                    )}
                                     <Button
-                                        onClick={() => {
-                                            setIsUpgradeDialogOpen(false);
-                                            navigate('/community/upgrade');
-                                        }}
-                                        className="h-14 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm uppercase rounded-xl tracking-wide group shadow-[0_0_30px_rgba(79,70,229,0.3)]"
+                                        onClick={handleCreateButton}
+                                        className="w-full bg-[#00a884] hover:bg-[#008f6f] text-white font-bold"
+                                        disabled={isCreating || !newCommunityName.trim()}
                                     >
-                                        Upgrade Now
-                                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        onClick={() => setIsUpgradeDialogOpen(false)}
-                                        className="text-slate-500 hover:text-white font-bold text-xs uppercase"
-                                    >
-                                        Maybe later
+                                        {isCreating ? "Saving..." : (editingCommunity ? "Save Changes" : "Create Community")}
                                     </Button>
                                 </div>
-                            </div>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            </div>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                </div>
 
-            {/* Search (Visual only for now) */}
-            <div className="p-3">
+                {/* Tabs */}
+                <div className="flex gap-1 bg-slate-200 dark:bg-slate-700/50 p-1 rounded-lg mb-2">
+                    <button
+                        onClick={() => setViewMode('chats')}
+                        className={`flex-1 py-1 rounded-md text-xs font-bold transition-all ${viewMode === 'chats' ? 'bg-white dark:bg-slate-600 shadow text-emerald-600 dark:text-emerald-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                        Chats
+                    </button>
+                    <button
+                        onClick={() => setViewMode('new')}
+                        className={`flex-1 py-1 rounded-md text-xs font-bold transition-all ${viewMode === 'new' ? 'bg-white dark:bg-slate-600 shadow text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                        New
+                    </button>
+                    <button
+                        onClick={() => setViewMode('requests')}
+                        className={`flex-1 py-1 rounded-md text-xs font-bold transition-all relative ${viewMode === 'requests' ? 'bg-white dark:bg-slate-600 shadow text-amber-600 dark:text-amber-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                        Requests
+                        {requests.length > 0 && <span className="ml-1 inline-flex items-center justify-center bg-red-500 text-white text-[9px] h-4 w-4 rounded-full">{requests.length}</span>}
+                    </button>
+                </div>
+
+                {/* Search */}
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                     <Input
-                        placeholder="Search"
-                        className="pl-9 bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 h-9 rounded-xl focus-visible:ring-offset-0 focus-visible:ring-indigo-500/20"
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 bg-slate-100 dark:bg-slate-900 border-none h-9 rounded-lg text-sm placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-slate-300"
                     />
                 </div>
             </div>
 
+            {/* Upgrade Dialog */}
+            <Dialog open={isUpgradeDialogOpen} onOpenChange={setIsUpgradeDialogOpen}>
+                <DialogContent className="p-0 overflow-hidden border-none max-w-lg rounded-[2rem] bg-transparent">
+                    <div className="relative w-full bg-slate-950 p-10 overflow-hidden border border-white/10 rounded-[2rem]">
+                        <div className="relative z-10 text-center">
+                            <DialogHeader>
+                                <DialogTitle className="text-3xl font-black text-white mb-4">Upgrade to Premium</DialogTitle>
+                            </DialogHeader>
+                            <Button onClick={() => navigate('/community/upgrade')} className="w-full bg-emerald-500 text-white">Upgrade</Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
             {/* Community List */}
-            <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                {communities.map((community) => (
-                    <button
-                        key={community.id}
-                        onClick={() => {
-                            onSelectCommunity(community.id);
-                            setUnreadMentions(prev => ({ ...prev, [community.id]: 0 }));
-                        }}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all group ${activeCommunityId === community.id
-                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-900 dark:text-indigo-100'
-                            : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                            }`}
-                    >
-                        <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${activeCommunityId === community.id ? 'bg-indigo-200 dark:bg-indigo-500/20 text-indigo-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                            }`}>
-                            {community.image_url ? (
-                                <img src={community.image_url} className="w-full h-full object-cover rounded-xl" />
-                            ) : (
-                                <Hash className="h-5 w-5" />
-                            )}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+                {viewMode === 'requests' ? (
+                    requests.length === 0 ? (
+                        <div className="p-8 text-center text-slate-500 text-sm">No pending requests</div>
+                    ) : (
+                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {requests.map(req => (
+                                <div key={req.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <Avatar className="h-10 w-10 border border-slate-200">
+                                            <AvatarImage src={req.profiles?.avatar_url} />
+                                            <AvatarFallback>{req.profiles?.display_name?.[0] || 'U'}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">{req.profiles?.display_name}</p>
+                                            <p className="text-xs text-slate-500 truncate">wants to join <span className="text-indigo-500 font-medium">{req.communities?.name}</span></p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            size="sm"
+                                            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white h-8 text-xs font-bold"
+                                            onClick={() => handleRequestAction(req.id, 'approved', req)}
+                                        >
+                                            Approve
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="flex-1 h-8 text-xs font-bold border-slate-200 text-slate-600 hover:text-red-500 hover:bg-red-50"
+                                            onClick={() => handleRequestAction(req.id, 'rejected')}
+                                        >
+                                            Reject
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <div className="flex-1 min-w-0 text-left flex justify-between items-center">
-                            <div className="truncate">
-                                <h3 className="font-bold text-sm truncate">{community.name}</h3>
-                                <p className="text-xs opacity-60 truncate">Active today</p>
+                    )
+                ) : (
+                    <div className="flex flex-col">
+                        {communities
+                            .filter(c => {
+                                const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase());
+                                if (!matchesSearch) return false;
+
+                                const isMember = joinedCommunityIds.has(c.id);
+                                if (viewMode === 'chats') return isMember;
+                                if (viewMode === 'new') return !isMember;
+                                return true;
+                            })
+                            .sort((a, b) => {
+                                const aPinned = pinnedCommunityIds.has(a.id) ? 1 : 0;
+                                const bPinned = pinnedCommunityIds.has(b.id) ? 1 : 0;
+                                return bPinned - aPinned;
+                            })
+                            .map((community) => (
+                                <div
+                                    key={community.id}
+                                    onClick={() => {
+                                        onSelectCommunity(community.id);
+                                        setUnreadCounts(prev => ({
+                                            ...prev,
+                                            [community.id]: { count: 0, hasMention: false }
+                                        }));
+                                    }}
+                                    className={`group flex items-center gap-3 px-3 py-3 w-full transition-colors border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer ${activeCommunityId === community.id
+                                        ? 'bg-slate-100 dark:bg-slate-800'
+                                        : ''
+                                        }`}
+                                >
+                                    <div className="relative shrink-0">
+                                        <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-slate-200 dark:bg-slate-700 overflow-hidden text-slate-500">
+                                            {community.image_url ? (
+                                                <img src={community.image_url} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Users className="h-6 w-6" />
+                                            )}
+                                        </div>
+                                        {unreadCounts[community.id] && unreadCounts[community.id].count > 0 && viewMode === 'chats' && (
+                                            <div className="absolute -top-1 -right-1 h-5 min-w-[1.25rem] px-1 rounded-full bg-[#ef4444] text-white text-[10px] font-bold flex items-center justify-center border-2 border-white dark:border-black animate-in zoom-in duration-300">
+                                                {unreadCounts[community.id].hasMention && (
+                                                    <span className="mr-0.5 text-[9px]">@</span>
+                                                )}
+                                                {unreadCounts[community.id].count > 99 ? '99+' : unreadCounts[community.id].count}
+                                            </div>
+                                        )}
+                                        {pinnedCommunityIds.has(community.id) && viewMode === 'chats' && (
+                                            <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm">
+                                                <Pin className="h-2.5 w-2.5 text-indigo-500 fill-indigo-500" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0 text-left">
+                                        <div className="flex justify-between items-baseline mb-0.5">
+                                            <div className="flex items-center gap-1.5 min-w-0">
+                                                <h3 className="font-semibold text-[15px] text-slate-900 dark:text-slate-100 truncate">
+                                                    {community.name}
+                                                </h3>
+                                                {activeCalls[community.id] && (
+                                                    <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border border-emerald-500/20 animate-pulse">
+                                                        <span className="h-1 w-1 rounded-full bg-emerald-500" />
+                                                        Live
+                                                    </div>
+                                                )}
+                                                {community.member_count > 0 && (
+                                                    <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-500 font-medium">
+                                                        {community.member_count}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {viewMode === 'chats' && (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                                        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <MoreVertical className="h-3 w-3" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem onClick={(e) => handleTogglePin(e, community.id)}>
+                                                            <Pin className={`mr-2 h-3 w-3 ${pinnedCommunityIds.has(community.id) ? 'fill-slate-400' : ''}`} />
+                                                            {pinnedCommunityIds.has(community.id) ? 'Unpin Chat' : 'Pin Chat'}
+                                                        </DropdownMenuItem>
+                                                        {community.created_by === user?.id && (
+                                                            <>
+                                                                <DropdownMenuItem onClick={() => {
+                                                                    setEditingCommunity(community);
+                                                                    setNewCommunityName(community.name);
+                                                                    setIsDialogOpen(true);
+                                                                }}>
+                                                                    <Pencil className="mr-2 h-3 w-3" /> Edit
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={(e) => handleDeleteCommunity(community.id, e)}
+                                                                    className="text-red-500 focus:text-red-500"
+                                                                >
+                                                                    <Trash className="mr-2 h-3 w-3" /> Delete
+                                                                </DropdownMenuItem>
+                                                            </>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            )}
+                                        </div>
+                                        <p className="text-[13px] text-slate-500 dark:text-slate-400 truncate">
+                                            {viewMode === 'new' ? 'Tap to view info' : (
+                                                (unreadCounts[community.id]?.count || 0) > 0 ? (
+                                                    <span className="font-bold text-slate-900 dark:text-slate-200">
+                                                        New Message
+                                                    </span>
+                                                ) : "Click to open chat"
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                        {communities.filter(c => viewMode === 'chats' ? joinedCommunityIds.has(c.id) : !joinedCommunityIds.has(c.id)).length === 0 && (
+                            <div className="p-8 text-center text-slate-400 text-sm">
+                                <Users className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                                <p>{viewMode === 'chats' ? 'No joined communities' : 'No new communities found'}</p>
                             </div>
-                            {user && (community.created_by === user.id || profile?.role === 'admin') && (
-                                <div onClick={(e) => e.stopPropagation()}>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <MoreVertical className="h-3 w-3" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => {
-                                                setEditingCommunity(community);
-                                                setNewCommunityName(community.name);
-                                                setIsDialogOpen(true);
-                                            }}>
-                                                <Pencil className="mr-2 h-3 w-3" /> Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={(e) => handleDeleteCommunity(community.id, e)}
-                                                className="text-red-600 focus:text-red-600"
-                                            >
-                                                <Trash className="mr-2 h-3 w-3" /> Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            )}
-                            {unreadMentions[community.id] > 0 && (
-                                <div className="h-5 min-w-[1.25rem] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                                    @{unreadMentions[community.id] > 9 ? '9+' : unreadMentions[community.id]}
-                                </div>
-                            )}
-                        </div>
-                    </button>
-                ))}
-                {communities.length === 0 && (
-                    <div className="text-center p-4 text-sm text-muted-foreground">
-                        No communities found. Create one!
+                        )}
                     </div>
                 )}
             </div>

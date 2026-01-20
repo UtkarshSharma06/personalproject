@@ -19,7 +19,7 @@ export default function Community() {
                     </div>
                     <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-2 uppercase tracking-tight">Access Restricted</h1>
                     <p className="text-slate-500 dark:text-slate-400 font-medium max-w-md mx-auto">
-                        youre are restrcted due to communiy gudeline voilations contact admin:- 05sharma@gmail.com
+                        youre are restrcted due to communiy gudeline voilations contact admin:- info.italostudy@gmail.com
                     </p>
                 </div>
             </Layout>

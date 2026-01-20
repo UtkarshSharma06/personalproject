@@ -65,9 +65,15 @@ export default function MFAGuide({ open, onOpenChange }: MFAGuideProps) {
                             <ShieldCheck className="w-4 h-4 text-emerald-600" />
                             <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Security Protocol</span>
                         </div>
-                        <p className="text-[9px] text-slate-500 font-bold leading-relaxed">
+                        <p className="text-[9px] text-slate-500 font-bold leading-relaxed mb-4">
                             Once enabled, you will be required to enter a code from your mobile device every time you sign in to Italostudy.
                         </p>
+                        <div className="pt-4 border-t border-emerald-100/50 dark:border-emerald-900/30">
+                            <h5 className="text-[9px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest mb-1">Troubleshooting: Code Rejected?</h5>
+                            <p className="text-[8px] text-slate-400 font-bold uppercase tracking-tight leading-relaxed">
+                                Most issues are caused by **Time Mismatch**. Ensure your mobile clock is set to "**Set Automatically**" in system settings.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </DialogContent>

@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { MultipleChoiceQuestion, TrueFalseQuestion, GapFillQuestion, MultiSelectQuestion } from "@/components/reading/QuestionTypes";
 import { Slider } from "@/components/ui/slider";
-import { Loader2, Play, Pause, Volume2, SkipForward, SkipBack, Save, Music, HelpCircle } from 'lucide-react';
+import { Loader2, Play, Pause, Volume2, SkipForward, SkipBack, Save, Music, HelpCircle, Bookmark } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/lib/auth';
 
@@ -112,7 +112,21 @@ export default function ListeningTest({
                 setParts(partData);
                 const partIds = partData.map(p => p.id);
                 const { data: qData } = await supabase.from('listening_questions').select('*').in('part_id', partIds).order('order_index');
-                if (qData) setQuestions(qData);
+                if (qData) {
+                    // Fetch user's bookmarks for these questions
+                    const questionIds = qData.map(q => q.id);
+                    const { data: bookmarksData } = await supabase
+                        .from('bookmarked_questions')
+                        .select('question_id')
+                        .eq('user_id', user.id)
+                        .in('question_id', questionIds);
+
+                    const bookmarkedIds = new Set(bookmarksData?.map(b => b.question_id) || []);
+                    setQuestions(qData.map(q => ({
+                        ...q,
+                        is_saved: bookmarkedIds.has(q.id)
+                    })));
+                }
 
                 if (user) {
                     const { data: subData, error: subError } = await supabase.from('listening_submissions').insert({
@@ -145,6 +159,37 @@ export default function ListeningTest({
 
     const handleAnswerChange = (questionId: string, value: string) => {
         setAnswers(prev => ({ ...prev, [questionId]: value }));
+    };
+
+    const handleBookmark = async (question: any) => {
+        if (!user) {
+            toast({ title: "Auth Required", description: "Log in to bookmark items." });
+            return;
+        }
+
+        if (question.is_saved) {
+            toast({ title: "Already Saved", description: "This question is already in your bookmarks." });
+            return;
+        }
+
+        try {
+            const { error } = await supabase.from('bookmarked_questions').insert({
+                user_id: user.id,
+                question_id: question.id
+            });
+
+            if (error) throw error;
+
+            // Update local state
+            setQuestions(prev => prev.map(q =>
+                q.id === question.id ? { ...q, is_saved: true } : q
+            ));
+
+            toast({ title: "Saved", description: "Added to your bookmarks." });
+        } catch (error) {
+            console.error(error);
+            toast({ title: "Error", description: "Failed to save bookmark.", variant: "destructive" });
+        }
     };
 
     const togglePlayPause = () => {
@@ -431,10 +476,24 @@ export default function ListeningTest({
                                             {String(i + 1).padStart(2, '0')}
                                         </div>
                                         <div className="flex-1 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-900/50 transition-all">
-                                            {q.question_type === 'mcq' && <MultipleChoiceQuestion question={q} value={answers[q.id] || ''} onChange={(v) => handleAnswerChange(q.id, v)} />}
-                                            {q.question_type === 'bool' && <TrueFalseQuestion question={q} value={answers[q.id] || ''} onChange={(v) => handleAnswerChange(q.id, v)} />}
-                                            {(q.question_type === 'gap' || q.question_type === 'short_answer') && <GapFillQuestion question={q} value={answers[q.id] || ''} onChange={(v) => handleAnswerChange(q.id, v)} />}
-                                            {q.question_type === 'multi_select' && <MultiSelectQuestion question={q} value={answers[q.id] || []} onChange={(v) => handleAnswerChange(q.id, v)} />}
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    {q.question_type === 'mcq' && <MultipleChoiceQuestion question={q} value={answers[q.id] || ''} onChange={(v) => handleAnswerChange(q.id, v)} />}
+                                                    {q.question_type === 'bool' && <TrueFalseQuestion question={q} value={answers[q.id] || ''} onChange={(v) => handleAnswerChange(q.id, v)} />}
+                                                    {(q.question_type === 'gap' || q.question_type === 'short_answer') && <GapFillQuestion question={q} value={answers[q.id] || ''} onChange={(v) => handleAnswerChange(q.id, v)} />}
+                                                    {q.question_type === 'multi_select' && <MultiSelectQuestion question={q} value={answers[q.id] || []} onChange={(v) => handleAnswerChange(q.id, v)} />}
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleBookmark(q)}
+                                                    className={`transition-all border shadow-sm ${q.is_saved
+                                                        ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
+                                                        : 'bg-white dark:bg-card border-slate-200 dark:border-border text-slate-500 hover:text-indigo-600 hover:border-indigo-100 hover:bg-slate-50'}`}
+                                                >
+                                                    <Bookmark className={`w-4 h-4 ${q.is_saved ? 'fill-indigo-600' : ''}`} />
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

@@ -16,10 +16,14 @@ import {
     ChevronRight,
     Search,
     BookOpen,
+    TrendingUp,
+    GraduationCap,
     Brain,
     Sparkles,
     BarChart3,
-    Award
+    Award,
+    Bookmark,
+    FlaskConical
 } from 'lucide-react';
 import { subDays } from 'date-fns';
 import { useExam } from '@/context/ExamContext';
@@ -37,6 +41,7 @@ interface TopStudent {
     email: string | null;
     total_score: number;
     tests_taken: number;
+    avatar_url?: string | null;
 }
 
 export default function Dashboard() {
@@ -94,47 +99,30 @@ export default function Dashboard() {
     };
 
     const fetchTopStudents = async () => {
-        const { data: testsData } = await (supabase as any)
-            .from('tests')
-            .select('user_id, score, correct_answers')
-            .eq('status', 'completed')
-            .eq('exam_type', activeExam.id)
-            .not('score', 'is', null);
+        try {
+            const { data: leaderboardData, error } = await supabase
+                .rpc('get_leaderboard', { p_exam_id: activeExam.id });
 
-        if (!testsData || testsData.length === 0) return;
-
-        const userScores: Record<string, { totalScore: number; testsTaken: number }> = {};
-        testsData.forEach((test: any) => {
-            if (!userScores[test.user_id]) {
-                userScores[test.user_id] = { totalScore: 0, testsTaken: 0 };
+            if (error) {
+                console.error("Error fetching leaderboard:", error);
+                return;
             }
-            userScores[test.user_id].totalScore += (test.correct_answers || 0);
-            userScores[test.user_id].testsTaken += 1;
-        });
 
-        const topUserIds = Object.entries(userScores)
-            .sort((a, b) => b[1].totalScore - a[1].totalScore)
-            .slice(0, 5)
-            .map(([userId]) => userId);
+            if (!leaderboardData) return;
 
-        const { data: profiles } = await supabase
-            .from('profiles')
-            .select('id, display_name, email')
-            .in('id', topUserIds);
+            const studentsWithScores: TopStudent[] = leaderboardData.map((student: any) => ({
+                id: student.user_id,
+                display_name: student.display_name,
+                email: null, // Privacy: don't expose emails of others
+                avatar_url: student.avatar_url,
+                total_score: student.total_score,
+                tests_taken: student.tests_taken,
+            }));
 
-        const studentsWithScores: TopStudent[] = topUserIds.map(userId => {
-            const profile = profiles?.find((p: any) => p.id === userId);
-            const scores = userScores[userId];
-            return {
-                id: userId,
-                display_name: profile?.display_name || profile?.email?.split('@')[0] || 'Anonymous',
-                email: profile?.email,
-                total_score: scores.totalScore,
-                tests_taken: scores.testsTaken,
-            };
-        });
-
-        setTopStudents(studentsWithScores);
+            setTopStudents(studentsWithScores);
+        } catch (err) {
+            console.error("Failed to load leaderboard", err);
+        }
     };
 
     const fetchDashboardData = async () => {
@@ -214,7 +202,7 @@ export default function Dashboard() {
 
         const { data: solvedBySubject } = await (supabase as any)
             .from('user_practice_responses')
-            .select('subject, is_correct')
+            .select('subject, is_correct, question_id')
             .eq('user_id', user!.id)
             .eq('exam_type', activeExam.id);
 
@@ -227,17 +215,25 @@ export default function Dashboard() {
                     .eq('exam_type', activeExam.id);
 
                 const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
-                const solvedCount = attemptsInSubject.length;
+                const uniqueSolved = new Set(attemptsInSubject.map(a => a.question_id)).size;
                 const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
 
-                const finalTotal = realTotal || (section.questionCount * 10);
+                // Add session counts for IELTS
+                let additionalSolved = 0;
+                if (activeExam.id === 'ielts-academic') {
+                    if (section.name === 'Academic Reading') additionalSolved = (readingCount || 0);
+                    if (section.name === 'Listening') additionalSolved = (listeningCount || 0);
+                    if (section.name === 'Academic Writing') additionalSolved = (writingCount || 0);
+                }
+
+                const finalTotal = realTotal || 0;
 
                 return {
                     subject: section.name,
-                    solved: solvedCount,
+                    solved: uniqueSolved + additionalSolved,
                     total: finalTotal,
-                    accuracy: solvedCount > 0
-                        ? Math.round((correctCount / solvedCount) * 100)
+                    accuracy: attemptsInSubject.length > 0
+                        ? Math.round((correctCount / attemptsInSubject.length) * 100)
                         : 0,
                 };
             }));
@@ -350,7 +346,7 @@ export default function Dashboard() {
         }
     };
 
-    const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Student';
+    const displayName = profile?.display_name || user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Student';
 
     // Calculate Dynamic Insights
     const weakestSubject = subjectMastery.length > 0
@@ -374,13 +370,12 @@ export default function Dashboard() {
         return (
             <Layout>
                 <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center">
-                    <div className="relative mb-8">
-                        <div className="w-24 h-24 border-4 border-indigo-100 dark:border-indigo-900 rounded-full animate-pulse" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <Brain className="w-10 h-10 text-indigo-600 animate-bounce" />
-                        </div>
-                    </div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-2">Syncing Study Data</h2>
+                    <img
+                        src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDE3NnNjdGNiODdiNWNsYmUyNnRudHFtdWllaDEzM3NtdnpxZzY4NiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fhAwk4DnqNgw8/giphy.gif"
+                        alt="Syncing..."
+                        className="w-32 h-32 mb-8 rounded-full object-cover"
+                    />
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-2">Syncing ITALOSTUDY Data</h2>
                     <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Optimizing your personalized curriculum...</p>
                 </div>
             </Layout>
@@ -390,14 +385,14 @@ export default function Dashboard() {
     return (
         <Layout>
             <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-7xl w-full">
-                <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
+                <div className="grid lg:grid-cols-12 gap-8">
                     {/* Main Content */}
-                    <div className="lg:col-span-8 space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div className="lg:col-span-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                         {/* Hero Section (Sleek/Open) */}
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-100 dark:border-border">
                             <div>
                                 <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mb-4">
-                                    Hi, <span className="text-indigo-600">{displayName}</span>
+                                    Hi, <span className="text-indigo-600 capitalize">{displayName}</span>
                                 </h1>
                                 <p className="text-xl font-bold text-slate-400">Ready to work!</p>
                             </div>
@@ -449,19 +444,18 @@ export default function Dashboard() {
                         {/* Stats Cards (Thin Borders) */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                             {[
-                                { label: 'TOTAL QUESTIONS', value: stats.totalQuestions, icon: Search, color: 'text-indigo-600', bg: 'bg-indigo-50/50' },
-                                { label: 'STREAK', value: `${stats.streak} days`, icon: Zap, color: 'text-orange-600', bg: 'bg-orange-50/50' },
-                                { label: 'AVG TIME', value: `${stats.avgTime}s`, icon: Clock, color: 'text-emerald-600', bg: 'bg-emerald-50/50' },
-                                { label: 'PERFORMANCE INDEX', value: oracleProjection, icon: Trophy, color: 'text-indigo-600', bg: 'bg-slate-900', isDark: true },
+                                { label: 'TOTAL QUESTIONS', value: stats.totalQuestions, icon: Search, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-100/50 dark:border-indigo-500/20' },
+                                { label: 'STREAK', value: `${stats.streak} days`, icon: Zap, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-100/50 dark:border-orange-500/20' },
+                                { label: 'AVG TIME', value: `${stats.avgTime}s`, icon: Clock, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-900/20', border: 'border-cyan-100/50 dark:border-cyan-500/20' },
+                                { label: 'ACCURACY', value: `${oracleProjection}%`, icon: Trophy, color: 'text-pink-600 dark:text-pink-400', bg: 'bg-pink-50 dark:bg-pink-900/20', border: 'border-pink-100/50 dark:border-pink-500/20' },
                             ].map((stat, i) => (
-                                <div key={i} className={`
-                                    ${stat.isDark ? 'bg-slate-900 border-slate-950 border-b-4 shadow-slate-900/20' : 'bg-white dark:bg-card border-slate-200 dark:border-border border-b-4 shadow-slate-200'}
-                                    p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border-2 shadow-xl hover:-translate-y-1 transition-all duration-300 group overflow-hidden relative`}>
-                                    {!stat.isDark && <div className={`absolute -top-1 -right-1 w-12 h-12 ${stat.bg} rounded-bl-[2rem] opacity-50 transition-transform group-hover:scale-125`} />}
-                                    <p className={`text-[10px] font-black ${stat.isDark ? 'text-slate-500' : 'text-slate-400'} uppercase tracking-widest mb-2`}>{stat.label}</p>
-                                    <div className="flex items-center justify-between">
-                                        <p className={`text-xl sm:text-2xl font-black ${stat.isDark ? 'text-white' : 'text-slate-900'} tracking-tight`}>{stat.value}</p>
-                                        <stat.icon className={`w-4 h-4 ${stat.isDark ? 'text-indigo-400' : stat.color} opacity-40`} />
+                                <div key={i} className={`relative group overflow-hidden ${stat.bg} ${stat.border} backdrop-blur-xl border-2 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500 hover:-translate-y-1 h-full flex flex-col justify-center`}>
+                                    <div className="relative z-10">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <p className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">{stat.label}</p>
+                                            <stat.icon className={`w-4 h-4 ${stat.color} opacity-80`} />
+                                        </div>
+                                        <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">{stat.value}</p>
                                     </div>
                                 </div>
                             ))}
@@ -475,40 +469,6 @@ export default function Dashboard() {
 
 
 
-                        {/* AI Strategic Summary (NEW) */}
-                        <div className="bg-indigo-600 p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] text-white relative overflow-hidden group shadow-2xl shadow-indigo-200 border-b-[8px] border-indigo-800 active:border-b-0 active:translate-y-2 transition-all duration-200">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_0%,rgba(255,255,255,0.2),transparent_70%)]" />
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center border border-white/30">
-                                        <Trophy className="w-5 h-5 text-white" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-sm font-black uppercase tracking-tight">Curriculum Mission Report</h3>
-                                        <p className="text-[10px] font-black text-indigo-100 uppercase tracking-widest opacity-60">Strategic Performance</p>
-                                    </div>
-                                </div>
-                                <div className="space-y-4">
-                                    <p className="text-lg md:text-xl font-bold tracking-tight leading-relaxed">
-                                        "{missionText}"
-                                    </p>
-                                    <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                                        <Button
-                                            onClick={handleConsultMission}
-                                            className="bg-white dark:bg-card text-indigo-600 hover:bg-indigo-50 font-black rounded-xl h-10 px-4 md:px-6 text-[10px] uppercase tracking-widest border-none items-center gap-2 w-full sm:w-auto"
-                                        >
-                                            <Brain className="w-3 h-3" />
-                                            Consult AI Mission
-                                        </Button>
-                                        <Link to="/analytics" className="w-full sm:w-auto">
-                                            <Button variant="ghost" className="text-white hover:bg-white/10 font-black rounded-xl h-10 px-4 md:px-6 text-[10px] uppercase tracking-widest border border-white/20 w-full">
-                                                Full Intel
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         {/* IELTS Mission Stats (Only for IELTS) */}
                         {activeExam.id === 'ielts-academic' && (
@@ -544,160 +504,242 @@ export default function Dashboard() {
                             </div>
                         )}
 
-                        {/* Subject Mastery Section */}
-                        <div className="bg-white dark:bg-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border-2 border-slate-100 dark:border-border border-b-[6px] shadow-xl shadow-slate-200/50">
-                            <div className="flex items-center justify-between mb-8">
-                                <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Subject Mastery</h2>
-                                <Link to="/subjects" className="text-indigo-600 font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-1">
-                                    View Full Report <ChevronRight className="w-3 h-3" />
-                                </Link>
-                            </div>
 
-                            <div className="grid md:grid-cols-2 gap-x-12 gap-y-8">
-                                {subjectMastery.slice(0, 4).map((subject, i) => (
-                                    <div key={i} className="group cursor-pointer">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-muted border border-slate-100 dark:border-border flex items-center justify-center text-lg group-hover:bg-white dark:bg-card group-hover:border-slate-300 transition-all duration-300">
-                                                    {subject.subject === 'Mathematics' ? '📐' :
-                                                        subject.subject === 'Biology' ? '🧬' :
-                                                            subject.subject === 'Chemistry' ? '⚗️' :
-                                                                subject.subject.includes('Reasoning') ? '🧠' : '⚛️'}
-                                                </div>
-                                                <span className="font-bold text-slate-800 text-sm tracking-tight">{subject.subject}</span>
-                                            </div>
-                                            <span className="text-[13px] font-black text-slate-900 dark:text-slate-100 dark:text-slate-100">{subject.accuracy}%</span>
+                        {/* Highlights Row: Subject Mastery & Top Champions */}
+                        <div className="grid md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+                            {/* Subject Mastery Card */}
+                            <div className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl flex flex-col h-full">
+                                <div className="flex items-center justify-between mb-10">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200/50 transition-transform hover:rotate-12">
+                                            <GraduationCap className="w-5 h-5 text-white" />
                                         </div>
-                                        <div className="h-2.5 bg-slate-50 dark:bg-muted rounded-full overflow-hidden border border-slate-100/50 p-[2px]">
-                                            <div
-                                                className="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(99,102,241,0.2)]"
-                                                style={{ width: `${subject.accuracy}%` }}
-                                            />
+                                        <div>
+                                            <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 dark:text-white">Subject Mastery</h2>
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">Competency Breakdown</p>
                                         </div>
                                     </div>
-                                ))}
+                                    <Link to="/subjects" className="px-5 py-2 rounded-full border border-slate-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 transition-colors">
+                                        Expand
+                                    </Link>
+                                </div>
+
+                                <div className="flex-1 space-y-8">
+                                    {subjectMastery.slice(0, 4).map((subject, i) => (
+                                        <div key={i} className="group relative">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                                                        {subject.subject === 'Mathematics' ? '📐' :
+                                                            subject.subject === 'Biology' ? '🧬' :
+                                                                subject.subject === 'Chemistry' ? '⚗️' :
+                                                                    subject.subject.includes('Reasoning') ? '🧠' : '⚛️'}
+                                                    </div>
+                                                    <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{subject.subject}</span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">{subject.accuracy}%</span>
+                                                    <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Stability</p>
+                                                </div>
+                                            </div>
+                                            <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-50 dark:border-white/5 relative">
+                                                <div
+                                                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                                                    style={{ width: `${subject.accuracy}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Top Champions Card */}
+                            <div className="bg-slate-50/80 dark:bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl flex flex-col h-full">
+                                <div className="flex items-center gap-4 mb-10">
+                                    <div className="w-10 h-10 rounded-2xl bg-amber-400 flex items-center justify-center shadow-lg shadow-amber-200/50">
+                                        <Trophy className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">Champions</h3>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">Top Performers</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 flex flex-col justify-between space-y-6">
+                                    {topStudents.slice(0, 5).map((student, i) => (
+                                        <div key={student.id} className="flex items-center gap-4 group transition-transform hover:translate-x-1">
+                                            <div className="relative">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-[10px] overflow-hidden border-2 ${i === 0 ? 'border-amber-400 shadow-amber-200/50 shadow-lg' : 'border-slate-100 dark:border-slate-800'}`}>
+                                                    {student.avatar_url ? (
+                                                        <img src={student.avatar_url} alt={student.display_name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className={`w-full h-full flex items-center justify-center ${i === 0 ? 'bg-amber-400 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                                                            {student.display_name.slice(0, 2).toUpperCase()}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {i < 3 && (
+                                                    <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] border-2 border-white dark:border-slate-900 ${i === 0 ? 'bg-yellow-400 text-yellow-900' :
+                                                        i === 1 ? 'bg-slate-300 text-slate-800' :
+                                                            'bg-amber-700 text-amber-100'
+                                                        }`}>
+                                                        {i === 0 ? '👑' : i + 1}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[11px] font-black text-slate-900 dark:text-slate-100 truncate uppercase tracking-tight">{student.display_name}</p>
+                                                <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-1.5 overflow-hidden">
+                                                    <div className="h-full bg-emerald-500" style={{ width: `${(student.total_score / (student.tests_taken * 10 || 1)) * 100}%` }} />
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-xs font-black text-indigo-600 leading-none">{((student.total_score / (student.tests_taken * 10 || 1)) * 100).toFixed(0)}%</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {topStudents.length === 0 && (
+                                        <div className="flex-1 flex items-center justify-center text-slate-400 italic text-xs">
+                                            Waiting for data...
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Sidebar */}
-                    <div className="lg:col-span-4 space-y-10 animate-in fade-in slide-in-from-right-4 duration-700">
-                        {/* Recent Writing Evaluations */}
+                    <div className="lg:col-span-4 space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
+                        {/* Apply University - Standalone Premium Button */}
+                        <button
+                            onClick={() => navigate('/apply-university')}
+                            className="w-full group relative flex items-center justify-between p-4 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-white transition-all shadow-xl shadow-amber-200/20 active:scale-95 hover:scale-[1.02] overflow-hidden border-2 border-amber-300/30"
+                        >
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.4),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                            <div className="relative z-10 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group-hover:rotate-12 transition-transform">
+                                    <Award className="w-5 h-5 text-white shadow-sm" />
+                                </div>
+                                <div className="text-left">
+                                    <span className="block text-[9px] font-black uppercase tracking-widest text-amber-100 group-hover:text-white transition-colors">Admission Protocol</span>
+                                    <span className="text-sm font-black tracking-tighter">Apply University</span>
+                                </div>
+                            </div>
+                            <ChevronRight className="relative z-10 w-5 h-5 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        </button>
+
+                        {/* Power Hub Card */}
+                        <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl space-y-6">
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Power Hub</h3>
+                            <div className="grid gap-4">
+                                <button
+                                    onClick={() => navigate('/bookmarks')}
+                                    className="group flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-card hover:bg-slate-900 hover:text-white transition-all border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:-translate-y-1"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-colors border border-orange-100/50">
+                                            <Bookmark className="w-5 h-5" />
+                                        </div>
+                                        <span className="text-sm font-black uppercase tracking-tight">Saved Assets</span>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-all" />
+                                </button>
+
+                                <div className="grid grid-cols-1 gap-3">
+                                    {[
+                                        { label: '3D Labs', path: '/labs', icon: FlaskConical, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/30', border: 'border-indigo-100/50' },
+                                        { label: 'Mission History', path: '/history', icon: Clock, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30', border: 'border-emerald-100/50' },
+                                        { label: 'Performance', path: '/analytics', icon: BarChart3, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-900/30', border: 'border-rose-100/50' },
+                                    ].map((item) => (
+                                        <button
+                                            key={item.label}
+                                            onClick={() => navigate(item.path)}
+                                            className="group flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-card hover:bg-slate-900 hover:text-white transition-all border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:-translate-y-1"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center ${item.color} group-hover:bg-white/10 group-hover:text-white transition-colors border ${item.border}`}>
+                                                    <item.icon className="w-5 h-5" />
+                                                </div>
+                                                <span className="text-sm font-black uppercase tracking-tight">{item.label}</span>
+                                            </div>
+                                            <ChevronRight className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-all" />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Compact Evaluations Integration (Only for IELTS) */}
                         {activeExam.id === 'ielts-academic' && recentEvaluations.length > 0 && (
-                            <div className="bg-white dark:bg-card p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border-2 border-slate-100 dark:border-border shadow-xl shadow-slate-200/50 overflow-hidden border-b-[6px]">
-                                <div className="flex items-center gap-4 mb-10">
-                                    <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center border border-indigo-100 shadow-sm">
-                                        <Sparkles className="w-5 h-5 text-indigo-600" />
+                            <div className="bg-slate-50/80 dark:bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl">
+                                <div className="flex items-center justify-between mb-10">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200/50">
+                                            <Sparkles className="w-5 h-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">Evaluations</h3>
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">Writing Feedback</p>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col">
-                                        <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 leading-none tracking-tight">Recent Evaluations</h3>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5 opacity-60">Writing Progress</p>
-                                    </div>
+                                    <Link to="/writing/history" className="px-5 py-2 rounded-full border border-slate-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 transition-colors">
+                                        View All
+                                    </Link>
                                 </div>
 
-                                <div className="space-y-6">
+                                <div className="space-y-4">
                                     {recentEvaluations.map((evalItem: any) => (
                                         <div
                                             key={evalItem.id}
-                                            className="group flex flex-col gap-3 transition-all hover:translate-x-1 border-b border-slate-50 dark:border-slate-800 pb-4 last:border-0 last:pb-0 cursor-pointer"
+                                            className="group p-4 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-indigo-200 transition-all cursor-pointer flex items-center gap-4"
                                             onClick={() => navigate(`/writing/results/${evalItem.id}`)}
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-muted border border-slate-100 dark:border-border flex items-center justify-center text-lg shrink-0 group-hover:bg-indigo-600 transition-colors group-hover:text-white">
-                                                    ✍️
+                                            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0 group-hover:rotate-6 transition-transform">
+                                                ✍️
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[11px] font-black text-slate-900 dark:text-white truncate uppercase mb-0.5">Writing Task</p>
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`h-1.5 w-1.5 rounded-full ${evalItem.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{evalItem.status}</p>
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-[11px] font-black text-slate-900 dark:text-slate-100 truncate uppercase tracking-tight mb-0.5">IELTS Writing</p>
-                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                                                        {format(new Date(evalItem.created_at), 'MMM d, h:mm a')}
-                                                    </p>
-                                                </div>
+                                            </div>
+                                            {evalItem.status === 'completed' && evalItem.writing_feedback?.[0] && (
                                                 <div className="text-right">
-                                                    {evalItem.status === 'completed' && evalItem.writing_feedback?.[0] ? (
-                                                        <>
-                                                            <p className="text-lg font-black text-indigo-600 leading-none">
-                                                                {evalItem.writing_feedback[0].overall_score}
-                                                            </p>
-                                                            <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-1">Band Score</p>
-                                                        </>
-                                                    ) : (
-                                                        <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse ml-auto" />
-                                                    )}
+                                                    <p className="text-xl font-black text-indigo-600 leading-none">{evalItem.writing_feedback[0].overall_score}</p>
+                                                    <p className="text-[7px] font-black text-slate-300 uppercase mt-1">Band</p>
                                                 </div>
-                                            </div>
-
-                                            <div className="flex items-center justify-between">
-                                                <div className={`text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border ${evalItem.status === 'completed'
-                                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                                    : 'bg-amber-100 text-amber-700 border-amber-200'
-                                                    }`}>
-                                                    {evalItem.status === 'completed' ? 'Evaluated' : 'In Review'}
-                                                </div>
-                                                <p className="text-[8px] font-bold text-slate-300 uppercase opacity-50">ID: {evalItem.id.split('-')[0]}</p>
-                                            </div>
+                                            )}
                                         </div>
                                     ))}
-                                    <Button
-                                        variant="ghost"
-                                        onClick={() => navigate('/writing/history')}
-                                        className="w-full text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 mt-2"
-                                    >
-                                        View All Evaluations
-                                    </Button>
                                 </div>
                             </div>
                         )}
 
-                        {/* WhatsApp Join Card (Sleek Green) */}
-                        <div className="bg-[#25D366] p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] text-white text-center relative overflow-hidden group transition-all hover:-translate-y-1 shadow-xl shadow-emerald-500/20 border-b-[6px] border-[#1da851] active:border-b-0 active:translate-y-1">
-                            <div className="absolute inset-0 bg-white/5 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="relative z-10">
-                                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/30 group-hover:scale-110 transition-transform">
-                                    <Users className="w-7 h-7 text-white" />
-                                </div>
-                                <h3 className="text-2xl font-black mb-1 leading-tight tracking-tight">WhatsApp Community</h3>
-                                <p className="font-bold text-emerald-50 text-[10px] uppercase tracking-[0.2em] mb-8">Join other students</p>
-                                <Button
-                                    onClick={() => window.open('https://chat.whatsapp.com/HMrIISJM6LUEIxgTxSMQp7', '_blank')}
-                                    className="w-full bg-slate-900 text-white hover:bg-slate-800 font-black py-4 rounded-xl border border-white/10 shadow-lg active:scale-95 transition-all h-14 text-xs tracking-widest uppercase"
-                                >
-                                    Join Now
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Top Students Leaderboard (Champions League Style) */}
-                        <div className="bg-white dark:bg-card p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border-2 border-slate-100 dark:border-border shadow-xl shadow-slate-200/50 overflow-hidden border-b-[6px]">
-                            <div className="flex items-center gap-4 mb-10">
-                                <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center border border-orange-100">
-                                    <Trophy className="w-5 h-5 text-orange-500" />
-                                </div>
-                                <div className="flex flex-col">
-                                    <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 leading-none tracking-tight">Top Students</h3>
-                                    <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-1.5 opacity-60">Champions League</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                {topStudents.map((student, i) => (
-                                    <div key={student.id} className="flex items-center gap-4 transition-all hover:translate-x-1 border-b border-slate-50 pb-4 last:border-0 last:pb-0">
-                                        <div className={`w-8 h-8 rounded-full border border-slate-200 dark:border-border flex items-center justify-center text-[10px] font-black shrink-0 ${i === 0 ? 'bg-yellow-400 border-yellow-500 text-slate-900 dark:text-slate-100 shadow-sm shadow-yellow-200' : 'bg-slate-50 dark:bg-muted text-slate-400'
-                                            }`}>
-                                            {i + 1}
+                        {/* Unified WhatsApp & Leaderboard Space */}
+                        <div className="grid grid-cols-1 gap-6">
+                            <div className="bg-[#128C7E] p-8 md:p-10 rounded-[2.5rem] text-white relative overflow-hidden group hover:bg-[#075E54] transition-colors border-b-8 border-slate-900/20 active:border-b-0 active:translate-y-2">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-[60px] translate-x-1/2 -translate-y-1/2" />
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-4 mb-6 text-left">
+                                        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center border border-white/30">
+                                            <Users className="w-6 h-6 text-white" />
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-[11px] font-black text-slate-900 dark:text-slate-100 truncate uppercase tracking-tight mb-1">{student.display_name}</p>
-                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Solved {student.tests_taken} Missions</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-[13px] font-black text-emerald-600 leading-none">{((student.total_score / (student.tests_taken * 10)) * 100).toFixed(1)}%</p>
-                                            <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-1">Accuracy</p>
+                                        <div>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter leading-none">Community</h3>
+                                            <p className="text-[9px] font-black text-emerald-100 uppercase mt-1.5 opacity-60">Collaborate now</p>
                                         </div>
                                     </div>
-                                ))}
+                                    <Button
+                                        onClick={() => window.open('https://chat.whatsapp.com/HMrIISJM6LUEIxgTxSMQp7', '_blank')}
+                                        className="w-full h-14 bg-white text-[#075E54] hover:bg-slate-50 font-black uppercase tracking-widest rounded-2xl border-none text-xs"
+                                    >
+                                        Join WhatsApp
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
                 </div>
             </div>

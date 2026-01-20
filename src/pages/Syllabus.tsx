@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, Microscope, Calculator, Globe, GraduationCap, Target, Users, Zap } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import SEO from '@/components/SEO';
 
 const AcademicBackground = () => {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -78,6 +79,11 @@ const syllabusData = [
 const Syllabus = () => {
     return (
         <div className="min-h-screen py-20 md:py-32 px-6">
+            <SEO
+                title="Exam Syllabus | IMAT, SAT, IELTS & CEnT-S"
+                description="Master your exam with the complete blueprint. Detailed syllabus and free practice resources for IMAT, SAT, IELTS, and CEnT-S."
+                keywords="IMAT Syllabus, SAT Exam Pattern, IELTS Syllabus, CEnT-S Blueprint, Free Practice Resources, Study in Italy Syllabus"
+            />
             <AcademicBackground />
 
             <div className="container mx-auto max-w-7xl">

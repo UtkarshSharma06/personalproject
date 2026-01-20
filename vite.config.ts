@@ -15,4 +15,19 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover', '@radix-ui/react-tooltip', 'lucide-react'],
+          'supabase': ['@supabase/supabase-js'],
+          'charts': ['recharts'],
+          'animation': ['framer-motion'],
+          '3d': ['three', '@react-three/fiber', '@react-three/drei'],
+          'utils': ['date-fns', 'clsx', 'tailwind-merge']
+        }
+      }
+    }
+  }
 }));

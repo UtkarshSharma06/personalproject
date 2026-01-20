@@ -29,7 +29,7 @@ export function usePlanAccess() {
                 supabase.from('user_practice_responses').select('subject').eq('user_id', user?.id).gte('created_at', isoToday),
                 supabase.from('reading_submissions').select('id').eq('user_id', user?.id).gte('created_at', isoToday).eq('status', 'completed'),
                 supabase.from('listening_submissions').select('id').eq('user_id', user?.id).gte('created_at', isoToday).eq('status', 'completed'),
-                supabase.from('writing_submissions').select('id').eq('user_id', user?.id).gte('submitted_at', isoToday).eq('status', 'completed')
+                supabase.from('writing_submissions').select('id').eq('user_id', user?.id).gte('created_at', isoToday).eq('status', 'completed')
             ]);
 
             const counts: Record<string, number> = {};

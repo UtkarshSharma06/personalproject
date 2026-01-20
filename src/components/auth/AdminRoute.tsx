@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/auth";
 import { Loader2 } from "lucide-react";
 
 export default function AdminRoute({ children }: { children: React.ReactNode }) {
-    const { user, loading } = useAuth();
+    const { user, profile, loading } = useAuth();
 
     if (loading) {
         return (
@@ -14,9 +14,10 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
     }
 
     // Strict Access Control List
-    const ALLOWED_ADMINS = ['05sharmautkarsh@gmail.com'];
+    const ALLOWED_ADMINS = ['info.italostudy@gmail.com', '05sharmautkarsh@gmail.com'];
+    const isAdminRole = profile?.role === 'admin';
 
-    if (!user || !user.email || !ALLOWED_ADMINS.includes(user.email)) {
+    if (!user || !user.email || (!ALLOWED_ADMINS.includes(user.email) && !isAdminRole)) {
         return <Navigate to="/dashboard" replace />;
     }
 

@@ -26,6 +26,7 @@ import {
   Columns,
   ShieldAlert,
   Target,
+  Bookmark
 } from 'lucide-react';
 
 interface DiagramData {
@@ -203,10 +204,21 @@ export default function TestPage() {
       .order('question_number');
 
     if (questionsData) {
+      // Fetch user's bookmarks for these questions
+      const questionIds = questionsData.map(q => q.id);
+      const { data: bookmarksData } = await supabase
+        .from('bookmarked_questions')
+        .select('question_id')
+        .eq('user_id', user.id)
+        .in('question_id', questionIds);
+
+      const bookmarkedIds = new Set(bookmarksData?.map(b => b.question_id) || []);
+
       setQuestions(questionsData.map(q => ({
         ...q,
         options: q.options as string[],
         diagram: q.diagram as unknown as DiagramData | null,
+        is_saved: bookmarkedIds.has(q.id)
       })));
     }
   };
@@ -335,11 +347,9 @@ export default function TestPage() {
     }
 
     try {
-      const { error } = await supabase.from('saved_questions').insert({
+      const { error } = await supabase.from('bookmarked_questions').insert({
         user_id: user.id,
-        question_id: question.id,
-        question_data: question as any,
-        notes: ''
+        question_id: question.id
       });
 
       if (error) throw error;
@@ -737,6 +747,27 @@ export default function TestPage() {
                   <div className="flex gap-2">
                     <div className="px-3 py-1 bg-slate-900 text-white text-[8px] font-black uppercase tracking-widest rounded-lg">Question {currentIndex + 1}</div>
                     <div className="px-3 py-1 bg-slate-50 dark:bg-muted text-slate-400 text-[8px] font-black uppercase tracking-widest rounded-lg border border-slate-100 dark:border-border dark:border-border">{currentQuestion.difficulty || 'Standard'} Mode</div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleMarkForReview}
+                      className={`p-2 rounded-xl transition-all border ${currentQuestion.is_marked
+                        ? 'bg-orange-50 border-orange-200 text-orange-600'
+                        : 'bg-white dark:bg-card border-slate-100 dark:border-border text-slate-300 hover:text-orange-500 hover:border-orange-100'}`}
+                      title="Mark for Review"
+                    >
+                      <Flag className={`w-3.5 h-3.5 ${currentQuestion.is_marked ? 'fill-orange-600' : ''}`} />
+                    </button>
+                    <button
+                      onClick={handleBookmark}
+                      className={`p-2 rounded-xl transition-all border shadow-sm ${currentQuestion.is_saved
+                        ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
+                        : 'bg-white dark:bg-card border-slate-200 dark:border-border text-slate-500 hover:text-indigo-600 hover:border-indigo-100 hover:bg-slate-50'}`}
+                      title="Bookmark Question"
+                    >
+                      <Bookmark className={`w-3.5 h-3.5 ${currentQuestion.is_saved ? 'fill-indigo-600' : ''}`} />
+                    </button>
                   </div>
                 </div>
                 {/* Question Text rendering handled by MathText */}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import {
@@ -12,15 +12,18 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import SEO from '@/components/SEO';
 
-const COUNTRY_CODES = [
+import { AuthModal } from '@/components/auth/AuthModal';
+
+const CountryCodes = [
     'US', 'DE', 'IT', 'NG', 'EG', 'AT', 'RS', 'KW', 'BR',
     'GB', 'TR', 'IN', 'PK', 'HU', 'MA', 'BD', 'NP', 'KR'
 ];
 
-const AcademicBackground = () => {
+const AcademicBackground = memo(() => {
     return (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none select-none bg-[#030014] h-screen w-full -z-10">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none select-none bg-[#030014] -z-10">
             {/* Dark Radial Glows */}
             <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-indigo-500/10 blur-[150px] rounded-full" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-violet-600/10 blur-[150px] rounded-full" />
@@ -38,9 +41,9 @@ const AcademicBackground = () => {
                 </svg>
             </div>
 
-            {/* Floating Connection Points */}
+            {/* Floating Connection Points - Reduced on Mobile */}
             <div className="absolute inset-0">
-                {[...Array(15)].map((_, i) => (
+                {[...Array(typeof window !== 'undefined' && window.innerWidth < 768 ? 6 : 15)].map((_, i) => (
                     <motion.div
                         key={i}
                         animate={{
@@ -63,9 +66,10 @@ const AcademicBackground = () => {
             </div>
         </div>
     );
-};
+});
+AcademicBackground.displayName = 'AcademicBackground';
 
-const GlassCard = ({ children, className, delay = 0, x = 0, y = 0 }: { children: React.ReactNode, className?: string, delay?: number, x?: number, y?: number }) => (
+const GlassCard = memo(({ children, className, delay = 0, x = 0, y = 0 }: { children: React.ReactNode, className?: string, delay?: number, x?: number, y?: number }) => (
     <motion.div
         initial={{ opacity: 0, scale: 0.9, x, y }}
         animate={{
@@ -85,10 +89,13 @@ const GlassCard = ({ children, className, delay = 0, x = 0, y = 0 }: { children:
         <div className="relative z-10">{children}</div>
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-[2.5rem] -z-10" />
     </motion.div>
-);
+));
+GlassCard.displayName = 'GlassCard';
 
 export default function Index() {
     const [scrolled, setScrolled] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -98,11 +105,18 @@ export default function Index() {
 
     return (
         <div className="min-h-screen font-sans selection:bg-violet-100 selection:text-violet-900 overflow-x-hidden relative">
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+            <SEO
+                title="ItaloStudy | Free IMAT Practice & Unlimited Free Mocks"
+                description="Experience the world's most advanced AI ecosystem for IMAT, SAT, CEnT-S and IELTS preparation. Get free practice questions and unlimited free mocks for your exam success."
+                keywords="Free IMAT Practice, Unlimited Free IMAT Mocks, Free SAT Prep, Free IELTS Preparation, Study in Italy, Medical Admission Italy, Free Academic Practice, ItaloStudy Free Mocks"
+            />
             <AcademicBackground />
 
             {/* Navbar */}
             <header className={cn(
-                "fixed left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-12",
+                "fixed left-0 right-0 z-40 transition-all duration-300 px-4 md:px-12",
                 scrolled
                     ? "top-0 py-3 md:py-4"
                     : "top-4 md:top-8 py-0"
@@ -110,10 +124,10 @@ export default function Index() {
                 <div className="container mx-auto flex items-center justify-between">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group">
-                        <img src="/logo.png" alt="Italostudy Logo" className="h-10 w-auto object-contain brightness-0 invert" />
+                        <img src="/logo.png" alt="Italostudy Logo" className="h-12 w-auto object-contain brightness-0 invert" />
                     </Link>
 
-                    {/* Pill Navbar */}
+                    {/* Pill Navbar (Desktop) */}
                     <nav className={cn(
                         "hidden lg:flex items-center backdrop-blur-2xl border transition-all duration-300 rounded-full px-12 py-3 shadow-2xl",
                         scrolled
@@ -144,17 +158,70 @@ export default function Index() {
                         </div>
                     </nav>
 
-                    {/* Auth */}
-                    <Link to="/auth">
-                        <Button className="h-12 px-8 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black rounded-full shadow-[0_0_20px_rgba(99,102,241,0.3)] text-xs transition-all hover:scale-105 border-none uppercase tracking-widest">
-                            Log in
+                    {/* Right Section */}
+                    <div className="flex items-center gap-4">
+                        <Button
+                            onClick={() => setIsAuthModalOpen(true)}
+                            className="hidden sm:flex group relative overflow-hidden h-12 px-8 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black rounded-full shadow-[0_0_20px_rgba(99,102,241,0.3)] text-xs transition-all hover:scale-105 border-none uppercase tracking-widest"
+                        >
+                            <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-violet-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <span className="relative z-10">Log in</span>
                         </Button>
-                    </Link>
+
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="lg:hidden p-3 rounded-2xl bg-white/5 border border-white/10 text-white"
+                        >
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                    </div>
                 </div>
+
+                {/* Mobile Menu Backdrop & Content */}
+                <AnimatePresence>
+                    {isMobileMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="absolute top-full left-0 right-0 mt-4 mx-4 p-8 rounded-[2rem] bg-[#030014]/95 backdrop-blur-3xl border border-white/10 lg:hidden flex flex-col gap-6 shadow-2xl z-50"
+                        >
+                            {[
+                                { name: 'Method', path: '/method' },
+                                { name: 'Syllabus', path: '/syllabus' },
+                                { name: 'Pricing', path: '/pricing' },
+                                { name: 'Institutional', path: '/institutional' },
+                                { name: 'Get Admission', path: '/get-admission', isSpecial: true }
+                            ].map((item) => (
+                                <Link
+                                    key={item.name}
+                                    to={item.path}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={cn(
+                                        "text-lg font-black tracking-tight",
+                                        item.isSpecial ? "text-blue-400" : "text-white/70"
+                                    )}
+                                >
+                                    {item.name}
+                                </Link>
+                            ))}
+                            <Button
+                                onClick={() => {
+                                    setIsAuthModalOpen(true);
+                                    setIsMobileMenuOpen(false);
+                                }}
+                                className="group relative overflow-hidden w-full h-14 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black rounded-2xl uppercase text-sm tracking-widest mt-4"
+                            >
+                                <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-violet-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                <span className="relative z-10">Log in</span>
+                            </Button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </header>
 
             {/* Hero Section */}
-            <section className="relative pt-32 pb-16 flex flex-col items-center text-center overflow-hidden">
+            <section className="relative pt-24 pb-16 md:pt-48 md:pb-32 flex flex-col items-center text-center overflow-hidden min-h-[85dvh]">
                 {/* Floating Glassmorphic Icon Cards */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden max-w-7xl mx-auto">
                     {/* DNA Helix - Top Left */}
@@ -203,6 +270,7 @@ export default function Index() {
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
                         className="text-5xl md:text-8xl font-black text-white mb-8 tracking-tighter leading-[0.95] md:leading-[0.9]"
                     >
                         ItaloStudy for <br />
@@ -234,20 +302,23 @@ export default function Index() {
                         preparation. Built for those who demand excellence.
                     </motion.p>
 
+
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                         className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-20"
                     >
-                        <Link to="/auth">
-                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                <Button className="h-14 md:h-16 px-8 md:px-10 bg-transparent text-white font-black text-base md:text-lg rounded-full border-2 border-cyan-400/50 hover:bg-cyan-400/10 transition-all group shadow-[0_0_30px_rgba(34,211,238,0.2)]">
-                                    Get Started
-                                    <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" />
-                                </Button>
-                            </motion.div>
-                        </Link>
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Button
+                                onClick={() => setIsAuthModalOpen(true)}
+                                className="h-14 md:h-16 px-8 md:px-10 bg-transparent text-white font-black text-base md:text-lg rounded-full border-2 border-cyan-400/50 hover:bg-cyan-400/10 transition-all group shadow-[0_0_30px_rgba(34,211,238,0.2)]"
+                            >
+                                Get Started
+                                <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" />
+                            </Button>
+                        </motion.div>
                         <Link to="/get-admission">
                             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                 <Button variant="outline" className="h-14 md:h-16 px-8 md:px-10 bg-white text-slate-900 border-none font-black text-base md:text-lg rounded-full hover:bg-white/90 transition-all shadow-xl">
@@ -258,10 +329,10 @@ export default function Index() {
                     </motion.div>
 
                 </div>
-            </section>
+            </section >
 
             {/* Feature Cards */}
-            <section className="py-24 bg-transparent border-y border-white/5 relative z-10 overflow-hidden">
+            < section className="py-24 bg-transparent border-y border-white/5 relative z-10 overflow-hidden" >
                 <div className="container mx-auto px-6">
                     <div className="grid md:grid-cols-3 gap-8">
                         {[
@@ -290,10 +361,10 @@ export default function Index() {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Testimonials */}
-            <section className="py-32 bg-[#030014]/50 relative z-10">
+            < section className="py-32 bg-[#030014]/50 relative z-10" >
                 <div className="container mx-auto px-6">
                     <div className="grid lg:grid-cols-2 gap-20 items-center">
                         <div className="space-y-10">
@@ -342,10 +413,10 @@ export default function Index() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Footer */}
-            <footer className="py-24 bg-[#030014] border-t border-white/5 relative z-10 overflow-hidden">
+            < footer className="py-24 bg-[#030014] border-t border-white/5 relative z-10 overflow-hidden" >
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-20" />
 
                 <div className="container mx-auto px-6">
@@ -385,7 +456,7 @@ export default function Index() {
                         </div>
                     </div>
                 </div>
-            </footer>
-        </div>
+            </footer >
+        </div >
     );
 }

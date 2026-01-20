@@ -101,6 +101,7 @@ export default function History() {
     const { data: speakingData } = await (supabase as any)
       .from('speaking_sessions')
       .select('*, speaking_scores(overall_score)')
+      .eq('candidate_id', user?.id)
       .order('started_at', { ascending: false });
 
     // 4. Fetch 'mock_exam_submissions'

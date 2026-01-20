@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, Zap, Sparkles, Brain, X } from 'lucide-react';
+import { ArrowLeft, Check, Zap, Sparkles, Brain, X, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth';
+import SEO from '@/components/SEO';
 
 export default function Pricing() {
     const { user } = useAuth();
@@ -10,20 +12,19 @@ export default function Pricing() {
             id: 'explorer',
             name: 'Explorer Plan',
             price: '€0',
-            description: 'Build your study habit with essential daily practice.',
+            description: 'Essential daily study habit.',
             icon: Brain,
-            color: 'from-slate-400 to-slate-600',
+            color: 'slate',
             features: ['10-15 Questions Daily', 'Basic Performance Stats', 'Sample Intro Videos', 'Read-only Community'],
-            limitations: ['No Mock Exams', 'No Full Lectures', 'Correct/Incorrect Only'],
             cta: 'START FREE'
         },
         {
             id: 'pro',
             name: 'Exam Prep Plan',
             price: '€0',
-            description: 'Everything you need to crack the exam with confidence.',
+            description: 'Everything you need for exam confidence.',
             icon: Zap,
-            color: 'from-indigo-500 to-violet-600',
+            color: 'indigo',
             badge: 'BETA SPECIAL',
             features: ['Unlimited Practice Exams', 'Detailed Explanations', 'Full Learning Section', 'Mock Simulations', 'Community Discussion', 'Exam Analytics'],
             cta: 'GET FOR FREE'
@@ -32,105 +33,94 @@ export default function Pricing() {
             id: 'elite',
             name: 'Global Admission Plan',
             price: '€0',
-            description: 'Complete support from preparation to university admission.',
+            description: 'Complete support from prep to admission.',
             icon: Sparkles,
-            color: 'from-amber-500 to-orange-600',
+            color: 'amber',
             badge: 'BETA SPECIAL',
-            features: ['Everything in PRO', 'Advanced Simulations', 'Priority Community Access', 'University Shortlisting', 'Visa Process Guidance', 'Elite Badge'],
+            features: ['Everything in PRO', 'Advanced Simulations', 'Priority Community Access', 'University Shortlisting', 'Visa Process Guidance'],
             cta: 'GET FOR FREE'
         }
     ];
 
     return (
-        <div className="min-h-screen bg-[#fafafa] dark:bg-[#020617] font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden relative">
-            {/* Background Glow */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/5 rounded-full blur-[120px]" />
-            </div>
+        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] font-sans selection:bg-emerald-100 selection:text-emerald-900 pb-20">
+            <SEO
+                title="Pricing & Plans | Free IMAT Prep & Mock Exams"
+                description="Choose the right plan for your exam preparation. ItaloStudy offers free practice, unlimited free mocks, and comprehensive admission support."
+            />
 
-            {/* Nav */}
-            <div className="bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl border-b border-slate-100 dark:border-white/5 sticky top-0 z-50">
-                <div className="container mx-auto px-6 py-5">
-                    <Link to="/" className="inline-flex items-center gap-3 font-black text-[10px] uppercase tracking-widest text-slate-400 hover:text-indigo-600 transition-all">
-                        <ArrowLeft className="w-4 h-4" /> Back to Base
+            {/* WhatsApp Style Header */}
+            <div className="bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-white/5 sticky top-0 z-50">
+                <div className="max-w-xl mx-auto px-6 py-6 flex items-center gap-4">
+                    <Link to="/" className="p-2 -ml-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                        <ArrowLeft size={24} />
                     </Link>
+                    <div>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Membership</h1>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Select Access Protocol</p>
+                    </div>
                 </div>
             </div>
 
-            {/* Hero */}
-            <section className="container mx-auto px-6 py-20 text-center relative">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-full mb-8 shadow-sm">
-                    <Zap className="w-3.5 h-3.5 text-indigo-600" />
-                    <span className="font-black text-indigo-900 dark:text-indigo-300 uppercase tracking-widest text-[9px]">Mission Investment</span>
+            <main className="max-w-xl mx-auto px-4 mt-8 space-y-6">
+                {/* Hero Note */}
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-3xl p-6 text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500 text-white rounded-full mb-3 shadow-lg shadow-emerald-500/20">
+                        <Zap size={12} className="fill-current" />
+                        <span className="text-[8px] font-black uppercase tracking-widest">Beta Access</span>
+                    </div>
+                    <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-tight leading-relaxed">
+                        All premium protocols are currently unlocked for free during the Beta testing phase.
+                    </p>
                 </div>
 
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter leading-tight">
-                    CHOOSE YOUR <span className="text-indigo-600">PLAN.</span>
-                </h1>
-                <p className="text-xl text-slate-400 font-bold max-w-2xl mx-auto mb-6 tracking-tight leading-relaxed">
-                    Access our high-performance simulation infrastructure with transparent licensing tiers.
-                </p>
-            </section>
-
-            {/* Pricing Matrix */}
-            <section className="container mx-auto px-6 pb-32">
-                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                    {tiers.map((plan, i) => (
-                        <div
-                            key={plan.id}
-                            className={`relative p-8 rounded-[3rem] border-2 bg-white dark:bg-slate-900 transition-all duration-300 group flex flex-col shadow-xl border-slate-100 dark:border-white/10 hover:border-indigo-600 hover:-translate-y-2 hover:shadow-2xl`}
-                        >
-                            {plan.badge && (
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-1.5 rounded-full text-[9px] font-black tracking-[0.2em] uppercase">
-                                    {plan.badge}
-                                </div>
-                            )}
-
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${plan.color} flex items-center justify-center shadow-lg transition-transform group-hover:scale-110`}>
-                                    <plan.icon className="w-7 h-7 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-black text-slate-900 dark:text-white leading-none mb-1 uppercase tracking-tight">{plan.name}</h3>
-                                    <p className="text-3xl font-black text-indigo-600 leading-none">{plan.price}</p>
-                                </div>
-                            </div>
-
-                            <p className="text-[10px] font-bold text-slate-500 leading-relaxed uppercase tracking-tight mb-8">
-                                {plan.description}
-                            </p>
-
-                            <div className="space-y-3 flex-1 mb-10">
-                                {plan.features.map((feature, idx) => (
-                                    <div key={idx} className="flex items-start gap-2">
-                                        <div className="mt-1 w-3.5 h-3.5 bg-emerald-500/10 rounded-full flex items-center justify-center shrink-0">
-                                            <Check className="w-2.5 h-2.5 text-emerald-600" />
-                                        </div>
-                                        <span className="text-[10px] font-black text-slate-900 dark:text-slate-200 uppercase tracking-tighter leading-tight">{feature}</span>
+                {/* Vertical Plans List */}
+                <div className="space-y-4">
+                    {tiers.map((plan) => (
+                        <Card key={plan.id} className="p-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200 dark:shadow-none bg-white dark:bg-slate-950 overflow-hidden relative group transition-transform active:scale-[0.98]">
+                            <div className="p-8">
+                                <div className="flex items-center gap-5 mb-8">
+                                    <div className={`w-16 h-16 rounded-2xl bg-${plan.color === 'slate' ? 'slate-100' : plan.id === 'pro' ? 'indigo-100' : 'amber-100'} flex items-center justify-center shadow-inner`}>
+                                        <plan.icon className={`w-8 h-8 ${plan.color === 'slate' ? 'text-slate-600' : plan.id === 'pro' ? 'text-indigo-600' : 'text-amber-600'}`} />
                                     </div>
-                                ))}
-                                {plan.limitations?.map((limit: string, idx: number) => (
-                                    <div key={idx} className="flex items-start gap-2 opacity-40">
-                                        <div className="mt-1 w-3.5 h-3.5 bg-rose-500/10 rounded-full flex items-center justify-center shrink-0">
-                                            <X className="w-2.5 h-2.5 text-rose-600" />
+                                    <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">{plan.name}</h3>
+                                            <span className="text-lg font-black text-[#00a884]">{plan.price}</span>
                                         </div>
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-tight line-through">{limit}</span>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{plan.description}</p>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
 
-                            <Link to={user ? "/onboarding" : "/auth"}>
-                                <Button
-                                    className="w-full h-16 bg-slate-900 hover:bg-slate-800 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl active:scale-95 transition-all shadow-xl shadow-slate-200 dark:shadow-none"
-                                >
-                                    {plan.cta}
-                                </Button>
-                            </Link>
-                        </div>
+                                <div className="space-y-3 mb-8">
+                                    {plan.features.map((feature, idx) => (
+                                        <div key={idx} className="flex items-center gap-3">
+                                            <div className="w-5 h-5 bg-emerald-50 dark:bg-emerald-500/10 rounded-full flex items-center justify-center shrink-0">
+                                                <Check className="w-3 h-3 text-[#00a884]" />
+                                            </div>
+                                            <span className="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{feature}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <Link to={user ? "/onboarding" : "/auth"}>
+                                    <Button className="w-full h-14 bg-[#00a884] hover:bg-[#008f6f] text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/20 group-hover:translate-x-1 transition-all">
+                                        {plan.cta}
+                                        <ChevronRight size={18} className="ml-2" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        </Card>
                     ))}
                 </div>
-            </section>
 
+                {/* Footer Note */}
+                <div className="text-center pt-8 pb-12">
+                    <p className="text-[9px] font-black text-slate-300 dark:text-white/10 uppercase tracking-[0.4em] leading-relaxed max-w-[280px] mx-auto">
+                        Your preparation status is recorded in the global protocol database.
+                    </p>
+                </div>
+            </main>
         </div>
     );
 }

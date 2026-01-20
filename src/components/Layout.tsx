@@ -20,9 +20,13 @@ import {
     Play,
     Loader2,
     MessageCircle,
-    Users
+    Users,
+    FlaskConical,
+    Bookmark,
+    Hash
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -34,6 +38,7 @@ import { EXAMS } from '@/config/exams';
 import { MandatoryFeedbackModal } from './MandatoryFeedbackModal';
 import { useMandatoryFeedback } from '@/hooks/useMandatoryFeedback';
 import { FeedbackDialog } from './FeedbackDialog';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 interface LayoutProps {
     children: ReactNode;
@@ -48,6 +53,7 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [syncTarget, setSyncTarget] = useState("");
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
     const handleExamSwitch = (exam: any) => {
         setIsSyncing(true);
@@ -63,7 +69,7 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
 
     const handleSignOut = async () => {
         await signOut();
-        navigate('/auth');
+        navigate('/');
     };
 
     const navItems: { label: string; path: string; icon: any; isComingSoon?: boolean }[] = [
@@ -72,8 +78,9 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
         { label: 'Practice', path: '/practice', icon: BookOpen },
         { label: 'Learning', path: '/learning', icon: Play },
         { label: 'Community', path: '/community', icon: MessageCircle },
+        { label: '3D Labs', path: '/labs', icon: FlaskConical },
         { label: 'Mock Exams', path: '/mock-exams', icon: Globe },
-        { label: 'Apply University', path: '/apply-university', icon: Award },
+        { label: 'Bookmarks', path: '/bookmarks', icon: Bookmark },
         { label: 'History', path: '/history', icon: Clock },
         { label: 'Analytics', path: '/analytics', icon: BarChart3 },
     ];
@@ -86,7 +93,35 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
 
     // Get display name from user metadata or email
     const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Student';
+    const [hasUnreadCommunityMessages, setHasUnreadCommunityMessages] = useState(false);
     const { showFeedback, markFeedbackComplete } = useMandatoryFeedback();
+
+    const fetchGlobalUnread = useCallback(async () => {
+        if (!user) return;
+
+        try {
+            const { data, error } = await supabase.rpc('has_unread_messages', { p_user_id: user.id });
+            if (error) throw error;
+            setHasUnreadCommunityMessages(!!data);
+        } catch (err) {
+            console.error('Error fetching global unread:', err);
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (!user) return;
+        fetchGlobalUnread();
+
+        const messageSub = supabase
+            .channel('global-chat-notifications')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'community_messages' }, () => fetchGlobalUnread())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'community_read_status', filter: `user_id=eq.${user.id}` }, () => fetchGlobalUnread())
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(messageSub);
+        };
+    }, [user, fetchGlobalUnread, activeExam.id]);
 
     return (
         <>
@@ -96,7 +131,7 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
             <div className={`bg-slate-50 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900 ${location.pathname.startsWith('/community') ? 'h-screen overflow-hidden' : 'min-h-screen'
                 }`}>
                 {/* Header */}
-                <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
+                <header className="sticky top-0 z-50 w-full bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border-b border-indigo-500/10 transition-all duration-300 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
                     <div className="container mx-auto px-6 h-18 flex items-center justify-between py-4">
                         {/* Left: Brand */}
                         <div className="flex items-center gap-4 shrink-0">
@@ -111,20 +146,20 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
 
                         {/* Center: Desktop Navigation (Pill Style) */}
                         <nav className="hidden lg:flex items-center gap-1">
-                            {displayedNavItems.filter(item => !['History', 'Analytics', 'Apply University'].includes(item.label)).map((item) => {
+                            {displayedNavItems.filter(item => !['History', 'Analytics', 'Apply University', 'Practice', 'Mock Exams', 'Community', '3D Labs', 'Bookmarks'].includes(item.label)).map((item) => {
                                 const isActive = location.pathname === item.path;
                                 return (
                                     <Link
                                         key={item.path}
                                         to={item.isComingSoon ? '#' : item.path}
-                                        className={`group relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[12px] font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 ${isActive
-                                            ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-100 ring-1 ring-indigo-200'
+                                        className={`group relative flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 ${isActive
+                                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 ring-4 ring-indigo-50'
                                             : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                                             } ${item.isComingSoon ? 'cursor-not-allowed opacity-60' : ''}`}
                                     >
-                                        <div className={`p-1 rounded-lg transition-all duration-300 ${isActive ? 'bg-indigo-500 text-white rotate-0' : 'bg-transparent group-hover:bg-indigo-100 group-hover:text-indigo-600 group-hover:rotate-12'
+                                        <div className={`p-1.5 rounded-full transition-all duration-300 ${isActive ? 'bg-indigo-500/20 text-white rotate-0' : 'bg-transparent group-hover:bg-indigo-100 group-hover:text-indigo-600 group-hover:rotate-12'
                                             }`}>
-                                            <item.icon className="w-4 h-4" />
+                                            <item.icon className="w-5 h-5" />
                                         </div>
                                         <span>{item.label}</span>
                                         {item.isComingSoon && (
@@ -137,35 +172,89 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                                 );
                             })}
 
-                            {/* Prominent Apply University Tab */}
-                            {displayedNavItems.find(i => i.label === 'Apply University') && (
-                                <Link
-                                    to="/apply-university"
-                                    className={`group relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-black tracking-tight transition-all duration-500 golden-tab ${location.pathname.startsWith('/apply-university') ? 'ring-2 ring-amber-400' : ''}`}
-                                >
-                                    <Award className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                                    <span>Apply University</span>
-                                </Link>
+                            {/* Arena Dropdown (Practice & Mock Exams) */}
+                            {profile?.role !== 'consultant' && (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            className={`group relative flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 ${['/practice', '/mock-exams', '/labs'].includes(location.pathname)
+                                                ? 'bg-indigo-50 text-indigo-700 shadow-md shadow-indigo-100 ring-4 ring-indigo-50 scale-105'
+                                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                                }`}
+                                        >
+                                            <div className={`p-1.5 rounded-full transition-all duration-300 ${['/practice', '/mock-exams', '/labs'].includes(location.pathname) ? 'bg-indigo-100 text-indigo-600 rotate-0' : 'bg-transparent group-hover:bg-indigo-100 group-hover:text-indigo-600 group-hover:rotate-12'
+                                                }`}>
+                                                <BookOpen className="w-5 h-5" />
+                                            </div>
+                                            <span className="text-sm">Arena</span>
+                                            <ChevronDown className="w-3 h-3 opacity-30 group-hover:opacity-100 transition-opacity" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start" className="w-48 bg-white/80 backdrop-blur-xl dark:bg-slate-900/80 border border-white/20 rounded-2xl shadow-2xl p-2 animate-in zoom-in-95 duration-200">
+                                        {displayedNavItems.filter(item => ['Practice', 'Mock Exams', '3D Labs'].includes(item.label)).map((item) => (
+                                            <DropdownMenuItem
+                                                key={item.path}
+                                                onClick={() => navigate(item.path)}
+                                                className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-colors ${location.pathname === item.path ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-50/50'
+                                                    }`}
+                                            >
+                                                <div className={`w-7 h-7 rounded-lg flex items-center justify-center border ${location.pathname === item.path ? 'bg-indigo-100 border-indigo-200' : 'bg-white/50 dark:bg-slate-800 border-slate-100'
+                                                    }`}>
+                                                    <item.icon className={`w-3.5 h-3.5 ${location.pathname === item.path ? 'text-indigo-600' : 'text-slate-500'}`} />
+                                                </div>
+                                                <span className="font-bold text-xs">{item.label}</span>
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             )}
+
+                            {/* Community (Positioned after Arena) */}
+                            {displayedNavItems.filter(item => item.label === 'Community').map((item) => {
+                                const isActive = location.pathname === item.path;
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        to={item.path}
+                                        className={`group relative flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 ${isActive
+                                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 ring-4 ring-indigo-50'
+                                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                            }`}
+                                    >
+                                        <div className={`p-1.5 rounded-full transition-all duration-300 ${isActive ? 'bg-indigo-500/20 text-white rotate-0' : 'bg-transparent group-hover:bg-indigo-100 group-hover:text-indigo-600 group-hover:rotate-12'
+                                            }`}>
+                                            <item.icon className="w-5 h-5" />
+                                        </div>
+                                        <span>{item.label}</span>
+                                        {hasUnreadCommunityMessages && !isActive && (
+                                            <span className="absolute top-1 right-1 flex h-2 w-2">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                            </span>
+                                        )}
+                                    </Link>
+                                );
+                            })}
+
 
                             {profile?.role !== 'consultant' && (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <button
-                                            className={`group relative flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 ${['/history', '/analytics'].includes(location.pathname)
-                                                ? 'bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100 ring-1 ring-indigo-200 scale-105'
+                                            className={`group relative flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 ${['/history', '/analytics'].includes(location.pathname)
+                                                ? 'bg-indigo-50 text-indigo-700 shadow-md shadow-indigo-100 ring-4 ring-indigo-50 scale-105'
                                                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                                                 }`}
                                         >
-                                            <div className={`p-1 rounded-lg transition-all duration-300 ${['/history', '/analytics'].includes(location.pathname) ? 'bg-indigo-100 text-indigo-600 rotate-0' : 'bg-transparent group-hover:bg-indigo-100 group-hover:text-indigo-600 group-hover:rotate-12'
+                                            <div className={`p-1.5 rounded-full transition-all duration-300 ${['/history', '/analytics'].includes(location.pathname) ? 'bg-indigo-100 text-indigo-600 rotate-0' : 'bg-transparent group-hover:bg-indigo-100 group-hover:text-indigo-600 group-hover:rotate-12'
                                                 }`}>
-                                                <Menu className="w-4 h-4" />
+                                                <Menu className="w-5 h-5" />
                                             </div>
-                                            <span className="text-[12px]">Others</span>
+                                            <span className="text-sm">Others</span>
                                         </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-card border border-slate-200 dark:border-border rounded-2xl shadow-xl p-2 animate-in zoom-in-95 duration-200">
-                                        {displayedNavItems.filter(item => ['History', 'Analytics'].includes(item.label)).map((item) => (
+                                        {displayedNavItems.filter(item => ['History', 'Analytics', 'Bookmarks'].includes(item.label)).map((item) => (
                                             <DropdownMenuItem
                                                 key={item.path}
                                                 onClick={() => navigate(item.path)}
@@ -217,55 +306,68 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                                 </DropdownMenu>
                             )}
 
+                            {/* Sign In Button (Visible when not logged in) */}
+                            {!user && (
+                                <button
+                                    onClick={() => setIsAuthModalOpen(true)}
+                                    className="hidden lg:flex items-center gap-2 px-5 py-2 rounded-xl bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 hover:scale-105 transition-all shadow-lg active:scale-95"
+                                >
+                                    <User className="w-3.5 h-3.5" />
+                                    <span>Sign In</span>
+                                </button>
+                            )}
+
                             {/* Profile Dropdown */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="flex items-center gap-3 pl-1 pr-1 py-1 rounded-full border border-slate-200 dark:border-border hover:border-indigo-200 hover:shadow-md transition-all duration-300 group bg-white dark:bg-card shadow-sm hover:scale-105">
-                                        <div className="w-8 h-8 rounded-full bg-indigo-600 border border-slate-100 flex items-center justify-center text-white font-black text-xs shadow-sm group-hover:rotate-12 transition-transform overflow-hidden">
-                                            {user?.user_metadata?.avatar_url ? (
-                                                <img src={user.user_metadata.avatar_url} alt="profile" className="w-full h-full object-cover" />
-                                            ) : (
-                                                displayName.charAt(0).toUpperCase()
+                            {user && (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button className="flex items-center gap-3 pl-1 pr-1 py-1 rounded-full border border-slate-200 dark:border-border hover:border-indigo-200 hover:shadow-md transition-all duration-300 group bg-white dark:bg-card shadow-sm hover:scale-105">
+                                            <div className="w-8 h-8 rounded-full bg-indigo-600 border border-slate-100 flex items-center justify-center text-white font-black text-xs shadow-sm group-hover:rotate-12 transition-transform overflow-hidden">
+                                                {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
+                                                    <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="profile" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    displayName.charAt(0).toUpperCase()
+                                                )}
+                                            </div>
+                                            <ChevronDown className="w-3.5 h-3.5 mr-2 opacity-30 group-hover:opacity-100 transition-opacity" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-60 bg-white dark:bg-card border border-slate-200 dark:border-border rounded-2xl shadow-2xl p-2 animate-in zoom-in-95 duration-200">
+                                        <div className="p-4 border-b border-slate-50 mb-2 bg-slate-50/50 rounded-xl">
+                                            <p className="font-black text-slate-900 dark:text-slate-100 text-sm">{displayName}</p>
+                                            <p className="text-[10px] font-bold text-slate-400 truncate">{user?.email}</p>
+                                            {profile?.role === 'consultant' && (
+                                                <div className="mt-2 py-0.5 px-2 bg-indigo-600 text-white text-[8px] font-black uppercase tracking-widest rounded-full inline-block">
+                                                    Certified Expert
+                                                </div>
                                             )}
                                         </div>
-                                        <ChevronDown className="w-3.5 h-3.5 mr-2 opacity-30 group-hover:opacity-100 transition-opacity" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-60 bg-white dark:bg-card border border-slate-200 dark:border-border rounded-2xl shadow-2xl p-2 animate-in zoom-in-95 duration-200">
-                                    <div className="p-4 border-b border-slate-50 mb-2 bg-slate-50/50 rounded-xl">
-                                        <p className="font-black text-slate-900 dark:text-slate-100 text-sm">{displayName}</p>
-                                        <p className="text-[10px] font-bold text-slate-400 truncate">{user?.email}</p>
-                                        {profile?.role === 'consultant' && (
-                                            <div className="mt-2 py-0.5 px-2 bg-indigo-600 text-white text-[8px] font-black uppercase tracking-widest rounded-full inline-block">
-                                                Certified Expert
-                                            </div>
+                                        {profile?.role !== 'consultant' && (
+                                            <>
+                                                <DropdownMenuItem
+                                                    onClick={() => navigate('/settings')}
+                                                    className="p-2.5 rounded-xl cursor-pointer hover:bg-slate-50 dark:bg-muted font-bold text-xs flex items-center gap-2"
+                                                >
+                                                    <User className="w-3.5 h-3.5 text-slate-400" /> Account Settings
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="p-2.5 rounded-xl cursor-not-allowed opacity-60 font-bold text-xs flex items-center justify-between gap-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Settings className="w-3.5 h-3.5 text-slate-400" /> Study Mode
+                                                    </div>
+                                                    <span className="text-[7px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full uppercase tracking-widest">Soon</span>
+                                                </DropdownMenuItem>
+                                            </>
                                         )}
-                                    </div>
-                                    {profile?.role !== 'consultant' && (
-                                        <>
-                                            <DropdownMenuItem
-                                                onClick={() => navigate('/settings')}
-                                                className="p-2.5 rounded-xl cursor-pointer hover:bg-slate-50 dark:bg-muted font-bold text-xs flex items-center gap-2"
-                                            >
-                                                <User className="w-3.5 h-3.5 text-slate-400" /> Account Settings
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="p-2.5 rounded-xl cursor-not-allowed opacity-60 font-bold text-xs flex items-center justify-between gap-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Settings className="w-3.5 h-3.5 text-slate-400" /> Study Mode
-                                                </div>
-                                                <span className="text-[7px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full uppercase tracking-widest">Soon</span>
-                                            </DropdownMenuItem>
-                                        </>
-                                    )}
-                                    <div className="h-px bg-slate-50 dark:bg-muted my-1.5" />
-                                    <DropdownMenuItem
-                                        onClick={handleSignOut}
-                                        className="p-2.5 rounded-xl cursor-pointer hover:bg-red-50 text-red-600 font-bold text-xs flex items-center gap-2"
-                                    >
-                                        <LogOut className="w-3.5 h-3.5" /> Sign Out
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                        <div className="h-px bg-slate-50 dark:bg-muted my-1.5" />
+                                        <DropdownMenuItem
+                                            onClick={handleSignOut}
+                                            className="p-2.5 rounded-xl cursor-pointer hover:bg-red-50 text-red-600 font-bold text-xs flex items-center gap-2"
+                                        >
+                                            <LogOut className="w-3.5 h-3.5" /> Sign Out
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            )}
 
                             {/* Mobile Menu Button */}
                             <button
@@ -281,7 +383,7 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                     {isMobileMenuOpen && (
                         <div className="lg:hidden border-t border-slate-100 bg-white/95 backdrop-blur-md animate-in slide-in-from-top duration-300 p-6 space-y-8 overflow-y-auto max-h-[calc(100vh-5rem)]">
                             <nav className="flex flex-col gap-2">
-                                {displayedNavItems.map((item) => {
+                                {displayedNavItems.filter(item => !['Practice', 'Mock Exams', '3D Labs', 'History', 'Analytics', 'Bookmarks'].includes(item.label)).map((item) => {
                                     const isActive = location.pathname === item.path;
                                     return (
                                         <Link
@@ -293,14 +395,76 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                                                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                                                 }`}
                                         >
-                                            <div className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-indigo-100 text-indigo-600' : 'bg-transparent'
-                                                }`}>
-                                                <item.icon className="w-5 h-5" />
+                                            <div className="relative">
+                                                <div className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-indigo-100 text-indigo-600' : 'bg-transparent'
+                                                    }`}>
+                                                    <item.icon className="w-5 h-5" />
+                                                </div>
+                                                {item.label === 'Community' && hasUnreadCommunityMessages && !isActive && (
+                                                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                                    </span>
+                                                )}
                                             </div>
                                             <span className="text-sm">{item.label}</span>
                                         </Link>
                                     );
                                 })}
+
+                                {/* Arena Section */}
+                                <div className="mt-4 px-2">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Arena</p>
+                                    <div className="flex flex-col gap-1">
+                                        {displayedNavItems.filter(item => ['Practice', 'Mock Exams', '3D Labs'].includes(item.label)).map((item) => {
+                                            const isActive = location.pathname === item.path;
+                                            return (
+                                                <Link
+                                                    key={item.path}
+                                                    to={item.path}
+                                                    onClick={() => setIsMobileMenuOpen(false)}
+                                                    className={`flex items-center gap-4 px-4 py-3 rounded-xl font-bold transition-all ${isActive
+                                                        ? 'bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100 ring-1 ring-indigo-200'
+                                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                                        }`}
+                                                >
+                                                    <div className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-indigo-100 text-indigo-600' : 'bg-transparent'
+                                                        }`}>
+                                                        <item.icon className="w-5 h-5" />
+                                                    </div>
+                                                    <span className="text-sm">{item.label}</span>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Others Section */}
+                                <div className="mt-4 px-2">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Others</p>
+                                    <div className="flex flex-col gap-1">
+                                        {displayedNavItems.filter(item => ['History', 'Analytics', 'Bookmarks'].includes(item.label)).map((item) => {
+                                            const isActive = location.pathname === item.path;
+                                            return (
+                                                <Link
+                                                    key={item.path}
+                                                    to={item.path}
+                                                    onClick={() => setIsMobileMenuOpen(false)}
+                                                    className={`flex items-center gap-4 px-4 py-3 rounded-xl font-bold transition-all ${isActive
+                                                        ? 'bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100 ring-1 ring-indigo-200'
+                                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                                        }`}
+                                                >
+                                                    <div className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-indigo-100 text-indigo-600' : 'bg-transparent'
+                                                        }`}>
+                                                        <item.icon className="w-5 h-5" />
+                                                    </div>
+                                                    <span className="text-sm">{item.label}</span>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             </nav>
 
                             {/* Mobile Exam Switcher */}
@@ -388,6 +552,8 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                         </div>
                     </div>
                 )}
+
+                <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
             </div>
         </>
     );

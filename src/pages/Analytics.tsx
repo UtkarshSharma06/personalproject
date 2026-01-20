@@ -16,7 +16,11 @@ import {
     FileText,
     Microscope,
     FlaskConical,
-    Atom
+    Atom,
+    PenTool,
+    Mic,
+    BookOpen,
+    Headphones
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +51,32 @@ const dailyData = [
     { day: 'Sun', score: 0 },
 ];
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        const data = payload[0].payload;
+        return (
+            <div className="bg-slate-900/90 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl">
+                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">{label}</p>
+                <div className="space-y-1.5">
+                    <div className="flex items-center justify-between gap-8">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Correct Answers</span>
+                        <span className="text-xs font-black text-white">{data.score}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-8">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Questions Solved</span>
+                        <span className="text-xs font-black text-white">{data.questions}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-8">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Daily Accuracy</span>
+                        <span className="text-xs font-black text-emerald-400">{data.accuracy}%</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    return null;
+};
+
 export default function Analytics() {
     const { user, profile } = useAuth();
     const { activeExam } = useExam();
@@ -60,6 +90,7 @@ export default function Analytics() {
     });
     const [points, setPoints] = useState(0);
     const [rank, setRank] = useState(0);
+    const [timeframe, setTimeframe] = useState<'7d' | '30d' | '6m'>('7d');
     const [velocityData, setVelocityData] = useState(dailyData);
     const [projection, setProjection] = useState({ score: 0, target: 60, confidence: 0, trajectory: 'Stable' });
 
@@ -75,7 +106,7 @@ export default function Analytics() {
 
             const { data: solvedBySubject } = await (supabase as any)
                 .from('user_practice_responses')
-                .select('subject, is_correct')
+                .select('subject, is_correct, question_id')
                 .eq('user_id', user.id)
                 .eq('exam_type', activeExam.id);
 
@@ -92,7 +123,7 @@ export default function Analytics() {
                     { data: listeningSubs }
                 ] = await Promise.all([
                     supabase.from('writing_submissions').select('*, writing_feedback(overall_score)').eq('user_id', user.id).eq('status', 'completed'),
-                    supabase.from('speaking_sessions').select('*, speaking_scores(overall_score)').eq('user_id', user.id),
+                    supabase.from('speaking_sessions').select('*, speaking_scores(overall_score)').eq('candidate_id', user.id),
                     supabase.from('reading_submissions').select('*').eq('user_id', user.id),
                     supabase.from('listening_submissions').select('*').eq('user_id', user.id),
                 ]);
@@ -108,10 +139,46 @@ export default function Analytics() {
                 const listeningAvg = listeningSubs && listeningSubs.length > 0 ? (listeningSubs.reduce((a, b) => a + b.score, 0) / listeningSubs.length) : 0;
 
                 ieltsData = [
-                    { subject: 'Writing', score: writingAvg, accuracy: Math.round(writingAvg * 11.1), color: '#6366f1' }, // 9 -> 100%
-                    { subject: 'Speaking', score: speakingAvg, accuracy: Math.round(speakingAvg * 11.1), color: '#f59e0b' },
-                    { subject: 'Reading', score: readingAvg, accuracy: readingAvg, color: '#10b981' },
-                    { subject: 'Listening', score: listeningAvg, accuracy: listeningAvg, color: '#ef4444' },
+                    {
+                        subject: 'Writing',
+                        score: writingAvg,
+                        total: totalQuestions?.filter((q: any) => q.subject === 'Academic Writing').length || 0,
+                        solved: (writingSubs?.length || 0) + (new Set(solvedBySubject?.filter((q: any) => q.subject === 'Academic Writing').map(a => a.question_id)).size),
+                        accuracy: Math.round(writingAvg * 11.1),
+                        color: '#6366f1',
+                        icon: PenTool,
+                        status: writingAvg >= 7 ? 'Mastered' : writingAvg >= 5 ? 'Improving' : 'Needs Focus'
+                    },
+                    {
+                        subject: 'Speaking',
+                        score: speakingAvg,
+                        total: totalQuestions?.filter((q: any) => q.subject === 'Speaking').length || 0,
+                        solved: (speakingSubs?.length || 0) + (new Set(solvedBySubject?.filter((q: any) => q.subject === 'Speaking').map(a => a.question_id)).size),
+                        accuracy: Math.round(speakingAvg * 11.1),
+                        color: '#f59e0b',
+                        icon: Mic,
+                        status: speakingAvg >= 7 ? 'Mastered' : speakingAvg >= 5 ? 'Improving' : 'Needs Focus'
+                    },
+                    {
+                        subject: 'Reading',
+                        score: readingAvg,
+                        total: totalQuestions?.filter((q: any) => q.subject === 'Academic Reading').length || 0,
+                        solved: (readingSubs?.length || 0) + (new Set(solvedBySubject?.filter((q: any) => q.subject === 'Academic Reading').map(a => a.question_id)).size),
+                        accuracy: readingAvg > 0 ? Math.round((readingAvg / 40) * 100) : (solvedBySubject?.filter((q: any) => q.subject === 'Academic Reading').length > 0 ? Math.round((solvedBySubject.filter((q: any) => q.subject === 'Academic Reading' && q.is_correct).length / solvedBySubject.filter((q: any) => q.subject === 'Academic Reading').length) * 100) : 0),
+                        color: '#10b981',
+                        icon: BookOpen,
+                        status: readingAvg >= 30 ? 'Mastered' : readingAvg >= 20 ? 'Improving' : 'Needs Focus'
+                    },
+                    {
+                        subject: 'Listening',
+                        score: listeningAvg,
+                        total: totalQuestions?.filter((q: any) => q.subject === 'Listening').length || 0,
+                        solved: (listeningSubs?.length || 0) + (new Set(solvedBySubject?.filter((q: any) => q.subject === 'Listening').map(a => a.question_id)).size),
+                        accuracy: listeningAvg > 0 ? Math.round((listeningAvg / 40) * 100) : (solvedBySubject?.filter((q: any) => q.subject === 'Listening').length > 0 ? Math.round((solvedBySubject.filter((q: any) => q.subject === 'Listening' && q.is_correct).length / solvedBySubject.filter((q: any) => q.subject === 'Listening').length) * 100) : 0),
+                        color: '#ef4444',
+                        icon: Headphones,
+                        status: listeningAvg >= 30 ? 'Mastered' : listeningAvg >= 20 ? 'Improving' : 'Needs Focus'
+                    },
                 ];
             }
 
@@ -129,18 +196,22 @@ export default function Analytics() {
                 const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
                 const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
 
-                // Show percentage of manual bank completed as the 'score' for visual representation
+                const uniqueSolved = new Set(attemptsInSubject.map(a => a.question_id)).size;
                 const completionPercentage = totalInSubject > 0
-                    ? Math.round((attemptsInSubject.length / totalInSubject) * 100)
+                    ? Math.round((uniqueSolved / totalInSubject) * 100)
                     : 0;
 
                 return {
                     subject: section.name,
-                    score: completionPercentage || 0, // Visual progress
+                    total: totalInSubject,
+                    score: completionPercentage || 0,
                     accuracy: attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0,
-                    solved: attemptsInSubject.length,
+                    solved: uniqueSolved,
                     icon: subjectIcons[section.name] || Sparkles,
-                    color: colors[index % colors.length]
+                    color: colors[index % colors.length],
+                    status: attemptsInSubject.length === 0 ? 'Not Started' :
+                        (correctCount / attemptsInSubject.length) >= 0.8 ? 'Mastered' :
+                            (correctCount / attemptsInSubject.length) >= 0.5 ? 'Improving' : 'Needs Focus'
                 };
             });
 
@@ -177,34 +248,55 @@ export default function Analytics() {
             const userRank = sortedScores.indexOf(currentUserScore) + 1;
             setRank(userRank || (sortedScores.length + 1));
 
-            const percentileValue = sortedScores.length > 0
-                ? Math.max(1, Math.round(((sortedScores.length - userRank + 1) / sortedScores.length) * 100))
-                : 0;
+            // 4. Growth Velocity
+            const daysToFetch = timeframe === '6m' ? 180 : timeframe === '30d' ? 30 : 7;
 
-            // 4. Growth Velocity (Last 7 Days)
-            const { data: weekTests } = await (supabase as any)
-                .from('tests')
-                .select('correct_answers, created_at')
-                .eq('user_id', user.id)
-                .eq('exam_type', activeExam.id)
-                .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+            const [{ data: periodTests }, { data: periodPractice }] = await Promise.all([
+                (supabase as any).from('tests').select('correct_answers, total_questions, created_at').eq('user_id', user.id).eq('exam_type', activeExam.id).gte('created_at', new Date(Date.now() - daysToFetch * 24 * 60 * 60 * 1000).toISOString()),
+                (supabase as any).from('user_practice_responses').select('is_correct, created_at').eq('user_id', user.id).eq('exam_type', activeExam.id).gte('created_at', new Date(Date.now() - daysToFetch * 24 * 60 * 60 * 1000).toISOString())
+            ]);
 
-            const last7Days = Array.from({ length: 7 }, (_, i) => {
+            const velocityPoints = Array.from({ length: daysToFetch }, (_, i) => {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
                 return {
-                    day: format(d, 'EEE'),
+                    day: timeframe === '6m' ? format(d, 'MMM d') : format(d, 'EEE'),
                     date: format(d, 'yyyy-MM-dd'),
-                    score: 0
+                    score: 0,
+                    questions: 0,
+                    accuracy: 0,
+                    correct: 0
                 };
             }).reverse();
 
-            weekTests?.forEach((t: any) => {
+            periodTests?.forEach((t: any) => {
                 const dayStr = format(new Date(t.created_at), 'yyyy-MM-dd');
-                const dayMatch = last7Days.find(d => d.date === dayStr);
-                if (dayMatch) dayMatch.score += (t.correct_answers || 0);
+                const dayMatch = velocityPoints.find(d => d.date === dayStr);
+                if (dayMatch) {
+                    dayMatch.score += (t.correct_answers || 0);
+                    dayMatch.questions += (t.total_questions || 0);
+                    dayMatch.correct += (t.correct_answers || 0);
+                }
             });
-            setVelocityData(last7Days);
+
+            periodPractice?.forEach((p: any) => {
+                const dayStr = format(new Date(p.created_at), 'yyyy-MM-dd');
+                const dayMatch = velocityPoints.find(d => d.date === dayStr);
+                if (dayMatch) {
+                    dayMatch.questions += 1;
+                    if (p.is_correct) {
+                        dayMatch.score += 1;
+                        dayMatch.correct += 1;
+                    }
+                }
+            });
+
+            velocityPoints.forEach(d => {
+                if (d.questions > 0) {
+                    d.accuracy = Math.round((d.correct / d.questions) * 100);
+                }
+            });
+            setVelocityData(velocityPoints);
 
             // 5. Score Projection
             const overallAccuracy = solvedBySubject && solvedBySubject.length > 0
@@ -226,6 +318,10 @@ export default function Analytics() {
                 confidence: Math.min(95, Math.round(overallAccuracy * 100 + (userTests?.length || 0))),
                 trajectory: recentAvg > overallAccuracy ? '↑ Improving' : '→ Stable'
             });
+
+            const percentileValue = sortedScores.length > 0
+                ? Math.round(((sortedScores.length - userRank) / sortedScores.length) * 100)
+                : 0;
 
             if (isIELTS) {
                 const scores = [dynamicSubjectData[0].score, dynamicSubjectData[1].score, dynamicSubjectData[2].score / 11.1, dynamicSubjectData[3].score / 11.1].filter(s => s > 0);
@@ -250,131 +346,229 @@ export default function Analytics() {
         };
 
         fetchAnalytics();
-    }, [user, activeExam]);
+    }, [user, activeExam, timeframe]);
 
     return (
         <Layout>
             <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-16 max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                {/* Header Area (Sleek Modern) */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10 sm:mb-16 border-b border-slate-100 dark:border-border pb-8">
-                    <div className="space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-muted rounded-full border border-indigo-100 dark:border-border">
-                            <BarChart3 className="w-3.5 h-3.5 text-indigo-600" />
-                            <span className="text-[9px] font-black text-indigo-900 dark:text-indigo-300 uppercase tracking-widest">Performance Profile</span>
+                {/* Compact Top Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl border border-indigo-500/10 rounded-3xl p-4 sm:p-6 shadow-sm mb-8">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                            <BarChart3 className="w-5 h-5 text-white" />
                         </div>
-                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
-                            Deep <span className="text-indigo-600">Analytics</span>
-                        </h1>
-                        <p className="text-base sm:text-lg text-slate-400 font-bold tracking-tight">Real-time breakdown of your preparation progress.</p>
+                        <div>
+                            <h1 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none uppercase">Analytical <span className="text-indigo-600">Intelligence</span></h1>
+                            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1">Real-time Performance Profile</p>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto">
-                        <div className="bg-white dark:bg-card px-6 sm:px-8 py-4 sm:py-5 rounded-2xl sm:rounded-3xl border border-slate-100 dark:border-border shadow-sm flex flex-col items-center flex-1 md:flex-none">
-                            <p className="text-[8px] sm:text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1.5 sm:mb-2">Total Points</p>
-                            <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{points.toLocaleString()}</p>
+                    <div className="flex items-center gap-3 mt-4 md:mt-0">
+                        <div className="flex flex-col items-end px-4 border-r border-slate-100 dark:border-border">
+                            <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Global Rank</p>
+                            <p className="text-sm font-black text-indigo-600">#{rank}</p>
                         </div>
-                        <div className="bg-slate-900 px-6 sm:px-8 py-4 sm:py-5 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col items-center group cursor-pointer hover:scale-105 transition-transform flex-1 md:flex-none">
-                            <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5 sm:mb-2 group-hover:text-indigo-400 transition-colors">Global Rank</p>
-                            <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">#{rank}</p>
+                        <div className="flex flex-col items-end px-4">
+                            <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Dash Points</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-slate-100">{points.toLocaleString()}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Free Tier Upgrade Hero */}
-                {profile?.selected_plan === 'explorer' && (
-                    <div className="mb-12 p-8 sm:p-12 rounded-[3rem] bg-indigo-600 shadow-2xl shadow-indigo-200 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div className="text-center md:text-left space-y-4">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full border border-white/20">
-                                    <Sparkles className="w-3.5 h-3.5 text-indigo-200" />
-                                    <span className="text-[10px] font-black text-white uppercase tracking-widest leading-none">Partial Analytics Active</span>
-                                </div>
-                                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase leading-none">
-                                    Unlock Neural <span className="text-indigo-200">Insights</span>
-                                </h3>
-                                <p className="text-sm font-medium text-indigo-100 max-w-sm leading-relaxed">
-                                    Your current plan only shows basic performance. Upgrade to see score projections, global rank distributions, and deep subject analysis.
-                                </p>
-                            </div>
-                            <Button
-                                onClick={() => navigate('/onboarding')}
-                                className="h-16 px-10 rounded-2xl bg-white text-indigo-600 hover:bg-slate-50 font-black text-xs uppercase tracking-widest shadow-xl group/btn shrink-0"
-                            >
-                                Upgrade Plan
-                                <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                            </Button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Primary Metrics Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
+                {/* Top Metrics Row */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {[
-                        { label: 'Avg Accuracy', value: stats.accuracy, icon: Target, bg: 'bg-white', text: 'text-slate-900' },
-                        { label: 'Time Spent', value: stats.timeSpent, icon: Clock, bg: 'bg-white', text: 'text-slate-900' },
-                        { label: 'Verified Skills', value: stats.verifiedSkills, icon: Award, bg: 'bg-emerald-50/50', text: 'text-emerald-900' },
-                        { label: 'Percentile', value: stats.percentile, icon: TrendingUp, bg: 'bg-indigo-50/50', text: 'text-indigo-900' },
+                        { label: 'Accuracy', value: stats.accuracy, icon: Target, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-100 dark:border-orange-700/30' },
+                        { label: 'Time Spent', value: stats.timeSpent, icon: Clock, color: 'text-pink-600 dark:text-pink-400', bg: 'bg-pink-50 dark:bg-pink-900/20', border: 'border-pink-100 dark:border-pink-700/30' },
+                        { label: 'Verified Skills', value: stats.verifiedSkills, icon: Award, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-100 dark:border-red-700/30' },
+                        { label: 'Percentile', value: stats.percentile, icon: TrendingUp, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-100 dark:border-emerald-700/30' },
                     ].map((stat, i) => (
-                        <div key={i} className={`${stat.bg} dark:bg-card p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border-2 border-slate-100 dark:border-border border-b-[6px] shadow-xl shadow-slate-200/50 hover:border-slate-300 hover:-translate-y-1 hover:shadow-2xl active:border-b-2 active:translate-y-1 transition-all duration-200 group`}>
-                            <div className="flex items-center justify-between mb-4 sm:mb-6">
-                                <stat.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.text} dark:text-slate-100 opacity-30 group-hover:opacity-100 transition-opacity`} />
-                                <ChevronRight className="w-3 h-3 text-slate-200" />
+                        <div key={i} className={`relative overflow-hidden ${stat.bg} backdrop-blur-xl border ${stat.border} p-6 rounded-[2rem] shadow-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl group`}>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className={`w-8 h-8 rounded-xl ${stat.bg.replace('/5', '/10')} flex items-center justify-center border ${stat.border}`}>
+                                    <stat.icon className={`w-4 h-4 ${stat.color} transition-transform group-hover:scale-110`} />
+                                </div>
+                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
-                            <p className={`text-xl sm:text-3xl font-black ${stat.text} dark:text-slate-100 tracking-tighter mb-1`}>{stat.value}</p>
-                            <p className="text-[7px] sm:text-[9px] font-black text-slate-300 uppercase tracking-widest">{stat.label}</p>
+                            <p className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tighter leading-none">{stat.value}</p>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{stat.label}</p>
+
+                            {/* Decorative Background Element */}
+                            <div className={`absolute -right-2 -bottom-2 w-12 h-12 ${stat.color.replace('text-', 'bg-')} opacity-[0.03] rounded-full blur-2xl group-hover:opacity-[0.08] transition-opacity`} />
                         </div>
                     ))}
                 </div>
 
-                {/* Charts Section */}
-                <div className="grid lg:grid-cols-12 gap-8 sm:gap-10 mb-8 sm:mb-12">
-                    {/* Activity Chart */}
-                    <div className="lg:col-span-8 bg-white dark:bg-card p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-100 dark:border-border border-b-[8px] shadow-xl shadow-slate-200/50 relative overflow-hidden group">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 sm:mb-12 relative z-10">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-indigo-50 dark:bg-muted rounded-xl flex items-center justify-center border border-indigo-100 dark:border-border">
-                                    <TrendingUp className="w-5 h-5 text-indigo-600" />
+                {/* Main Dashboard Grid */}
+                <div className="flex flex-col gap-6">
+                    {/* Row 1: Proficiency & Oracle Side-by-Side */}
+                    <div className="grid lg:grid-cols-2 gap-6 items-stretch">
+                        {/* Module Proficiency */}
+                        <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl flex flex-col h-full overflow-hidden">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-8 h-8 bg-emerald-50 dark:bg-muted rounded-xl flex items-center justify-center border border-emerald-100 dark:border-border">
+                                    <Award className="w-4 h-4 text-emerald-600" />
                                 </div>
-                                <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight">Growth Velocity</h3>
+                                <h3 className="text-base font-black text-slate-900 dark:text-slate-100 tracking-tight uppercase">Module Proficiency</h3>
                             </div>
-                            <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-slate-400 bg-slate-50 dark:bg-muted px-4 py-2 rounded-full border border-slate-100 dark:border-border uppercase tracking-widest">
-                                <Calendar className="w-3 h-3" /> Past 7 Cycles
+
+                            <div className="space-y-4 flex-1">
+                                <div className="grid grid-cols-12 px-6 py-3 text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50 dark:border-border/50">
+                                    <div className="col-span-5">Component</div>
+                                    <div className="col-span-3 text-center">Completion</div>
+                                    <div className="col-span-2 text-center">Accuracy</div>
+                                    <div className="col-span-2 text-right">Status</div>
+                                </div>
+                                <div className="space-y-2 p-2">
+                                    {subjectData.map((item, index) => (
+                                        <div key={index} className="grid grid-cols-12 items-center px-4 py-4 rounded-3xl hover:bg-white/40 dark:hover:bg-white/5 transition-all group border border-transparent hover:border-slate-100 dark:hover:border-white/5">
+                                            <div className="col-span-5 flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm" style={{ backgroundColor: `${item.color}10`, border: `1px solid ${item.color}20` }}>
+                                                    <item.icon className="w-4 h-4" style={{ color: item.color }} />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-black text-slate-700 dark:text-slate-200 truncate uppercase tracking-tight">{item.subject}</p>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{item.solved} / {item.total} Solved</p>
+                                                </div>
+                                            </div>
+                                            <div className="col-span-3 px-4">
+                                                <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-50 dark:border-white/5 relative">
+                                                    <div
+                                                        className="h-full rounded-full transition-all duration-1000 ease-out"
+                                                        style={{
+                                                            width: `${item.score}%`,
+                                                            backgroundColor: item.color,
+                                                            boxShadow: `0 0 10px ${item.color}40`
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-span-2 text-center">
+                                                <span className="text-sm font-black text-slate-900 dark:text-white tracking-tighter">{item.accuracy}%</span>
+                                            </div>
+                                            <div className="col-span-2 text-right">
+                                                <span className={`inline-flex px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border ${item.status === 'Mastered' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                    item.status === 'Improving' ? 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' :
+                                                        item.status === 'Needs Focus' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' :
+                                                            'bg-slate-500/10 text-slate-500 border-slate-500/20'
+                                                    }`}>
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="h-[250px] sm:h-[350px] w-full relative z-10">
+                        {/* Neural Oracle Projection */}
+                        <div className="bg-slate-950 p-8 rounded-[2.5rem] relative overflow-hidden flex flex-col group border border-slate-800 shadow-2xl h-full">
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.25),transparent_70%)]" />
+
+                            <div className="relative z-10 flex flex-col h-full items-center justify-between text-center">
+                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full border border-white/10 mb-4">
+                                    <Bot className="w-4 h-4 text-indigo-400" />
+                                    <span className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.2em]">Neural Oracle v2.0</span>
+                                </div>
+
+                                {profile?.selected_plan === 'explorer' ? (
+                                    <div className="space-y-6 my-auto">
+                                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 mx-auto">
+                                            <Brain className="w-8 h-8 text-indigo-400" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h4 className="text-xl font-black text-white uppercase tracking-tight">Intelligence Locked</h4>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4">Score Projection is exclusive to PRO members.</p>
+                                        </div>
+                                        <Button size="sm" onClick={() => navigate('/onboarding')} className="h-10 px-6 bg-white/10 hover:bg-white/20 text-white border-white/10 text-[9px] font-black uppercase tracking-widest rounded-xl">Unlock Insights</Button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="relative w-32 h-32 flex items-center justify-center my-2">
+                                            <svg className="w-full h-full -rotate-90">
+                                                <circle cx="50%" cy="50%" r="42%" stroke="rgba(255,255,255,0.05)" strokeWidth="10" fill="none" />
+                                                <circle cx="50%" cy="50%" r="42%" stroke="url(#oracleGrad)" strokeWidth="10" fill="none" strokeDasharray="264" strokeDashoffset={264 - (264 * (projection.score / projection.target))} strokeLinecap="round" className="transition-all duration-1000 ease-out" />
+                                                <defs>
+                                                    <linearGradient id="oracleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                        <stop offset="0%" stopColor="#4f46e5" />
+                                                        <stop offset="100%" stopColor="#818cf8" />
+                                                    </linearGradient>
+                                                </defs>
+                                            </svg>
+                                            <div className="absolute flex flex-col items-center">
+                                                <p className="text-3xl font-black text-white tracking-tighter leading-none">{projection.score}</p>
+                                                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-1">Target: {projection.target}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="w-full space-y-2 mt-4">
+                                            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 transition-colors hover:bg-white/10">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Confidence</span>
+                                                <span className="text-sm font-black text-white">{projection.confidence}%</span>
+                                            </div>
+                                            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 transition-colors hover:bg-white/10">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Trajectory</span>
+                                                <span className={`text-xs font-black ${projection.trajectory.includes('↑') ? 'text-emerald-400' : 'text-amber-400'}`}>{projection.trajectory}</span>
+                                            </div>
+                                        </div>
+
+                                        <Button onClick={() => navigate('/practice')} className="w-full h-12 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-xl mt-6 border-none transition-all active:scale-95">Start Simulation</Button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 2: Growth Velocity Full-Width */}
+                    <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl flex flex-col min-h-[320px]">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-8 h-8 bg-indigo-50 dark:bg-muted rounded-xl flex items-center justify-center border border-indigo-100 dark:border-border">
+                                    <TrendingUp className="w-4 h-4 text-indigo-600" />
+                                </div>
+                                <h3 className="text-base font-black text-slate-900 dark:text-slate-100 tracking-tight uppercase">Growth Velocity</h3>
+                            </div>
+                            <div className="flex bg-slate-100/50 dark:bg-muted/30 p-1 rounded-2xl border border-slate-200/50 dark:border-white/5">
+                                {(['7d', '30d', '6m'] as const).map((t) => (
+                                    <button
+                                        key={t}
+                                        onClick={() => setTimeframe(t)}
+                                        className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${timeframe === t
+                                            ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm'
+                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                            }`}
+                                    >
+                                        {t === '7d' ? '7 Days' : t === '30d' ? '30 Days' : '6 Months'}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="h-[300px] w-full mt-auto">
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={velocityData}>
+                                <AreaChart data={velocityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15} />
+                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
                                             <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" opacity={0.1} />
                                     <XAxis
                                         dataKey="day"
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#cbd5e1', fontWeight: 'bold', fontSize: 10 }}
+                                        tick={{ fill: '#94a3b8', fontWeight: '900', fontSize: 10 }}
                                         dy={10}
                                     />
                                     <YAxis
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#cbd5e1', fontWeight: 'bold', fontSize: 10 }}
-                                        dx={-5}
+                                        tick={{ fill: '#94a3b8', fontWeight: '900', fontSize: 10 }}
                                     />
                                     <Tooltip
-                                        contentStyle={{
-                                            borderRadius: '1.25rem',
-                                            border: '1px solid #f1f5f9',
-                                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                            fontWeight: 'bold',
-                                            padding: '8px 12px',
-                                            fontSize: '10px'
-                                        }}
+                                        content={<CustomTooltip />}
+                                        cursor={{ stroke: '#6366f1', strokeWidth: 2, strokeDasharray: '5 5' }}
                                     />
                                     <Area
                                         type="monotone"
@@ -383,149 +577,24 @@ export default function Analytics() {
                                         strokeWidth={4}
                                         fillOpacity={1}
                                         fill="url(#colorScore)"
-                                        animationDuration={2000}
+                                        animationDuration={1500}
+                                        activeDot={{
+                                            r: 6,
+                                            fill: '#6366f1',
+                                            stroke: '#fff',
+                                            strokeWidth: 3,
+                                            className: "shadow-2xl"
+                                        }}
+                                        dot={{
+                                            r: 4,
+                                            fill: '#fff',
+                                            stroke: '#6366f1',
+                                            strokeWidth: 2
+                                        }}
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 dark:bg-muted rounded-full blur-3xl opacity-50 group-hover:scale-125 transition-transform duration-1000" />
-                    </div>
-
-                    {/* Score Oracle Projection (NEW FEATURE - Restricted for Free) */}
-                    <div className={`lg:col-span-4 bg-slate-900 p-8 sm:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-2xl shadow-indigo-200 dark:shadow-none relative overflow-hidden group border-b-[8px] border-slate-950 active:border-b-0 active:translate-y-2 transition-all duration-200 ${profile?.selected_plan === 'explorer' ? 'min-h-[400px]' : ''}`}>
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.15),transparent_70%)]" />
-
-                        {profile?.selected_plan === 'explorer' ? (
-                            <div className="relative z-20 h-full flex flex-col items-center justify-center text-center space-y-6">
-                                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10">
-                                    <Brain className="w-8 h-8 text-indigo-400" />
-                                </div>
-                                <div className="space-y-2">
-                                    <h4 className="text-xl font-black text-white uppercase tracking-tight">Oracle Locked</h4>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4">AI Score Projection is exclusive to PRO members.</p>
-                                </div>
-                                <Button size="sm" onClick={() => navigate('/onboarding')} className="bg-white/10 hover:bg-white/20 text-white border-white/10 text-[9px] font-black uppercase tracking-widest px-6">
-                                    Unlock Now
-                                </Button>
-                            </div>
-                        ) : (
-                            <div className="relative z-10 text-center space-y-6 sm:space-y-8">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full border border-white/10 mb-2">
-                                    <Bot className="w-3 h-3 text-indigo-400" />
-                                    <span className="text-[9px] font-black text-white uppercase tracking-widest text-indigo-300">Neural Oracle v1.0</span>
-                                </div>
-
-                                <h3 className="text-lg sm:text-xl font-black text-white tracking-tight uppercase">Score Projection</h3>
-
-                                {/* Oracle Gauge Visualization */}
-                                <div className="relative w-36 h-36 sm:w-48 sm:h-48 mx-auto flex items-center justify-center">
-                                    <svg className="w-full h-full -rotate-90">
-                                        <circle cx="50%" cy="50%" r="42%" stroke="rgba(255,255,255,0.05)" strokeWidth="10" fill="none" />
-                                        <circle
-                                            cx="50%" cy="50%" r="42%"
-                                            stroke="url(#oracleGradient)"
-                                            strokeWidth="10"
-                                            fill="none"
-                                            strokeDasharray="264"
-                                            strokeDashoffset={264 - (264 * (projection.score / projection.target))}
-                                            strokeLinecap="round"
-                                            className="transition-all duration-1000 ease-out"
-                                        />
-                                        <defs>
-                                            <linearGradient id="oracleGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                <stop offset="0%" stopColor="#4f46e5" />
-                                                <stop offset="100%" stopColor="#818cf8" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <p className="text-4xl sm:text-5xl font-black text-white tracking-tighter">{projection.score}</p>
-                                        <p className="text-[9px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest leading-none mt-1">Target: {projection.target}</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-3 sm:space-y-4">
-                                    <div className="flex items-center justify-between p-3 sm:p-4 bg-white/5 rounded-xl sm:rounded-2xl border border-white/5">
-                                        <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">Confidence</span>
-                                        <span className="text-xs sm:text-sm font-black text-white">{projection.confidence}%</span>
-                                    </div>
-                                    <div className="flex items-center justify-between p-3 sm:p-4 bg-white/5 rounded-xl sm:rounded-2xl border border-white/5">
-                                        <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">Trajectory</span>
-                                        <span className={`text-xs sm:text-sm font-black ${projection.trajectory.includes('↑') ? 'text-emerald-400' : 'text-amber-400'}`}>{projection.trajectory}</span>
-                                    </div>
-                                </div>
-
-                                <Button
-                                    onClick={() => navigate('/practice')}
-                                    className="w-full h-12 sm:h-14 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] rounded-xl sm:rounded-2xl shadow-xl transition-all active:scale-95 border-none"
-                                >
-                                    EXAM SIMULATION
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="grid lg:grid-cols-12 gap-10">
-                    {/* Subject Analysis (Adjusted col span) */}
-                    <div className="lg:col-span-12 bg-white dark:bg-card p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-100 dark:border-border border-b-[8px] shadow-xl shadow-slate-200/50">
-                        <div className="flex items-center justify-between mb-8 sm:mb-12">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-emerald-50 dark:bg-muted rounded-xl flex items-center justify-center border border-emerald-100 dark:border-border">
-                                    <Award className="w-5 h-5 text-emerald-600" />
-                                </div>
-                                <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight">
-                                    {activeExam.id === 'ielts-academic' ? 'Module Proficiency' : 'Proficiency Breakdown'}
-                                </h3>
-                            </div>
-                            <div className="hidden sm:flex gap-3">
-                                <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-muted rounded-lg border border-slate-100 dark:border-border">
-                                    <div className="w-2 h-2 rounded-full bg-indigo-600" />
-                                    <span className="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest">Elite</span>
-                                </div>
-                                <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-muted rounded-lg border border-slate-100 dark:border-border">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                                    <span className="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest">Target</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-6 mb-8">
-                            <div className="grid grid-cols-12 px-4 py-2 text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50 dark:border-border/50">
-                                <div className="col-span-8">Subject</div>
-                                <div className="col-span-2 text-center">Mastery</div>
-                                <div className="col-span-2 text-right">Solved</div>
-                            </div>
-                            {subjectData.map((item, index) => (
-                                <div key={index} className="grid grid-cols-12 items-center px-4 py-4 rounded-[1.5rem] hover:bg-slate-50 dark:hover:bg-muted/50 transition-all group">
-                                    <div className="col-span-8 flex items-center gap-4 sm:gap-6">
-                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center relative overflow-hidden shrink-0" style={{ backgroundColor: `${item.color}15` }}>
-                                            <item.icon className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" style={{ color: item.color }} />
-                                            <div className="absolute inset-0 opacity-10" style={{ backgroundColor: item.color }} />
-                                        </div>
-                                        <span className="text-sm sm:text-lg font-black text-slate-900 dark:text-slate-100 tracking-tight group-hover:translate-x-1 transition-transform">{item.subject}</span>
-                                    </div>
-                                    <div className="col-span-2 text-center">
-                                        <span className="text-base sm:text-xl font-black text-rose-500 tracking-tighter">{item.accuracy}%</span>
-                                    </div>
-                                    <div className="col-span-2 text-right">
-                                        <span className="text-base sm:text-xl font-black text-slate-300 dark:text-slate-500 tracking-tighter">{item.solved || 0}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {profile?.selected_plan === 'explorer' && (
-                            <div className="mt-8 flex items-center justify-between p-6 bg-slate-50 dark:bg-muted rounded-2xl border border-slate-100 dark:border-border">
-                                <div className="flex items-center gap-3">
-                                    <Bot className="w-5 h-5 text-indigo-600" />
-                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Showing limited modules. Upgrade for full breakdown.</p>
-                                </div>
-                                <Button size="sm" onClick={() => navigate('/onboarding')} className="bg-slate-900 text-white font-black text-[9px] uppercase tracking-widest rounded-xl">
-                                    Unlock Data
-                                </Button>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
