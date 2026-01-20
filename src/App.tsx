@@ -32,6 +32,8 @@ const Bookmarks = lazy(() => import("./pages/Bookmarks"));
 const Admin = lazy(() => import("./pages/Admin"));
 const InternationalMockWaitingRoom = lazy(() => import("./pages/InternationalMockWaitingRoom"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const ExamIMAT = lazy(() => import("./pages/ExamIMAT"));
 const ExamCENTS = lazy(() => import("./pages/ExamCENTS"));
@@ -168,6 +170,8 @@ const App = () => (
                   <Route path="/consultant/application/:id/offer" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationOffer /></ProtectedRoute>} />
 
                   <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/terms" element={<Terms />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

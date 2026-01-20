@@ -534,8 +534,8 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                                 <div className="flex items-center gap-6">
                                     <FeedbackDialog />
                                     <div className="flex gap-8 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                                        <a href="#" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Privacy</a>
-                                        <a href="#" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Terms</a>
+                                        <Link to="/privacy" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Privacy</Link>
+                                        <Link to="/terms" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Terms</Link>
                                         <a href="#" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Support</a>
                                     </div>
                                 </div>

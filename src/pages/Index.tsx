@@ -473,8 +473,8 @@ export default function Index() {
                             © 2026 ITALOSTUDY SYSTEMS • DESIGNED FOR EXCELLENCE
                         </p>
                         <div className="flex gap-8">
-                            <a href="#" className="text-[10px] font-black text-white/20 hover:text-white transition-colors uppercase tracking-widest">Privacy Policy</a>
-                            <a href="#" className="text-[10px] font-black text-white/20 hover:text-white transition-colors uppercase tracking-widest">Terms of Service</a>
+                            <Link to="/privacy" className="text-[10px] font-black text-white/20 hover:text-white transition-colors uppercase tracking-widest">Privacy Policy</Link>
+                            <Link to="/terms" className="text-[10px] font-black text-white/20 hover:text-white transition-colors uppercase tracking-widest">Terms of Service</Link>
                         </div>
                     </div>
                 </div>
