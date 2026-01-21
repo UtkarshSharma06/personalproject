@@ -15,7 +15,8 @@ export default function Pricing() {
             description: 'Essential daily study habit.',
             icon: Brain,
             color: 'slate',
-            features: ['10-15 Questions Daily', 'Basic Performance Stats', 'Sample Intro Videos', 'Read-only Community'],
+            included: ['10-15 Questions Daily', 'Basic Performance Stats', 'Sample Intro Videos', 'Read-only Community'],
+            excluded: ['Unlimited Practice Exams', 'Full Learning Section', 'Mock Simulations', 'University Shortlisting'],
             cta: 'START FREE'
         },
         {
@@ -26,7 +27,8 @@ export default function Pricing() {
             icon: Zap,
             color: 'indigo',
             badge: 'BETA SPECIAL',
-            features: ['Unlimited Practice Exams', 'Detailed Explanations', 'Full Learning Section', 'Mock Simulations', 'Community Discussion', 'Exam Analytics'],
+            included: ['Unlimited Practice Exams', 'Detailed Explanations', 'Full Learning Section', 'Mock Simulations', 'Community Discussion', 'Exam Analytics'],
+            excluded: ['Priority Community Access', 'University Shortlisting', 'Visa Process Guidance'],
             cta: 'GET FOR FREE'
         },
         {
@@ -37,7 +39,8 @@ export default function Pricing() {
             icon: Sparkles,
             color: 'amber',
             badge: 'BETA SPECIAL',
-            features: ['Everything in PRO', 'Advanced Simulations', 'Priority Community Access', 'University Shortlisting', 'Visa Process Guidance'],
+            included: ['Everything in PRO', 'Advanced Simulations', 'Priority Community Access', 'University Shortlisting', 'Visa Process Guidance'],
+            excluded: [],
             cta: 'GET FOR FREE'
         }
     ];
@@ -93,12 +96,20 @@ export default function Pricing() {
                                 </div>
 
                                 <div className="space-y-3 mb-8">
-                                    {plan.features.map((feature, idx) => (
-                                        <div key={idx} className="flex items-center gap-3">
+                                    {plan.included.map((feature, idx) => (
+                                        <div key={`inc-${idx}`} className="flex items-center gap-3">
                                             <div className="w-5 h-5 bg-emerald-50 dark:bg-emerald-500/10 rounded-full flex items-center justify-center shrink-0">
                                                 <Check className="w-3 h-3 text-[#00a884]" />
                                             </div>
                                             <span className="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{feature}</span>
+                                        </div>
+                                    ))}
+                                    {plan.excluded.map((feature, idx) => (
+                                        <div key={`exc-${idx}`} className="flex items-center gap-3 opacity-50">
+                                            <div className="w-5 h-5 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center shrink-0">
+                                                <X className="w-3 h-3 text-red-500" />
+                                            </div>
+                                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tight line-through decoration-red-500/30">{feature}</span>
                                         </div>
                                     ))}
                                 </div>
