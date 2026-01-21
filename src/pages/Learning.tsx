@@ -480,11 +480,12 @@ export default function Learning() {
         setSelectedVideo(video);
 
         // Find the "topic" (lesson group) this belongs to
-        // If it's direct content, the parent is the topic itself
-        const foundTopic = topics.find(t =>
-            t.id === parent.id ||
-            t.subunits?.some((s: any) => s.id === parent.id)
-        );
+        const foundTopic = (parent?.name === 'Direct')
+            ? topics.find(t => t.id === 'topic-direct')
+            : topics.find(t =>
+                t.id === parent?.id ||
+                t.subunits?.some((s: any) => s.id === parent?.id)
+            );
         setSelectedTopic(foundTopic);
 
         fetchComments(video.id);
@@ -1105,7 +1106,7 @@ export default function Learning() {
                             {topicsWithLessons.map((lesson, idx) => (
                                 <button
                                     key={lesson.id}
-                                    onClick={() => setSelectedVideo(lesson)}
+                                    onClick={() => handleVideoSelect(lesson, lesson.subunit)}
                                     className={cn(
                                         "w-full p-4 lg:p-5 rounded-2xl lg:rounded-[2rem] text-left transition-all border group relative overflow-hidden",
                                         selectedVideo.id === lesson.id
@@ -1282,7 +1283,7 @@ export default function Learning() {
                                     <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full md:w-auto">
                                         {nextVideo && (
                                             <Button
-                                                onClick={() => setSelectedVideo(nextVideo)}
+                                                onClick={() => handleVideoSelect(nextVideo, nextVideo.subunit)}
                                                 className="h-14 sm:h-16 lg:h-20 px-6 sm:px-8 lg:px-12 rounded-xl sm:rounded-[2rem] bg-white text-slate-900 hover:bg-white/90 font-black text-[9px] lg:text-[10px] uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 shrink-0 group w-full sm:w-auto"
                                             >
                                                 Next Session
