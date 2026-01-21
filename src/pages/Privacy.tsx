@@ -62,15 +62,15 @@ export default function Privacy() {
 
                 <div className="space-y-4">
                     <PrivacySection icon={Eye} title="Data Collection">
-                        <p>We collect information necessary to provide our AI-driven academic ecosystem. This includes:</p>
+                        <p>We collect information necessary to provide our intelligent academic ecosystem. This includes:</p>
                         <ul className="list-disc pl-6 space-y-2">
                             <li>Account Identification (Email, Display Name)</li>
                             <li>Academic Profile (Target Exams, Performance Metrics)</li>
-                            <li>Interaction Logs (Practice Session Results, AI Tutor Sessions)</li>
+                            <li>Interaction Logs (Practice Session Results, Tutoring Sessions)</li>
                         </ul>
                     </PrivacySection>
 
-                    <PrivacySection icon={Database} title="AI Processing & Privacy">
+                    <PrivacySection icon={Database} title="Smart Processing & Privacy">
                         <p>ItaloStudy utilizes advanced neural networks to personalize your learning experience. Your data is used to:</p>
                         <ul className="list-disc pl-6 space-y-2">
                             <li>Calibrate Adaptive Difficulty Algorithms</li>
@@ -93,7 +93,7 @@ export default function Privacy() {
                     </PrivacySection>
 
                     <PrivacySection icon={UserCheck} title="Service Transparency">
-                        <p>We utilize trusted infrastructure partners including Supabase (Database), Vercel (Hosting), and OpenAI/Google (AI Intelligence). Each partner is selected based on their commitment to enterprise-grade security and compliance.</p>
+                        <p>We utilize trusted infrastructure partners including Supabase (Database), Vercel (Hosting), and industry-leading providers for our learning engine. Each partner is selected based on their commitment to enterprise-grade security and compliance.</p>
                     </PrivacySection>
                 </div>
 

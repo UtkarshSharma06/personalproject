@@ -14,9 +14,9 @@ export default function Method() {
         },
         {
             number: '02',
-            title: 'AI Logic Training',
+            title: 'Smart Logic Training',
             icon: Brain,
-            description: 'Our proprietary neural engine generates personalized item sets targeting your specific architectural weaknesses.',
+            description: 'Our proprietary learning engine generates personalized item sets targeting your specific architectural weaknesses.',
             color: 'bg-indigo-50',
             iconColor: 'text-indigo-600'
         },

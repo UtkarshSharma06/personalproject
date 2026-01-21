@@ -29,7 +29,7 @@ export default function Terms() {
         <div className="min-h-screen bg-[#030014] text-white font-sans selection:bg-amber-500/30">
             <SEO
                 title="Terms of Service | ItaloStudy"
-                description="The legal protocol governing the usage of the ItaloStudy AI ecosystem and educational tools."
+                description="The legal protocol governing the usage of the ItaloStudy intelligent ecosystem and educational tools."
             />
 
             {/* Header */}
@@ -62,9 +62,9 @@ export default function Terms() {
 
                 <div className="space-y-4">
                     <TermsSection icon={Zap} title="Service Scope">
-                        <p>ItaloStudy provides an AI-integrated educational platform for exam preparation (IMAT, SAT, IELTS, CEnT-S). Our services include:</p>
+                        <p>ItaloStudy provides an intelligent educational platform for exam preparation (IMAT, SAT, IELTS, CEnT-S). Our services include:</p>
                         <ul className="list-disc pl-6 space-y-2">
-                            <li>Real-time AI Tutoring & Item Generation</li>
+                            <li>Real-time Expert Tutoring & Item Generation</li>
                             <li>Performance Analytics & Diagnostic Simulations</li>
                             <li>Community Modules & Collaborative Workspaces</li>
                         </ul>
@@ -74,10 +74,10 @@ export default function Terms() {
                         <p>Users must maintain high standards of academic honesty. The platform is designed for preparation and learning, not for dynamic assistance during official exam administrations. Usage of ItaloStudy to automate cheating or bypass exam security protocols is strictly prohibited.</p>
                     </TermsSection>
 
-                    <TermsSection icon={Cpu} title="AI Intelligence Disclaimer">
-                        <p>Our AI engines strive for 99.9% accuracy, but given the nature of generative intelligence:</p>
+                    <TermsSection icon={Cpu} title="Learning Engine Disclaimer">
+                        <p>Our learning engines strive for 99.9% accuracy, but given the nature of dynamic educational intelligence:</p>
                         <ul className="list-disc pl-6 space-y-2">
-                            <li>AI-generated explanations are for educational guidance and should be cross-referenced with official blueprints.</li>
+                            <li>System-generated explanations are for educational guidance and should be cross-referenced with official blueprints.</li>
                             <li>Diagnostic scores are predictive estimates, not guarantees of final exam results.</li>
                         </ul>
                     </TermsSection>

@@ -121,7 +121,7 @@ export default function Index() {
 
             <SEO
                 title="ItaloStudy | Free IMAT Practice & Unlimited Free Mocks"
-                description="Experience the world's most advanced AI ecosystem for IMAT, SAT, CEnT-S and IELTS preparation. Get free practice questions and unlimited free mocks for your exam success."
+                description="Experience the world's most advanced study simulator for IMAT, SAT, CEnT-S and IELTS preparation. Get free practice questions and unlimited free mocks for your exam success."
                 keywords="Free IMAT Practice, Unlimited Free IMAT Mocks, Free SAT Prep, Free IELTS Preparation, Study in Italy, Medical Admission Italy, Free Academic Practice, ItaloStudy Free Mocks"
             />
             <AcademicBackground />
@@ -292,7 +292,7 @@ export default function Index() {
                         className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full mb-6 shadow-lg scale-90 md:scale-100"
                     >
                         <Sparkles className="w-3 md:w-4 h-3 md:h-4 text-cyan-400 animate-pulse" />
-                        <span className="text-[9px] md:text-[11px] font-black text-white/80 uppercase tracking-[0.15em] md:tracking-[0.2em] whitespace-nowrap">Next-Gen Admission Intelligence</span>
+                        <span className="text-[9px] md:text-[11px] font-black text-white/80 uppercase tracking-[0.15em] md:tracking-[0.2em] whitespace-nowrap">Next-Gen Admission Expert</span>
                     </motion.div>
 
                     <motion.h1
@@ -363,7 +363,7 @@ export default function Index() {
                     <div className="container mx-auto px-6">
                         <div className="grid md:grid-cols-3 gap-8">
                             {[
-                                { icon: <Zap className="w-8 h-8" />, title: "Adaptive Study", desc: "Our AI identifies your knowledge gaps and builds a custom path for any exam.", color: "from-amber-400 to-orange-500", glow: "shadow-amber-500/20" },
+                                { icon: <Zap className="w-8 h-8" />, title: "Adaptive Study", desc: "Our system identifies your knowledge gaps and builds a custom path for any exam.", color: "from-amber-400 to-orange-500", glow: "shadow-amber-500/20" },
                                 { icon: <Target className="w-8 h-8" />, title: "Exam Simulation", desc: "Practice in an environment identical to the real test. Zero surprises on test day.", color: "from-indigo-500 to-violet-600", glow: "shadow-indigo-500/20" },
                                 { icon: <Users className="w-8 h-8" />, title: "Student Ranked", desc: "Compare your performance against thousands of global applicants in real-time.", color: "from-emerald-400 to-teal-500", glow: "shadow-emerald-500/20" }
                             ].map((feat, i) => (
@@ -458,7 +458,7 @@ export default function Index() {
                                     loading="lazy"
                                 />
                                 <p className="text-sm font-bold text-white/40 max-w-xs text-center lg:text-left leading-relaxed">
-                                    Empowering students worldwide with AI-driven academic excellence and simplified admissions.
+                                    Empowering students worldwide with data-driven academic excellence and simplified admissions.
                                 </p>
                             </div>
 
