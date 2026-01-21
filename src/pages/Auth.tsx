@@ -290,13 +290,13 @@ export default function Auth() {
                     </h1>
 
                     <p className="text-xl text-slate-400 font-bold mb-16 max-w-lg leading-relaxed tracking-tight">
-                        Experience the most advanced AI-driven preparation ecosystem for global academic success.
+                        Experience the most advanced adaptive preparation ecosystem for global academic success.
                     </p>
 
                     <div className="space-y-4">
                         {[
                             { text: 'Dynamic Adaptive Testing', color: 'bg-indigo-50', textCol: 'text-indigo-600' },
-                            { text: 'Live AI Proctoring System', color: 'bg-slate-50', textCol: 'text-slate-600' },
+                            { text: 'Live Proctoring System', color: 'bg-slate-50', textCol: 'text-slate-600' },
                             { text: 'Deep Performance Analytics', color: 'bg-indigo-50', textCol: 'text-indigo-600' },
                         ].map((feature, i) => (
                             <FeatureItem key={i} feature={feature} />

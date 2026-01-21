@@ -68,7 +68,7 @@ export function UpgradeModal({
                         <div className="space-y-4 mb-8">
                             {[
                                 "Unlimited practice questions",
-                                "Deep Logic AI explanations",
+                                "Deep Logic explanations",
                                 "Official full-length simulations",
                                 "Priority university support"
                             ].map((item, i) => (

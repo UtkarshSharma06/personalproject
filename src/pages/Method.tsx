@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Brain, Target, TrendingUp, Zap, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SEO from '@/components/SEO';
 
 export default function Method() {
     const steps = [
@@ -40,6 +41,35 @@ export default function Method() {
 
     return (
         <div className="min-h-screen bg-white dark:bg-card font-sans selection:bg-indigo-100 selection:text-indigo-900">
+            <SEO
+                title="Our Methodology | The ItaloStudy Standard"
+                description="Discover our 4-step cognitive framework engineered to accelerate expertise in medical sciences. Diagnostic, Training, Retention, and Simulation."
+                keywords="ItaloStudy Method, Cognitive Framework, Medical Exam Preparation, Smart Logic Training, Exam Simulation"
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": "ItaloStudy Methodology",
+                    "description": "A multi-layered cognitive framework engineered to accelerate expertise in medical sciences.",
+                    "url": "https://italostudy.com/method",
+                    "breadcrumb": {
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Home",
+                                "item": "https://italostudy.com"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Methodology",
+                                "item": "https://italostudy.com/method"
+                            }
+                        ]
+                    }
+                }}
+            />
             {/* Header (Sleek Modern) */}
             <div className="bg-white/80 backdrop-blur-xl border-b border-slate-50 sticky top-0 z-50">
                 <div className="container mx-auto px-6 py-5">

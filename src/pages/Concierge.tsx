@@ -501,7 +501,7 @@ export default function Concierge() {
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Application to Visa</span>
                                 </h1>
                                 <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
-                                    ITALOSTUDY is an AI-powered consultancy dedicated to making your study abroad dreams a reality. We combine human expertise with smart technology to simplify every step of your journey.
+                                    ITALOSTUDY is an intelligent consultancy dedicated to making your study abroad dreams a reality. We combine human expertise with smart technology to simplify every step of your journey.
                                 </p>
                             </div>
 
@@ -533,7 +533,7 @@ export default function Concierge() {
                             <div className="grid md:grid-cols-3 gap-6">
                                 {[
                                     { icon: ShieldCheck, title: "Verified Partners", desc: "We work directly with top-tier universities worldwide." },
-                                    { icon: Zap, title: "Fast-Track", desc: "Our AI speeds up the application process by 3x." },
+                                    { icon: Zap, title: "Fast-Track", desc: "Our system speeds up the application process by 3x." },
                                     { icon: Heart, title: "Student First", desc: "Your career goals are our top priority, always." }
                                 ].map((feat, i) => (
                                     <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">

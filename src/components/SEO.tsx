@@ -7,6 +7,8 @@ interface SEOProps {
     image?: string;
     url?: string;
     type?: string;
+    schema?: Record<string, any>;
+    canonicalUrl?: string;
 }
 
 export default function SEO({
@@ -15,7 +17,9 @@ export default function SEO({
     keywords = "IMAT, SAT, IELTS, Free Practice, Free Mocks, Study in Italy, Medical Admission Italy, Free IMAT mocks, Unlimited free mocks",
     image = "/logo.png",
     url = "https://italostudy.com", // Fallback URL
-    type = "website"
+    type = "website",
+    schema,
+    canonicalUrl
 }: SEOProps) {
     const siteTitle = title.includes("ItaloStudy") ? title : `${title} | ItaloStudy`;
 
@@ -39,6 +43,16 @@ export default function SEO({
             <meta name="twitter:title" content={siteTitle} />
             <meta name="twitter:description" content={description} />
             <meta name="twitter:image" content={image} />
+
+            {/* Canonical */}
+            <link rel="canonical" href={canonicalUrl || url} />
+
+            {/* Structured Data (JSON-LD) */}
+            {schema && (
+                <script type="application/ld+json">
+                    {JSON.stringify(schema)}
+                </script>
+            )}
         </Helmet>
     );
 }

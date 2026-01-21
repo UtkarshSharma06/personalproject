@@ -19,6 +19,7 @@ import {
 import { useExam } from '@/context/ExamContext';
 import { usePlanAccess } from '@/hooks/usePlanAccess';
 import Layout from '@/components/Layout';
+import { UpgradeModal } from '@/components/UpgradeModal';
 
 const DIFFICULTIES = [
   { value: 'easy', label: 'Easy', description: 'Basic concepts', color: 'text-emerald-500' },
@@ -43,6 +44,7 @@ export default function StartTest() {
   const [questionCount, setQuestionCount] = useState(Number(searchParams.get('count')) || 10);
   const [timeLimit, setTimeLimit] = useState(30);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   // Fetch unique topics for the selected subject
   useEffect(() => {
@@ -123,11 +125,7 @@ export default function StartTest() {
 
     // Only check limits for authenticated users
     if (user && hasReachedSubjectLimit(isFullMock ? 'Mock Simulation' : subject)) {
-      toast({
-        title: 'Daily Limit Reached',
-        description: `You have reached your 15-question daily limit for ${isFullMock ? 'Mock Simulations' : subject}. Upgrade to PRO for unlimited practice!`,
-        variant: 'destructive',
-      });
+      setIsUpgradeModalOpen(true);
       return;
     }
 
@@ -426,7 +424,7 @@ export default function StartTest() {
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Step 3: Mission Scale</h3>
               </div>
               <div className="flex gap-2 flex-wrap">
-                {[5, 10, 15, 20, 25].map((count) => {
+                {[1, 5, 10, 15, 20, 25].map((count) => {
                   const remaining = getRemainingQuestions(subject);
                   const isDisabled = isExplorer && count > remaining;
                   return (
@@ -454,11 +452,37 @@ export default function StartTest() {
               )}
             </section>
 
-            {/* Step 4: Difficulty */}
+            {/* Step 4: Time Limit */}
+            <section className="space-y-6">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-indigo-600" />
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Step 4: Time Limit</h3>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {[10, 15, 20, 30, 45, 60].map((time) => (
+                  <button
+                    key={time}
+                    type="button"
+                    onClick={() => setTimeLimit(time)}
+                    className={`px-4 h-12 rounded-xl border-2 font-black text-xs transition-all ${timeLimit === time
+                      ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900 shadow-sm'
+                      : 'border-slate-50 bg-slate-50/30 text-slate-400 hover:border-slate-200'
+                      }`}
+                  >
+                    {time}m
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                Selected: <span className="text-indigo-600">{timeLimit} minutes</span>
+              </p>
+            </section>
+
+            {/* Step 5: Difficulty */}
             <section className="space-y-6">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-indigo-600" />
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Step 4: Difficulty</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Step 5: Difficulty</h3>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {DIFFICULTIES.map((d) => (
@@ -491,6 +515,14 @@ export default function StartTest() {
           </div>
         </div>
       </div>
+
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        title="Daily Practice Limit Reached"
+        description={`You've reached your 15-question daily limit for ${subject}. Upgrade to PRO for unlimited practice questions and full access to all features!`}
+        feature="Unlimited Practice Questions"
+      />
     </Layout>
   );
 }

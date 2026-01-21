@@ -262,13 +262,13 @@ export default function Results() {
             <div className="space-y-3">
               {rankings.leaderboard.map((entry: any, idx: number) => (
                 <div key={idx} className={`p-6 rounded-2xl border-2 flex items-center gap-6 transition-all ${entry.user_id === user?.id
-                    ? 'border-indigo-600 bg-indigo-50/50 shadow-lg'
-                    : 'border-slate-100 dark:border-border bg-slate-50/50'
+                  ? 'border-indigo-600 bg-indigo-50/50 shadow-lg'
+                  : 'border-slate-100 dark:border-border bg-slate-50/50'
                   }`}>
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg ${entry.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
-                      entry.rank === 2 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-white' :
-                        entry.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
-                          'bg-slate-50 dark:bg-muted text-slate-400 border border-slate-200 dark:border-border'
+                    entry.rank === 2 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-white' :
+                      entry.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
+                        'bg-slate-50 dark:bg-muted text-slate-400 border border-slate-200 dark:border-border'
                     }`}>
                     {entry.rank}
                   </div>
@@ -410,7 +410,7 @@ export default function Results() {
                           <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4">Deep Logic Explanation</p>
                           {isExplorer ? (
                             <div className="space-y-4">
-                              <p className="text-xs text-slate-400 font-medium italic">Detailed AI explanations are exclusive to PRO and ELITE plans.</p>
+                              <p className="text-xs text-slate-400 font-medium italic">Detailed expert explanations are exclusive to PRO and ELITE plans.</p>
                               <Button
                                 onClick={() => setIsUpgradeModalOpen(true)}
                                 size="sm"
@@ -454,8 +454,8 @@ export default function Results() {
       <UpgradeModal
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
-        title="Unlock AI Explanations"
-        description="Upgrade to PRO to access detailed, step-by-step AI explanations for every question and optimize your study strategy."
+        title="Unlock Expert Explanations"
+        description="Upgrade to PRO to access detailed, step-by-step logic explanations for every question and optimize your study strategy."
         feature="Deep Logic Explanations"
       />
     </Layout>

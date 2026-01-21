@@ -604,6 +604,15 @@ export default function Learning() {
         }
     };
 
+    const handleNextUnit = () => {
+        if (!selectedUnit) return;
+        const currentIndex = units.findIndex(u => u.id === selectedUnit.id);
+        const nextUnit = units[currentIndex + 1];
+        if (nextUnit) {
+            fetchUnitDashboard(nextUnit, currentIndex + 1);
+        }
+    };
+
     const resetToCourse = () => {
         setView('selection');
         setSelectionLevel('course');
@@ -818,7 +827,11 @@ export default function Learning() {
                                     <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">Archive Live</span>
                                 </div>
                                 <div className="hidden sm:block h-6 w-px bg-slate-100" />
-                                <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-8 sm:h-9 px-4 sm:px-5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-100 transition-all active:scale-95">
+                                <Button
+                                    size="sm"
+                                    onClick={handleNextUnit}
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-8 sm:h-9 px-4 sm:px-5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-100 transition-all active:scale-95"
+                                >
                                     Next Skill
                                 </Button>
                             </div>

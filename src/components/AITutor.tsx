@@ -97,8 +97,8 @@ export default function AITutor({
                         <GraduationCap className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-foreground">AI Tutor</h3>
-                        <p className="text-xs text-muted-foreground">Get personalized help</p>
+                        <h3 className="font-semibold text-foreground">Expert Tutor</h3>
+                        <p className="text-xs text-muted-foreground">Get personalized guidance</p>
                     </div>
                 </div>
             </div>
@@ -160,8 +160,8 @@ export default function AITutor({
                                 <div
                                     key={idx}
                                     className={`p-3 rounded-lg ${msg.role === 'user'
-                                            ? 'bg-primary/10 ml-8'
-                                            : 'bg-secondary/50 mr-8'
+                                        ? 'bg-primary/10 ml-8'
+                                        : 'bg-secondary/50 mr-8'
                                         }`}
                                 >
                                     <p className="text-sm font-medium mb-1">

@@ -26,7 +26,7 @@ const GetAdmission = () => {
         {
             icon: <School className="w-8 h-8" />,
             title: "University Selection",
-            desc: "Our AI helps you shortlist dream universities based on your profile, with a focus on high-ranking but affordable options.",
+            desc: "Our system helps you shortlist dream universities based on your profile, with a focus on high-ranking but affordable options.",
             color: "from-blue-500 to-indigo-600"
         },
         {
@@ -46,9 +46,67 @@ const GetAdmission = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#020617] selection:bg-indigo-100 selection:text-indigo-900 relative overflow-x-hidden">
             <SEO
-                title="University Admission Support | Study in Italy"
-                description="Your gateway to top universities abroad. Get expert admission support, visa guidance, and free admission consultations for Italy."
-                keywords="Italy University Admission, Study in Italy Support, Visa Guidance Italy, Free Admission Consultation, Abroad University Admission, ItaloStudy Admission"
+                title="Get Admission in Italy | Expert Medical School Consultants"
+                description="Secure your medical seat in Italy with ItaloStudy's admission consultancy. From university selection to visa processing, we guide you every step of the way."
+                keywords="Medical Admission Italy, Study Medicine in Italy, IMAT Consulting, Italy Visa Assistance, University Selection Italy, MBBS Italy Consultants"
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "serviceType": "Educational Consultancy",
+                    "provider": {
+                        "@type": "Organization",
+                        "name": "ItaloStudy",
+                        "sameAs": "https://italostudy.com"
+                    },
+                    "areaServed": {
+                        "@type": "Country",
+                        "name": "Italy"
+                    },
+                    "hasOfferCatalog": {
+                        "@type": "OfferCatalog",
+                        "name": "Admission Services",
+                        "itemListElement": [
+                            {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                    "@type": "Service",
+                                    "name": "University Selection"
+                                }
+                            },
+                            {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                    "@type": "Service",
+                                    "name": "Document Handling"
+                                }
+                            },
+                            {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                    "@type": "Service",
+                                    "name": "Visa Assistance"
+                                }
+                            }
+                        ]
+                    },
+                    "breadcrumb": {
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Home",
+                                "item": "https://italostudy.com"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Get Admission",
+                                "item": "https://italostudy.com/get-admission"
+                            }
+                        ]
+                    }
+                }}
             />
             {/* Navbar */}
             <header className={`fixed left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-6 ${scrolled ? "top-0 bg-white/70 backdrop-blur-md border-b border-slate-200 py-3 md:py-4 shadow-sm" : "top-4 md:top-6 bg-transparent"
@@ -209,7 +267,7 @@ const GetAdmission = () => {
                             <span className="text-indigo-600">Local Pricing.</span>
                         </h2>
                         <p className="text-lg text-slate-500 dark:text-slate-400 font-bold leading-relaxed max-w-lg">
-                            We believe in democratizing high-quality education. By leveraging AI and a streamlined consultant protocol, we've slashed traditional consultancy fees by 80%.
+                            We believe in democratizing high-quality education. By leveraging smart technology and a streamlined consultant protocol, we've slashed traditional consultancy fees by 80%.
                         </p>
                         <div className="grid sm:grid-cols-2 gap-4">
                             {[

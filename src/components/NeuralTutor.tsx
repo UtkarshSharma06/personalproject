@@ -150,7 +150,7 @@ export default function NeuralTutor() {
                                 <Brain className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-tighter">AI Tutor</h3>
+                                <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-tighter">Smart Tutor</h3>
                                 <div className="flex items-center gap-2 mt-1">
                                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Online</span>
@@ -220,7 +220,7 @@ export default function NeuralTutor() {
                                     <Sparkles className="w-10 h-10 text-indigo-200" />
                                 </div>
                                 <div className="space-y-2">
-                                    <h4 className="text-base font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">AI Assistant Ready</h4>
+                                    <h4 className="text-base font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight">Smart Assistant Ready</h4>
                                     <p className="text-xs text-slate-400 font-bold max-w-[240px] mx-auto leading-relaxed tracking-tight">
                                         Ask me anything about your current session.
                                     </p>
@@ -296,7 +296,7 @@ export default function NeuralTutor() {
                             </button>
                         </div>
                         <p className="text-[8px] font-black text-slate-300 text-center mt-6 uppercase tracking-[0.3em]">
-                            Italostudy AI
+                            Italostudy Smart System
                         </p>
                     </div>
                 </div>

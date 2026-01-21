@@ -83,6 +83,46 @@ const Syllabus = () => {
                 title="Exam Syllabus | IMAT, SAT, IELTS & CEnT-S"
                 description="Master your exam with the complete blueprint. Detailed syllabus and free practice resources for IMAT, SAT, IELTS, and CEnT-S."
                 keywords="IMAT Syllabus, SAT Exam Pattern, IELTS Syllabus, CEnT-S Blueprint, Free Practice Resources, Study in Italy Syllabus"
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "ItemList",
+                    "itemListElement": syllabusData.map((exam, index) => ({
+                        "@type": "Course",
+                        "position": index + 1,
+                        "name": `${exam.title} Preparation Course`,
+                        "description": exam.subtitle,
+                        "provider": {
+                            "@type": "Organization",
+                            "name": "ItaloStudy",
+                            "sameAs": "https://italostudy.com"
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "category": "Educational",
+                            "price": "0",
+                            "priceCurrency": "EUR",
+                            "availability": "https://schema.org/InStock",
+                            "url": "https://italostudy.com/syllabus"
+                        }
+                    })),
+                    "breadcrumb": {
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Home",
+                                "item": "https://italostudy.com"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Syllabus",
+                                "item": "https://italostudy.com/syllabus"
+                            }
+                        ]
+                    }
+                }}
             />
             <AcademicBackground />
 

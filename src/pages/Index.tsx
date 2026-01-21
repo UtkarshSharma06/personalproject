@@ -123,6 +123,48 @@ export default function Index() {
                 title="ItaloStudy | Free IMAT Practice & Unlimited Free Mocks"
                 description="Experience the world's most advanced study simulator for IMAT, SAT, CEnT-S and IELTS preparation. Get free practice questions and unlimited free mocks for your exam success."
                 keywords="Free IMAT Practice, Unlimited Free IMAT Mocks, Free SAT Prep, Free IELTS Preparation, Study in Italy, Medical Admission Italy, Free Academic Practice, ItaloStudy Free Mocks"
+                schema={{
+                    "@context": "https://schema.org",
+                    "@graph": [
+                        {
+                            "@type": "Organization",
+                            "@id": "https://italostudy.com/#organization",
+                            "name": "ItaloStudy",
+                            "url": "https://italostudy.com",
+                            "logo": "https://italostudy.com/logo.png",
+                            "sameAs": [
+                                "https://www.instagram.com/italostudy",
+                                "https://twitter.com/italostudy"
+                            ],
+                            "description": "The #1 Platform for Abroad Universities Admission and Exam Preparation."
+                        },
+                        {
+                            "@type": "WebSite",
+                            "@id": "https://italostudy.com/#website",
+                            "url": "https://italostudy.com",
+                            "name": "ItaloStudy",
+                            "publisher": {
+                                "@id": "https://italostudy.com/#organization"
+                            },
+                            "potentialAction": {
+                                "@type": "SearchAction",
+                                "target": "https://italostudy.com/search?q={search_term_string}",
+                                "query-input": "required name=search_term_string"
+                            }
+                        },
+                        {
+                            "@type": "BreadcrumbList",
+                            "itemListElement": [
+                                {
+                                    "@type": "ListItem",
+                                    "position": 1,
+                                    "name": "Home",
+                                    "item": "https://italostudy.com"
+                                }
+                            ]
+                        }
+                    ]
+                }}
             />
             <AcademicBackground />
 

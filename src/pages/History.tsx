@@ -338,7 +338,7 @@ export default function History() {
           <p className="text-[9px] sm:text-[10px] text-slate-900 dark:text-slate-100 tracking-tight uppercase leading-none truncate">
             {result.type === 'Writing' ? 'Manual Rev.' :
               result.type === 'Reading' ? 'Auto Grade' :
-                result.type === 'Listening' ? 'Auto Grade' : 'AI Analysis'}
+                result.type === 'Listening' ? 'Auto Grade' : 'Smart Analysis'}
           </p>
         </div>
         <div className="bg-slate-50/50 dark:bg-muted/30 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-50/50 dark:border-border/50 col-span-2 sm:col-span-1">

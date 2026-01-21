@@ -33,7 +33,7 @@ export default function ConciergeUpgrade() {
     ];
 
     const features = [
-        { icon: Target, label: "University Matching", desc: "AI-powered recommendations" },
+        { icon: Target, label: "University Matching", desc: "Data-driven recommendations" },
         { icon: Shield, label: "Document Review", desc: "Expert feedback on essays" },
         { icon: Globe, label: "Global Network", desc: "Access to 500+ universities" },
         { icon: Zap, label: "Fast Track", desc: "Priority application processing" }

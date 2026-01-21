@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Building2, Timer } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 const AcademicBackground = () => {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -34,6 +35,18 @@ const AcademicBackground = () => {
 const Institutional = () => {
     return (
         <div className="min-h-screen relative flex flex-col items-center justify-center p-6 text-center">
+            <SEO
+                title="Institutional Portal | ItaloStudy for Schools"
+                description="A dedicated ecosystem for schools and universities to manage global exam preparation. Coming soon to ItaloStudy."
+                keywords="Institutional Learning, School Exam Management, University Preparation Portal, ItaloStudy for Schools"
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": "Institutional Portal",
+                    "description": "Coming soon page for ItaloStudy Institutional Portal",
+                    "url": "https://italostudy.com/institutional"
+                }}
+            />
             <AcademicBackground />
 
             <div className="max-w-2xl mx-auto space-y-8">
