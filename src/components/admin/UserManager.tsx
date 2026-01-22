@@ -62,6 +62,27 @@ export default function UserManager() {
 
     useEffect(() => {
         fetchUsers();
+
+        // Set up real-time subscription for profile changes
+        const channel = supabase
+            .channel('admin_profiles_changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'profiles'
+                },
+                () => {
+                    // Refresh the user list when any profile changes
+                    fetchUsers();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const handleToggleCommunity = async (userId: string, currentStatus: boolean, username: string) => {

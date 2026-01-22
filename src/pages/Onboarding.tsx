@@ -143,8 +143,14 @@ export default function Onboarding() {
                 description: `Successfully configured for ${selectedPlan.toUpperCase()} access.`,
             });
 
-            // 3. Navigate to dashboard ONLY AFTER state is confirmed
-            navigate('/dashboard');
+            // 3. Check for pending redirect from waiting room
+            const pendingRedirect = sessionStorage.getItem('onboarding_redirect');
+            if (pendingRedirect) {
+                sessionStorage.removeItem('onboarding_redirect');
+                navigate(pendingRedirect);
+            } else {
+                navigate('/dashboard');
+            }
         } catch (error: any) {
             toast({
                 title: "Setup Failed",

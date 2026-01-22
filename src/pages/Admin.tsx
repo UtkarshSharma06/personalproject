@@ -20,7 +20,9 @@ import {
     X,
     Zap,
     Brain,
-    Pencil
+    Pencil,
+    Lock,
+    Unlock
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { EXAMS } from '@/config/exams';
@@ -36,7 +38,8 @@ import MockEvaluationManager from '@/components/admin/MockEvaluationManager';
 import UserManager from '@/components/admin/UserManager';
 import ConsultantManager from '@/components/admin/ConsultantManager';
 import NotificationManager from '@/components/admin/NotificationManager';
-import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog, Box, Bell } from 'lucide-react';
+import MockResultsViewer from '@/components/admin/MockResultsViewer';
+import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog, Box, Bell, Trophy } from 'lucide-react';
 
 interface MockSession {
     id: string;
@@ -47,6 +50,7 @@ interface MockSession {
     exam_type: string;
     is_active: boolean;
     is_official: boolean;
+    access_type: 'open' | 'request_required';
     registration_count?: number;
     config?: {
         reading_test_id?: string;
@@ -78,6 +82,7 @@ export default function Admin() {
         start_time: '',
         end_time: '',
         exam_type: 'cent-s-prep',
+        access_type: 'open',
         is_official: false,
         reading_test_id: '',
         listening_test_id: '',
@@ -114,7 +119,63 @@ export default function Admin() {
     useEffect(() => {
         fetchSessions();
         fetchIeltsOptions();
+
+        // Subscribe to real-time registration updates
+        const channel = supabase
+            .channel('admin_registrations')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'session_registrations'
+                },
+                () => {
+                    fetchSessions();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
+
+    // Fetch questions when a session is selected
+    useEffect(() => {
+        if (selectedSession) {
+            fetchSessionQuestions(selectedSession.id);
+        } else {
+            setManualQuestions([]);
+        }
+    }, [selectedSession]);
+
+    const fetchSessionQuestions = async (sessionId: string) => {
+        const { data, error } = await supabase
+            .from('session_questions')
+            .select('*')
+            .eq('session_id', sessionId);
+
+        if (error) {
+            toast({
+                title: "Error fetching questions",
+                description: error.message,
+                variant: "destructive"
+            });
+            return;
+        }
+
+        if (data) {
+            setManualQuestions(data.map((q: any) => ({
+                section_name: q.section_name,
+                question_text: q.question_text,
+                options: q.options,
+                correct_index: q.correct_index,
+                explanation: q.explanation || "",
+                topic: q.topic || ""
+            })));
+        }
+    };
 
     const fetchIeltsOptions = async () => {
         const [
@@ -308,6 +369,7 @@ export default function Admin() {
             start_time: new Date(formData.start_time).toISOString(),
             end_time: new Date(formData.end_time).toISOString(),
             exam_type: formData.exam_type,
+            access_type: formData.access_type,
             is_official: formData.is_official,
             is_active: true,
             config: formData.exam_type === 'ielts-academic' ? {
@@ -351,6 +413,7 @@ export default function Admin() {
             start_time: '',
             end_time: '',
             exam_type: 'cent-s-prep',
+            access_type: 'open',
             is_official: false,
             reading_test_id: '',
             listening_test_id: '',
@@ -368,6 +431,7 @@ export default function Admin() {
             start_time: new Date(session.start_time).toISOString().slice(0, 16),
             end_time: new Date(session.end_time).toISOString().slice(0, 16),
             exam_type: session.exam_type,
+            access_type: session.access_type || 'open',
             is_official: session.is_official,
             reading_test_id: (session as any).config?.reading_test_id || '',
             listening_test_id: (session as any).config?.listening_test_id || '',
@@ -437,6 +501,9 @@ export default function Admin() {
                             </TabsTrigger>
                             <TabsTrigger value="mock-evals" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
                                 Mock Evaluations
+                            </TabsTrigger>
+                            <TabsTrigger value="mock-results" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
+                                Mock Results
                             </TabsTrigger>
                             <TabsTrigger value="writing-tasks" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
                                 Writing Library
@@ -519,6 +586,19 @@ export default function Admin() {
                                                 <option value="imat-prep">IMAT</option>
                                                 <option value="sat-prep">SAT (Beta)</option>
                                                 <option value="ielts-academic">IELTS Academic</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="access_type">Access Control</Label>
+                                            <select
+                                                id="access_type"
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                value={formData.access_type}
+                                                onChange={(e) => setFormData({ ...formData, access_type: e.target.value })}
+                                            >
+                                                <option value="open">🔓 Open for All</option>
+                                                <option value="request_required">🔒 Request Access Required</option>
                                             </select>
                                         </div>
 
@@ -688,6 +768,17 @@ export default function Admin() {
                                                                 Official
                                                             </span>
                                                         )}
+                                                        {session.access_type === 'request_required' ? (
+                                                            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-[8px] font-black uppercase tracking-tighter">
+                                                                <Lock className="w-2 h-2" />
+                                                                Locked
+                                                            </span>
+                                                        ) : (
+                                                            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[8px] font-black uppercase tracking-tighter">
+                                                                <Unlock className="w-2 h-2" />
+                                                                Open
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     <p className="text-sm text-muted-foreground max-w-md">{session.description}</p>
                                                     <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-muted-foreground">
@@ -798,6 +889,21 @@ export default function Admin() {
                                 <h2 className="text-xl font-black tracking-tight uppercase">IELTS Mock Evaluation Center</h2>
                             </div>
                             <MockEvaluationManager />
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="mock-results">
+                        <div className="card-surface p-8 rounded-[3rem]">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <Trophy className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black tracking-tight uppercase">Mock Exam Results Dashboard</h2>
+                                    <p className="text-sm text-muted-foreground">View participant scores and rankings</p>
+                                </div>
+                            </div>
+                            <MockResultsViewer />
                         </div>
                     </TabsContent>
 

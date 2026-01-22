@@ -211,6 +211,12 @@ export default function Auth() {
                         variant: 'destructive',
                     });
                 } else {
+                    // Store the redirect URL for new users to use after onboarding
+                    const from = (location.state as any)?.from?.pathname;
+                    if (from && from !== '/dashboard') {
+                        sessionStorage.setItem('onboarding_redirect', from);
+                    }
+
                     toast({
                         title: 'Account created!',
                         description: 'Welcome to Italostudy. Let\'s get started!',
@@ -228,6 +234,12 @@ export default function Auth() {
         setIsLoading(true);
         try {
             const from = (location.state as any)?.from?.pathname || '/dashboard';
+
+            // Store redirect URL for potential new users (will be used after onboarding if needed)
+            if (from && from !== '/dashboard') {
+                sessionStorage.setItem('onboarding_redirect', from);
+            }
+
             const redirectUrl = `${window.location.origin}${from}`;
             const { error } = await signInWithGoogle(redirectUrl);
             if (error) throw error;
