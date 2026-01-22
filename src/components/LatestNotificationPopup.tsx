@@ -66,15 +66,19 @@ export default function LatestNotificationPopup() {
     const handleClose = async () => {
         setIsVisible(false);
 
-        // Optional: Mark as read when dismissed
-        /*
+        // Mark as read when dismissed to persist across sessions/devices
         if (latestNotification && user) {
-            await supabase.from('user_notifications_read').upsert({
-                user_id: user.id,
-                notification_id: latestNotification.id
-            });
+            try {
+                const { error } = await supabase.from('user_notifications_read').upsert({
+                    user_id: user.id,
+                    notification_id: latestNotification.id
+                });
+
+                if (error) throw error;
+            } catch (err) {
+                console.error('Error marking notification as read:', err);
+            }
         }
-        */
     };
 
     if (!latestNotification) return null;
