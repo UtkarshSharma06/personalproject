@@ -107,7 +107,7 @@ const ChampionItem = memo(({ student, index }: { student: TopStudent, index: num
                 ) : (
                     <div className={`w-full h-full flex items-center justify-center text-sm font-black ${index === 0 ? 'bg-gradient-to-br from-amber-100 to-orange-100 text-amber-700' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500'
                         }`}>
-                        {student.display_name.slice(0, 1).toUpperCase()}
+                        {(student.display_name || 'S').slice(0, 1).toUpperCase()}
                     </div>
                 )}
             </div>
@@ -115,7 +115,7 @@ const ChampionItem = memo(({ student, index }: { student: TopStudent, index: num
         <div className="flex-1 min-w-0">
             <h4 className="text-sm font-black text-slate-900 dark:text-white truncate tracking-tight">{student.display_name}</h4>
             <p className="text-[10px] font-bold text-slate-400 truncate uppercase tracking-widest opacity-60">
-                @{student.display_name.toLowerCase().replace(/\s+/g, '')}
+                @{(student.display_name || 'student').toLowerCase().replace(/\s+/g, '')}
             </p>
         </div>
         <div className="text-right shrink-0">
@@ -210,7 +210,7 @@ export default function Dashboard() {
 
             const studentsWithScores: TopStudent[] = championsData.map((champion: any) => ({
                 id: champion.user_id,
-                display_name: champion.display_name,
+                display_name: champion.display_name || 'Student',
                 email: null,
                 avatar_url: champion.avatar_url,
                 total_score: champion.questions_solved, // Questions solved
