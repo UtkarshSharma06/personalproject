@@ -116,7 +116,6 @@ const App = () => (
                       <Admin />
                     </AdminRoute>
                   } />
-                  <Route path="/waiting-room/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><InternationalMockWaitingRoom /></ProtectedRoute>} />
                   <Route path="/test/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Test /></ProtectedRoute>} />
                   <Route path="/results/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Results /></ProtectedRoute>} />
                   <Route path="/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><History /></ProtectedRoute>} />
@@ -129,6 +128,7 @@ const App = () => (
                   <Route path="/syllabus" element={<Syllabus />} />
                   <Route path="/method" element={<Method />} />
                   <Route path="/get-admission" element={<GetAdmission />} />
+                  <Route path="/waiting-room/:sessionId" element={<InternationalMockWaitingRoom />} />
 
                   {/* Study Modules */}
                   <Route path="/exams/imat" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamIMAT /></ProtectedRoute>} />
