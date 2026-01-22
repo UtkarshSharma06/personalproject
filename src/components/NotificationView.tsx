@@ -1,7 +1,6 @@
-import { Bell, X, Clock, Sparkles, MessageCircle } from 'lucide-react';
+import { Check, Bell } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { formatDistanceToNow } from 'date-fns';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 // VisuallyHidden component for accessibility
 const VisuallyHidden = ({ children }: { children: React.ReactNode }) => (
@@ -17,97 +16,54 @@ interface NotificationViewProps {
     short_description?: string;
 }
 
-export default function NotificationView({ isOpen, onClose, title, content, created_at, short_description }: NotificationViewProps) {
+export default function NotificationView({ isOpen, onClose, title, content }: NotificationViewProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl w-[95%] p-0 overflow-hidden border-none bg-transparent shadow-none flex flex-col max-h-[90vh]">
+            <DialogContent className="max-w-[440px] w-[95%] p-0 overflow-hidden border border-slate-100 bg-white rounded-lg shadow-[0_24px_64px_-12px_rgba(0,0,0,0.08)] flex flex-col max-h-[85vh] [&>button]:hidden">
                 <VisuallyHidden>
                     <DialogTitle>{title}</DialogTitle>
                 </VisuallyHidden>
 
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    initial={{ opacity: 0, scale: 0.98, y: 15 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                    className="flex flex-col flex-1 min-h-0 h-full max-h-full overflow-hidden translate-z-0"
+                    transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                    className="flex flex-col h-full max-h-full overflow-hidden"
                 >
-                    {/* Modern Header with Abstract Pattern */}
-                    <div className="relative bg-slate-900 dark:bg-slate-950 p-10 rounded-t-[2.5rem] overflow-hidden shrink-0 border-b border-white/5">
-                        {/* Abstract Background */}
-                        <div className="absolute inset-0 opacity-10">
-                            <svg className="w-full h-full" viewBox="0 0 400 200">
-                                <defs>
-                                    <linearGradient id="circuit-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stopColor="#6366f1" />
-                                        <stop offset="50%" stopColor="#8b5cf6" />
-                                        <stop offset="100%" stopColor="#ec4899" />
-                                    </linearGradient>
-                                </defs>
-                                <g stroke="url(#circuit-gradient)" fill="none" strokeWidth="2" opacity="0.3">
-                                    <circle cx="50" cy="50" r="20" />
-                                    <circle cx="350" cy="150" r="30" />
-                                    <circle cx="200" cy="100" r="15" />
-                                    <line x1="70" y1="50" x2="185" y2="100" />
-                                    <line x1="215" y1="100" x2="320" y2="150" />
-                                    <rect x="150" y="30" width="40" height="40" rx="5" />
-                                    <rect x="280" y="90" width="30" height="30" rx="5" />
-                                </g>
-                            </svg>
+                    <div className="flex flex-col pt-4 px-6 pb-6 md:pt-5 md:px-8 md:pb-8 h-full max-h-full w-full overflow-hidden items-center">
+                        {/* 1. Header Section - Fixed & Centered */}
+                        <div className="shrink-0 mb-8 mt-0 w-full flex justify-center text-center">
+                            <div className="relative inline-flex items-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-[0_15px_45px_-10px_rgba(0,0,0,0.15),inset_0_-8px_12px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.05)] border border-slate-50 group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-white via-indigo-50/30 to-slate-50/60 rounded-2xl" />
+                                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-200/50 to-transparent opacity-50" />
+
+                                <h3 className="relative text-2xl md:text-3xl font-[1000] text-slate-900 tracking-tighter leading-tight uppercase break-words">
+                                    {title}
+                                </h3>
+
+                                <div className="relative shrink-0 p-2 bg-indigo-50 rounded-full border border-indigo-100/50 shadow-sm">
+                                    <Bell className="w-5 h-5 text-indigo-600 animate-pulse" />
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="relative z-10">
-                            <button
-                                onClick={onClose}
-                                className="absolute top-0 right-0 w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/10"
-                            >
-                                <X className="w-5 h-5 text-white" />
-                            </button>
-
-                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-start gap-4">
-                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-2xl">
-                                    <MessageCircle className="w-8 h-8 text-white" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-3">
-                                        <Bell className="w-3 h-3 text-white" />
-                                        <span className="text-[9px] font-black text-white/80 uppercase tracking-widest">Update</span>
-                                    </div>
-                                    <h2 className="text-3xl font-black text-white tracking-tight line-clamp-2">{title}</h2>
-                                    {short_description && (
-                                        <p className="text-white/70 font-medium text-sm mt-1 line-clamp-1">{short_description}</p>
-                                    )}
-                                </div>
-                            </motion.div>
-                        </div>
-                    </div>
-
-                    {/* Content Area */}
-                    <div className="bg-white dark:bg-card rounded-b-[2.5rem] flex flex-col flex-1 min-h-0 overflow-hidden relative border-2 border-slate-100 dark:border-border border-t-0">
-                        {/* Scroll Container */}
-                        <div className="flex-1 overflow-y-auto min-h-0 scroll-smooth">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="p-8 md:p-12 prose prose-slate dark:prose-invert max-w-none"
+                        {/* 2. Content Section - Scrollable */}
+                        <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar min-h-0 text-center">
+                            <div
+                                className="text-[17px] font-bold text-slate-600 leading-relaxed"
                                 dangerouslySetInnerHTML={{ __html: content }}
                             />
                         </div>
 
-                        {/* Sticky Footer */}
-                        <div className="px-8 py-6 bg-slate-50 dark:bg-muted/50 border-t border-slate-100 dark:border-border shrink-0 z-20">
-                            <div className="flex items-center justify-between gap-4">
-                                <div className="flex items-center gap-2 text-slate-400">
-                                    <Sparkles className="w-4 h-4" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">ItaloStudy Intelligence</span>
-                                </div>
-                                <button
-                                    onClick={onClose}
-                                    className="px-8 py-3 bg-slate-900 hover:bg-black text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-xl active:scale-95"
-                                >
-                                    Dismiss
-                                </button>
-                            </div>
+                        {/* 3. Action Section - Pinned Bottom */}
+                        <div className="shrink-0 pt-6 mt-4 border-t border-slate-50 w-full flex justify-center">
+                            <button
+                                onClick={onClose}
+                                className="w-fit px-12 h-18 bg-indigo-600 hover:bg-indigo-700 text-white font-[1000] uppercase tracking-[0.2em] text-[13px] rounded-xl transition-all shadow-2xl shadow-indigo-100 flex items-center justify-center gap-4 active:scale-[0.98] group"
+                            >
+                                <Check className="w-6 h-6 transition-transform group-hover:scale-110" />
+                                Understood
+                            </button>
                         </div>
                     </div>
                 </motion.div>

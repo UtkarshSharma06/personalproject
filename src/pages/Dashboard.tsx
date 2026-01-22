@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { subDays } from 'date-fns';
 import { useExam } from '@/context/ExamContext';
+import LatestNotificationPopup from '@/components/LatestNotificationPopup';
 
 interface SubjectMastery {
     subject: string;
@@ -508,6 +509,7 @@ export default function Dashboard() {
 
     return (
         <Layout>
+            <LatestNotificationPopup />
             <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-7xl w-full">
                 <div className="grid lg:grid-cols-12 gap-8">
                     {/* Main Content */}
