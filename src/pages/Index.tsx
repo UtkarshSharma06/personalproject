@@ -201,6 +201,7 @@ export default function Index() {
                                 { name: 'Syllabus', path: '/syllabus' },
                                 { name: 'Pricing', path: '/pricing' },
                                 { name: 'Institutional', path: '/institutional' },
+                                { name: 'Contact', path: '/contact' },
                                 { name: 'Get Admission', path: '/get-admission', isSpecial: true }
                             ].map((item) => (
                                 <Link
@@ -259,6 +260,7 @@ export default function Index() {
                                 { name: 'Syllabus', path: '/syllabus' },
                                 { name: 'Pricing', path: '/pricing' },
                                 { name: 'Institutional', path: '/institutional' },
+                                { name: 'Contact', path: '/contact' },
                                 { name: 'Get Admission', path: '/get-admission', isSpecial: true }
                             ].map((item) => (
                                 <Link
@@ -509,7 +511,8 @@ export default function Index() {
                                     { name: 'Method', path: '/method' },
                                     { name: 'Syllabus', path: '/syllabus' },
                                     { name: 'Pricing', path: '/pricing' },
-                                    { name: 'Institutional', path: '/institutional' }
+                                    { name: 'Institutional', path: '/institutional' },
+                                    { name: 'Contact Us', path: '/contact' }
                                 ].map(item => (
                                     <Link
                                         key={item.name}

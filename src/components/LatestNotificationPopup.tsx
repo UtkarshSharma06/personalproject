@@ -13,15 +13,30 @@ export default function LatestNotificationPopup() {
     useEffect(() => {
         if (user && activeExam) {
             checkLatestNotification();
+
+            // Real-time subscription for newly added notifications
+            const subscription = supabase
+                .channel('public:site_notifications_popup')
+                .on('postgres_changes',
+                    { event: 'INSERT', schema: 'public', table: 'site_notifications' },
+                    (payload) => {
+                        const newNotif = payload.new;
+                        // Check if it's active and targets the current user's exam (or general)
+                        if (newNotif.is_active && (!newNotif.exam_type || newNotif.exam_type === activeExam.id)) {
+                            checkLatestNotification(); // Refresh and potentially show the new one
+                        }
+                    }
+                )
+                .subscribe();
+
+            return () => {
+                subscription.unsubscribe();
+            };
         }
     }, [user, activeExam?.id]);
 
     const checkLatestNotification = async () => {
         if (!user) return;
-
-        // Check if we've already shown a popup in this session
-        const sessionShown = sessionStorage.getItem('latest_notif_popup_shown');
-        if (sessionShown) return;
 
         try {
             // 1. Fetch the latest active notification for this exam
@@ -32,9 +47,9 @@ export default function LatestNotificationPopup() {
                 .order('created_at', { ascending: false });
 
             if (activeExam?.id) {
-                query = query.or(`exam_type.is.null,exam_type.eq.${activeExam.id}`);
+                query = query.or(`exam_type.is.null,exam_type.eq.,exam_type.eq.${activeExam.id}`);
             } else {
-                query = query.is('exam_type', null);
+                query = query.or('exam_type.is.null,exam_type.eq.');
             }
 
             const { data: notifs, error } = await query.limit(1);
@@ -43,7 +58,14 @@ export default function LatestNotificationPopup() {
 
             const latest = notifs[0];
 
-            // 2. Check if the user has read this specific notification
+            // 2. Strict Logic: Check if we've already shown THIS specific notification in this session
+            // This prevents annoying the user if they navigate between pages, 
+            // but ensures they see EVERY new notification at least once after it is issued.
+            const sessionShownKey = `shown_notif_${latest.id}`;
+            const sessionShown = sessionStorage.getItem(sessionShownKey);
+            if (sessionShown) return;
+
+            // 3. Persistent Logic: Check if the user has EVER read this specific notification in the DB
             const { data: readStatus } = await supabase
                 .from('user_notifications_read')
                 .select('*')
@@ -55,8 +77,8 @@ export default function LatestNotificationPopup() {
                 // Not read yet! Show the popup
                 setLatestNotification(latest);
                 setIsVisible(true);
-                // Mark as shown in session to avoid annoying the user on every dashboard visit
-                sessionStorage.setItem('latest_notif_popup_shown', 'true');
+                // Mark as shown in this session ONLY for this specific ID
+                sessionStorage.setItem(sessionShownKey, 'true');
             }
         } catch (err) {
             console.error('Error checking latest notification:', err);
@@ -91,6 +113,7 @@ export default function LatestNotificationPopup() {
             content={latestNotification.content_html}
             created_at={latestNotification.created_at}
             short_description={latestNotification.short_description}
+            show_minimal={latestNotification.show_minimal}
         />
     );
 }

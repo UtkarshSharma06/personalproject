@@ -24,7 +24,8 @@ import {
     Check,
     Brain,
     Zap,
-    Sparkles
+    Sparkles,
+    MessageSquare
 } from 'lucide-react';
 import {
     Dialog,
@@ -451,6 +452,38 @@ export default function Settings() {
                                         color="rose"
                                     />
                                 )}
+                            </Card>
+
+                            {/* WhatsApp-style Contact Section */}
+                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-[#25d366]/5 bg-white dark:bg-slate-950 overflow-hidden relative">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-[#25d366]/5 rounded-full -translate-y-12 translate-x-12 blur-2xl" />
+                                <div className="p-6 flex items-center gap-4 relative z-10">
+                                    <div className="w-12 h-12 rounded-2xl bg-[#25d366]/10 flex items-center justify-center text-[#25d366]">
+                                        <MessageSquare size={24} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Need Assistance?</h3>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Protocol Support & Inquiries</p>
+                                    </div>
+                                </div>
+                                <div className="px-6 pb-6 space-y-4 relative z-10">
+                                    <div className="p-5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 group hover:border-[#25d366]/30 transition-colors">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Support Channel</span>
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-1.5 h-1.5 bg-[#25d366] rounded-full animate-pulse" />
+                                                <span className="text-[9px] font-black text-[#25d366] uppercase tracking-widest">24h Protocol</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-sm font-black text-slate-900 dark:text-white">info.italostudy@gmail.com</p>
+                                    </div>
+                                    <Button
+                                        onClick={() => navigate('/contact')}
+                                        className="w-full h-12 bg-[#25d366] hover:bg-[#20bd5c] text-white rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all shadow-lg shadow-[#25d366]/20 active:scale-[0.98]"
+                                    >
+                                        Open Communication Hub
+                                    </Button>
+                                </div>
                             </Card>
                         </>
                     ) : activeSection === 'profile' ? (

@@ -34,6 +34,7 @@ const InternationalMockWaitingRoom = lazy(() => import("./pages/InternationalMoc
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
+const Contact = lazy(() => import("./pages/Contact"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const ExamIMAT = lazy(() => import("./pages/ExamIMAT"));
 const ExamCENTS = lazy(() => import("./pages/ExamCENTS"));
@@ -172,6 +173,7 @@ const App = () => (
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
+                  <Route path="/contact" element={<Contact />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

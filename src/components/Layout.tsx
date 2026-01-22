@@ -536,7 +536,7 @@ export default function Layout({ children, showFooter = true }: LayoutProps) {
                                     <div className="flex gap-8 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                                         <Link to="/privacy" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Privacy</Link>
                                         <Link to="/terms" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Terms</Link>
-                                        <a href="#" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Support</a>
+                                        <Link to="/contact" className="hover:text-slate-900 dark:text-slate-100 transition-colors">Support</Link>
                                     </div>
                                 </div>
                             </div>

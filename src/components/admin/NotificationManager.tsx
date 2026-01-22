@@ -11,18 +11,21 @@ import {
     Loader2,
     Calendar,
     Briefcase,
-    Sparkles
+    Sparkles,
+    Pencil,
+    X as CloseIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Notification {
     id: string;
-    title: string;
-    short_description: string;
+    title: string | null;
+    short_description: string | null;
     content_html: string;
     created_at: string;
     is_active: boolean;
     exam_type: string | null;
+    show_minimal: boolean;
 }
 
 const EXAM_OPTIONS = [
@@ -44,8 +47,10 @@ export default function NotificationManager() {
         title: '',
         short_description: '',
         content_html: '',
-        exam_type: ''
+        exam_type: '',
+        show_minimal: false
     });
+    const [editingId, setEditingId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchNotifications();
@@ -72,23 +77,56 @@ export default function NotificationManager() {
         setIsSubmitting(true);
 
         try {
-            const { error } = await supabase
-                .from('site_notifications')
-                .insert([{
-                    ...formData,
-                    created_by: (await supabase.auth.getUser()).data.user?.id
-                }]);
+            if (editingId) {
+                const { error } = await supabase
+                    .from('site_notifications')
+                    .update({
+                        ...formData,
+                        exam_type: formData.exam_type === '' ? null : formData.exam_type,
+                    })
+                    .eq('id', editingId);
 
-            if (error) throw error;
+                if (error) throw error;
+                toast.success('Notification updated successfully');
+            } else {
+                const { error } = await supabase
+                    .from('site_notifications')
+                    .insert([{
+                        ...formData,
+                        exam_type: formData.exam_type === '' ? null : formData.exam_type,
+                        created_by: (await supabase.auth.getUser()).data.user?.id
+                    }]);
 
-            toast.success('Notification created successfully');
-            setFormData({ title: '', short_description: '', content_html: '', exam_type: '' });
+                if (error) throw error;
+                toast.success('Notification created successfully');
+            }
+
+            setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false });
+            setEditingId(null);
             fetchNotifications();
         } catch (error: any) {
-            toast.error('Error creating notification: ' + error.message);
+            toast.error('Error saving notification: ' + error.message);
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleEdit = (notif: Notification) => {
+        setFormData({
+            title: notif.title || '',
+            short_description: notif.short_description || '',
+            content_html: notif.content_html,
+            exam_type: notif.exam_type || '',
+            show_minimal: notif.show_minimal
+        });
+        setEditingId(notif.id);
+        // Scroll to form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCancelEdit = () => {
+        setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false });
+        setEditingId(null);
     };
 
     const handleDelete = async (id: string) => {
@@ -141,12 +179,11 @@ export default function NotificationManager() {
                     <h3 className="font-black text-slate-900 border-l-4 border-indigo-500 pl-4 uppercase tracking-widest text-xs">Create Announcement</h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Title</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Title (Optional)</label>
                             <Input
                                 placeholder="E.g., New Course Available!"
                                 value={formData.title}
                                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                required
                                 className="rounded-xl border-slate-100 focus:border-indigo-500 transition-all font-bold"
                             />
                         </div>
@@ -163,14 +200,26 @@ export default function NotificationManager() {
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Short Description (Dropdown Preview)</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Short Description (Optional)</label>
                             <Input
                                 placeholder="A brief summary for the notification bell list"
                                 value={formData.short_description}
                                 onChange={e => setFormData({ ...formData, short_description: e.target.value })}
-                                required
                                 className="rounded-xl border-slate-100 focus:border-indigo-500 transition-all font-bold"
                             />
+                        </div>
+
+                        <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <input
+                                type="checkbox"
+                                id="show_minimal"
+                                checked={formData.show_minimal}
+                                onChange={e => setFormData({ ...formData, show_minimal: e.target.checked })}
+                                className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <label htmlFor="show_minimal" className="text-xs font-black text-slate-900 cursor-pointer uppercase tracking-tight">
+                                Show Minimal (No 3D Header/Title Box)
+                            </label>
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
@@ -183,8 +232,8 @@ export default function NotificationManager() {
                                                 ...formData,
                                                 title: 'INTERNATIONAL CENT-S MOCK TEST',
                                                 short_description: 'Global Simulation Arena v4.0 is now live.',
-                                                content_html: `<div class="p-2 [perspective:1000px]">
-    <div class="bg-white/70 backdrop-blur-xl border border-white/40 rounded-[30px] p-8 md:p-10 [transform:rotateX(3deg)_rotateY(-3deg)] shadow-2xl transition-all duration-500 hover:[transform:rotateX(0deg)_rotateY(0deg)_scale(1.01)] hover:bg-white/90 group">
+                                                content_html: `<div class="[perspective:1000px]">
+    <div class="bg-white border-b border-white/40 rounded-t-[30px] p-8 md:p-10 [transform:rotateX(1deg)] shadow-2xl transition-all duration-500 hover:[transform:rotateX(0deg)] group">
         <!-- Floating Header -->
         <div class="flex items-center gap-4 mb-8">
             <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[18px] flex items-center justify-center shadow-lg shadow-indigo-500/30 transform -rotate-6 transition-transform group-hover:rotate-0">
@@ -245,13 +294,25 @@ export default function NotificationManager() {
                                 className="rounded-xl border-slate-100 focus:border-indigo-500 transition-all font-mono text-sm min-h-[200px]"
                             />
                         </div>
-                        <Button
-                            disabled={isSubmitting}
-                            className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl h-12 font-black uppercase tracking-widest text-xs gap-2"
-                        >
-                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                            Publish Notification
-                        </Button>
+                        <div className="flex gap-4">
+                            <Button
+                                disabled={isSubmitting}
+                                className="flex-1 bg-slate-900 hover:bg-slate-800 text-white rounded-xl h-12 font-black uppercase tracking-widest text-xs gap-2"
+                            >
+                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (editingId ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />)}
+                                {editingId ? 'Update Notification' : 'Publish Notification'}
+                            </Button>
+                            {editingId && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleCancelEdit}
+                                    className="rounded-xl h-12 border-slate-200 font-black uppercase tracking-widest text-xs px-6"
+                                >
+                                    Cancel
+                                </Button>
+                            )}
+                        </div>
                     </form>
                 </div>
 
@@ -292,6 +353,13 @@ export default function NotificationManager() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={() => handleEdit(notif)}
+                                                className="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors"
+                                                title="Edit"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </button>
                                             <button
                                                 onClick={() => toggleStatus(notif.id, notif.is_active)}
                                                 className={`p-2 rounded-lg transition-colors ${notif.is_active ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
