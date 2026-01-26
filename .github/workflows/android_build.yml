@@ -30,6 +30,9 @@ jobs:
 
       - name: Build Web Assets
         run: npm run build
+        env:
+          VITE_SUPABASE_URL: "https://jyjhpqtqbwtxxgijxetq.supabase.co"
+          VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_LZduUlJ96GYtgyo0l-iTzw_P-8Glk_v"
 
       - name: Sync Capacitor
         run: npx cap sync android
