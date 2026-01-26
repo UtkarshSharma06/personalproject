@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ITALOSTUDY</string>
+    <string name="title_activity_main">ITALOSTUDY</string>
+    <string name="package_name">com.italostudy.app</string>
+    <string name="custom_url_scheme">com.italostudy.app</string>
+</resources>

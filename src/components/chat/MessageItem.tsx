@@ -11,6 +11,16 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetDescription,
+    SheetFooter,
+    SheetClose
+} from "@/components/ui/sheet";
+import { Copy } from "lucide-react";
 
 export interface Message {
     id: string;
@@ -116,7 +126,7 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
     const { user } = useAuth();
     const isOwn = user?.id === message.user_id;
     const [showReactionPicker, setShowReactionPicker] = useState(false);
-    const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+    const longPressTimer = useRef<NodeJS.Timeout | null>(null); // Timer ref
 
     const handleReaction = async (emoji: string) => {
         try {
@@ -132,10 +142,16 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
     };
 
     // Mobile Long Press Handling
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const isLongPressRef = useRef(false);
+
     const startLongPress = (e: React.MouseEvent | React.TouchEvent) => {
         if ('button' in e && e.button !== 0) return; // Only left click
+        isLongPressRef.current = false;
         longPressTimer.current = setTimeout(() => {
-            setShowReactionPicker(true);
+            isLongPressRef.current = true;
+            if (navigator.vibrate) navigator.vibrate(50);
+            setIsSheetOpen(true);
         }, 500);
     };
 
@@ -144,6 +160,21 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
             clearTimeout(longPressTimer.current);
             longPressTimer.current = null;
         }
+    };
+
+    const cancelLongPress = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
+    };
+
+    const handleCopy = () => {
+        if (message.content) {
+            navigator.clipboard.writeText(message.content);
+            // toast({ title: "Copied" }); // toast not in props, skipping or assuming parent handles
+        }
+        setIsSheetOpen(false);
     };
 
     // Group reactions by emoji
@@ -182,9 +213,10 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
             className={`group flex w-full animate-in fade-in slide-in-from-bottom-1 duration-200 ${isOwn ? 'justify-end' : 'justify-start'} mb-1 relative`}
             onMouseDown={startLongPress}
             onMouseUp={endLongPress}
-            onMouseLeave={endLongPress}
+            onMouseLeave={cancelLongPress}
             onTouchStart={startLongPress}
             onTouchEnd={endLongPress}
+            onTouchMove={cancelLongPress}
         >
             {/* Forward Action (Outside Bubble) */}
             {(message.file_url || (batchMessages && batchMessages.length > 0)) && (
@@ -436,9 +468,10 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
                     )}
                 </div>
 
-                {/* Dropdown Options */}
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity self-start mt-2 px-1 relative">
+                {/* Dropdown Options (Desktop) */}
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity self-start mt-2 px-1 relative hidden md:block">
                     <DropdownMenu>
+                        {/* ... keep existing dropdown content ... */}
                         <DropdownMenuTrigger className="focus:outline-none">
                             <div className="w-6 h-6 rounded-full bg-slate-200/50 hover:bg-slate-300 dark:bg-slate-700/50 dark:hover:bg-slate-600 flex items-center justify-center text-slate-500 dark:text-slate-300">
                                 <MoreHorizontal className="w-3 h-3" />
@@ -450,6 +483,9 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => onReply(message)}>
                                 <Reply className="w-3 h-3 mr-2" /> Reply
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleCopy}>
+                                <Copy className="w-3 h-3 mr-2" /> Copy
                             </DropdownMenuItem>
                             {(isAdmin || onPin) && (
                                 <DropdownMenuItem onClick={() => onPin?.(message.id)}>
@@ -477,6 +513,51 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
+
+                {/* Mobile Long Press Sheet */}
+                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                    <SheetContent side="bottom" className="rounded-t-[1.5rem] p-4 pb-8 z-[100]">
+                        <SheetHeader className="mb-4">
+                            <SheetTitle>Message Options</SheetTitle>
+                        </SheetHeader>
+                        <div className="grid gap-3">
+                            {/* Reactions in Sheet */}
+                            <div className="flex items-center gap-2 justify-center mb-2 p-2 bg-secondary/20 rounded-full overflow-x-auto">
+                                {REACTION_OPTIONS.map(emoji => (
+                                    <button
+                                        key={emoji}
+                                        onClick={() => { handleReaction(emoji); setIsSheetOpen(false); }}
+                                        className="text-2xl hover:scale-125 transition-transform px-2"
+                                    >
+                                        {emoji}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <Button variant="outline" className="justify-start gap-4 h-12" onClick={() => { onReply(message); setIsSheetOpen(false); }}>
+                                <Reply size={18} /> Reply
+                            </Button>
+                            <Button variant="outline" className="justify-start gap-4 h-12" onClick={handleCopy}>
+                                <Copy size={18} /> Copy
+                            </Button>
+                            {(isAdmin || onPin) && (
+                                <Button variant="outline" className="justify-start gap-4 h-12" onClick={() => { onPin?.(message.id); setIsSheetOpen(false); }}>
+                                    <Pin size={18} /> {isPinned ? "Unpin" : "Pin"}
+                                </Button>
+                            )}
+                            {isOwn && (
+                                <Button variant="ghost" className="justify-start gap-4 h-12 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => { onDelete(message.id); setIsSheetOpen(false); }}>
+                                    <Trash2 size={18} /> Delete
+                                </Button>
+                            )}
+                            {isAdmin && !isOwn && (
+                                <Button variant="ghost" className="justify-start gap-4 h-12 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => { onBan?.(message.user_id, message.profiles?.username || 'user'); setIsSheetOpen(false); }}>
+                                    <Ban size={18} /> Ban User
+                                </Button>
+                            )}
+                        </div>
+                    </SheetContent>
+                </Sheet>
             </div>
         </div>
     );

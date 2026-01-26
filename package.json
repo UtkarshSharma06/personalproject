@@ -11,6 +11,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
+    "@capacitor/device": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/share": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0",
     "@hookform/resolvers": "^3.10.0",
     "@livekit/components-react": "^2.9.19",
     "@radix-ui/react-accordion": "^1.2.11",
@@ -53,6 +61,8 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.26.1",
+    "i18next": "^25.8.0",
+    "i18next-browser-languagedetector": "^8.2.0",
     "input-otp": "^1.4.2",
     "livekit-client": "^2.17.0",
     "lucide-react": "^0.462.0",
@@ -63,6 +73,7 @@
     "react-easy-crop": "^5.5.6",
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.61.1",
+    "react-i18next": "^16.5.3",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.9",
     "react-router-dom": "^6.30.1",
@@ -75,6 +86,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@eslint/js": "^9.32.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.16.5",
