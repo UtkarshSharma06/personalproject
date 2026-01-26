@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth";
 import { useTheme } from "next-themes";
 import { lazy, Suspense, useEffect, useState } from "react";
@@ -315,12 +315,21 @@ const App = () => {
               <Toaster />
               <Sonner />
               <VercelAnalytics />
-              <BrowserRouter>
-                <SecurityEnforcer />
-                <Suspense fallback={<PageLoader />}>
-                  {isMobile ? <MobileRouter /> : <WebRouter />}
-                </Suspense>
-              </BrowserRouter>
+              {isMobile ? (
+                <HashRouter>
+                  <SecurityEnforcer />
+                  <Suspense fallback={<PageLoader />}>
+                    <MobileRouter />
+                  </Suspense>
+                </HashRouter>
+              ) : (
+                <BrowserRouter>
+                  <SecurityEnforcer />
+                  <Suspense fallback={<PageLoader />}>
+                    <WebRouter />
+                  </Suspense>
+                </BrowserRouter>
+              )}
             </TooltipProvider>
           </ExamProvider>
         </AIProvider>
