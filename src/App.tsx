@@ -277,8 +277,12 @@ const MobileRouter = () => (
   </Routes>
 );
 
+import { PremiumSplashScreen } from "@/mobile/components/PremiumSplashScreen";
+import { StatusBar, Style } from '@capacitor/status-bar';
+
 const App = () => {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     const checkPlatform = async () => {
@@ -286,8 +290,18 @@ const App = () => {
       const isNative = info.platform === 'android' || info.platform === 'ios';
       const isSmallScreen = window.innerWidth < 768;
 
-      // Use mobile UI if native app OR small browser window
       setIsMobile(isNative || isSmallScreen);
+
+      if (isNative) {
+        try {
+          // Immersive Mode: Make status bar transparent/overlay
+          await StatusBar.setOverlaysWebView({ overlay: true });
+          await StatusBar.setStyle({ style: Style.Dark }); // or Light based on theme
+          // To hide navigation bar, it requires the specific plugin, but this is a good start.
+        } catch (e) {
+          console.error("StatusBar error", e);
+        }
+      }
     };
 
     checkPlatform();
@@ -299,9 +313,13 @@ const App = () => {
     if (isMobile === true) {
       setTheme('dark');
     } else if (isMobile === false) {
-      setTheme('light');
+      setTheme('light'); // Force light for web
     }
   }, [isMobile]);
+
+  if (showSplash && isMobile !== false) { // Show premium splash on mobile/init
+    return <PremiumSplashScreen onComplete={() => setShowSplash(false)} />;
+  }
 
   if (isMobile === null) return <PageLoader />;
 
