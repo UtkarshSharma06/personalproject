@@ -97,6 +97,7 @@ const MobileLabs = lazy(() => import("./mobile/pages/MobileLabs"));
 const MobileConcierge = lazy(() => import("./mobile/pages/MobileConcierge"));
 const MobileConciergeApply = lazy(() => import("./mobile/pages/MobileConciergeApply"));
 const MobileStudentApplicationStatus = lazy(() => import("./mobile/pages/MobileStudentApplicationStatus"));
+const MobileContact = lazy(() => import("./mobile/pages/MobileContact"));
 const MobileMockWaitingRoom = lazy(() => import("./mobile/pages/MobileMockWaitingRoom"));
 import MobileLayout from "./mobile/components/MobileLayout";
 
@@ -262,8 +263,7 @@ const MobileRouter = () => (
     <Route path="/method" element={<Method />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy" element={<Privacy />} />
-    <Route path="/terms" element={<Terms />} />
-    <Route path="/contact" element={<Contact />} />
+    <Route path="/contact" element={<MobileContact />} />
 
     {/* Consultant & Application Parity */}
     <Route path="/apply-university/application/:id" element={<ProtectedRoute allowedRoles={['consultant', 'admin', 'user']}><ApplicationDetail /></ProtectedRoute>} />
