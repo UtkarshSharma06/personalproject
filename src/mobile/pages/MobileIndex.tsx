@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import {
     Brain, Zap, Target, ArrowRight,
@@ -8,6 +9,35 @@ import { motion } from 'framer-motion';
 
 export default function MobileIndex() {
     const navigate = useNavigate();
+    const { user, loading } = useAuth();
+
+    useEffect(() => {
+        const checkMode = async () => {
+            if (loading) return;
+
+            // If already logged in, we let the main router/dashboard redirect handle it (or do it here)
+            // But usually App.tsx or protected routes handle auth -> dashboard.
+            // If we are here at '/', it means not redirected yet.
+
+            if (user) {
+                navigate('/mobile/dashboard', { replace: true });
+                return;
+            }
+
+            // Check if Native App
+            try {
+                const { Device } = await import('@capacitor/device');
+                const info = await Device.getInfo();
+                if (info.platform === 'android' || info.platform === 'ios') {
+                    // Native App: Skip Landing Page, go strictly to Auth
+                    navigate('/auth', { replace: true });
+                }
+            } catch (e) {
+                // Ignore, assume web
+            }
+        };
+        checkMode();
+    }, [user, loading, navigate]);
 
     const features = [
         { icon: Zap, title: "Adaptive Feed", desc: "AI-driven curriculum gaps identification.", color: 'bg-amber-500' },
