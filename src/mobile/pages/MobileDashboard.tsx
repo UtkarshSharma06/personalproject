@@ -81,19 +81,53 @@ const MobileDashboard: React.FC = () => {
                 setRecentTests(tests.slice(0, 3));
             }
 
-            // 2. Performance Tracking
-            const { data: perfData } = await (supabase as any)
-                .from('topic_performance')
-                .select('*')
+            // 2. Performance Tracking (Synced with Web)
+            const { data: totalQuestionsBySubject } = await (supabase as any)
+                .from('practice_questions')
+                .select('subject')
                 .eq('exam_type', activeExam.id);
 
-            if (perfData) {
-                const totalSolved = perfData.reduce((acc: number, p: any) => acc + p.total_questions, 0);
-                const totalCorrect = perfData.reduce((acc: number, p: any) => acc + p.correct_answers, 0);
+            const { data: solvedBySubject } = await (supabase as any)
+                .from('user_practice_responses')
+                .select('subject, is_correct, question_id')
+                .eq('user_id', user!.id)
+                .eq('exam_type', activeExam.id);
+
+            let calculatedAccuracy = 0;
+            let calculatedSolved = 0;
+
+            if (totalQuestionsBySubject) {
+                const mastery = await Promise.all(activeExam.sections.map(async (section: any) => {
+                    const { count: realTotal } = await (supabase as any)
+                        .from('practice_questions')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('subject', section.name)
+                        .eq('exam_type', activeExam.id);
+
+                    const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
+                    const uniqueSolved = new Set(attemptsInSubject.map(a => a.question_id)).size;
+                    const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
+
+                    const acc = attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0;
+
+                    // Simple aggregation for overall stats (aligned with Web approximation)
+                    calculatedAccuracy += acc;
+                    calculatedSolved += uniqueSolved;
+
+                    return {
+                        subject: section.name,
+                        solved: uniqueSolved,
+                        total: realTotal || 0,
+                        accuracy: acc,
+                    };
+                }));
+
+                calculatedAccuracy = Math.round(calculatedAccuracy / (activeExam.sections.length || 1));
+                setSubjectMastery(mastery);
                 setStats(prev => ({
                     ...prev,
-                    solved: totalSolved,
-                    accuracy: totalSolved > 0 ? Math.round((totalCorrect / totalSolved) * 100) : 0
+                    solved: calculatedSolved,
+                    accuracy: calculatedAccuracy
                 }));
             }
 
@@ -110,30 +144,8 @@ const MobileDashboard: React.FC = () => {
                 })));
             }
 
-            // 4. Subject Mastery (Real Totals)
-            const { data: solvedBySubject } = await (supabase as any)
-                .from('user_practice_responses')
-                .select('subject, is_correct, question_id')
-                .eq('user_id', user!.id)
-                .eq('exam_type', activeExam.id);
-
-            const mastery = await Promise.all(activeExam.sections.map(async (section: any) => {
-                const { count: realTotal } = await (supabase as any)
-                    .from('practice_questions')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('subject', section.name)
-                    .eq('exam_type', activeExam.id);
-
-                const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
-                const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
-                return {
-                    subject: section.name,
-                    solved: new Set(attemptsInSubject.map(a => a.question_id)).size,
-                    total: realTotal || 0,
-                    accuracy: attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0,
-                };
-            }));
-            setSubjectMastery(mastery);
+            // 4. Subject Mastery (Merged into Step 2 for Sync)
+            // ...
 
             // 5. IELTS Specifics
             if (activeExam.id === 'ielts-academic') {
@@ -241,7 +253,7 @@ const MobileDashboard: React.FC = () => {
                     <Sparkles className="w-4 h-4 text-primary" />
                     <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">{t('menu.online')}</span>
                 </div>
-                <h1 className="text-4xl font-black uppercase tracking-tight leading-none">Hello, <br /><span className="text-primary">{profile?.display_name?.split(' ')[0] || 'Student'}</span></h1>
+                <h1 className="text-4xl font-black uppercase tracking-tight leading-none">Hello, <br /><span className="text-primary">{(profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Student').split(' ')[0]}</span></h1>
 
 
                 {/* Continue Learning Button */}

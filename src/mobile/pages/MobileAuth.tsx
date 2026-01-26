@@ -72,6 +72,7 @@ export default function MobileAuth() {
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
                                 className="pl-12 h-14 bg-secondary/20 border-border/40 rounded-2xl font-bold text-xs uppercase"
+                                required
                             />
                         </div>
                     </div>
@@ -87,6 +88,7 @@ export default function MobileAuth() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="pl-12 h-14 bg-secondary/20 border-border/40 rounded-2xl font-bold text-xs uppercase"
+                            required
                         />
                     </div>
                 </div>
@@ -101,6 +103,7 @@ export default function MobileAuth() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="pl-12 h-14 bg-secondary/20 border-border/40 rounded-2xl font-bold text-xs"
+                            required
                         />
                     </div>
                 </div>
