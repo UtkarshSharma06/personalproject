@@ -376,7 +376,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <PushNotificationManager />
+        {/* <PushNotificationManager /> */}
         <AIProvider>
           <ExamProvider>
             <TooltipProvider>
