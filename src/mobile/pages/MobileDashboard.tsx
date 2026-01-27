@@ -63,6 +63,10 @@ const generateAvatarColor = (name: string) => {
 
 const MobileDashboard: React.FC = () => {
     const { user, profile } = useAuth();
+    // Use Google metadata or profile name, defaulting to "Cadet"
+    const displayName = profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || "Cadet";
+    const firstName = displayName.split(' ')[0];
+
     const { activeExam } = useExam();
     const navigate = useNavigate();
     const { t } = useTranslation();
