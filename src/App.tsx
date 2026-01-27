@@ -283,6 +283,7 @@ const MobileRouter = () => (
 
 import { PremiumSplashScreen } from "@/mobile/components/PremiumSplashScreen";
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 const App = () => {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -302,8 +303,30 @@ const App = () => {
         try {
           await StatusBar.setOverlaysWebView({ overlay: true });
           await StatusBar.setStyle({ style: Style.Dark });
+
+          // Initialize Push Notifications
+          await PushNotifications.requestPermissions();
+          await PushNotifications.register();
+          await PushNotifications.createChannel({
+            id: 'default',
+            name: 'General Updates',
+            importance: 5,
+            visibility: 1,
+            sound: 'default_notification',
+            vibration: true
+          });
+
+          PushNotifications.addListener('registration', (token) => {
+            console.log('Push Token:', token.value);
+            // In a real app, send this token to Supabase profiles table
+          });
+
+          PushNotifications.addListener('pushNotificationReceived', (notification) => {
+            console.log('Push Rec:', notification);
+          });
+
         } catch (e) {
-          console.error("StatusBar error", e);
+          console.error("Native Setup Error", e);
         }
       } else {
         setTheme('light');

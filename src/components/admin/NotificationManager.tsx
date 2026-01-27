@@ -99,6 +99,17 @@ export default function NotificationManager() {
 
                 if (error) throw error;
                 toast.success('Notification created successfully');
+
+                // Trigger Push Notification
+                if (data && !formData.show_minimal) {
+                    supabase.functions.invoke('send-push', {
+                        body: {
+                            title: formData.title || 'New Announcement',
+                            body: formData.short_description || 'Check the app for details',
+                            topic: formData.exam_type || 'all_users'
+                        }
+                    });
+                }
             }
 
             setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false });
