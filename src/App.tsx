@@ -359,17 +359,24 @@ const App = () => {
           });
 
           PushNotifications.addListener('registration', async (token) => {
-            console.log('Push Token:', token.value);
+            console.log('Push Token Registered:', token.value);
+            // We'll also store it in a global or local state if we need it later, 
+            // but the profile update is the critical part.
             if (user?.id) {
-              await supabase
+              const { error } = await supabase
                 .from('profiles')
                 .update({ fcm_token: token.value } as any)
                 .eq('id', user.id);
+
+              if (error) console.error('Error updating fcm_token:', error);
+              else console.log('fcm_token synchronized with profile');
             }
           });
 
           PushNotifications.addListener('pushNotificationReceived', (notification) => {
-            console.log('Push Rec:', notification);
+            console.log('Push Received in foreground:', notification);
+            // With presentationOptions in capacitor.config.ts, 
+            // the system will show the banner automatically.
           });
 
           PushNotifications.addListener('registrationError', (error) => {
