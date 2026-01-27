@@ -307,6 +307,7 @@ export default function MobileCommunity() {
                                     key={c.id}
                                     chat={c}
                                     unreadCount={unreadCounts[c.id] || 0}
+                                    isPinned={pinnedIds.has(c.id)}
                                     onClick={() => setActiveCommunityId(c.id)}
                                     onLongPress={() => {
                                         setLongPressedChat(c.id);
@@ -364,7 +365,7 @@ export default function MobileCommunity() {
 }
 
 // Helper component for long-press
-const ChatRow = ({ chat, unreadCount, onClick, onLongPress }: any) => {
+const ChatRow = ({ chat, unreadCount, isPinned, onClick, onLongPress }: any) => {
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const isLongPressRef = useRef(false);
 
@@ -417,7 +418,10 @@ const ChatRow = ({ chat, unreadCount, onClick, onLongPress }: any) => {
             </Avatar>
             <div className="flex-1 min-w-0 border-b border-border/5 pb-3">
                 <div className="flex justify-between items-baseline mb-0.5">
-                    <h3 className="text-[16px] font-normal text-foreground truncate">{chat.name}</h3>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                        <h3 className="text-[16px] font-normal text-foreground truncate">{chat.name}</h3>
+                        {isPinned && <Pin size={12} className="text-muted-foreground/40 rotate-45 shrink-0" />}
+                    </div>
                     <span className={cn("text-[11px] font-medium", unreadCount > 0 ? "text-[#25d366]" : "text-muted-foreground")}>
                         Yesterday
                     </span>
@@ -425,7 +429,7 @@ const ChatRow = ({ chat, unreadCount, onClick, onLongPress }: any) => {
                 <div className="flex justify-between items-center">
                     <p className="text-[13px] text-muted-foreground truncate max-w-[85%] flex items-center gap-1">
                         <Check size={14} className="text-blue-500" />
-                        {chat.description || "Hey! Did you see the new exam upload?"}
+                        {chat.description || "Active community group"}
                     </p>
                     {unreadCount > 0 && (
                         <div className="min-w-[20px] h-5 rounded-full bg-[#25d366] text-white text-[10px] font-bold flex items-center justify-center px-1">

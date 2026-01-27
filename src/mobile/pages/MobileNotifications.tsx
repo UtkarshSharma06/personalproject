@@ -63,6 +63,23 @@ const MobileNotifications = () => {
         }
     };
 
+    // Mark as read when viewing
+    useEffect(() => {
+        if (selectedNotif && user) {
+            const markAsRead = async () => {
+                try {
+                    await supabase.from('user_notifications_read').upsert({
+                        user_id: user.id,
+                        notification_id: selectedNotif.id
+                    });
+                } catch (e) {
+                    console.error("Error marking as read:", e);
+                }
+            };
+            markAsRead();
+        }
+    }, [selectedNotif?.id, user?.id]);
+
     return (
         <div className="flex flex-col min-h-full bg-background pb-10 animate-in fade-in duration-500">
             {/* Header */}
@@ -97,37 +114,39 @@ const MobileNotifications = () => {
                         <div
                             key={notif.id}
                             onClick={() => setSelectedNotif(notif)}
-                            className="group relative overflow-hidden bg-card border border-border/10 rounded-[1.5rem] p-5 active:scale-[0.98] transition-all shadow-lg hover:shadow-xl hover:border-primary/20"
+                            className="group relative overflow-hidden bg-white/50 dark:bg-card border border-border/20 rounded-[2rem] p-6 active:scale-[0.98] transition-all shadow-sm hover:shadow-md hover:border-primary/30"
                         >
-                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <Megaphone size={80} className="transform rotate-12 -translate-y-4 translate-x-4" />
+                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                                <Megaphone size={120} className="transform rotate-12 -translate-y-8 translate-x-8" />
                             </div>
 
-                            <div className="relative z-10 flex gap-4">
+                            <div className="relative z-10 flex gap-5">
                                 <div className="flex-shrink-0">
-                                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 shadow-inner">
-                                        <Bell size={20} className={cn(notif.exam_type ? "animate-pulse" : "")} />
+                                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                                        <Bell size={24} className={cn(notif.exam_type ? "animate-pulse" : "")} />
                                     </div>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-                                            <Calendar size={10} />
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5 leading-none">
+                                            <Calendar size={11} />
                                             {format(new Date(notif.created_at), 'MMM d, yyyy')}
                                         </span>
                                         {notif.exam_type && (
-                                            <span className="bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">
-                                                Important
+                                            <span className="bg-rose-500/10 text-rose-500 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest leading-none border border-rose-500/10">
+                                                Urgent
                                             </span>
                                         )}
                                     </div>
-                                    <h3 className="text-lg font-black text-foreground leading-tight mb-2 pr-4">{notif.title || "Announcement"}</h3>
-                                    <p className="text-xs text-muted-foreground font-medium line-clamp-2 leading-relaxed">
+                                    <h3 className="text-[17px] font-black text-foreground leading-tight mb-2 pr-2">{notif.title || "Announcement"}</h3>
+                                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wide line-clamp-1 opacity-70">
                                         {notif.short_description || "Tap to view details..."}
                                     </p>
                                 </div>
                                 <div className="self-center">
-                                    <ChevronRight className="text-muted-foreground/20 group-hover:text-primary transition-colors" size={20} />
+                                    <div className="w-8 h-8 rounded-full bg-secondary/30 flex items-center justify-center text-muted-foreground/40 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                                        <ChevronRight size={16} />
+                                    </div>
                                 </div>
                             </div>
                         </div>

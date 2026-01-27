@@ -13,6 +13,8 @@ import { Device } from '@capacitor/device';
 import { ExamProvider } from "@/context/ExamContext";
 import { AIProvider } from "@/context/AIContext";
 
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import NetworkStatus from "@/components/NetworkStatus";
 import AdminRoute from "@/components/auth/AdminRoute";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -303,8 +305,25 @@ const App = () => {
         try {
           await StatusBar.setOverlaysWebView({ overlay: true });
           await StatusBar.setStyle({ style: Style.Dark });
+        } catch (e) {
+          console.error("Native Setup Error", e);
+        }
+      } else {
+        setTheme('light');
+      }
+    };
 
-          // Initialize Push Notifications
+    checkPlatform();
+  }, []);
+  const PushNotificationManager = () => {
+    const { user } = useAuth();
+
+    useEffect(() => {
+      const initPush = async () => {
+        const info = await Device.getInfo();
+        if (info.platform !== 'android' && info.platform !== 'ios') return;
+
+        try {
           await PushNotifications.requestPermissions();
           await PushNotifications.register();
           await PushNotifications.createChannel({
@@ -316,25 +335,29 @@ const App = () => {
             vibration: true
           });
 
-          PushNotifications.addListener('registration', (token) => {
+          PushNotifications.addListener('registration', async (token) => {
             console.log('Push Token:', token.value);
-            // In a real app, send this token to Supabase profiles table
+            if (user?.id) {
+              await supabase
+                .from('profiles')
+                .update({ fcm_token: token.value } as any)
+                .eq('id', user.id);
+            }
           });
 
           PushNotifications.addListener('pushNotificationReceived', (notification) => {
             console.log('Push Rec:', notification);
           });
-
         } catch (e) {
-          console.error("Native Setup Error", e);
+          console.error("Push Init Error", e);
         }
-      } else {
-        setTheme('light');
-      }
-    };
+      };
 
-    checkPlatform();
-  }, []);
+      if (user) initPush();
+    }, [user]);
+
+    return null;
+  };
 
 
   if (showSplash && isMobile !== false) { // Show premium splash on mobile/init
@@ -346,6 +369,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <PushNotificationManager />
         <AIProvider>
           <ExamProvider>
             <TooltipProvider>

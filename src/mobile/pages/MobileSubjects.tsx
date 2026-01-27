@@ -3,9 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { useExam } from '@/context/ExamContext';
-import { ChevronRight, Sparkles, BookOpen, Info, Search } from 'lucide-react';
+import { ChevronRight, Sparkles, BookOpen, Info, Search, ArrowLeft, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 export default function MobileSubjects() {
     const { user } = useAuth();
@@ -13,50 +21,107 @@ export default function MobileSubjects() {
     const navigate = useNavigate();
     const [stats, setStats] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedSubject, setSelectedSubject] = useState<any>(null);
 
     useEffect(() => {
         if (user && activeExam) fetchSubjectStats();
     }, [user, activeExam.id]);
 
     const fetchSubjectStats = async () => {
-        const { data: perfData } = await (supabase as any)
-            .from('topic_performance')
-            .select('*')
-            .eq('exam_type', activeExam.id);
+        setLoading(true);
+        try {
+            // 1. Fetch User Practice Performance
+            const { data: solvedBySubject } = await (supabase as any)
+                .from('user_practice_responses')
+                .select('subject, is_correct, question_id')
+                .eq('user_id', user!.id)
+                .eq('exam_type', activeExam.id);
 
-        const masteryMap: Record<string, any> = {};
-        if (perfData) {
-            perfData.forEach((p: any) => {
-                if (!masteryMap[p.subject]) masteryMap[p.subject] = { solved: 0, correct: 0 };
-                masteryMap[p.subject].solved += p.total_questions;
-                masteryMap[p.subject].correct += p.correct_answers;
-            });
+            // 2. Fetch the mastery for each section
+            const mastery = await Promise.all(activeExam.sections.map(async (section: any) => {
+                const { count: realTotal } = await (supabase as any)
+                    .from('practice_questions')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('subject', section.name)
+                    .eq('exam_type', activeExam.id);
+
+                const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
+                const uniqueSolved = new Set(attemptsInSubject.map(a => a.question_id)).size;
+                const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
+                const acc = attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0;
+
+                return {
+                    subject: section.name,
+                    icon: section.icon,
+                    solved: uniqueSolved,
+                    total: realTotal || 0,
+                    accuracy: acc,
+                };
+            }));
+
+            setStats(mastery);
+        } catch (error) {
+            console.error('Error fetching subject stats:', error);
+        } finally {
+            setLoading(false);
         }
+    };
 
-        const subjectStats = activeExam.sections.map((section: any) => ({
-            subject: section.name,
-            icon: section.icon,
-            color: section.color,
-            accuracy: masteryMap[section.name]?.solved > 0
-                ? Math.round((masteryMap[section.name].correct / masteryMap[section.name].solved) * 100)
-                : 0,
-            solved: masteryMap[section.name]?.solved || 0
-        }));
+    const getSubjectDescription = (name: string) => {
+        const desc: Record<string, string> = {
+            'Mathematics': 'Elementary operations, algebra, geometry, functions, and statistics.',
+            'Reasoning on texts and data': 'Logic, deduction, and interpretation of complex datasets.',
+            'Biology': 'From biological molecules to anatomy and ecosystems.',
+            'Chemistry': 'Atomic structure, stoichiometry, reactions, and organic chemistry.',
+            'Physics': 'Mechanics, fluids, thermodynamics, and electromagnetism.'
+        };
+        return desc[name] || 'Master the concepts and practice questions for this subject.';
+    };
 
-        setStats(subjectStats);
-        setLoading(false);
+    const getStudyGuide = (name: string) => {
+        const guides: Record<string, string> = {
+            'Mathematics': 'Focus on formula derivation and high-speed mental math. Practice past problems with a timer to improve efficiency.',
+            'Reasoning on texts and data': 'Read academic journals and data reports. Practice identifying logical fallacies and data trends quickly.',
+            'Biology': 'Use active recall and spaced repetition for vocabulary. Diagrams are key—ensure you can draw and label organ systems.',
+            'Chemistry': 'Understand the periodic table trends first. Focus on stoichiometry calculations and reaction mechanics rather than pure memorization.',
+            'Physics': 'Master the base units and dimensional analysis. Most problems are solved by identifying which conservation law applies.'
+        };
+        return guides[name] || 'Start with fundamental concepts, then move to timed practice sessions. Review every mistake in detail.';
+    };
+
+    const handlePracticeSubject = (subject: string) => {
+        const params = new URLSearchParams({
+            subject,
+            count: '10'
+        });
+        navigate(`/mobile/practice?${params.toString()}`);
     };
 
     return (
         <div className="flex flex-col min-h-full bg-background pb-32 animate-in fade-in duration-500">
-            {/* Native Header Section */}
-            <header className="p-8 pt-10">
-                <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Knowledge Repository</span>
+            {/* Premium Header Section */}
+            <header className="px-6 pt-12 pb-6 sticky top-0 bg-background/80 backdrop-blur-xl z-20 border-b border-border/10">
+                <div className="flex items-center gap-4 mb-6">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate(-1)}
+                        className="rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Curriculum Matrix</span>
+                    </div>
                 </div>
-                <h1 className="text-4xl font-black tracking-tight uppercase leading-none">{activeExam.id.split('-')[0]} <br /><span className="text-primary">Syllabus</span></h1>
-                <p className="text-xs font-bold text-muted-foreground mt-4 opacity-60 uppercase tracking-tight">Mission curriculum & performance index</p>
+                <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">
+                    Mission <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">Syllabus</span>
+                </h1>
+                <p className="text-[10px] font-black text-muted-foreground mt-4 opacity-40 uppercase tracking-widest leading-relaxed">
+                    Neural performance index for <span className="text-foreground">{activeExam.name}</span>
+                </p>
             </header>
 
             {/* Subject Grid */}
@@ -65,30 +130,124 @@ export default function MobileSubjects() {
                     <div className="py-20 flex justify-center"><div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>
                 ) : (
                     stats.map((stat, i) => (
-                        <Card
-                            key={i}
-                            onClick={() => navigate(`/mobile/dashboard?subject=${stat.subject}`)}
-                            className="bg-secondary/20 border-border/40 rounded-[2.5rem] overflow-hidden active:scale-[0.98] transition-all group border-b-4 hover:border-primary/40"
-                        >
-                            <CardContent className="p-6 flex items-center gap-5">
-                                <div className="w-16 h-16 rounded-2xl bg-background border border-border/50 flex items-center justify-center text-3xl shadow-sm group-hover:rotate-6 transition-transform">
-                                    {stat.icon}
-                                </div>
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <h3 className="font-black text-lg uppercase tracking-tight">{stat.subject}</h3>
-                                        <span className="text-[10px] font-black text-primary">{stat.accuracy}%</span>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-1 h-1 bg-background rounded-full overflow-hidden">
-                                            <div className="h-full bg-primary" style={{ width: `${stat.accuracy}%` }} />
+                        <Dialog key={i}>
+                            <DialogTrigger asChild>
+                                <Card
+                                    onClick={() => setSelectedSubject(stat)}
+                                    className="bg-card border border-border/10 rounded-[2.5rem] overflow-hidden active:scale-[0.98] transition-all group relative cursor-pointer"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <CardContent className="p-6 flex items-center gap-5 relative z-10">
+                                        <div className="w-16 h-16 rounded-2xl bg-secondary/50 flex items-center justify-center text-3xl shadow-sm group-hover:rotate-6 transition-transform">
+                                            {stat.icon}
                                         </div>
-                                        <span className="text-[8px] font-black text-muted-foreground uppercase opacity-60">{stat.solved} Missions</span>
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h3 className="font-black text-lg uppercase tracking-tighter">{stat.subject}</h3>
+                                                <span className={cn(
+                                                    "text-lg font-black",
+                                                    stat.accuracy >= 80 ? "text-emerald-500" : stat.accuracy >= 50 ? "text-amber-500" : "text-rose-500"
+                                                )}>
+                                                    {stat.accuracy}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <div className="w-full bg-muted h-1 rounded-full overflow-hidden">
+                                                    <div
+                                                        className={cn(
+                                                            "h-full transition-all duration-1000",
+                                                            stat.accuracy >= 80 ? "bg-emerald-500" : stat.accuracy >= 50 ? "bg-amber-500" : "bg-rose-500"
+                                                        )}
+                                                        style={{ width: `${stat.accuracy}%` }}
+                                                    />
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
+                                                        {stat.solved} / {stat.total} Missions
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ChevronRight className="w-5 h-5 text-muted-foreground opacity-30 group-hover:text-primary transition-colors" />
+                                    </CardContent>
+                                </Card>
+                            </DialogTrigger>
+
+                            <DialogContent className="w-[95vw] max-w-[95vw] bg-background border border-border/10 rounded-[2rem] p-0 overflow-hidden shadow-2xl">
+                                <div className="p-6 overflow-y-auto max-h-[85vh] no-scrollbar">
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="w-14 h-14 bg-secondary/50 rounded-2xl flex items-center justify-center text-3xl">
+                                            {stat.icon}
+                                        </div>
+                                        <div className="flex-1">
+                                            <DialogTitle className="text-xl font-black uppercase tracking-tight mb-1">{stat.subject}</DialogTitle>
+                                            <div className="flex gap-2">
+                                                <span className="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-[8px] font-black uppercase tracking-widest leading-none border border-primary/10">
+                                                    {stat.accuracy}% Accuracy
+                                                </span>
+                                                <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full text-[8px] font-black uppercase tracking-widest leading-none border border-emerald-500/10">
+                                                    {stat.solved} Missions
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-8">
+                                        {/* Description */}
+                                        <p className="text-xs font-bold text-muted-foreground leading-relaxed uppercase tracking-tight opacity-70">
+                                            {getSubjectDescription(stat.subject)}
+                                        </p>
+
+                                        {/* Study Guide */}
+                                        <section>
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <HelpCircle className="w-4 h-4 text-primary" />
+                                                <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Study Strategy</h3>
+                                            </div>
+                                            <div className="bg-secondary/20 p-5 rounded-2xl border border-border/10">
+                                                <p className="text-xs font-bold text-foreground leading-relaxed">
+                                                    {getStudyGuide(stat.subject)}
+                                                </p>
+                                            </div>
+                                        </section>
+
+                                        {/* Syllabus */}
+                                        <section>
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <BookOpen className="w-4 h-4 text-primary" />
+                                                <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Syllabus Matrix</h3>
+                                            </div>
+                                            <div className="space-y-4">
+                                                {activeExam.syllabus[stat.subject]?.map((topic: any, idx: number) => (
+                                                    <div key={idx} className="p-4 rounded-2xl border border-border/10 bg-white/50">
+                                                        <h4 className="font-black text-[11px] uppercase tracking-tight mb-3 flex justify-between">
+                                                            {topic.name}
+                                                            <span className="text-[8px] opacity-30">{topic.subtopics.length} SUB-TOPICS</span>
+                                                        </h4>
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {topic.subtopics.map((sub: string, sIdx: number) => (
+                                                                <span key={sIdx} className="bg-secondary/40 text-muted-foreground px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-tight">
+                                                                    {sub}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    </div>
+
+                                    <div className="mt-10 flex gap-3 sticky bottom-0 bg-background/90 backdrop-blur-md pt-4 pb-2">
+                                        <Button
+                                            onClick={() => handlePracticeSubject(stat.subject)}
+                                            className="flex-1 h-14 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black text-[10px] uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all"
+                                        >
+                                            Launch Practice
+                                        </Button>
                                     </div>
                                 </div>
-                                <ChevronRight className="w-5 h-5 text-muted-foreground opacity-30 group-hover:text-primary transition-colors" />
-                            </CardContent>
-                        </Card>
+                            </DialogContent>
+                        </Dialog>
                     ))
                 )}
             </div>

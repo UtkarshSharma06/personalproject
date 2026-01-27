@@ -1,6 +1,8 @@
 import { Check, Bell } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 // VisuallyHidden component for accessibility
 const VisuallyHidden = ({ children }: { children: React.ReactNode }) => (
@@ -22,6 +24,7 @@ export default function NotificationView({
     onClose,
     title,
     content,
+    created_at,
     show_minimal = false
 }: NotificationViewProps) {
     return (
@@ -37,29 +40,45 @@ export default function NotificationView({
                     transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
                     className="flex flex-col h-full max-h-full overflow-hidden"
                 >
-                    <div className={`flex flex-col h-full max-h-full w-full overflow-hidden ${show_minimal ? 'p-0' : 'pt-4 px-6 pb-6 md:pt-5 md:px-8 md:pb-8 items-center'}`}>
+                    <div className={cn(
+                        "flex flex-col h-full max-h-full w-full overflow-hidden",
+                        show_minimal ? "p-0" : "pt-4 px-4 pb-4 md:pt-5 md:px-8 md:pb-8"
+                    )}>
                         {/* 1. Header Section - Fixed & Centered */}
                         {!show_minimal && title && (
-                            <div className="shrink-0 mb-8 mt-0 w-full flex justify-center text-center">
-                                <div className="relative inline-flex items-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-[0_15px_45px_-10px_rgba(0,0,0,0.15),inset_0_-8px_12px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.05)] border border-slate-50 group">
+                            <div className="shrink-0 mb-6 mt-0 w-full flex justify-center">
+                                <div className="relative w-full flex items-center justify-between gap-3 px-5 py-4 bg-white rounded-2xl shadow-[0_15px_45px_-10px_rgba(0,0,0,0.15),inset_0_-8px_12px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.05)] border border-slate-50 group overflow-hidden">
                                     <div className="absolute inset-0 bg-gradient-to-br from-white via-indigo-50/30 to-slate-50/60 rounded-2xl" />
                                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-200/50 to-transparent opacity-50" />
 
-                                    <h3 className="relative text-2xl md:text-3xl font-[1000] text-slate-900 tracking-tighter leading-tight uppercase break-words">
-                                        {title}
-                                    </h3>
+                                    <div className="relative flex flex-col gap-0.5 flex-1 min-w-0">
+                                        <h3 className="text-lg md:text-2xl font-[1000] text-slate-900 tracking-tighter leading-tight uppercase truncate">
+                                            {title}
+                                        </h3>
+                                        {created_at && (
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                                                {format(new Date(created_at), 'MMMM d, yyyy')}
+                                            </p>
+                                        )}
+                                    </div>
 
                                     <div className="relative shrink-0 p-2 bg-indigo-50 rounded-full border border-indigo-100/50 shadow-sm">
-                                        <Bell className="w-5 h-5 text-indigo-600 animate-pulse" />
+                                        <Bell className="w-4 h-4 text-indigo-600 animate-pulse" />
                                     </div>
                                 </div>
                             </div>
                         )}
 
                         {/* 2. Content Section - Scrollable */}
-                        <div className={`flex-1 overflow-y-auto custom-scrollbar min-h-0 w-full ${show_minimal ? '' : 'pr-4 text-center'}`}>
+                        <div className={cn(
+                            "flex-1 overflow-y-auto custom-scrollbar min-h-0 w-full",
+                            show_minimal ? "" : "px-0 pb-4"
+                        )}>
                             <div
-                                className={`${show_minimal ? '' : 'text-[17px] font-bold text-slate-600 leading-relaxed'}`}
+                                className={cn(
+                                    "w-full overflow-x-hidden break-words",
+                                    !show_minimal && "prose prose-sm dark:prose-invert prose-headings:font-black prose-p:text-slate-600 prose-img:rounded-3xl prose-img:mx-auto prose-strong:text-indigo-600 font-bold leading-relaxed text-center px-1"
+                                )}
                                 dangerouslySetInnerHTML={{ __html: content }}
                             />
                         </div>

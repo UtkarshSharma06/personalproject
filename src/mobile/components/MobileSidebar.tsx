@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/auth';
 import {
     User, History, Bookmark, Microscope, Users,
     LogOut, ShieldCheck, ChevronRight, Settings, Info,
-    GraduationCap, Target, Globe, ChevronDown
+    GraduationCap, Target, Globe, ChevronDown, BookOpen
 } from 'lucide-react';
 import {
     Sheet,
@@ -45,12 +45,12 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onOpenChange }) =
     };
 
     const menuItems = [
+        { icon: BookOpen, label: 'Subjects', path: '/subjects', color: 'text-blue-500' },
         { icon: History, label: t('menu.history'), path: '/mobile/history', color: 'text-indigo-500' },
         { icon: Target, label: t('menu.mock'), path: '/mock-exams', color: 'text-rose-500' },
         { icon: Bookmark, label: t('menu.bookmarks'), path: '/bookmarks', color: 'text-amber-500' },
         { icon: Microscope, label: t('menu.labs'), path: '/labs', color: 'text-emerald-500' },
         { icon: GraduationCap, label: t('menu.apply'), path: '/apply-university', color: 'text-indigo-600' },
-        { icon: Users, label: t('menu.community'), path: '/community', color: 'text-amber-500' },
     ];
 
     const adminItems = [

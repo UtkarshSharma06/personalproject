@@ -5,7 +5,8 @@ import {
     Play, BookOpen, Trophy, ArrowRight, Zap, Target,
     Loader2, Sparkles, Clock as HistoryIcon, User,
     BarChart3, Bookmark, FlaskConical, GraduationCap,
-    Award, ChevronRight, Bell
+    Award, ChevronRight, Bell, Dna, Brain, Calculator,
+    Languages, Database, Microscope, ClipboardList
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -62,13 +63,20 @@ const generateAvatarColor = (name: string) => {
 
 const MobileDashboard: React.FC = () => {
     const { user, profile } = useAuth();
-    // Use Google metadata or profile name, defaulting to "Cadet"
-    const displayName = profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || "Cadet";
-    const firstName = displayName.split(' ')[0];
-
     const { activeExam } = useExam();
     const navigate = useNavigate();
     const { t } = useTranslation();
+
+    const getSubjectIcon = (subject: string) => {
+        const s = subject.toLowerCase();
+        if (s.includes('biol')) return <div className="p-2 bg-emerald-500/20 text-emerald-500 rounded-lg"><Dna size={16} /></div>;
+        if (s.includes('chem')) return <div className="p-2 bg-rose-500/20 text-rose-500 rounded-lg"><FlaskConical size={16} /></div>;
+        if (s.includes('phys')) return <div className="p-2 bg-cyan-500/20 text-cyan-500 rounded-lg"><Database size={16} /></div>;
+        if (s.includes('math')) return <div className="p-2 bg-amber-500/20 text-amber-500 rounded-lg"><Calculator size={16} /></div>;
+        if (s.includes('logic')) return <div className="p-2 bg-indigo-500/20 text-indigo-500 rounded-lg"><Brain size={16} /></div>;
+        if (s.includes('read') || s.includes('listen') || s.includes('writ') || s.includes('speak')) return <div className="p-2 bg-violet-500/20 text-violet-500 rounded-lg"><Languages size={16} /></div>;
+        return <div className="p-2 bg-slate-500/20 text-slate-500 rounded-lg"><BookOpen size={16} /></div>;
+    };
 
     // ... (rest of state definitions)
     const [stats, setStats] = useState({
@@ -272,7 +280,7 @@ const MobileDashboard: React.FC = () => {
     );
 
     return (
-        <div className="flex flex-col min-h-full bg-background pb-32 animate-in fade-in duration-700 overflow-y-auto">
+        <div className="flex flex-col min-h-full bg-background animate-in fade-in duration-700 overflow-y-auto">
             {/* Cinematic Hero Section - Semantic Colors, No Image */}
             <header className="relative w-full h-[45vh] overflow-hidden bg-background flex flex-col justify-between p-6 pb-8 pt-12">
                 {/* Gradient Mesh Background */}
@@ -284,14 +292,6 @@ const MobileDashboard: React.FC = () => {
                         {firstName} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Ready?</span>
                     </h1>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate('/mobile/notifications')}
-                        className="rounded-full bg-white/5 border border-white/10 text-foreground hover:bg-white/10 active:scale-95 transition-all"
-                    >
-                        <Bell size={20} />
-                    </Button>
                 </div>
 
                 <div className="relative z-20 w-full space-y-4">
@@ -311,10 +311,10 @@ const MobileDashboard: React.FC = () => {
                             </Button>
                             <Button
                                 variant="outline"
-                                onClick={() => navigate('/mobile/analytics')}
+                                onClick={() => navigate('/mobile/practice')}
                                 className="h-16 px-8 rounded-2xl border-border bg-background/50 backdrop-blur-sm text-foreground hover:bg-muted font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
                             >
-                                <Target size={16} className="mr-2" /> Stats
+                                <ClipboardList size={16} className="mr-2" /> Practice
                             </Button>
                         </div>
                     ) : (
@@ -392,17 +392,15 @@ const MobileDashboard: React.FC = () => {
             <section className="mt-4 space-y-4">
                 <div className="flex justify-between items-center px-6">
                     <h2 className="font-black text-xs uppercase tracking-[0.2em] text-muted-foreground">Mission Status</h2>
-                    <button onClick={() => navigate('/mobile/practice')} className="text-[9px] font-bold text-primary uppercase tracking-widest hover:text-primary/80 transition-colors">View All</button>
+                    <button onClick={() => navigate('/subjects')} className="text-[9px] font-bold text-primary uppercase tracking-widest hover:text-primary/80 transition-colors">View All</button>
                 </div>
 
                 <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-4 snap-x">
                     {subjectMastery.map((sub, i) => (
-                        <div key={i} onClick={() => navigate('/mobile/practice')} className="snap-start shrink-0 w-64 bg-card p-5 rounded-2xl border border-border/5 active:scale-95 transition-all relative overflow-hidden group">
+                        <div key={i} onClick={() => navigate('/subjects')} className="snap-start shrink-0 w-64 bg-card p-5 rounded-3xl border border-border/5 active:scale-95 transition-all relative overflow-hidden group">
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             <div className="flex justify-between items-start mb-4 relative z-10">
-                                <div className="p-2 bg-muted rounded-lg text-foreground">
-                                    <BookOpen size={16} />
-                                </div>
+                                {getSubjectIcon(sub.subject)}
                                 <span className={cn("text-xl font-black", sub.accuracy >= 80 ? "text-emerald-500" : sub.accuracy >= 50 ? "text-amber-500" : "text-rose-500")}>{sub.accuracy}%</span>
                             </div>
                             <h4 className="font-bold text-[13px] text-foreground uppercase tracking-tight mb-1 relative z-10">{sub.subject}</h4>

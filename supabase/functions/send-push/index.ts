@@ -24,56 +24,54 @@ serve(async (req) => {
     }
 
     try {
-        if (!SERVICE_ACCOUNT) {
-            throw new Error("Missing FIREBASE_SERVICE_ACCOUNT secret");
-        }
-
+        if (!SERVICE_ACCOUNT) throw new Error("Missing FIREBASE_SERVICE_ACCOUNT secret");
         const serviceAccount = JSON.parse(SERVICE_ACCOUNT);
-        const { title, body, topic } = await req.json();
+        const { title, body, topic, token, tokens, data: extraData } = await req.json();
 
         const jwt = await getAccessToken(serviceAccount);
-
-        // Exchange JWT for Access Token
-        const tokenParams = new URLSearchParams();
-        tokenParams.append('grant_type', 'urn:ietf:params:oauth:grant-type:jwt-bearer');
-        tokenParams.append('assertion', jwt);
-
         const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: tokenParams,
+            body: new URLSearchParams({
+                grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                assertion: jwt
+            })
         });
-        const tokenData = await tokenRes.json();
-        const accessToken = tokenData.access_token;
+        const { access_token: accessToken } = await tokenRes.json();
 
-        // Send to FCM
-        const fcmProject = serviceAccount.project_id;
-        const fcmUrl = `https://fcm.googleapis.com/v1/projects/${fcmProject}/messages:send`;
+        const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
 
-        const messagePayload = {
-            message: {
-                topic: topic || "all_users",
-                notification: {
-                    title: title,
-                    body: body,
-                },
-                data: {
-                    url: "/mobile/notifications"
+        const sendPush = async (target: { topic?: string, token?: string }) => {
+            const messagePayload = {
+                message: {
+                    ...target,
+                    notification: { title, body },
+                    data: {
+                        url: "/community",
+                        ...extraData
+                    }
                 }
-            }
+            };
+            return fetch(fcmUrl, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${accessToken}`, "Content-Type": "application/json" },
+                body: JSON.stringify(messagePayload),
+            });
         };
 
-        const response = await fetch(fcmUrl, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(messagePayload),
-        });
+        let results = [];
+        if (topic) {
+            results.push(await (await sendPush({ topic })).json());
+        } else if (token) {
+            results.push(await (await sendPush({ token })).json());
+        } else if (tokens && Array.isArray(tokens)) {
+            // Send to multiple (Multicast equivalent for v1)
+            for (const t of tokens) {
+                results.push(await (await sendPush({ token: t })).json());
+            }
+        }
 
-        const result = await response.json();
-        return new Response(JSON.stringify(result), { headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' } });
+        return new Response(JSON.stringify({ success: true, results }), { headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' } });
 
     } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' } });
