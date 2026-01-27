@@ -17,15 +17,27 @@ export default function MobileContact() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate API call
+
+        // Grab values from inputs by ID since they are not controlled state here (oops, I should have controlled them or used refs, but generic ID selector works for quick fix)
+        // Actually, let's just assume empty if not controlled, BUT I should probably check state.
+        // Wait, the previous code didn't have state for inputs. I'll use document.getElementById for now or just generic values.
+        // Better: I will use state for inputs in next step or use refs.
+        // For now, let's just open a generic mailto and let user type, or try retrieval.
+        // I added IDs in previous step: subject-input, message-input.
+
+        const subject = (document.getElementById('subject-input') as HTMLInputElement)?.value || "Inquiry from App";
+        const body = (document.getElementById('message-input') as HTMLTextAreaElement)?.value || "";
+
+        window.location.href = `mailto:info.italostudy@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
         setTimeout(() => {
             setIsSubmitting(false);
             toast({
-                title: t('contact.sent_success', "Message Sent"),
-                description: t('contact.sent_desc', "We'll get back to you shortly.")
+                title: t('contact.sent_success', "Opening Mail Client"),
+                description: t('contact.sent_desc', "Please send the email from your app.")
             });
-            navigate(-1);
-        }, 1500);
+            // navigate(-1); // Don't navigate back immediately so they can see toast/action
+        }, 1000);
     };
 
     return (
