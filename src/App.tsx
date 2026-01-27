@@ -393,7 +393,8 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <PushNotificationManager />
+        {/* <PushNotificationManager /> */}
+        {/* TODO: Re-enable after adding FirebaseApp.initializeApp() in MainActivity.java */}
         <AIProvider>
           <ExamProvider>
             <TooltipProvider>
