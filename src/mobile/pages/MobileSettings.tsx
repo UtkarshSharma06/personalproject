@@ -276,10 +276,10 @@ export default function MobileSettings() {
         });
     };
 
-    /* const toggleTheme = () => {
+    const toggleTheme = () => {
         const newTheme = theme === 'dark' ? 'light' : 'dark';
         setTheme(newTheme);
-    }; */
+    };
 
     const settingsGroups = [
         {
@@ -326,11 +326,11 @@ export default function MobileSettings() {
                 {
                     icon: Moon,
                     label: t('settings.appearance'),
-                    sub: "Auto-managed",
-                    toggle: false,
+                    sub: theme === 'dark' ? "Dark Mode" : "Light Mode",
+                    toggle: true,
                     checked: theme === 'dark',
-                    // onClick: toggleTheme, // Disabled for strict platform enforcement
-                    iconClass: "bg-slate-700 opacity-50"
+                    onClick: toggleTheme,
+                    iconClass: "bg-slate-700"
                 },
             ]
         },
