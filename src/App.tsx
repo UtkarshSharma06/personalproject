@@ -331,7 +331,20 @@ const App = () => {
         if (info.platform !== 'android' && info.platform !== 'ios') return;
 
         try {
-          await PushNotifications.requestPermissions();
+          // Check permission status first
+          const permStatus = await PushNotifications.checkPermissions();
+
+          if (permStatus.receive === 'prompt' || permStatus.receive === 'prompt-with-rationale') {
+            const result = await PushNotifications.requestPermissions();
+            if (result.receive !== 'granted') {
+              console.log('Push notification permission denied');
+              return;
+            }
+          } else if (permStatus.receive !== 'granted') {
+            console.log('Push notifications not granted');
+            return;
+          }
+
           await PushNotifications.register();
           await PushNotifications.createChannel({
             id: 'default',
@@ -355,6 +368,10 @@ const App = () => {
           PushNotifications.addListener('pushNotificationReceived', (notification) => {
             console.log('Push Rec:', notification);
           });
+
+          PushNotifications.addListener('registrationError', (error) => {
+            console.error('Push registration error:', error);
+          });
         } catch (e) {
           console.error("Push Init Error", e);
         }
@@ -376,7 +393,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {/* <PushNotificationManager /> */}
+        <PushNotificationManager />
         <AIProvider>
           <ExamProvider>
             <TooltipProvider>
