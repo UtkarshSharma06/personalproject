@@ -17,6 +17,18 @@ public class MainActivity extends BridgeActivity {
         FirebaseApp.initializeApp(this);
 
         // Enable Sticky Immersive Mode
+        applyImmersiveMode();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            applyImmersiveMode();
+        }
+    }
+
+    private void applyImmersiveMode() {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         View decorView = getWindow().getDecorView();
         WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), decorView);
