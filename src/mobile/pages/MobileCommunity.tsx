@@ -337,15 +337,6 @@ export default function MobileCommunity() {
                 )}
             </main>
 
-            {/* Floating Action Button */}
-            <Button
-                onClick={() => {
-                    navigate('/community/create'); // New route or modal
-                }}
-                className="fixed bottom-24 right-5 w-14 h-14 rounded-[16px] bg-[#008069] text-white shadow-lg active:scale-90 transition-all flex items-center justify-center"
-            >
-                <MessageSquare size={24} fill="currentColor" className="text-white" />
-            </Button>
 
             {/* Context Menu Sheet */}
             <Sheet open={isContextMenuOpen} onOpenChange={setIsContextMenuOpen}>
