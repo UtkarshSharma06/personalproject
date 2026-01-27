@@ -26,6 +26,7 @@ interface Question {
     topic: string | null;
     subject?: string | null;
     is_saved?: boolean;
+    practice_question_id?: string | null;
 }
 
 export default function MobileTest() {
@@ -114,6 +115,21 @@ export default function MobileTest() {
             user_answer: optionIndex,
             answered_at: new Date().toISOString(),
         }).eq('id', question.id);
+
+        // Sync with user_practice_responses for real-time dashboard updates
+        if (question.practice_question_id && user) {
+            await (supabase as any)
+                .from('user_practice_responses')
+                .upsert({
+                    user_id: user.id,
+                    question_id: question.practice_question_id,
+                    exam_type: activeExam?.id || 'standard',
+                    subject: question.subject || test?.subject || 'General',
+                    topic: question.topic,
+                    is_correct: optionIndex === question.correct_index,
+                    created_at: new Date().toISOString()
+                }, { onConflict: 'user_id,question_id' });
+        }
     };
 
     const handleMarkForReview = async () => {
@@ -144,6 +160,58 @@ export default function MobileTest() {
             correct_answers: correct,
             completed_at: new Date().toISOString(),
         }).eq('id', testId);
+
+        // Update topic performance for analytics
+        const topicGroups: Record<string, { correct: number; total: number; subject: string }> = {};
+
+        questions.forEach(q => {
+            const subject = q.subject || test?.subject || 'General';
+            const topic = q.topic || subject;
+            const key = `${subject}:${topic}`;
+
+            if (!topicGroups[key]) {
+                topicGroups[key] = { correct: 0, total: 0, subject };
+            }
+            topicGroups[key].total++;
+            if (q.user_answer === q.correct_index) {
+                topicGroups[key].correct++;
+            }
+        });
+
+        for (const [key, data] of Object.entries(topicGroups)) {
+            const [subject, topic] = key.split(':');
+            const { data: existing } = await (supabase.from('topic_performance') as any)
+                .select('*')
+                .eq('user_id', user!.id)
+                .eq('subject', data.subject)
+                .eq('topic', topic)
+                .eq('exam_type', activeExam?.id || test?.exam_type)
+                .maybeSingle();
+
+            if (existing) {
+                await supabase
+                    .from('topic_performance')
+                    .update({
+                        total_questions: existing.total_questions + data.total,
+                        correct_answers: existing.correct_answers + data.correct,
+                        accuracy_percentage: ((existing.correct_answers + data.correct) / (existing.total_questions + data.total)) * 100,
+                        last_attempted_at: new Date().toISOString(),
+                    })
+                    .eq('id', existing.id);
+            } else {
+                await supabase
+                    .from('topic_performance')
+                    .insert({
+                        user_id: user!.id,
+                        exam_type: activeExam?.id || test?.exam_type,
+                        subject: data.subject,
+                        topic,
+                        total_questions: data.total,
+                        correct_answers: data.correct,
+                        accuracy_percentage: (data.correct / data.total) * 100,
+                    });
+            }
+        }
 
         navigate(`/results/${testId}`);
     };
