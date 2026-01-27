@@ -227,7 +227,7 @@ const MobileLayout: React.FC = () => {
 
       {/* Premium Floating Bottom Deck */}
       <div className="fixed bottom-6 left-0 right-0 px-6 z-50 pointer-events-none">
-        <nav className="max-w-md mx-auto h-20 bg-background/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] flex items-center justify-around px-4 shadow-[0_20px_50px_rgba(0,0,0,0.3)] pointer-events-auto">
+        <nav className="max-w-md mx-auto h-22 bg-background/80 backdrop-blur-3xl border border-white/20 rounded-[1.5rem] flex items-center justify-around px-4 shadow-[0_20px_50px_rgba(0,0,0,0.4)] pointer-events-auto">
           <NavButton to="/mobile/dashboard" icon={<Home size={22} />} label="Home" />
           <NavButton to="/mobile/practice" icon={<ClipboardList size={22} />} label="Arena" />
           <NavButton to="/learning" icon={<Play size={22} />} label="Study" />
