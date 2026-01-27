@@ -99,6 +99,7 @@ const MobileConciergeApply = lazy(() => import("./mobile/pages/MobileConciergeAp
 const MobileStudentApplicationStatus = lazy(() => import("./mobile/pages/MobileStudentApplicationStatus"));
 const MobileContact = lazy(() => import("./mobile/pages/MobileContact"));
 const MobileMockWaitingRoom = lazy(() => import("./mobile/pages/MobileMockWaitingRoom"));
+const MobileStudentProfile = lazy(() => import("./mobile/pages/MobileStudentProfile"));
 import MobileLayout from "./mobile/components/MobileLayout";
 
 const queryClient = new QueryClient();
@@ -205,6 +206,7 @@ const MobileRouter = () => (
       <Route path="/mobile/practice" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobilePractice /></ProtectedRoute>} />
       <Route path="/mobile/analytics" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileAnalytics /></ProtectedRoute>} />
       <Route path="/mobile/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSettings /></ProtectedRoute>} />
+      <Route path="/mobile/student/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStudentProfile /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSettings /></ProtectedRoute>} />
 
       {/* Coverage for all other features */}
@@ -283,6 +285,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 const App = () => {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [showSplash, setShowSplash] = useState(true);
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     const checkPlatform = async () => {
@@ -293,29 +296,21 @@ const App = () => {
       setIsMobile(isNative || isSmallScreen);
 
       if (isNative) {
+        setTheme('dark');
         try {
-          // Immersive Mode: Make status bar transparent/overlay
           await StatusBar.setOverlaysWebView({ overlay: true });
-          await StatusBar.setStyle({ style: Style.Dark }); // or Light based on theme
-          // To hide navigation bar, it requires the specific plugin, but this is a good start.
+          await StatusBar.setStyle({ style: Style.Dark });
         } catch (e) {
           console.error("StatusBar error", e);
         }
+      } else {
+        setTheme('light');
       }
     };
 
     checkPlatform();
   }, []);
 
-  const { setTheme } = useTheme();
-
-  useEffect(() => {
-    if (isMobile === true) {
-      setTheme('dark');
-    } else if (isMobile === false) {
-      setTheme('light'); // Force light for web
-    }
-  }, [isMobile]);
 
   if (showSplash && isMobile !== false) { // Show premium splash on mobile/init
     return <PremiumSplashScreen onComplete={() => setShowSplash(false)} />;

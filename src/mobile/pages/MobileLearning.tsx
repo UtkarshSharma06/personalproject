@@ -63,11 +63,24 @@ export default function MobileLearning() {
                 const targetCourse = courses.find(c => c.id === location.state.courseId);
                 if (targetCourse) {
                     await handleCourseSelect(targetCourse);
-                    // If contentId is present, we could try to auto-open it, but for now opening the course dashboard is a good start.
-                    // To auto-open video, we'd need to fetch units -> subunits -> content and find it. 
-                    // Let's at least get them to the course view.
+
+                    if (location.state.contentId) {
+                        try {
+                            const { data: content } = await (supabase as any)
+                                .from('learning_content')
+                                .select('*')
+                                .eq('id', location.state.contentId)
+                                .single();
+
+                            if (content) {
+                                // We need to ensure unit is selected effectively, but direct video selection works if state is ready
+                                handleVideoSelect(content);
+                            }
+                        } catch (e) {
+                            console.error("Deep link content error", e);
+                        }
+                    }
                 }
-                // Clear state to prevent loop if desired, or just leave it.
             }
         };
         initDeepLink();

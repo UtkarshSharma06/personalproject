@@ -5,7 +5,7 @@ import {
     Play, BookOpen, Trophy, ArrowRight, Zap, Target,
     Loader2, Sparkles, Clock as HistoryIcon, User,
     BarChart3, Bookmark, FlaskConical, GraduationCap,
-    Award, ChevronRight, MessageSquare
+    Award, ChevronRight
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,7 +37,6 @@ const MobileDashboard: React.FC = () => {
     const { t } = useTranslation();
 
     // States
-    const [recentTests, setRecentTests] = useState<any[]>([]);
     const [stats, setStats] = useState({
         solved: 0,
         accuracy: 0,
@@ -61,36 +60,32 @@ const MobileDashboard: React.FC = () => {
     const fetchDashboardData = async () => {
         setIsLoading(true);
         try {
-            // 0. Fetch Continue Learning
             await fetchLastProgress();
 
-            // 1. Fetch Tests for Stats & Activity
             const { data: tests } = await (supabase as any).from('tests')
                 .select('*')
                 .eq('exam_type', activeExam.id)
                 .order('created_at', { ascending: false });
 
             if (tests) {
-                const completed = tests.filter((t: any) => t.status === 'completed');
                 const totalQ = tests.reduce((acc: number, t: any) => acc + (t.total_questions || 0), 0);
                 setStats(prev => ({
                     ...prev,
                     totalQuestions: totalQ,
                     streak: profile?.streak || 0
                 }));
-                setRecentTests(tests.slice(0, 3));
             }
 
-            // 2. Performance Tracking (Synced with Web)
-            const { data: totalQuestionsBySubject } = await (supabase as any)
-                .from('practice_questions')
-                .select('subject')
-                .eq('exam_type', activeExam.id);
-
+            // Performance Tracking
             const { data: solvedBySubject } = await (supabase as any)
                 .from('user_practice_responses')
                 .select('subject, is_correct, question_id')
                 .eq('user_id', user!.id)
+                .eq('exam_type', activeExam.id);
+
+            const { data: totalQuestionsBySubject } = await (supabase as any)
+                .from('practice_questions')
+                .select('subject')
                 .eq('exam_type', activeExam.id);
 
             let calculatedAccuracy = 0;
@@ -107,10 +102,8 @@ const MobileDashboard: React.FC = () => {
                     const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
                     const uniqueSolved = new Set(attemptsInSubject.map(a => a.question_id)).size;
                     const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
-
                     const acc = attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0;
 
-                    // Simple aggregation for overall stats (aligned with Web approximation)
                     calculatedAccuracy += acc;
                     calculatedSolved += uniqueSolved;
 
@@ -131,7 +124,7 @@ const MobileDashboard: React.FC = () => {
                 }));
             }
 
-            // 3. Champions League
+            // Champions League
             const { data: championsData } = await (supabase as any).rpc('get_champions_by_questions_solved');
             if (championsData) {
                 setTopStudents(championsData.map((c: any) => ({
@@ -144,10 +137,7 @@ const MobileDashboard: React.FC = () => {
                 })));
             }
 
-            // 4. Subject Mastery (Merged into Step 2 for Sync)
-            // ...
-
-            // 5. IELTS Specifics
+            // IELTS Specifics
             if (activeExam.id === 'ielts-academic') {
                 const [{ count: rC }, { count: lC }, { count: wC }] = await Promise.all([
                     supabase.from('reading_submissions').select('*', { count: 'exact', head: true }).eq('user_id', user!.id),
@@ -155,7 +145,6 @@ const MobileDashboard: React.FC = () => {
                     supabase.from('writing_submissions').select('*', { count: 'exact', head: true }).eq('user_id', user!.id),
                 ]);
 
-                // Writing Band
                 const { data: wScores } = await supabase
                     .from('writing_submissions')
                     .select('writing_feedback(overall_score)')
@@ -176,7 +165,6 @@ const MobileDashboard: React.FC = () => {
         } catch (e) {
             console.error("Dashboard Sync Error:", e);
         } finally {
-            setIsDashboardLoading(false);
             setIsLoading(false);
         }
     };
@@ -213,7 +201,7 @@ const MobileDashboard: React.FC = () => {
                 if (subunit) {
                     const { data: unit } = await (supabase as any).from('learning_units').select('topic_id').eq('id', subunit.unit_id).single();
                     if (unit) {
-                        const { data: topic } = await (supabase as any).from('learning_topics').select('course_id').eq('id', unit.topic_id).single();
+                        const { data: topic } = await (supabase as any).from('learning_topics').select('course_id').eq('id', (unit as any).topic_id).single();
                         if (topic) courseId = topic.course_id;
                     }
                 }
@@ -233,242 +221,208 @@ const MobileDashboard: React.FC = () => {
         }
     };
 
-    const [isDashboardLoading, setIsDashboardLoading] = useState(false);
-
-    const weakestSubject = subjectMastery.length > 0
-        ? [...subjectMastery].sort((a, b) => a.accuracy - b.accuracy)[0]
-        : null;
-
     if (isLoading) return (
-        <div className="flex items-center justify-center h-[80vh]">
-            <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
+        <div className="flex items-center justify-center h-[80vh] bg-[#020617]">
+            <Loader2 className="w-8 h-8 animate-spin text-white opacity-20" />
         </div>
     );
 
     return (
-        <div className="flex flex-col min-h-full bg-background pb-32 animate-in fade-in duration-500 overflow-y-auto">
-            {/* Greeting */}
-            <header className="p-6 pt-10">
-                <div className="flex items-center gap-2 mb-1">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">{t('menu.online')}</span>
-                </div>
-                <h1 className="text-4xl font-black uppercase tracking-tight leading-none">Hello, <br /><span className="text-primary">{(profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Student').split(' ')[0]}</span></h1>
+        <div className="flex flex-col min-h-full bg-[#020617] pb-32 animate-in fade-in duration-700 overflow-y-auto">
+            {/* Cinematic Hero Section */}
+            <header className="relative w-full h-[45vh] overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/20 via-[#020617]/50 to-[#020617] z-10" />
+                <img
+                    src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop"
+                    className="absolute inset-0 w-full h-full object-cover opacity-40 scale-105 animate-slow-pan"
+                    alt="Hero Background"
+                />
 
-
-                {/* Continue Learning Button */}
-                {lastProgress && (
-                    <div className="mt-4">
-                        <button
-                            onClick={() => navigate('/learning', {
-                                state: {
-                                    continueLearning: true,
-                                    courseId: lastProgress.courseId,
-                                    contentId: lastProgress.content_id
-                                }
-                            })}
-                            className="w-full flex items-center gap-4 p-4 rounded-[2rem] bg-indigo-600 text-white shadow-xl shadow-indigo-600/30 active:scale-[0.98] transition-all relative overflow-hidden group"
-                        >
-                            <div className="absolute inset-0 bg-white/10 opacity-0 group-active:opacity-100 transition-opacity" />
-                            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm border border-white/20">
-                                <Play className="w-5 h-5 fill-white" />
-                            </div>
-                            <div className="text-left flex-1 min-w-0">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-indigo-200 mb-0.5">Continue Learning</p>
-                                <p className="text-sm font-black truncate">{lastProgress.content?.title || 'Resume Course'}</p>
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-indigo-200" />
-                        </button>
+                <div className="absolute bottom-0 left-0 w-full p-6 z-20 space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full">
+                        <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+                        <span className="text-[9px] font-black text-white uppercase tracking-[0.3em] leading-none">Live Protocol</span>
                     </div>
-                )}
+                    <h1 className="text-5xl font-black uppercase tracking-tighter text-white leading-[0.9] drop-shadow-2xl">
+                        {profile?.display_name?.split(' ')[0] || "Cadet"} <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Ready?</span>
+                    </h1>
+
+                    {lastProgress ? (
+                        <div className="flex gap-3 pt-2">
+                            <Button
+                                onClick={() => navigate('/learning', {
+                                    state: {
+                                        continueLearning: true,
+                                        courseId: lastProgress.courseId,
+                                        contentId: lastProgress.content_id
+                                    }
+                                })}
+                                className="h-12 px-6 rounded-xl bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest text-[10px] shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 transition-all"
+                            >
+                                <Play size={14} className="mr-2 fill-black" /> Resume
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => navigate('/mobile/analytics')}
+                                className="h-12 px-6 rounded-xl border-white/20 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10 font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
+                            >
+                                <Target size={14} className="mr-2" /> Stats
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button
+                            onClick={() => navigate('/mobile/practice')}
+                            className="h-12 px-8 rounded-xl bg-white text-black hover:bg-white/90 font-black uppercase tracking-widest text-[10px] shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 transition-all"
+                        >
+                            <Zap size={14} className="mr-2 fill-black" /> Initialize
+                        </Button>
+                    )}
+                </div>
             </header>
 
-            {/* Quick Action Card */}
-            <div className="px-4">
-                <Card
-                    onClick={() => navigate('/mobile/practice')}
-                    className="relative overflow-hidden border-none bg-foreground text-background shadow-2xl rounded-[2.5rem] active:scale-[0.98] transition-all group"
-                >
-                    <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4 group-hover:translate-x-0 transition-transform duration-700">
-                        <Zap size={150} />
-                    </div>
-                    <CardHeader className="pt-8 px-8 pb-2">
-                        <CardTitle className="text-2xl font-black uppercase tracking-tighter">{t('dashboard.start_practicing')}</CardTitle>
-                        <p className="text-background/50 text-[10px] font-black uppercase tracking-widest">Reach your target score</p>
-                    </CardHeader>
-                    <CardContent className="px-8 pb-8">
-                        <Button variant="secondary" className="w-full mt-4 h-14 rounded-2xl bg-background text-foreground hover:bg-background/90 font-black uppercase text-[10px] tracking-[0.2em] shadow-xl">
-                            {t('dashboard.continue')}
-                            <Play className="ml-2 w-4 h-4 fill-current" />
-                        </Button>
-                    </CardContent>
-                </Card>
+            {/* Quick Stats Row (glass) */}
+            <div className="px-4 -mt-6 relative z-30">
+                <div className="grid grid-cols-4 gap-2 bg-white/5 backdrop-blur-xl border border-white/10 p-3 rounded-2xl shadow-xl">
+                    <MiniStat icon={Target} val={`${stats.accuracy}%`} label="Acc" color="text-emerald-400" />
+                    <MiniStat icon={Zap} val={stats.streak} label="Streak" color="text-amber-400" />
+                    <MiniStat icon={Play} val={stats.solved} label="Solved" color="text-indigo-400" />
+                    <MiniStat icon={HistoryIcon} val={stats.totalQuestions} label="Total" color="text-cyan-400" />
+                </div>
             </div>
 
-            {/* Core Stats Grid */}
-            <div className="grid grid-cols-2 gap-3 px-4 mt-8">
-                <StatCard label={t('dashboard.accuracy')} value={stats.accuracy + '%'} icon={Target} color="text-emerald-500" />
-                <StatCard label={t('dashboard.streak')} value={stats.streak + ' Days'} icon={Zap} color="text-amber-500" />
-                <StatCard label={t('dashboard.solved')} value={stats.solved.toString()} icon={Play} color="text-primary" />
-                <StatCard label={t('dashboard.total_q')} value={stats.totalQuestions.toString()} icon={HistoryIcon} color="text-cyan-500" />
-            </div>
-
-            {/* IELTS Grid (Conditional) */}
-            {activeExam.id === 'ielts-academic' && (
-                <section className="mt-10 px-4 space-y-4">
-                    <h3 className="px-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50">IELTS Analytics</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-secondary/10 p-5 rounded-3xl border border-border/40">
-                            <span className="text-[20px] block mb-2">✍️</span>
-                            <span className="text-xl font-black block">{ieltsStats.avgBand || '—'}</span>
-                            <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Avg Band Score</span>
-                        </div>
-                        <div className="bg-secondary/10 p-5 rounded-3xl border border-border/40">
-                            <span className="text-[20px] block mb-2">📖</span>
-                            <span className="text-xl font-black block">{ieltsStats.reading}</span>
-                            <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Reading Tests</span>
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* Subject Mastery List */}
-            <section className="mt-10 px-4 space-y-6">
-                <div className="flex justify-between items-center px-2">
-                    <h2 className="font-black text-xs uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                        <GraduationCap size={16} /> {t('dashboard.mastery')}
-                    </h2>
-                    <Button onClick={() => navigate('/mobile/practice')} variant="ghost" size="sm" className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('dashboard.continue')}</Button>
-                </div>
-                <div className="space-y-6 bg-secondary/10 p-6 rounded-[2.5rem] border border-border/40 shadow-inner">
-                    {subjectMastery.map((sub, i) => (
-                        <div key={i} className="space-y-3">
-                            <div className="flex justify-between items-end">
-                                <span className="text-[10px] font-black uppercase tracking-tight">{sub.subject}</span>
-                                <span className="text-xs font-black text-primary">{sub.accuracy}%</span>
-                            </div>
-                            <div className="h-2 bg-background rounded-full overflow-hidden border border-border/30">
-                                <div className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.3)] transition-all duration-1000" style={{ width: sub.accuracy + '%' }} />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* Champions League (Horizontal Scroller) */}
-            <section className="mt-10 space-y-6">
-                <h2 className="px-6 font-black text-xs uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                    <Trophy size={16} className="text-amber-500" /> {t('dashboard.champions_league')}
+            {/* Horizontal Scroll: Trending / Champions */}
+            <section className="mt-8 space-y-4">
+                <h2 className="px-6 font-black text-xs uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
+                    <Trophy size={14} className="text-amber-500" /> Top Performers
                 </h2>
-                <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-4">
+                <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-4 snap-x">
                     {topStudents.map((student, i) => (
-                        <div key={student.id} className="shrink-0 w-40 bg-secondary/10 p-5 rounded-[2rem] border border-border/40 relative overflow-hidden group">
-                            {i === 0 && <div className="absolute -top-2 -right-2 w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center rotate-12"><Trophy size={14} className="text-amber-500" /></div>}
-                            <div className="w-12 h-12 rounded-xl bg-background border border-border/50 flex items-center justify-center overflow-hidden mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                                {student.avatar_url ? <img src={student.avatar_url} className="w-full h-full object-cover" /> : <User className="text-muted-foreground opacity-30" />}
-                            </div>
-                            <h4 className="font-black text-[11px] uppercase truncate tracking-tight">{student.display_name}</h4>
-                            <div className="flex items-center justify-between mt-2">
-                                <span className="text-[9px] font-black text-primary">{student.accuracy}%</span>
-                                <span className="text-[8px] font-bold text-muted-foreground uppercase opacity-40">{student.total_score} pts</span>
+                        <div key={student.id} className="snap-start shrink-0 w-32 aspect-[3/4] bg-gradient-to-b from-white/10 to-transparent p-1 rounded-2xl relative group overflow-hidden border border-white/10">
+                            {i === 0 && <div className="absolute top-2 right-2 text-amber-500 font-black text-4xl opacity-20 italic z-0">1</div>}
+                            <div className="w-full h-full rounded-xl overflow-hidden relative">
+                                {student.avatar_url ? (
+                                    <img src={student.avatar_url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                ) : (
+                                    <div className="w-full h-full bg-indigo-900/50 flex items-center justify-center">
+                                        <User className="text-white/20 w-10 h-10" />
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+                                <div className="absolute bottom-3 left-3 right-3">
+                                    <h4 className="font-bold text-[10px] text-white truncate">{student.display_name}</h4>
+                                    <p className="text-[8px] font-black text-emerald-400">{student.total_score} XP</p>
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
             </section>
 
-            {/* Study Tools Navigation */}
-            <section className="mt-10 px-4 space-y-6">
-                <h2 className="px-2 font-black text-xs uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                    <Sparkles size={16} /> Study Tools
-                </h2>
+            {/* Horizontal Scroll: Subject Mastery (Netflix Categories) */}
+            <section className="mt-4 space-y-4">
+                <div className="flex justify-between items-center px-6">
+                    <h2 className="font-black text-xs uppercase tracking-[0.2em] text-white/40">Mission Status</h2>
+                    <button onClick={() => navigate('/mobile/practice')} className="text-[9px] font-bold text-indigo-400 uppercase tracking-widest hover:text-white transition-colors">View All</button>
+                </div>
+
+                <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-4 snap-x">
+                    {subjectMastery.map((sub, i) => (
+                        <div key={i} onClick={() => navigate('/mobile/practice')} className="snap-start shrink-0 w-64 bg-[#0F172A] p-5 rounded-2xl border border-white/5 active:scale-95 transition-all relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="flex justify-between items-start mb-4 relative z-10">
+                                <div className="p-2 bg-white/5 rounded-lg text-white">
+                                    <BookOpen size={16} />
+                                </div>
+                                <span className={cn("text-xl font-black", sub.accuracy >= 80 ? "text-emerald-400" : sub.accuracy >= 50 ? "text-amber-400" : "text-rose-400")}>{sub.accuracy}%</span>
+                            </div>
+                            <h4 className="font-bold text-[13px] text-white uppercase tracking-tight mb-1 relative z-10">{sub.subject}</h4>
+                            <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden relative z-10">
+                                <div
+                                    className={cn("h-full transition-all duration-1000", sub.accuracy >= 80 ? "bg-emerald-500" : sub.accuracy >= 50 ? "bg-amber-500" : "bg-rose-500")}
+                                    style={{ width: `${sub.accuracy}%` }}
+                                />
+                            </div>
+                            <p className="text-[8px] text-white/40 font-bold uppercase tracking-widest mt-2">{sub.solved} Solved</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Featured Action Banner */}
+            <div className="px-4 mt-6">
+                <div
+                    onClick={() => navigate('/apply-university')}
+                    className="w-full h-40 rounded-[2rem] bg-gradient-to-r from-violet-600 to-indigo-900 relative overflow-hidden flex items-center px-8 active:scale-[0.98] transition-all shadow-2xl shadow-indigo-900/50"
+                >
+                    <div className="absolute right-0 top-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 [mask-image:linear-gradient(to_left,black,transparent)]" />
+                    <div className="relative z-10 space-y-2">
+                        <div className="inline-block px-2 py-1 rounded-md bg-white/20 backdrop-blur-md border border-white/10 text-[8px] font-black text-white uppercase tracking-widest">Premium Access</div>
+                        <h3 className="text-2xl font-black text-white uppercase tracking-tighter max-w-[150px] leading-none">Apply University</h3>
+                        <p className="text-[9px] text-indigo-200 font-bold max-w-[180px]">Get matched with top global universities.</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Quick Grid Tools */}
+            <section className="mt-10 px-4 space-y-4">
+                <h2 className="px-2 font-black text-xs uppercase tracking-[0.2em] text-white/40">Tools</h2>
                 <div className="grid grid-cols-2 gap-3">
                     <HubItem
                         icon={<HistoryIcon size={18} />}
                         label={t('menu.history')}
-                        sub="Practice Records"
+                        sub="Records"
                         onClick={() => navigate('/mobile/history')}
-                        color="bg-emerald-500/10 text-emerald-500"
+                        color="bg-emerald-500/20 text-emerald-400"
                     />
                     <HubItem
                         icon={<BarChart3 size={18} />}
                         label="Analytics"
-                        sub="Statistics"
+                        sub="Data"
                         onClick={() => navigate('/mobile/analytics')}
-                        color="bg-rose-500/10 text-rose-500"
+                        color="bg-rose-500/20 text-rose-400"
                     />
                     <HubItem
                         icon={<FlaskConical size={18} />}
                         label={t('menu.labs')}
-                        sub="Practice Lab"
+                        sub="Sims"
                         onClick={() => navigate('/mobile/labs')}
-                        color="bg-indigo-500/10 text-indigo-500"
+                        color="bg-cyan-500/20 text-cyan-400"
                     />
                     <HubItem
                         icon={<Bookmark size={18} />}
                         label={t('menu.bookmarks')}
-                        sub="Saved Assets"
+                        sub="Saved"
                         onClick={() => navigate('/bookmarks')}
-                        color="bg-amber-500/10 text-amber-500"
+                        color="bg-amber-500/20 text-amber-400"
                     />
                 </div>
             </section>
-
-            {/* Apply University Premium Banner */}
-            <div className="px-4 mt-12 pb-12">
-                <Card
-                    onClick={() => navigate('/apply-university')}
-                    className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-900 border-none rounded-[2.5rem] p-8 relative overflow-hidden shadow-2xl shadow-indigo-500/30 active:scale-[0.98] transition-all group"
-                >
-                    <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 group-hover:rotate-45 transition-transform duration-1000">
-                        <GraduationCap size={120} />
-                    </div>
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-                                <Award className="text-white" size={20} />
-                            </div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-100">Premium Admission Protocol</span>
-                        </div>
-                        <h3 className="text-2xl font-black text-white uppercase tracking-tighter leading-tight mb-2">Apply University</h3>
-                        <p className="text-indigo-100/60 text-xs font-bold uppercase tracking-tight leading-relaxed max-w-[200px]">Strategic consultation for global academic placement.</p>
-                        <Button variant="secondary" className="mt-8 rounded-xl bg-white text-indigo-900 hover:bg-white/90 font-black uppercase text-[10px] tracking-widest px-6 h-12 shadow-inner">
-                            Consult Admission
-                        </Button>
-                    </div>
-                </Card>
-            </div>
         </div>
     );
 };
 
-const StatCard = ({ label, value, icon: Icon, color }: { label: string, value: string, icon: any, color: string }) => (
-    <Card className="bg-secondary/10 border-border/40 backdrop-blur-sm rounded-[2rem] overflow-hidden shadow-sm active:scale-95 transition-all">
-        <CardContent className="p-5 flex flex-col items-center">
-            <div className={cn("mb-2 p-3 rounded-2xl bg-background border border-border/50", color)}><Icon size={18} /></div>
-            <div className="text-lg font-black tracking-tighter">{value}</div>
-            <div className="text-[8px] uppercase tracking-widest text-muted-foreground font-black mt-1">
-                {label}
-            </div>
-        </CardContent>
-    </Card>
+const MiniStat = ({ icon: Icon, val, label, color }: any) => (
+    <div className="flex flex-col items-center">
+        <span className={cn("text-sm font-black tracking-tighter text-white", color)}>{val}</span>
+        <span className="text-[7px] font-bold uppercase tracking-widest text-white/40 mt-0.5">{label}</span>
+    </div>
 );
 
 const HubItem = ({ icon, label, sub, onClick, color }: { icon: any, label: string, sub: string, onClick: () => void, color: string }) => (
     <div
         onClick={onClick}
-        className="p-5 bg-secondary/10 rounded-[2rem] border border-border/40 active:bg-secondary/20 transition-all flex items-center gap-4 group"
+        className="p-5 bg-white/5 rounded-[2rem] border border-white/5 active:bg-white/10 transition-all flex items-center gap-4 group"
     >
         <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-active:scale-90", color)}>
             {icon}
         </div>
         <div className="min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-tight truncate">{label}</p>
-            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest opacity-40 mt-0.5 truncate">{sub}</p>
+            <p className="text-[10px] font-black uppercase tracking-tight truncate text-white">{label}</p>
+            <p className="text-[7px] font-black text-white/40 uppercase tracking-widest mt-0.5 truncate">{sub}</p>
         </div>
-        <ChevronRight size={12} className="ml-auto opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+        <ChevronRight size={12} className="ml-auto text-white/20 group-hover:text-white transition-all" />
     </div>
 );
-
 
 export default MobileDashboard;
