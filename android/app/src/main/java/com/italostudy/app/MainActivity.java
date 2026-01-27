@@ -2,6 +2,7 @@ package com.italostudy.app;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
+import com.google.firebase.FirebaseApp;
 import android.view.View;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
