@@ -215,7 +215,7 @@ export default function MobileCommunity() {
     });
 
     return (
-        <div className="flex flex-col h-full bg-background pb-20">
+        <div className="flex flex-col h-full bg-background">
             {/* WhatsApp Header */}
             <header className="bg-primary dark:bg-card text-white pt-12 pb-0 shadow-sm shrink-0">
                 <div className="px-4 pb-4 flex justify-between items-center">
