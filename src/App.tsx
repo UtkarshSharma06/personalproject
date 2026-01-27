@@ -301,22 +301,24 @@ const App = () => {
 
   useEffect(() => {
     const checkPlatform = async () => {
-      const info = await Device.getInfo();
-      const isNative = info.platform === 'android' || info.platform === 'ios';
-      const isSmallScreen = window.innerWidth < 768;
+      try {
+        const info = await Device.getInfo();
+        const isNative = info.platform === 'android' || info.platform === 'ios';
+        const isSmallScreen = window.innerWidth < 768;
 
-      setIsMobile(isNative || isSmallScreen);
+        setIsMobile(isNative || isSmallScreen);
 
-      if (isNative) {
-        setTheme('dark');
-        try {
+        if (isNative) {
+          setTheme('dark');
+          // Set overlay and style, but don't force hide here as we use native immersive mode
           await StatusBar.setOverlaysWebView({ overlay: true });
           await StatusBar.setStyle({ style: Style.Dark });
-        } catch (e) {
-          console.error("Native Setup Error", e);
+        } else {
+          setTheme('light');
         }
-      } else {
-        setTheme('light');
+      } catch (e) {
+        console.error("Native Setup Error", e);
+        setIsMobile(window.innerWidth < 768);
       }
     };
 

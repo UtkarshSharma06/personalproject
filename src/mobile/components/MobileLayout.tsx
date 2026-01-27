@@ -180,7 +180,7 @@ const MobileLayout: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
       {/* Persistent Native Header */}
-      <header className="h-16 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-0 z-40 shrink-0">
+      <header className="pt-[env(safe-area-inset-top)] h-[calc(4rem+env(safe-area-inset-top))] flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-0 z-40 shrink-0">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -215,14 +215,14 @@ const MobileLayout: React.FC = () => {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto pb-24">
+      <main className="flex-1 overflow-y-auto pb-32">
         <Outlet />
       </main>
 
       <MobileSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
 
       {/* Premium Floating Bottom Deck */}
-      <div className="fixed bottom-4 left-0 right-0 px-4 z-50 pointer-events-none">
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-50 pointer-events-none">
         <nav className="max-w-md mx-auto h-20 bg-background/95 backdrop-blur-3xl border border-white/20 rounded-[2rem] flex items-center justify-around px-1 shadow-[0_25px_60px_rgba(0,0,0,0.6)] pointer-events-auto overflow-hidden">
           <NavButton to="/mobile/dashboard" icon={<Home />} />
           <NavButton to="/mobile/practice" icon={<ClipboardList />} />
