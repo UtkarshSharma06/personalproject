@@ -33,22 +33,24 @@ export default function MobileAnalytics() {
     const [points, setPoints] = useState(0);
     const [rank, setRank] = useState(0);
     const [timeframe, setTimeframe] = useState<'7d' | '30d' | '6m'>('7d');
-    const [velocityData, setVelocityData] = useState(dailyData);
+    const [velocityData, setVelocityData] = useState<any[]>([]);
     const [projection, setProjection] = useState({ score: 0, target: 60, confidence: 0, trajectory: 'Stable' });
 
     useEffect(() => {
         const fetchAnalytics = async () => {
             if (!user || !activeExam) return;
 
+            // ... (Existing subject mastery code preserved) ...
             // 1. Fetch Data Logic (Identical to Web)
             const { data: totalQuestions } = await (supabase as any).from('practice_questions').select('subject').eq('exam_type', activeExam.id);
-            const { data: solvedBySubject } = await (supabase as any).from('user_practice_responses').select('subject, is_correct, question_id').eq('user_id', user.id).eq('exam_type', activeExam.id);
+            const { data: solvedBySubject } = await (supabase as any).from('user_practice_responses').select('subject, is_correct, question_id, created_at').eq('user_id', user.id).eq('exam_type', activeExam.id);
 
             const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
             const isIELTS = activeExam.id === 'ielts-academic';
 
             let processedData = [];
             if (isIELTS) {
+                // ... (IELTS Logic preserved)
                 const [
                     { data: writingSubs }, { data: speakingSubs },
                     { data: readingSubs }, { data: listeningSubs }
@@ -97,8 +99,39 @@ export default function MobileAnalytics() {
             const { data: userTests } = await (supabase as any).from('tests').select('*').eq('user_id', user.id).eq('exam_type', activeExam.id).eq('status', 'completed');
             setPoints(userTests?.reduce((acc: number, t: any) => acc + (t.correct_answers || 0), 0) || 0);
 
-            // Calculation for Rank and Velocity (Simplified for performance, keep parity logic)
-            // ... (Rank and Velocity logic remains same as web for data consistency)
+
+            // --- NEW GROWTH VELOCITY LOGIC ---
+            const days = timeframe === '30d' ? 30 : 7;
+            const now = new Date();
+            const past = new Date();
+            past.setDate(now.getDate() - days);
+
+            // Filter responses by date
+            const recentResponses = solvedBySubject?.filter((r: any) => new Date(r.created_at) >= past) || [];
+
+            // Also fetch tests if needed, but responses are usually enough for "activity"
+
+            const groupedData: Record<string, number> = {};
+            // Initialize all days with 0
+            for (let i = 0; i < days; i++) {
+                const d = new Date();
+                d.setDate(d.getDate() - (days - 1 - i));
+                const dateKey = format(d, 'MMM d'); // Using date format instead of Day name for clearer 30d view
+                groupedData[dateKey] = 0;
+            }
+
+            // Fill with real data
+            recentResponses.forEach((r: any) => {
+                const dateKey = format(new Date(r.created_at), 'MMM d');
+                if (groupedData[dateKey] !== undefined) {
+                    groupedData[dateKey]++;
+                }
+            });
+
+            // Convert to array
+            const velocityChartData = Object.entries(groupedData).map(([day, score]) => ({ day, score }));
+            setVelocityData(velocityChartData);
+
 
             // Stats calculation
             const overallAccuracy = solvedBySubject && solvedBySubject.length > 0 ? Math.round((solvedBySubject.filter((q: any) => q.is_correct).length / solvedBySubject.length) * 100) : 0;

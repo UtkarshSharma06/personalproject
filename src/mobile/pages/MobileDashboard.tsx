@@ -30,13 +30,47 @@ interface TopStudent {
     accuracy?: number;
 }
 
+const COLORS = [
+    "bg-red-200 text-red-700",
+    "bg-orange-200 text-orange-700",
+    "bg-amber-200 text-amber-700",
+    "bg-yellow-200 text-yellow-700",
+    "bg-lime-200 text-lime-700",
+    "bg-green-200 text-green-700",
+    "bg-emerald-200 text-emerald-700",
+    "bg-teal-200 text-teal-700",
+    "bg-cyan-200 text-cyan-700",
+    "bg-sky-200 text-sky-700",
+    "bg-blue-200 text-blue-700",
+    "bg-indigo-200 text-indigo-700",
+    "bg-violet-200 text-violet-700",
+    "bg-purple-200 text-purple-700",
+    "bg-fuchsia-200 text-fuchsia-700",
+    "bg-pink-200 text-pink-700",
+    "bg-rose-200 text-rose-700",
+];
+
+const generateAvatarColor = (name: string) => {
+    if (!name) return COLORS[0];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % COLORS.length;
+    return COLORS[index];
+};
+
 const MobileDashboard: React.FC = () => {
     const { user, profile } = useAuth();
+    // Use Google metadata or profile name, defaulting to "Cadet"
+    const displayName = profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || "Cadet";
+    const firstName = displayName.split(' ')[0];
+
     const { activeExam } = useExam();
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    // States
+    // ... (rest of state definitions)
     const [stats, setStats] = useState({
         solved: 0,
         accuracy: 0,
@@ -240,19 +274,21 @@ const MobileDashboard: React.FC = () => {
     return (
         <div className="flex flex-col min-h-full bg-background pb-32 animate-in fade-in duration-700 overflow-y-auto">
             {/* Cinematic Hero Section - Semantic Colors, No Image */}
-            <header className="relative w-full h-[40vh] overflow-hidden bg-background">
+            <header className="relative w-full h-[45vh] overflow-hidden bg-background flex flex-col justify-between p-6 pb-8 pt-12">
                 {/* Gradient Mesh Background */}
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-500/10 via-background to-background" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
 
-                <div className="absolute bottom-0 left-0 w-full p-6 z-20 space-y-4">
-                    <h1 className="text-5xl font-black uppercase tracking-tighter text-foreground leading-[0.9] drop-shadow-sm">
-                        {profile?.display_name?.split(' ')[0] || "Cadet"} <br />
+                <div className="relative z-20">
+                    <h1 className="text-7xl font-black uppercase tracking-tighter text-foreground leading-[0.85] drop-shadow-sm">
+                        {firstName} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Ready?</span>
                     </h1>
+                </div>
 
+                <div className="relative z-20 w-full space-y-4">
                     {lastProgress ? (
-                        <div className="flex gap-3 pt-2">
+                        <div className="flex gap-4">
                             <Button
                                 onClick={() => navigate('/learning', {
                                     state: {
@@ -261,24 +297,24 @@ const MobileDashboard: React.FC = () => {
                                         contentId: lastProgress.content_id
                                     }
                                 })}
-                                className="h-12 px-6 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
+                                className="flex-1 h-16 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
                             >
-                                <Play size={14} className="mr-2 fill-current" /> Resume Learning
+                                <Play size={16} className="mr-2 fill-current" /> Resume Learning
                             </Button>
                             <Button
                                 variant="outline"
                                 onClick={() => navigate('/mobile/analytics')}
-                                className="h-12 px-6 rounded-xl border-border bg-background/50 backdrop-blur-sm text-foreground hover:bg-muted font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
+                                className="h-16 px-8 rounded-2xl border-border bg-background/50 backdrop-blur-sm text-foreground hover:bg-muted font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
                             >
-                                <Target size={14} className="mr-2" /> Stats
+                                <Target size={16} className="mr-2" /> Stats
                             </Button>
                         </div>
                     ) : (
                         <Button
                             onClick={() => navigate('/mobile/practice')}
-                            className="h-12 px-8 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
+                            className="w-full h-16 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
                         >
-                            <Zap size={14} className="mr-2 fill-current" /> Start Learning
+                            <Zap size={16} className="mr-2 fill-current" /> Start Learning
                         </Button>
                     )}
                 </div>
@@ -327,8 +363,8 @@ const MobileDashboard: React.FC = () => {
                                 {student.avatar_url ? (
                                     <img src={student.avatar_url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                 ) : (
-                                    <div className="w-full h-full bg-muted flex items-center justify-center">
-                                        <User className="text-muted-foreground/30 w-10 h-10" />
+                                    <div className={cn("w-full h-full flex items-center justify-center", generateAvatarColor(student.display_name))}>
+                                        <span className="font-black text-2xl uppercase opacity-80">{(student.display_name || '?').charAt(0)}</span>
                                     </div>
                                 )}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
