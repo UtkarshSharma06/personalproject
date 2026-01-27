@@ -5,7 +5,7 @@ import {
     Play, BookOpen, Trophy, ArrowRight, Zap, Target,
     Loader2, Sparkles, Clock as HistoryIcon, User,
     BarChart3, Bookmark, FlaskConical, GraduationCap,
-    Award, ChevronRight
+    Award, ChevronRight, Bell
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -279,11 +279,19 @@ const MobileDashboard: React.FC = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-500/10 via-background to-background" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
 
-                <div className="relative z-20">
+                <div className="relative z-20 flex justify-between items-start">
                     <h1 className="text-7xl font-black uppercase tracking-tighter text-foreground leading-[0.85] drop-shadow-sm">
                         {firstName} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Ready?</span>
                     </h1>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate('/mobile/notifications')}
+                        className="rounded-full bg-white/5 border border-white/10 text-foreground hover:bg-white/10 active:scale-95 transition-all"
+                    >
+                        <Bell size={20} />
+                    </Button>
                 </div>
 
                 <div className="relative z-20 w-full space-y-4">

@@ -264,9 +264,19 @@ const StudentProfile = () => {
                                         <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
+                                <XAxis
+                                    dataKey="day"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                                    interval={1}
+                                />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '12px', border: '1px solid hsl(var(--border))', fontWeight: 'bold' }}
-                                    itemStyle={{ color: 'hsl(var(--foreground))' }}
+                                    cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '12px', border: '1px solid hsl(var(--border))', fontWeight: 'bold', color: 'hsl(var(--foreground))' }}
+                                    itemStyle={{ color: 'hsl(var(--primary))' }}
+                                    labelStyle={{ color: 'hsl(var(--muted-foreground))', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                                    formatter={(value: any) => [`${value} Questions`, 'Solved']}
                                 />
                                 <Area
                                     type="monotone"
@@ -275,6 +285,7 @@ const StudentProfile = () => {
                                     strokeWidth={3}
                                     fillOpacity={1}
                                     fill="url(#colorScore)"
+                                    animationDuration={2000}
                                 />
                             </AreaChart>
                         </ResponsiveContainer>

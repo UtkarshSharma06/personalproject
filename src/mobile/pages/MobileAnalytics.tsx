@@ -233,7 +233,28 @@ export default function MobileAnalytics() {
                                         <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <Area type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorMobile)" />
+                                <XAxis
+                                    dataKey="day"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                                    interval="preserveStartEnd"
+                                />
+                                <RechartsTooltip
+                                    cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '12px', border: '1px solid hsl(var(--border))', fontWeight: 'bold', color: 'hsl(var(--foreground))' }}
+                                    itemStyle={{ color: '#6366f1' }}
+                                    labelStyle={{ color: 'hsl(var(--muted-foreground))', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                                    formatter={(value: any) => [`${value} Solved`, 'Activity']}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="score"
+                                    stroke="#6366f1"
+                                    strokeWidth={3}
+                                    fillOpacity={1}
+                                    fill="url(#colorMobile)"
+                                />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>

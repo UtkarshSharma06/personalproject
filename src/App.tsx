@@ -100,6 +100,7 @@ const MobileStudentApplicationStatus = lazy(() => import("./mobile/pages/MobileS
 const MobileContact = lazy(() => import("./mobile/pages/MobileContact"));
 const MobileMockWaitingRoom = lazy(() => import("./mobile/pages/MobileMockWaitingRoom"));
 const MobileStudentProfile = lazy(() => import("./mobile/pages/MobileStudentProfile"));
+const MobileNotifications = lazy(() => import("./mobile/pages/MobileNotifications"));
 import MobileLayout from "./mobile/components/MobileLayout";
 
 const queryClient = new QueryClient();
@@ -207,6 +208,7 @@ const MobileRouter = () => (
       <Route path="/mobile/analytics" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileAnalytics /></ProtectedRoute>} />
       <Route path="/mobile/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSettings /></ProtectedRoute>} />
       <Route path="/mobile/student/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStudentProfile /></ProtectedRoute>} />
+      <Route path="/mobile/notifications" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileNotifications /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSettings /></ProtectedRoute>} />
 
       {/* Coverage for all other features */}
