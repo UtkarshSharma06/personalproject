@@ -1,14 +1,62 @@
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, Zap, Sparkles, Brain, X, ChevronRight } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Check, Zap, Sparkles, Brain, X, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth';
 import SEO from '@/components/SEO';
 import { useCurrency } from '@/hooks/useCurrency';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 export default function Pricing() {
-    const { user } = useAuth();
+    const { user, profile, refreshProfile } = useAuth() as any;
     const { currency, formatPrice } = useCurrency();
+    const navigate = useNavigate();
+    const { toast } = useToast();
+    const [isUpdating, setIsUpdating] = useState<string | null>(null);
+
+    const handlePlanSelect = async (planId: string) => {
+        if (!user) {
+            navigate('/auth');
+            return;
+        }
+
+        // Only show onboarding if user hasn't selected an exam yet (first time)
+        if (!profile?.selected_exam) {
+            navigate('/onboarding');
+            return;
+        }
+
+        setIsUpdating(planId);
+        try {
+            const tierMap: any = { 'explorer': 'initiate', 'pro': 'elite', 'elite': 'global' };
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    selected_plan: planId,
+                    subscription_tier: tierMap[planId] || 'initiate'
+                })
+                .eq('id', user.id);
+
+            if (error) throw error;
+
+            await refreshProfile();
+            toast({
+                title: "Plan Updated",
+                description: `You now have full access to the ${planId.toUpperCase()} tier features.`,
+            });
+            navigate('/dashboard');
+        } catch (error: any) {
+            toast({
+                title: "Update Failed",
+                description: error.message,
+                variant: "destructive"
+            });
+        } finally {
+            setIsUpdating(null);
+        }
+    };
     const tiers = [
         {
             id: 'explorer',
@@ -101,8 +149,8 @@ export default function Pricing() {
                         <ArrowLeft size={24} />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Membership</h1>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Select Access Protocol</p>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Upgrade Your Plan</h1>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Unlock your full potential</p>
                     </div>
                 </div>
             </div>
@@ -166,12 +214,20 @@ export default function Pricing() {
                                     ))}
                                 </div>
 
-                                <Link to={user ? "/onboarding" : "/auth"} className="mt-auto">
-                                    <Button className="w-full h-12 bg-[#00a884] hover:bg-[#008f6f] text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/20 transition-all">
-                                        {plan.cta}
-                                        <ChevronRight size={16} className="ml-2" />
-                                    </Button>
-                                </Link>
+                                <Button
+                                    onClick={() => handlePlanSelect(plan.id)}
+                                    disabled={isUpdating !== null}
+                                    className="w-full h-12 bg-[#00a884] hover:bg-[#008f6f] text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/20 transition-all mt-auto"
+                                >
+                                    {isUpdating === plan.id ? (
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    ) : (
+                                        <>
+                                            {plan.cta}
+                                            <ChevronRight size={16} className="ml-2" />
+                                        </>
+                                    )}
+                                </Button>
                             </div>
                         </Card>
                     ))}

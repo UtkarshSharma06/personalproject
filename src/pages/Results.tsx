@@ -28,6 +28,7 @@ import {
 import { useExam } from '@/context/ExamContext';
 import { EXAMS } from '@/config/exams';
 import { usePlanAccess } from '@/hooks/usePlanAccess';
+import { MathText } from '@/components/MathText';
 import { UpgradeModal } from '@/components/UpgradeModal';
 
 interface DiagramData {
@@ -68,6 +69,8 @@ interface TestResult {
   exam_type: string | null;
   proctoring_status: string | null;
   violation_count: number | null;
+  is_ranked?: boolean;
+  is_mock?: boolean;
 }
 
 export default function Results() {
@@ -380,7 +383,7 @@ export default function Results() {
                     <div className="px-8 pb-10 pt-6 border-t border-slate-50 animate-in slide-in-from-top-4 duration-300">
                       {question.diagram && <DiagramRenderer diagram={question.diagram} className="mb-8" />}
 
-                      <p className="text-slate-800 font-bold mb-8 leading-relaxed text-sm">{question.question_text}</p>
+                      <MathText content={question.question_text} className="text-slate-800 font-bold mb-8 leading-relaxed text-sm" />
 
                       <div className="grid gap-3 mb-10">
                         {question.options.map((option, index) => {
@@ -397,9 +400,7 @@ export default function Results() {
                                 }`}>
                                 {String.fromCharCode(65 + index)}
                               </div>
-                              <span className={`text-sm font-bold ${isCorrectAns ? 'text-emerald-900' : isUserAns ? 'text-rose-900' : 'text-slate-500'}`}>
-                                {option}
-                              </span>
+                              <MathText content={option} className={`text-sm font-bold ${isCorrectAns ? 'text-emerald-900' : isUserAns ? 'text-rose-900' : 'text-slate-500'}`} />
                             </div>
                           );
                         })}
@@ -420,7 +421,7 @@ export default function Results() {
                               </Button>
                             </div>
                           ) : (
-                            <p className="text-xs text-slate-300 font-medium leading-relaxed">{question.explanation}</p>
+                            <MathText content={question.explanation} className="text-xs text-slate-300 font-medium leading-relaxed" />
                           )}
                         </div>
                       )}

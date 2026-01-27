@@ -7,7 +7,8 @@ import {
     Play, Rocket, ChevronRight, Video,
     BookOpen, Search, Lock, Sparkles,
     ArrowLeft, Loader2, Target, CheckCircle2,
-    MessageSquare, Send, Trophy, History, X
+    MessageSquare, Send, Trophy, History, X,
+    FileText, Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,8 +16,9 @@ import { usePlanAccess } from '@/hooks/usePlanAccess';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { MathText } from '@/components/MathText';
+import { UpgradeModal } from '@/components/UpgradeModal';
 
-type View = 'selection' | 'dashboard' | 'video' | 'quiz';
+type View = 'selection' | 'dashboard' | 'video' | 'quiz' | 'resources';
 
 export default function MobileLearning() {
     const { toast } = useToast();
@@ -28,6 +30,7 @@ export default function MobileLearning() {
     // App View States
     const [view, setView] = useState<View>('selection');
     const [isLoading, setIsLoading] = useState(true);
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
     // Data States
     const [exams, setExams] = useState<any[]>([]);
@@ -118,12 +121,16 @@ export default function MobileLearning() {
         setUnits(activeTopics);
         setView('dashboard');
         if (activeTopics.length > 0) {
-            await fetchUnitDashboard(activeTopics[0]);
+            await fetchUnitDashboard(activeTopics[0], 0);
         }
         setIsLoading(false);
     }
 
-    async function fetchUnitDashboard(topic: any) {
+    async function fetchUnitDashboard(topic: any, index?: number) {
+        if (isExplorer && index !== undefined && index > 0) {
+            setIsUpgradeModalOpen(true);
+            return;
+        }
         setIsLoading(true);
         setSelectedUnit(topic);
 
@@ -296,16 +303,18 @@ export default function MobileLearning() {
             </div>
 
             <div className="flex gap-2 p-4 overflow-x-auto no-scrollbar">
-                {units.map((unit) => (
+                {units.map((unit, idx) => (
                     <button
                         key={unit.id}
-                        onClick={() => fetchUnitDashboard(unit)}
+                        onClick={() => fetchUnitDashboard(unit, idx)}
                         className={cn(
                             "px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest whitespace-nowrap transition-all active:scale-95",
-                            selectedUnit?.id === unit.id ? "bg-primary text-white shadow-lg" : "bg-secondary/40 text-muted-foreground"
+                            selectedUnit?.id === unit.id ? "bg-primary text-white shadow-lg" : "bg-secondary/40 text-muted-foreground",
+                            isExplorer && idx > 0 && "opacity-50"
                         )}
                     >
                         {unit.name}
+                        {isExplorer && idx > 0 && <Lock className="w-2 h-2 ml-1 inline-block" />}
                     </button>
                 ))}
             </div>
@@ -538,12 +547,92 @@ export default function MobileLearning() {
         );
     };
 
+    const renderResources = () => (
+        <div className="min-h-full bg-background pb-32">
+            <div className="bg-background/95 backdrop-blur-xl p-6 border-b border-border/50 sticky top-0 z-40">
+                <button onClick={() => setView('selection')} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary mb-4 active:scale-95 transition-transform">
+                    <ArrowLeft size={14} /> Back to Missions
+                </button>
+                <h2 className="text-2xl font-black uppercase tracking-tighter">Resource Library</h2>
+            </div>
+
+            <ResourceList activeExam={activeExam} />
+        </div>
+    );
+
     return (
         <div className="min-h-full bg-background animate-in fade-in duration-500">
             {view === 'selection' && renderSelection()}
             {view === 'dashboard' && renderDashboard()}
             {view === 'video' && renderVideo()}
             {view === 'quiz' && renderQuiz()}
+            {view === 'resources' && renderResources()}
+
+            <UpgradeModal
+                isOpen={isUpgradeModalOpen}
+                onClose={() => setIsUpgradeModalOpen(false)}
+                title="Unlock Full Course"
+                description="Explorer members can only access the introductory sector. Upgrade to PRO to unlock all mission intel."
+                feature="Full Learning Academy"
+            />
+        </div>
+    );
+}
+
+function ResourceList({ activeExam }: { activeExam: any }) {
+    const [resources, setResources] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (activeExam?.id) fetchResources();
+    }, [activeExam]);
+
+    const fetchResources = async () => {
+        setLoading(true);
+        const { data } = await supabase
+            .from('exam_resources')
+            .select('*')
+            .eq('exam_type', activeExam.id)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+        setResources(data || []);
+        setLoading(false);
+    };
+
+    if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-primary" /></div>;
+
+    if (resources.length === 0) return (
+        <div className="p-12 text-center opacity-50">
+            <FileText className="w-12 h-12 mx-auto mb-4 text-slate-300" />
+            <p className="text-xs font-bold uppercase">No Resources Found</p>
+        </div>
+    );
+
+    return (
+        <div className="p-6 space-y-4">
+            {resources.map((r, i) => (
+                <div key={r.id} className="bg-secondary/20 p-5 rounded-[2rem] border border-border/50 flex flex-col gap-4">
+                    <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-900/20 flex items-center justify-center text-pink-600 shrink-0">
+                            <FileText className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-sm leading-tight mb-1">{r.title}</h4>
+                            <p className="text-[10px] text-muted-foreground line-clamp-2">{r.description}</p>
+                        </div>
+                    </div>
+                    <Button
+                        variant="outline"
+                        className="w-full rounded-xl h-10 font-bold uppercase text-[10px] tracking-widest hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 dark:hover:bg-pink-900/30"
+                        asChild
+                    >
+                        <a href={r.file_url} target="_blank" rel="noopener noreferrer">
+                            <Download className="w-3 h-3 mr-2" />
+                            Download PDF
+                        </a>
+                    </Button>
+                </div>
+            ))}
         </div>
     );
 }

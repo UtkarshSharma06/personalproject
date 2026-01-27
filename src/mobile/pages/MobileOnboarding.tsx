@@ -14,13 +14,13 @@ const exams = [
     { id: 'imat-prep', name: 'IMAT', fullName: 'Medicine Admission', icon: Target, color: 'bg-violet-600' },
     { id: 'sat-prep', name: 'SAT', fullName: 'US Undergrad', icon: GraduationCap, color: 'bg-cyan-600' },
     { id: 'ielts-academic', name: 'IELTS', fullName: 'English Mastery', icon: Globe, color: 'bg-indigo-600' },
-    { id: 'cents-prep', name: 'CEnT-S', fullName: 'Tech Science', icon: Brain, color: 'bg-slate-800' }
+    { id: 'cent-s-prep', name: 'CEnT-S', fullName: 'Tech Science', icon: Brain, color: 'bg-slate-800' }
 ];
 
 const plans = [
     {
         id: 'explorer',
-        name: 'Explorer',
+        name: 'Explorer Plan',
         price: 'FREE',
         icon: Brain,
         color: 'bg-slate-500',
@@ -28,7 +28,7 @@ const plans = [
     },
     {
         id: 'pro',
-        name: 'Prep Pro',
+        name: 'Exam Prep Plan',
         price: 'BETA €0',
         icon: Zap,
         color: 'bg-indigo-600',
@@ -36,7 +36,7 @@ const plans = [
     },
     {
         id: 'elite',
-        name: 'Elite',
+        name: 'Global Admission Plan',
         price: 'BETA €0',
         icon: Sparkles,
         color: 'bg-amber-500',
@@ -55,8 +55,12 @@ export default function MobileOnboarding() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (profile?.selected_exam && !profile.selected_plan) setStep(2);
-    }, [profile]);
+        if (profile?.selected_exam && profile?.selected_plan) {
+            navigate('/mobile/dashboard');
+            return;
+        }
+        if (profile?.selected_exam) setStep(2);
+    }, [profile, navigate]);
 
     const handleConfirm = async () => {
         if (!selectedExam || !selectedPlan || !user) return;
@@ -70,7 +74,7 @@ export default function MobileOnboarding() {
             }).eq('id', user.id);
             if (error) throw error;
             await refreshProfile();
-            setActiveExam(selectedExam);
+            await setActiveExam(selectedExam);
             toast({ title: "Protocol Armed", description: "Your journey begins now." });
             navigate('/dashboard');
         } catch (e: any) {

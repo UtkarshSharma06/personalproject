@@ -351,7 +351,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                             </h2>
                                             <div className="mt-4 flex flex-col items-center gap-2">
                                                 <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.3em]">
-                                                    Initiating Neural Link...
+                                                    Preparing Your Dashboard...
                                                 </p>
                                                 <div className="w-32 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                     <motion.div

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { create } from "https://deno.land/x/djwt@v2.8/mod.ts";
 
@@ -18,7 +18,7 @@ function getAccessToken({ client_email, private_key }: any) {
     );
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' } })
     }
@@ -73,7 +73,7 @@ serve(async (req) => {
 
         return new Response(JSON.stringify({ success: true, results }), { headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' } });
 
-    } catch (error) {
+    } catch (error: any) {
         return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' } });
     }
 });

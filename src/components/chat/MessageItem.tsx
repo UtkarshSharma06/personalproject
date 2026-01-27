@@ -31,9 +31,11 @@ export interface Message {
     created_at: string;
     user_id: string;
     reply_to_id: string | null;
-    recipient_id: string | null;
+    recipient_id?: string | null;
     is_deleted: boolean;
-    view_count: number;
+    view_count?: number;
+    community_id?: string;
+    batch_id?: string | null;
     profiles: {
         display_name: string | null;
         email: string | null;
@@ -52,7 +54,6 @@ export interface Message {
         image_url: string;
         url: string;
     } | null;
-    batch_id?: string | null;
 }
 
 interface MessageItemProps {

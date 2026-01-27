@@ -301,7 +301,9 @@ export default function MobileSettings() {
                 {
                     icon: CreditCard,
                     label: t('settings.subscription'),
-                    sub: profile?.selected_plan || "Free Tier",
+                    sub: profile?.selected_plan === 'pro' ? 'Exam Prep Plan' :
+                        profile?.selected_plan === 'elite' ? 'Global Admission Plan' :
+                            profile?.selected_plan === 'explorer' ? 'Explorer Plan' : "Free Tier",
                     onClick: () => navigate('/pricing'),
                     iconClass: "bg-amber-500"
                 },
@@ -677,31 +679,50 @@ export default function MobileSettings() {
                     <div key={i} className="px-4">
                         <div className="bg-card rounded-[2.5rem] border border-border/20 overflow-hidden shadow-2xl shadow-primary/5">
                             {group.items.map((item, j) => (
-                                <button
-                                    key={j}
-                                    onClick={item.onClick}
-                                    className="w-full h-24 flex items-center justify-between p-6 hover:bg-secondary/10 active:bg-secondary/20 transition-colors text-left border-b border-border/5 last:border-0 group"
-                                >
-                                    <div className="flex items-center gap-5">
-                                        <div className={cn(
-                                            "w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xl transition-all group-active:scale-90 group-hover:rotate-3",
-                                            item.iconClass
-                                        )}>
-                                            <item.icon size={24} className="stroke-[2.5px]" />
+                                item.toggle ? (
+                                    <div
+                                        key={j}
+                                        className="w-full h-24 flex items-center justify-between p-6 hover:bg-secondary/10 transition-colors text-left border-b border-border/5 last:border-0 group"
+                                    >
+                                        <div className="flex items-center gap-5">
+                                            <div className={cn(
+                                                "w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xl transition-all group-hover:rotate-3",
+                                                item.iconClass
+                                            )}>
+                                                <item.icon size={24} className="stroke-[2.5px]" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="text-[15px] font-black tracking-tight text-foreground uppercase">{item.label}</p>
+                                                {item.sub && <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-40 leading-tight mt-1">{item.sub}</p>}
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <p className="text-[15px] font-black tracking-tight text-foreground uppercase">{item.label}</p>
-                                            {item.sub && <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-40 leading-tight mt-1">{item.sub}</p>}
+                                        <div className="flex items-center gap-2">
+                                            <Switch className="scale-110" checked={item.checked} onCheckedChange={item.onClick} />
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        {item.toggle ? (
-                                            <Switch className="scale-110" />
-                                        ) : (
+                                ) : (
+                                    <button
+                                        key={j}
+                                        onClick={item.onClick}
+                                        className="w-full h-24 flex items-center justify-between p-6 hover:bg-secondary/10 active:bg-secondary/20 transition-colors text-left border-b border-border/5 last:border-0 group"
+                                    >
+                                        <div className="flex items-center gap-5">
+                                            <div className={cn(
+                                                "w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xl transition-all group-active:scale-90 group-hover:rotate-3",
+                                                item.iconClass
+                                            )}>
+                                                <item.icon size={24} className="stroke-[2.5px]" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="text-[15px] font-black tracking-tight text-foreground uppercase">{item.label}</p>
+                                                {item.sub && <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-40 leading-tight mt-1">{item.sub}</p>}
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
                                             <ChevronRight size={20} className="text-muted-foreground/20 group-hover:text-primary transition-colors" />
-                                        )}
-                                    </div>
-                                </button>
+                                        </div>
+                                    </button>
+                                )
                             ))}
                         </div>
                     </div>

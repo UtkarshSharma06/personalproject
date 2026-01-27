@@ -5,8 +5,10 @@ import { ArrowLeft, Trophy, Target, Zap, Clock, User, TrendingUp, Loader2 } from
 import { Card } from "@/components/ui/card";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
+import { useExam } from '@/context/ExamContext';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { cn } from '@/lib/utils';
+import { format, subDays } from 'date-fns';
 
 interface StudentStats {
     display_name: string;
@@ -15,6 +17,7 @@ interface StudentStats {
     streak: number;
     questions_solved: number;
     hours_trained: number;
+    plan?: string;
 }
 
 const COLORS = [
@@ -51,6 +54,7 @@ const StudentProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { activeExam } = useExam();
     const [stats, setStats] = useState<StudentStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [chartData, setChartData] = useState<any[]>([]);
@@ -62,15 +66,16 @@ const StudentProfile = () => {
     const fetchStudentData = async () => {
         try {
             // Attempt to get data from the Champions RPC first (public accessible stats)
-            const { data: championsData } = await (supabase as any).rpc('get_champions_by_questions_solved');
+            const { data: championsData } = await (supabase as any).rpc('get_champions_by_questions_solved', { target_exam_id: activeExam.id });
             const champion = championsData?.find((c: any) => c.user_id === id);
 
             let profileData: any = {};
             let questionsSolved = 0;
             let accuracy = 0;
             let streak = 0;
-            let displayName = "Cadet";
+            let displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || "Cadet";
             let avatarUrl = null;
+            let plan = 'explorer';
 
             if (champion) {
                 // If found in leaderboard, use that data (it's fast and aggregated)
@@ -81,37 +86,70 @@ const StudentProfile = () => {
                 // Streak might not be in RPC, default to 0 or fetch separately
             }
 
-            // Always try to fetch specific profile for latest streak/details if RLS allows or if not in top list
+            // Always try to fetch specific profile for latest details if RLS allows or if not in top list
             const { data: directProfile } = await (supabase as any)
                 .from('profiles')
-                .select('display_name, avatar_url, streak')
+                .select('display_name, avatar_url, selected_exam, selected_plan')
                 .eq('id', id)
                 .single();
 
             if (directProfile) {
                 displayName = directProfile.display_name || displayName;
                 avatarUrl = directProfile.avatar_url || avatarUrl;
-                streak = directProfile.streak || 0;
+                plan = directProfile.selected_plan || plan;
+            }
+
+            // Calculate real streak from tests
+            const { data: userTests } = await (supabase as any)
+                .from('tests')
+                .select('created_at')
+                .eq('user_id', id)
+                .order('created_at', { ascending: false });
+
+            if (userTests) {
+                const activeDates = new Set(userTests.map((t: any) => format(new Date(t.created_at), 'yyyy-MM-dd')));
+                let calculatedStreak = 0;
+                let checkDate = new Date();
+                while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                    calculatedStreak++;
+                    checkDate = subDays(checkDate, 1);
+                }
+                streak = calculatedStreak;
             }
 
             // If we still don't have stats from RPC (e.g. user not in top list), try direct count
             // Note: This might fail depending on RLS, but it's the backup
             if (!champion) {
-                const { count: solved } = await (supabase as any)
-                    .from('user_practice_responses')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('user_id', id)
-                    .eq('is_correct', true);
+                const examType = directProfile?.selected_exam || activeExam.id;
+                const [
+                    { count: correctCount },
+                    { count: totalAttempts },
+                    { data: uniqueData }
+                ] = await Promise.all([
+                    (supabase as any)
+                        .from('user_practice_responses')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('user_id', id)
+                        .eq('exam_type', examType)
+                        .eq('is_correct', true),
+                    (supabase as any)
+                        .from('user_practice_responses')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('user_id', id)
+                        .eq('exam_type', examType),
+                    (supabase as any)
+                        .from('user_practice_responses')
+                        .select('question_id')
+                        .eq('user_id', id)
+                        .eq('exam_type', examType)
+                ]);
 
-                const { count: total } = await (supabase as any)
-                    .from('user_practice_responses')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('user_id', id);
+                const uniqueSolved = new Set(uniqueData?.map((r: any) => r.question_id) || []).size;
 
-                if (total !== null) {
-                    questionsSolved = solved || 0;
-                    accuracy = total > 0 ? Math.round((solved! / total) * 100) : 0;
-                }
+                questionsSolved = uniqueSolved;
+                accuracy = totalAttempts && totalAttempts > 0
+                    ? Math.round((correctCount! / totalAttempts) * 100)
+                    : 0;
             }
 
             // Calculate pseudo-hours
@@ -123,7 +161,8 @@ const StudentProfile = () => {
                 streak: streak,
                 questions_solved: questionsSolved,
                 accuracy: accuracy,
-                hours_trained: hours
+                hours_trained: hours,
+                plan: plan
             });
 
             // Real Growth Velocity Data (from Direct Query)
@@ -198,8 +237,10 @@ const StudentProfile = () => {
 
                 <div className="flex flex-col items-center">
                     <div className="w-32 h-32 rounded-full border-4 border-background p-1 mb-4 shadow-2xl shadow-primary/10 relative">
-                        <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground text-xs font-black px-3 py-1 rounded-full uppercase tracking-widest border-4 border-background shadow-lg">
-                            Elite
+                        <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground text-[8px] font-black px-3 py-2 rounded-full uppercase tracking-widest border-4 border-background shadow-lg">
+                            {stats?.plan === 'elite' ? 'Global Admission Plan' :
+                                stats?.plan === 'pro' ? 'Exam Prep Plan' :
+                                    stats?.plan === 'explorer' ? 'Explorer Plan' : 'Cadet'}
                         </div>
                         <div className="w-full h-full rounded-full bg-background overflow-hidden relative border border-border/10">
                             {stats?.avatar_url ? (

@@ -23,7 +23,8 @@ import {
     Users,
     FlaskConical,
     Bookmark,
-    Hash
+    Hash,
+    FileText
 } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import { useState, useEffect, useCallback } from 'react';
@@ -72,14 +73,15 @@ export default function Layout({ children, showFooter = true, showHeader = true 
         checkPlatform();
     }, []);
 
-    const handleExamSwitch = (exam: any) => {
+    const handleExamSwitch = async (exam: any) => {
         setIsSyncing(true);
         setSyncTarget(exam.name);
+        // Wait for the animation/simulation feel plus the actual DB update
+        await setActiveExam(exam.id);
         setTimeout(() => {
-            setActiveExam(exam.id);
             navigate('/dashboard');
             setIsSyncing(false);
-        }, 1500);
+        }, 1200);
     };
 
     const handleSignOut = async () => {
@@ -212,12 +214,19 @@ export default function Layout({ children, showFooter = true, showHeader = true 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className="flex items-center gap-3 p-1.5 pr-4 rounded-2xl border border-indigo-500/10 hover:border-indigo-500/30 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group overflow-hidden bg-white dark:bg-slate-900 shadow-sm relative">
-                                        <div className="w-9 h-9 rounded-[0.8rem] bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-200/50 group-hover:scale-105 transition-transform duration-300">
-                                            <User className="w-5 h-5" />
+                                        <div className="w-9 h-9 rounded-[0.8rem] bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-200/50 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                                            {profile?.avatar_url ? (
+                                                <img
+                                                    src={profile.avatar_url}
+                                                    alt={displayName}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <User className="w-5 h-5" />
+                                            )}
                                         </div>
                                         <div className="flex flex-col items-start">
                                             <span className="text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest leading-none line-clamp-1">{displayName}</span>
-                                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Beta Member</span>
                                         </div>
                                     </button>
                                 </DropdownMenuTrigger>
@@ -247,7 +256,7 @@ export default function Layout({ children, showFooter = true, showHeader = true 
                     </div>
                 </header>
             )}
-            <main className="flex-1 relative">
+            <main className={`flex-1 relative ${location.pathname.startsWith('/community') ? 'flex flex-col min-h-0' : ''}`}>
                 {children}
             </main>
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />

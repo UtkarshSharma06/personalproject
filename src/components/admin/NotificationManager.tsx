@@ -98,6 +98,8 @@ export default function NotificationManager() {
                     }]);
 
                 if (error) throw error;
+                const { data } = await supabase.from('site_notifications').select().eq('id', (await supabase.from('site_notifications').select('id').order('created_at', { ascending: false }).limit(1).single()).data?.id).single();
+
                 toast.success('Notification created successfully');
 
                 // Trigger Push Notification

@@ -8,12 +8,15 @@ import {
     Award, ChevronRight, Bell, Dna, Brain, Calculator,
     Languages, Database, Microscope, ClipboardList
 } from 'lucide-react';
+import { format, subDays } from 'date-fns';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { useExam } from '@/context/ExamContext';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { usePlanAccess } from '@/hooks/usePlanAccess';
+import { UpgradeModal } from '@/components/UpgradeModal';
 
 interface SubjectMastery {
     subject: string;
@@ -26,7 +29,7 @@ interface TopStudent {
     id: string;
     display_name: string;
     total_score: number; // This is questions_solved
-    tests_taken: number;
+    exam_total: number;
     avatar_url?: string | null;
     accuracy?: number;
 }
@@ -64,12 +67,19 @@ const generateAvatarColor = (name: string) => {
 const MobileDashboard: React.FC = () => {
     const { user, profile } = useAuth();
     // Use Google metadata or profile name, defaulting to "Cadet"
-    const displayName = profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || "Cadet";
+    const displayName = profile?.display_name ||
+        user?.user_metadata?.full_name ||
+        user?.user_metadata?.name ||
+        user?.user_metadata?.given_name ||
+        user?.email?.split('@')[0] ||
+        "Student";
     const firstName = displayName.split(' ')[0];
 
     const { activeExam } = useExam();
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const { isExplorer } = usePlanAccess();
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
     const getSubjectIcon = (subject: string) => {
         const s = subject.toLowerCase();
@@ -82,13 +92,14 @@ const MobileDashboard: React.FC = () => {
         return <div className="p-2 bg-slate-500/20 text-slate-500 rounded-lg"><BookOpen size={16} /></div>;
     };
 
-    // ... (rest of state definitions)
     const [stats, setStats] = useState({
         solved: 0,
         accuracy: 0,
         streak: 0,
-        totalQuestions: 0
+        totalQuestions: 0,
+        mockSolved: 0
     });
+
     const [subjectMastery, setSubjectMastery] = useState<SubjectMastery[]>([]);
     const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
     const [platformTotalQuestions, setPlatformTotalQuestions] = useState(0);
@@ -108,112 +119,126 @@ const MobileDashboard: React.FC = () => {
     const fetchDashboardData = async () => {
         setIsLoading(true);
         try {
-            await fetchLastProgress();
+            // Run high-level independent queries in parallel
+            const [
+                _progress,
+                totalPlatformRes,
+                testsRes,
+                solvedRes,
+                championsRes,
+                ieltsExtraRes
+            ] = await Promise.all([
+                fetchLastProgress(),
+                (supabase as any).from('practice_questions').select('*', { count: 'exact', head: true }).eq('exam_type', activeExam.id),
+                (supabase as any).from('tests').select('total_questions, created_at, test_type, status').eq('exam_type', activeExam.id),
+                (supabase as any).from('user_practice_responses').select('subject, is_correct, question_id').eq('user_id', user!.id).eq('exam_type', activeExam.id),
+                (supabase as any).rpc('get_champions_by_questions_solved', { target_exam_id: activeExam.id }),
+                activeExam.id === 'ielts-academic' ? Promise.all([
+                    supabase.from('reading_submissions').select('*', { count: 'exact', head: true }).eq('user_id', user!.id),
+                    supabase.from('listening_submissions').select('*', { count: 'exact', head: true }).eq('user_id', user!.id),
+                    supabase.from('writing_submissions').select('*', { count: 'exact', head: true }).eq('user_id', user!.id),
+                    supabase.from('writing_submissions').select('writing_feedback(overall_score)').eq('user_id', user!.id).eq('status', 'completed')
+                ]) : Promise.resolve(null)
+            ]);
 
-            // 1. Get Platform Total Questions for this exam (for denominator)
-            const { count: totalPlatformQ } = await (supabase as any)
-                .from('practice_questions')
-                .select('*', { count: 'exact', head: true })
-                .eq('exam_type', activeExam.id);
-            setPlatformTotalQuestions(totalPlatformQ || 0);
+            // 1. Platform Total
+            setPlatformTotalQuestions(totalPlatformRes.count || 0);
 
-            // 2. Fetch User Stats (Tests)
-            const { data: tests } = await (supabase as any).from('tests')
-                .select('*')
-                .eq('exam_type', activeExam.id)
-                .order('created_at', { ascending: false });
+            // 2. User Stats (Tests)
+            if (testsRes.data) {
+                const totalQ = (testsRes.data as any[]).reduce((acc: number, t: any) => acc + (t.total_questions || 0), 0);
 
-            if (tests) {
-                const totalQ = tests.reduce((acc: number, t: any) => acc + (t.total_questions || 0), 0);
+                // Calculate streak
+                const activeDates = new Set((testsRes.data as any[]).map((t: any) => format(new Date(t.created_at), 'yyyy-MM-dd')));
+                let streak = 0;
+                let checkDate = new Date();
+                while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                    streak++;
+                    checkDate = subDays(checkDate, 1);
+                }
+
+                const mockSolved = (testsRes.data as any[]).filter((t: any) => t.test_type === 'mock').length;
+
                 setStats(prev => ({
                     ...prev,
                     totalQuestions: totalQ,
-                    streak: profile?.streak || 0
+                    streak: streak,
+                    mockSolved: mockSolved
                 }));
             }
 
-            // 3. User Practice Performance
-            const { data: solvedBySubject } = await (supabase as any)
-                .from('user_practice_responses')
-                .select('subject, is_correct, question_id')
-                .eq('user_id', user!.id)
-                .eq('exam_type', activeExam.id);
+            // 3. Practice Performance & Mastery
+            const solvedBySubject = solvedRes.data || [];
 
-            const { data: totalQuestionsBySubject } = await (supabase as any)
+            // Optimization: Get counts for all subjects in one query instead of a loop
+            const { data: questionCounts } = await (supabase as any)
                 .from('practice_questions')
                 .select('subject')
                 .eq('exam_type', activeExam.id);
 
+            const subjectCountsMap: Record<string, number> = {};
+            questionCounts?.forEach((q: any) => {
+                subjectCountsMap[q.subject] = (subjectCountsMap[q.subject] || 0) + 1;
+            });
+
             let calculatedAccuracy = 0;
             let calculatedSolved = 0;
 
-            if (totalQuestionsBySubject) {
-                const mastery = await Promise.all(activeExam.sections.map(async (section: any) => {
-                    const { count: realTotal } = await (supabase as any)
-                        .from('practice_questions')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('subject', section.name)
-                        .eq('exam_type', activeExam.id);
+            const mastery = activeExam.sections.map((section: any) => {
+                const realTotal = subjectCountsMap[section.name] || 0;
+                const attemptsInSubject = solvedBySubject.filter((q: any) => q.subject === section.name);
+                const uniqueSolvedIds = new Set(attemptsInSubject.map(a => a.question_id));
+                const uniqueSolved = uniqueSolvedIds.size;
+                const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
+                const acc = attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0;
 
-                    const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
-                    const uniqueSolved = new Set(attemptsInSubject.map(a => a.question_id)).size;
-                    const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
-                    const acc = attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0;
+                calculatedAccuracy += acc;
+                calculatedSolved += uniqueSolved;
 
-                    calculatedAccuracy += acc;
-                    calculatedSolved += uniqueSolved;
+                return {
+                    subject: section.name,
+                    solved: uniqueSolved,
+                    total: realTotal,
+                    accuracy: acc,
+                };
+            });
 
-                    return {
-                        subject: section.name,
-                        solved: uniqueSolved,
-                        total: realTotal || 0,
-                        accuracy: acc,
-                    };
-                }));
+            const totalAttempts = solvedBySubject.length;
+            const totalCorrect = solvedBySubject.filter((q: any) => q.is_correct).length;
+            const globalAccuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
 
-                calculatedAccuracy = Math.round(calculatedAccuracy / (activeExam.sections.length || 1));
-                setSubjectMastery(mastery);
-                setStats(prev => ({
-                    ...prev,
-                    solved: calculatedSolved,
-                    accuracy: calculatedAccuracy
-                }));
-            }
+            setSubjectMastery(mastery);
+            setStats(prev => ({
+                ...prev,
+                solved: calculatedSolved,
+                accuracy: globalAccuracy
+            }));
 
-            // 4. Champions League (Top 10)
-            const { data: championsData } = await (supabase as any).rpc('get_champions_by_questions_solved');
-            if (championsData) {
-                setTopStudents(championsData.slice(0, 10).map((c: any) => ({
+            // 4. Champions League
+            console.log("Mobile Champions Raw Data:", championsRes.data);
+            if (championsRes.data) {
+                const mappedChampions = championsRes.data.slice(0, 10).map((c: any) => ({
                     id: c.user_id,
                     display_name: c.display_name || 'Student',
                     avatar_url: c.avatar_url,
-                    total_score: c.questions_solved, // Mapped to total_score for simplicity
-                    tests_taken: c.total_questions,
+                    total_score: c.questions_solved,
+                    exam_total: c.total_questions,
                     accuracy: c.accuracy
-                })));
+                }));
+                console.log("Mapped Mobile Champions:", mappedChampions);
+                setTopStudents(mappedChampions);
             }
 
             // 5. IELTS Specifics
-            if (activeExam.id === 'ielts-academic') {
-                const [{ count: rC }, { count: lC }, { count: wC }] = await Promise.all([
-                    supabase.from('reading_submissions').select('*', { count: 'exact', head: true }).eq('user_id', user!.id),
-                    supabase.from('listening_submissions').select('*', { count: 'exact', head: true }).eq('user_id', user!.id),
-                    supabase.from('writing_submissions').select('*', { count: 'exact', head: true }).eq('user_id', user!.id),
-                ]);
-
-                const { data: wScores } = await supabase
-                    .from('writing_submissions')
-                    .select('writing_feedback(overall_score)')
-                    .eq('user_id', user!.id)
-                    .eq('status', 'completed');
-
-                const scores = wScores?.flatMap(w => w.writing_feedback).map((f: any) => f.overall_score).filter(s => !!s) || [];
+            if (ieltsExtraRes) {
+                const [rC, lC, wC, wScores] = ieltsExtraRes;
+                const scores = (wScores.data as any[])?.flatMap(w => w.writing_feedback).map((f: any) => f.overall_score).filter(s => !!s) || [];
                 const avgBand = scores.length > 0 ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)) : 0;
 
                 setIeltsStats({
-                    reading: rC || 0,
-                    listening: lC || 0,
-                    writing: wC || 0,
+                    reading: rC.count || 0,
+                    listening: lC.count || 0,
+                    writing: wC.count || 0,
                     avgBand
                 });
             }
@@ -334,10 +359,11 @@ const MobileDashboard: React.FC = () => {
 
             {/* Quick Stats Row (glass) */}
             <div className="px-4 -mt-6 relative z-30">
-                <div className="grid grid-cols-4 gap-2 bg-card/60 backdrop-blur-xl border border-border/10 p-3 rounded-2xl shadow-xl">
+                <div className="grid grid-cols-5 gap-1 bg-card/60 backdrop-blur-xl border border-border/10 p-2 rounded-2xl shadow-xl">
                     <MiniStat icon={Target} val={`${stats.accuracy}%`} label="Acc" color="text-emerald-500" />
-                    <MiniStat icon={Zap} val={stats.streak} label="Streak" color="text-amber-500" />
+                    <MiniStat icon={Zap} val={`${stats.streak}d`} label="Streak" color="text-amber-500" />
                     <MiniStat icon={Play} val={stats.solved} label="Solved" color="text-indigo-500" />
+                    <MiniStat icon={ClipboardList} val={stats.mockSolved} label="Mocks" color="text-rose-500" />
                     <MiniStat icon={HistoryIcon} val={stats.totalQuestions} label="Total" color="text-cyan-500" />
                 </div>
             </div>
@@ -376,14 +402,14 @@ const MobileDashboard: React.FC = () => {
                                     <img src={student.avatar_url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                 ) : (
                                     <div className={cn("w-full h-full flex items-center justify-center", generateAvatarColor(student.display_name))}>
-                                        <span className="font-black text-2xl uppercase opacity-80">{(student.display_name || '?').charAt(0)}</span>
+                                        <span className="font-black text-2xl uppercase opacity-80">{(student.display_name || 'Student').charAt(0)}</span>
                                     </div>
                                 )}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                                 <div className="absolute bottom-3 left-3 right-3">
                                     <h4 className="font-bold text-[10px] text-white truncate">{student.display_name}</h4>
                                     <p className="text-[8px] font-black text-emerald-400">
-                                        {student.total_score} / {platformTotalQuestions || '?'}
+                                        {student.total_score} / {student.exam_total ?? 0}
                                     </p>
                                 </div>
                             </div>
@@ -395,7 +421,7 @@ const MobileDashboard: React.FC = () => {
             {/* Horizontal Scroll: Subject Mastery (Netflix Categories) */}
             <section className="mt-4 space-y-4">
                 <div className="flex justify-between items-center px-6">
-                    <h2 className="font-black text-xs uppercase tracking-[0.2em] text-muted-foreground">Mission Status</h2>
+                    <h2 className="font-black text-xs uppercase tracking-[0.2em] text-muted-foreground">Learning Progress</h2>
                     <button onClick={() => navigate('/subjects')} className="text-[9px] font-bold text-primary uppercase tracking-widest hover:text-primary/80 transition-colors">View All</button>
                 </div>
 
@@ -435,6 +461,27 @@ const MobileDashboard: React.FC = () => {
                 </div>
             </div>
 
+            {/* Premium Upsell for Explorer Users */}
+            {isExplorer && (
+                <section className="mt-8 px-6">
+                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all" onClick={() => setIsUpgradeModalOpen(true)}>
+                        <div className="absolute top-0 right-0 p-8 opacity-20 rotate-12"><Sparkles size={100} /></div>
+                        <div className="relative z-10 space-y-4">
+                            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/20">
+                                <Zap className="text-white w-6 h-6 animate-pulse" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-black uppercase tracking-tight leading-none">Upgrade to <span className="text-amber-400">PRO</span></h3>
+                                <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mt-2">Unlock unlimited missions & expert intel.</p>
+                            </div>
+                            <Button className="w-full bg-white text-indigo-600 hover:bg-white/90 font-black text-[10px] uppercase tracking-widest h-12 rounded-xl">
+                                Unlock Premium Access
+                            </Button>
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* Quick Grid Tools */}
             <section className="mt-10 px-4 space-y-4">
                 <h2 className="px-2 font-black text-xs uppercase tracking-[0.2em] text-muted-foreground">Tools</h2>
@@ -443,7 +490,7 @@ const MobileDashboard: React.FC = () => {
                         icon={<HistoryIcon size={18} />}
                         label={t('menu.history')}
                         sub="Records"
-                        onClick={() => navigate('/mobile/history')}
+                        onClick={() => navigate('/history')}
                         color="bg-emerald-500/20 text-emerald-500"
                     />
                     <HubItem
@@ -469,6 +516,14 @@ const MobileDashboard: React.FC = () => {
                     />
                 </div>
             </section>
+
+            <UpgradeModal
+                isOpen={isUpgradeModalOpen}
+                onClose={() => setIsUpgradeModalOpen(false)}
+                title="Premium Protocol"
+                description="Your current authorization level is Explorer. Upgrade to PRO to access full spectrum analysis and unlimited practice sessions."
+                feature="Full Platform Access"
+            />
         </div>
     );
 };

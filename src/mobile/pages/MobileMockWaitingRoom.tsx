@@ -18,6 +18,7 @@ interface MockSession {
     start_time: string;
     end_time: string;
     exam_type: string;
+    attempts_per_person?: number;
 }
 
 export default function MobileMockWaitingRoom() {
@@ -84,8 +85,26 @@ export default function MobileMockWaitingRoom() {
                 .maybeSingle();
 
             if (existing) {
-                if (existing.status === 'in_progress') navigate(`/test/${existing.id}`);
-                else toast({ title: "Attempt Complete", description: "You have already finished this exam.", variant: "destructive" });
+                if (existing.status === 'in_progress') {
+                    navigate(`/sectioned-test/${existing.id}`);
+                    return;
+                }
+            }
+
+            // Check total attempts
+            const { count: attemptCount } = await (supabase as any)
+                .from('tests')
+                .select('id', { count: 'exact', head: true })
+                .eq('user_id', user.id)
+                .eq('session_id', session.id);
+
+            const limit = session.attempts_per_person || 1;
+            if (attemptCount >= limit) {
+                toast({
+                    title: "Attempt Limit Reached",
+                    description: `You have already completed the maximum of ${limit} attempt(s) for this session.`,
+                    variant: "destructive"
+                });
                 return;
             }
 
@@ -118,22 +137,40 @@ export default function MobileMockWaitingRoom() {
 
             if (error) throw error;
 
-            // Clone questions
-            const questions = sQs.map((sq: any, i: number) => ({
-                test_id: test.id,
-                question_number: i + 1,
-                question_text: sq.question_text,
-                options: sq.options,
-                correct_index: sq.correct_index,
-                explanation: sq.explanation,
-                difficulty: 'mixed',
-                topic: sq.topic,
-                subject: sq.section_name,
-                exam_type: session.exam_type,
-            }));
+            // Clone questions with section support
+            const examConfig = EXAMS[session.exam_type as keyof typeof EXAMS];
+            const isSectionedExam = !!(examConfig && examConfig.sections && examConfig.sections.length > 1);
+
+            const questions = sQs.map((sq: any, i: number) => {
+                let sectionNum = 1;
+                if (examConfig && isSectionedExam) {
+                    const sectionIdx = examConfig.sections.findIndex(s => s.name === sq.section_name);
+                    if (sectionIdx !== -1) sectionNum = sectionIdx + 1;
+                }
+
+                return {
+                    test_id: test.id,
+                    question_number: i + 1,
+                    question_text: sq.question_text,
+                    options: sq.options,
+                    correct_index: sq.correct_index,
+                    explanation: sq.explanation,
+                    difficulty: 'mixed',
+                    topic: sq.topic,
+                    subject: sq.section_name,
+                    exam_type: session.exam_type,
+                    section_number: sectionNum,
+                    section_name: sq.section_name
+                };
+            });
 
             await (supabase as any).from('questions').insert(questions);
-            navigate(`/test/${test.id}`);
+
+            if (isSectionedExam) {
+                navigate(`/sectioned-test/${test.id}`);
+            } else {
+                navigate(`/test/${test.id}`);
+            }
         } catch (e: any) {
             toast({ title: "Error starting exam", description: e.message, variant: "destructive" });
         } finally {
@@ -202,6 +239,33 @@ export default function MobileMockWaitingRoom() {
                             <span className="text-[10px] font-black uppercase">{isLocked ? 'Locked' : 'Active'}</span>
                         </div>
                     </div>
+
+                    {session.exam_type && EXAMS[session.exam_type as keyof typeof EXAMS]?.sections && (
+                        <div className="space-y-4 pt-4 border-t border-border/20">
+                            <div className="flex items-center justify-between px-2">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Exam Structure</h4>
+                                <span className="text-[9px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
+                                    {EXAMS[session.exam_type as keyof typeof EXAMS].sections.length} Sections
+                                </span>
+                            </div>
+                            <div className="space-y-2">
+                                {EXAMS[session.exam_type as keyof typeof EXAMS].sections.map((s, idx) => (
+                                    <div key={idx} className="flex items-center justify-between p-3 bg-secondary/20 rounded-xl border border-border/10">
+                                        <div className="flex items-center gap-3">
+                                            <span className="w-5 h-5 bg-background border border-border/40 rounded-full flex items-center justify-center text-[8px] font-black">
+                                                {idx + 1}
+                                            </span>
+                                            <span className="text-[10px] font-black uppercase tracking-tight">{s.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-[8px] font-black text-muted-foreground uppercase">{s.questionCount} Qs</span>
+                                            <span className="text-[8px] font-black text-primary uppercase">{s.durationMinutes} Min</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="w-full px-4 space-y-4">

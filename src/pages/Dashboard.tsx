@@ -23,7 +23,9 @@ import {
     BarChart3,
     Award,
     Bookmark,
-    FlaskConical
+    FlaskConical,
+    FileText,
+    ClipboardList
 } from 'lucide-react';
 import { subDays } from 'date-fns';
 import { useExam } from '@/context/ExamContext';
@@ -142,7 +144,8 @@ export default function Dashboard() {
         totalQuestions: 0,
         streak: 0,
         avgTime: 0,
-        mockExams: 2,
+        mockExams: 0,
+        accuracy: 0,
     });
     const [subjectMastery, setSubjectMastery] = useState<SubjectMastery[]>([]);
     const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
@@ -194,7 +197,7 @@ export default function Dashboard() {
     const fetchTopStudents = async () => {
         try {
             const { data: championsData, error } = await supabase
-                .rpc('get_champions_by_questions_solved');
+                .rpc('get_champions_by_questions_solved', { target_exam_id: activeExam.id });
 
             if (error) {
                 console.error("Error fetching champions:", error);
@@ -219,7 +222,7 @@ export default function Dashboard() {
                 accuracy: champion.accuracy, // Real accuracy percentage
             }));
 
-            setTopStudents(studentsWithScores);
+            setTopStudents(studentsWithScores.slice(0, 4));
         } catch (err) {
             console.error("Failed to load champions", err);
         }
@@ -247,11 +250,14 @@ export default function Dashboard() {
                 checkDate = subDays(checkDate, 1);
             }
 
+            const mockSolved = tests.filter((t: any) => t.test_type === 'mock').length;
+
             setStats(prev => ({
                 ...prev,
                 totalQuestions,
                 streak,
                 avgTime,
+                mockExams: mockSolved,
             }));
         }
 
@@ -338,6 +344,16 @@ export default function Dashboard() {
                 };
             }));
             setSubjectMastery(mastery);
+
+            // Calculate overall accuracy for stats
+            const totalAttempts = solvedBySubject?.length || 0;
+            const totalCorrect = solvedBySubject?.filter((q: any) => q.is_correct).length || 0;
+            const globalAccuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+
+            setStats(prev => ({
+                ...prev,
+                accuracy: globalAccuracy
+            }));
         } else {
             setSubjectMastery(activeExam.sections.map((s: any) => ({
                 subject: s.name,
@@ -425,8 +441,8 @@ export default function Dashboard() {
         ? [...subjectMastery].sort((a, b) => a.accuracy - b.accuracy)[0]
         : null;
 
-    const overallAccuracy = subjectMastery.reduce((acc, curr) => acc + curr.accuracy, 0) / (subjectMastery.length || 1);
-    const oracleProjection = overallAccuracy.toFixed(1);
+    const overallAccuracy = stats.accuracy;
+    const oracleProjection = overallAccuracy.toString();
 
     const missionText = weakestSubject && weakestSubject.solved > 0
         ? (
@@ -568,12 +584,13 @@ export default function Dashboard() {
                         </div>
 
                         {/* Stats Cards (Thin Borders) */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
                             {[
-                                { label: 'TOTAL QUESTIONS', value: stats.totalQuestions, icon: Search, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-100/50 dark:border-indigo-500/20' },
-                                { label: 'STREAK', value: `${stats.streak} days`, icon: Zap, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-100/50 dark:border-orange-500/20' },
+                                { label: 'TOTAL SOLVED', value: stats.totalQuestions, icon: Search, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-100/50 dark:border-indigo-500/20' },
+                                { label: 'MOCK SOLVED', value: stats.mockExams, icon: ClipboardList, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20', border: 'border-rose-100/50 dark:border-rose-500/20' },
+                                { label: 'STREAK', value: `${stats.streak} d`, icon: Zap, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-100/50 dark:border-orange-500/20' },
                                 { label: 'AVG TIME', value: `${stats.avgTime} s`, icon: Clock, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-900/20', border: 'border-cyan-100/50 dark:border-cyan-500/20' },
-                                { label: 'ACCURACY', value: `${oracleProjection}%`, icon: Trophy, color: 'text-pink-600 dark:text-pink-400', bg: 'bg-pink-50 dark:bg-pink-900/20', border: 'border-pink-100/50 dark:border-pink-500/20' },
+                                { label: 'STABILITY', value: `${oracleProjection}%`, icon: Trophy, color: 'text-pink-600 dark:text-pink-400', bg: 'bg-pink-50 dark:bg-pink-900/20', border: 'border-pink-100/50 dark:border-pink-500/20' },
                             ].map((stat, i) => (
                                 <StatCard key={i} {...stat} />
                             ))}
@@ -719,6 +736,7 @@ export default function Dashboard() {
 
                                 <div className="grid grid-cols-1 gap-3">
                                     {[
+                                        { label: 'Resource Library', path: '/resources', icon: FileText, color: 'text-pink-600', bg: 'bg-pink-50 dark:bg-pink-900/30', border: 'border-pink-100/50' },
                                         { label: '3D Labs', path: '/labs', icon: FlaskConical, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/30', border: 'border-indigo-100/50' },
                                         { label: 'Mission History', path: '/history', icon: Clock, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30', border: 'border-emerald-100/50' },
                                         { label: 'Performance', path: '/analytics', icon: BarChart3, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-900/30', border: 'border-rose-100/50' },
@@ -729,7 +747,7 @@ export default function Dashboard() {
                                             className="group flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-card hover:bg-slate-900 hover:text-white transition-all border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:-translate-y-1"
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className={`w - 10 h - 10 rounded - xl ${item.bg} flex items - center justify - center ${item.color} group - hover: bg - white / 10 group - hover: text - white transition - colors border ${item.border} `}>
+                                                <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center ${item.color} group-hover:bg-white/10 group-hover:text-white transition-colors border ${item.border}`}>
                                                     <item.icon className="w-5 h-5" />
                                                 </div>
                                                 <span className="text-sm font-black uppercase tracking-tight">{item.label}</span>

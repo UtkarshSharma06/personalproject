@@ -11,6 +11,7 @@ import {
     Calendar, ShieldCheck, ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/use-toast";
 
 export default function MobileStudentApplicationStatus() {
     const { id } = useParams();

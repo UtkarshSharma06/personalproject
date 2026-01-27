@@ -11,6 +11,8 @@ import {
 import { useExam } from '@/context/ExamContext';
 import { usePlanAccess } from '@/hooks/usePlanAccess';
 import { cn } from '@/lib/utils';
+import { EXAMS } from '@/config/exams';
+import { UpgradeModal } from '@/components/UpgradeModal';
 
 export default function MobileStartTest() {
     const { user } = useAuth();
@@ -31,6 +33,19 @@ export default function MobileStartTest() {
     const [availableTopics, setAvailableTopics] = useState<{ name: string; count: number }[]>([]);
     const [isLoadingTopics, setIsLoadingTopics] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+
+    // Check for practice mode params
+    const sessionId = searchParams.get('session_id');
+    const practiceMode = searchParams.get('practice_mode') === 'true';
+    const isPracticeMock = sessionId && practiceMode;
+
+    // Auto-start practice mock if params present
+    useEffect(() => {
+        if (isPracticeMock && user) {
+            handlePracticeMockStart();
+        }
+    }, [isPracticeMock, user]);
 
     // Sync topics when subject changes
     useEffect(() => {
@@ -62,6 +77,96 @@ export default function MobileStartTest() {
         fetchTopics();
     }, [subject, activeExam.id]);
 
+    const handlePracticeMockStart = async () => {
+        if (!user || !sessionId) return;
+        setIsGenerating(true);
+        try {
+            // Fetch session details
+            const { data: session, error: sessionError } = await (supabase as any)
+                .from('mock_sessions')
+                .select('*')
+                .eq('id', sessionId)
+                .single();
+
+            if (sessionError || !session) {
+                throw new Error("Session not found");
+            }
+
+            // Fetch session questions
+            const { data: sQs } = await (supabase as any)
+                .from('session_questions')
+                .select('*')
+                .eq('session_id', sessionId);
+
+            if (!sQs || sQs.length === 0) {
+                throw new Error("No questions found for this mock exam");
+            }
+
+            // Create practice test (NOT ranked)
+            const { data: test, error: testError } = await (supabase as any)
+                .from('tests')
+                .insert({
+                    user_id: user.id,
+                    session_id: null, // Don't link to session for practice mode
+                    subject: session.title,
+                    difficulty: 'mixed',
+                    total_questions: sQs.length,
+                    time_limit_minutes: session.duration || 100,
+                    status: 'in_progress',
+                    test_type: 'mock',
+                    exam_type: session.exam_type,
+                    is_ranked: false, // CRITICAL: Not ranked for practice mode
+                    is_mock: true
+                })
+                .select()
+                .single();
+
+            if (testError) throw testError;
+
+            // Clone questions with section support
+            const examConfig = EXAMS[session.exam_type as keyof typeof EXAMS];
+            const isSectionedExam = !!(examConfig && examConfig.sections && examConfig.sections.length > 1);
+
+            const questions = sQs.map((sq: any, i: number) => {
+                let sectionNum = 1;
+                if (examConfig && isSectionedExam) {
+                    const sectionIdx = examConfig.sections.findIndex(s => s.name === sq.section_name);
+                    if (sectionIdx !== -1) sectionNum = sectionIdx + 1;
+                }
+
+                return {
+                    test_id: test.id,
+                    question_number: i + 1,
+                    question_text: sq.question_text,
+                    options: sq.options,
+                    correct_index: sq.correct_index,
+                    explanation: sq.explanation,
+                    difficulty: sq.difficulty || 'mixed',
+                    topic: sq.topic,
+                    subject: sq.section_name,
+                    exam_type: session.exam_type,
+                    section_number: sectionNum,
+                    section_name: sq.section_name
+                };
+            });
+
+            await (supabase as any).from('questions').insert(questions);
+
+            toast({ title: "Practice Mock Started", description: "This attempt won't affect rankings." });
+
+            if (isSectionedExam) {
+                navigate(`/sectioned-test/${test.id}`);
+            } else {
+                navigate(`/test/${test.id}`);
+            }
+        } catch (e: any) {
+            toast({ title: "Failed to Start", description: e.message, variant: "destructive" });
+            navigate('/mock-exams'); // Redirect back on error
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     const handleStart = async () => {
         if (!user) {
             toast({ title: "Authentication Required", variant: "destructive" });
@@ -70,7 +175,7 @@ export default function MobileStartTest() {
         }
 
         if (hasReachedSubjectLimit(subject)) {
-            toast({ title: "Limit Reached", description: "Standard daily limits apply. Upgrade to PRO.", variant: "destructive" });
+            setIsUpgradeModalOpen(true);
             return;
         }
 
@@ -154,8 +259,10 @@ export default function MobileStartTest() {
                 <div className="w-24 h-24 border-8 border-primary/10 border-t-primary rounded-full animate-spin" />
                 <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary w-10 h-10 animate-pulse" />
             </div>
-            <h2 className="text-2xl font-black uppercase tracking-tight">Preparing <span className="text-primary">Test</span></h2>
-            <p className="text-[10px] font-black tracking-widest uppercase opacity-40 mt-4">Loading Curriculum Data...</p>
+            <h2 className="text-2xl font-black uppercase tracking-tight">Preparing <span className="text-primary">{isPracticeMock ? 'Practice Mock' : 'Test'}</span></h2>
+            <p className="text-[10px] font-black tracking-widest uppercase opacity-40 mt-4">
+                {isPracticeMock ? 'Loading Mock Exam...' : 'Loading Curriculum Data...'}
+            </p>
         </div>
     );
 
@@ -269,6 +376,14 @@ export default function MobileStartTest() {
                     Start Test <PlayCircle className="ml-3 w-6 h-6" />
                 </Button>
             </div>
+
+            <UpgradeModal
+                isOpen={isUpgradeModalOpen}
+                onClose={() => setIsUpgradeModalOpen(false)}
+                title="Daily Limit Reached"
+                description={`You've exhausted your daily practice allowance for ${subject}. Upgrade to PRO for unlimited mission intelligence.`}
+                feature="Unlimited Practice"
+            />
         </div>
     );
 }

@@ -34,7 +34,7 @@ const exams = [
         label: 'Proficiency'
     },
     {
-        id: 'cents-prep',
+        id: 'cent-s-prep',
         name: 'CEnT-S',
         fullName: 'Technical & Industrial Science',
         icon: Brain,
@@ -88,10 +88,14 @@ export default function Onboarding() {
 
     // If profile already complete, we can pre-set step 2 if they have exam but no plan
     useEffect(() => {
-        if (profile?.selected_exam && !profile.selected_plan) {
+        if (profile?.selected_exam && profile?.selected_plan) {
+            navigate('/dashboard');
+            return;
+        }
+        if (profile?.selected_exam) {
             setStep(2);
         }
-    }, [profile]);
+    }, [profile, navigate]);
 
     const handleNextStep = () => {
         if (selectedExam) setStep(2);
@@ -136,7 +140,7 @@ export default function Onboarding() {
             // Profile refreshed
 
             // 2. Immediately sync local context to prevent redirect loop/mismatch
-            setActiveExam(selectedExam);
+            await setActiveExam(selectedExam);
 
             toast({
                 title: "Protocol Initialized",

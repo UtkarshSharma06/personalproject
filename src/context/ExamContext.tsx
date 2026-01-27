@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ExamConfig, EXAMS } from '../config/exams';
 import { useAuth } from '../lib/auth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ExamContextType {
     activeExam: ExamConfig;
-    setActiveExam: (examId: string) => void;
+    setActiveExam: (examId: string) => Promise<void>;
     isLoading: boolean;
 }
 
@@ -31,10 +32,22 @@ export const ExamProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, [authLoading, profile?.selected_exam]);
 
-    const setActiveExam = (examId: string) => {
+    const setActiveExam = async (examId: string) => {
         if (EXAMS[examId]) {
             setActiveExamState(EXAMS[examId]);
             localStorage.setItem('activeExamId', examId);
+
+            // Persist to Profile if logged in
+            if (profile?.id) {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ selected_exam: examId })
+                    .eq('id', profile.id);
+
+                if (error) {
+                    console.error('Error persisting exam selection:', error);
+                }
+            }
         }
     };
 

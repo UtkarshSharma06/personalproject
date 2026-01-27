@@ -480,7 +480,7 @@ export default function Analytics() {
                                             <h4 className="text-xl font-black text-white uppercase tracking-tight">Intelligence Locked</h4>
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4">Score Projection is exclusive to PRO members.</p>
                                         </div>
-                                        <Button size="sm" onClick={() => navigate('/onboarding')} className="h-10 px-6 bg-white/10 hover:bg-white/20 text-white border-white/10 text-[9px] font-black uppercase tracking-widest rounded-xl">Unlock Insights</Button>
+                                        <Button size="sm" onClick={() => navigate('/pricing')} className="h-10 px-6 bg-white/10 hover:bg-white/20 text-white border-white/10 text-[9px] font-black uppercase tracking-widest rounded-xl">Unlock Insights</Button>
                                     </div>
                                 ) : (
                                     <>

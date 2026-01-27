@@ -28,7 +28,7 @@ export default function Community() {
 
     return (
         <Layout>
-            <div className="h-full w-full max-w-full flex overflow-hidden bg-white dark:bg-black">
+            <div className="flex-1 h-full w-full max-w-full flex overflow-hidden bg-white dark:bg-black">
                 {/* Sidebar: Hidden on mobile if chat is active */}
                 <div className={`w-full md:w-80 border-r border-slate-200 dark:border-slate-800 flex-shrink-0 bg-white dark:bg-black z-20 ${activeCommunityId ? 'hidden md:flex' : 'flex'}`}>
                     <CommunitySidebar

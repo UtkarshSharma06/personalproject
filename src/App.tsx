@@ -23,7 +23,6 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-// ... (rest of the imports kept)
 const Subjects = lazy(() => import("./pages/Subjects"));
 const Practice = lazy(() => import("./pages/Practice"));
 const MockExams = lazy(() => import("./pages/MockExams"));
@@ -78,6 +77,8 @@ const ConsultantApplicationReview = lazy(() => import("./pages/ConsultantApplica
 const ConsultantApplicationChat = lazy(() => import("./pages/ConsultantApplicationChat"));
 const ConsultantApplicationOffer = lazy(() => import("./pages/ConsultantApplicationOffer"));
 
+const Resources = lazy(() => import("./pages/Resources"));
+
 const MobileIndex = lazy(() => import("./mobile/pages/MobileIndex"));
 const MobileAuth = lazy(() => import("./mobile/pages/MobileAuth"));
 const MobileDashboard = lazy(() => import("./mobile/pages/MobileDashboard"));
@@ -101,9 +102,12 @@ const MobileConciergeApply = lazy(() => import("./mobile/pages/MobileConciergeAp
 const MobileStudentApplicationStatus = lazy(() => import("./mobile/pages/MobileStudentApplicationStatus"));
 const MobileContact = lazy(() => import("./mobile/pages/MobileContact"));
 const MobileMockWaitingRoom = lazy(() => import("./mobile/pages/MobileMockWaitingRoom"));
+const MobileSectionedTest = lazy(() => import("./mobile/pages/MobileSectionedTest"));
 const MobileStudentProfile = lazy(() => import("./mobile/pages/MobileStudentProfile"));
 const MobileNotifications = lazy(() => import("./mobile/pages/MobileNotifications"));
-import MobileLayout from "./mobile/components/MobileLayout";
+const MobileResources = lazy(() => import("./mobile/pages/MobileResources"));
+const MobileBookmarks = lazy(() => import("./mobile/pages/MobileBookmarks"));
+const MobileLayout = lazy(() => import("./mobile/components/MobileLayout"));
 
 const queryClient = new QueryClient();
 
@@ -141,6 +145,7 @@ const WebRouter = () => (
     <Route path="/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><History /></ProtectedRoute>} />
     <Route path="/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Settings /></ProtectedRoute>} />
     <Route path="/bookmarks" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Bookmarks /></ProtectedRoute>} />
+    <Route path="/resources" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Resources /></ProtectedRoute>} />
 
     {/* Public Pages */}
     <Route path="/pricing" element={<Pricing />} />
@@ -215,6 +220,7 @@ const MobileRouter = () => (
 
       {/* Coverage for all other features */}
       <Route path="/onboarding" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileOnboarding /></ProtectedRoute>} />
+      <Route path="/resources" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResources /></ProtectedRoute>} />
       <Route path="/community" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileCommunity /></ProtectedRoute>} />
       <Route path="/community/upgrade" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileCommunityUpgrade /></ProtectedRoute>} />
       <Route path="/subjects" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSubjects /></ProtectedRoute>} />
@@ -223,7 +229,7 @@ const MobileRouter = () => (
       <Route path="/learning" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileLearning /></ProtectedRoute>} />
       <Route path="/mock-exams" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileMockExams /></ProtectedRoute>} />
       <Route path="/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
-      <Route path="/bookmarks" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Bookmarks /></ProtectedRoute>} />
+      <Route path="/bookmarks" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileBookmarks /></ProtectedRoute>} />
 
       {/* History Synced to Mobile History */}
       <Route path="/reading/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
@@ -251,6 +257,7 @@ const MobileRouter = () => (
     {/* Immersive Mobile Experiences (Outside shared layout) */}
     <Route path="/labs" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileLabs /></ProtectedRoute>} />
     <Route path="/test/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileTest /></ProtectedRoute>} />
+    <Route path="/sectioned-test/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSectionedTest /></ProtectedRoute>} />
     <Route path="/results/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResults /></ProtectedRoute>} />
     <Route path="/mock-results/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResults /></ProtectedRoute>} />
     <Route path="/waiting-room/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileMockWaitingRoom /></ProtectedRoute>} />

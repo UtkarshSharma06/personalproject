@@ -30,32 +30,80 @@ export default function MobileSubjects() {
     const fetchSubjectStats = async () => {
         setLoading(true);
         try {
-            // 1. Fetch User Practice Performance
-            const { data: solvedBySubject } = await (supabase as any)
+            // 1. Fetch Practice Responses (General)
+            const { data: practiceResponses } = await (supabase as any)
                 .from('user_practice_responses')
                 .select('subject, is_correct, question_id')
                 .eq('user_id', user!.id)
                 .eq('exam_type', activeExam.id);
 
-            // 2. Fetch the mastery for each section
-            const mastery = await Promise.all(activeExam.sections.map(async (section: any) => {
-                const { count: realTotal } = await (supabase as any)
-                    .from('practice_questions')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('subject', section.name)
-                    .eq('exam_type', activeExam.id);
+            // 2. Fetch specialized IELTS submissions if needed
+            let specializedData: any = {};
+            if (activeExam.id === 'ielts-academic') {
+                const [reading, listening, writing] = await Promise.all([
+                    (supabase as any).from('reading_submissions').select('id, score').eq('user_id', user!.id),
+                    (supabase as any).from('listening_submissions').select('id, score').eq('user_id', user!.id),
+                    (supabase as any).from('writing_submissions').select('id, status').eq('candidate_id', user!.id)
+                ]);
+                specializedData = {
+                    'Academic Reading': reading.data || [],
+                    'Listening': listening.data || [],
+                    'Academic Writing': writing.data || []
+                };
+            }
 
-                const attemptsInSubject = solvedBySubject?.filter((q: any) => q.subject === section.name) || [];
-                const uniqueSolved = new Set(attemptsInSubject.map(a => a.question_id)).size;
-                const correctCount = attemptsInSubject.filter((q: any) => q.is_correct).length;
-                const acc = attemptsInSubject.length > 0 ? Math.round((correctCount / attemptsInSubject.length) * 100) : 0;
+            // 3. Aggregate Mastery
+            const mastery = await Promise.all(activeExam.sections.map(async (section: any) => {
+                let realTotal = 0;
+                let solved = 0;
+                let accuracy = 0;
+
+                // A. Calculate Total Questions
+                if (activeExam.id === 'ielts-academic') {
+                    if (section.name === 'Academic Reading') {
+                        const { count } = await (supabase as any).from('reading_tests').select('*', { count: 'exact', head: true }).eq('is_mock_only', false);
+                        realTotal = count || 0;
+                    } else if (section.name === 'Listening') {
+                        const { count } = await (supabase as any).from('listening_tests').select('*', { count: 'exact', head: true }).eq('is_mock_only', false);
+                        realTotal = count || 0;
+                    } else if (section.name === 'Academic Writing') {
+                        const { count } = await (supabase as any).from('writing_tasks').select('*', { count: 'exact', head: true }).eq('is_mock_only', false);
+                        realTotal = count || 0;
+                    } else {
+                        const { count } = await (supabase as any).from('practice_questions').select('*', { count: 'exact', head: true }).eq('subject', section.name).eq('exam_type', activeExam.id);
+                        realTotal = count || 0;
+                    }
+                } else {
+                    const { count } = await (supabase as any).from('practice_questions').select('*', { count: 'exact', head: true }).eq('subject', section.name).eq('exam_type', activeExam.id);
+                    realTotal = count || 0;
+                }
+
+                // B. Calculate Solved & Accuracy
+                if (activeExam.id === 'ielts-academic' && specializedData[section.name]) {
+                    const submissions = specializedData[section.name];
+                    solved = submissions.length;
+                    if (solved > 0) {
+                        if (section.name === 'Academic Writing') accuracy = 100;
+                        else {
+                            const totalScore = submissions.reduce((acc: number, curr: any) => acc + (curr.score || 0), 0);
+                            accuracy = Math.round(totalScore / solved);
+                        }
+                    }
+                } else {
+                    const attempts = practiceResponses?.filter((q: any) => q.subject === section.name) || [];
+                    const uniqueSolved = new Set(attempts.map((a: any) => a.question_id)).size;
+                    solved = uniqueSolved;
+
+                    const correctCount = attempts.filter((q: any) => q.is_correct).length;
+                    accuracy = attempts.length > 0 ? Math.round((correctCount / attempts.length) * 100) : 0;
+                }
 
                 return {
                     subject: section.name,
                     icon: section.icon,
-                    solved: uniqueSolved,
+                    solved: solved,
                     total: realTotal || 0,
-                    accuracy: acc,
+                    accuracy: accuracy,
                 };
             }));
 
@@ -112,15 +160,15 @@ export default function MobileSubjects() {
                     </Button>
                     <div className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Curriculum Matrix</span>
+                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Subject Overview</span>
                     </div>
                 </div>
                 <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">
-                    Mission <br />
+                    Course <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">Syllabus</span>
                 </h1>
                 <p className="text-[10px] font-black text-muted-foreground mt-4 opacity-40 uppercase tracking-widest leading-relaxed">
-                    Neural performance index for <span className="text-foreground">{activeExam.name}</span>
+                    Learning performance for <span className="text-foreground">{activeExam.name}</span>
                 </p>
             </header>
 
@@ -163,7 +211,7 @@ export default function MobileSubjects() {
                                                 </div>
                                                 <div className="flex justify-between items-center">
                                                     <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
-                                                        {stat.solved} / {stat.total} Missions
+                                                        {stat.solved} / {stat.total} Solved
                                                     </span>
                                                 </div>
                                             </div>
@@ -186,7 +234,7 @@ export default function MobileSubjects() {
                                                     {stat.accuracy}% Accuracy
                                                 </span>
                                                 <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full text-[8px] font-black uppercase tracking-widest leading-none border border-emerald-500/10">
-                                                    {stat.solved} Missions
+                                                    {stat.solved} Solved
                                                 </span>
                                             </div>
                                         </div>
@@ -215,7 +263,7 @@ export default function MobileSubjects() {
                                         <section>
                                             <div className="flex items-center gap-2 mb-4">
                                                 <BookOpen className="w-4 h-4 text-primary" />
-                                                <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Syllabus Matrix</h3>
+                                                <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Syllabus Overview</h3>
                                             </div>
                                             <div className="space-y-4">
                                                 {activeExam.syllabus[stat.subject]?.map((topic: any, idx: number) => (
@@ -242,7 +290,7 @@ export default function MobileSubjects() {
                                             onClick={() => handlePracticeSubject(stat.subject)}
                                             className="flex-1 h-14 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black text-[10px] uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all"
                                         >
-                                            Launch Practice
+                                            Start Practice
                                         </Button>
                                     </div>
                                 </div>
@@ -256,9 +304,9 @@ export default function MobileSubjects() {
             <div className="px-4 mt-8">
                 <div className="bg-foreground text-background p-8 rounded-[3rem] shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12"><BookOpen size={80} /></div>
-                    <h4 className="text-xl font-black uppercase tracking-tight relative z-10 leading-tight">Master <br />The Matrix</h4>
-                    <p className="text-[10px] font-bold uppercase opacity-60 mt-2 relative z-10">Neural-link optimization enabled</p>
-                    <Button variant="secondary" className="mt-4 rounded-xl bg-white text-black hover:bg-white/90 font-black text-[10px] uppercase tracking-widest px-6 h-10">Protocol Help</Button>
+                    <h4 className="text-xl font-black uppercase tracking-tight relative z-10 leading-tight">Master <br />the Syllabus</h4>
+                    <p className="text-[10px] font-bold uppercase opacity-60 mt-2 relative z-10">Personalized tracking enabled</p>
+                    <Button variant="secondary" className="mt-4 rounded-xl bg-white text-black hover:bg-white/90 font-black text-[10px] uppercase tracking-widest px-6 h-10">Support</Button>
                 </div>
             </div>
         </div>

@@ -40,24 +40,35 @@ export default function Subjects() {
     }, [user, activeExam.id]);
 
     const fetchSubjectStats = async () => {
-        const { data: perfData } = await (supabase as any)
-            .from('topic_performance')
-            .select('*')
-            .eq('exam_type', activeExam.id);
+        try {
+            // 1. Fetch Practice Responses (General)
+            const { data: practiceResponses } = await (supabase as any)
+                .from('user_practice_responses')
+                .select('subject, is_correct, question_id')
+                .eq('user_id', user!.id)
+                .eq('exam_type', activeExam.id);
 
-        if (perfData) {
-            const masteryMap: Record<string, { solved: number; correct: number }> = {};
-
-            perfData.forEach((p: any) => {
-                if (!masteryMap[p.subject]) {
-                    masteryMap[p.subject] = { solved: 0, correct: 0 };
-                }
-                masteryMap[p.subject].solved += p.total_questions;
-                masteryMap[p.subject].correct += p.correct_answers;
-            });
+            // 2. Fetch specialized IELTS submissions if needed
+            let specializedData: any = {};
+            if (activeExam.id === 'ielts-academic') {
+                const [reading, listening, writing] = await Promise.all([
+                    (supabase as any).from('reading_submissions').select('id, score, reading_test_id').eq('user_id', user!.id),
+                    (supabase as any).from('listening_submissions').select('id, score, listening_test_id').eq('user_id', user!.id),
+                    (supabase as any).from('writing_submissions').select('id, status').eq('candidate_id', user!.id)
+                ]);
+                specializedData = {
+                    'Academic Reading': reading.data || [],
+                    'Listening': listening.data || [],
+                    'Academic Writing': writing.data || []
+                };
+            }
 
             const subjectStats: SubjectStats[] = await Promise.all(activeExam.sections.map(async (section: any) => {
                 let realTotalQuestions = 0;
+                let solvedCount = 0;
+                let correctCount = 0;
+
+                // A. Calculate Total Questions (Denominator)
                 if (activeExam.id === 'ielts-academic') {
                     if (section.name === 'Academic Reading') {
                         const { count } = await (supabase as any).from('reading_tests').select('*', { count: 'exact', head: true }).eq('is_mock_only', false);
@@ -69,30 +80,56 @@ export default function Subjects() {
                         const { count } = await (supabase as any).from('writing_tasks').select('*', { count: 'exact', head: true }).eq('is_mock_only', false);
                         realTotalQuestions = count || 0;
                     } else {
-                        const { count } = await (supabase as any)
-                            .from('practice_questions')
-                            .select('*', { count: 'exact', head: true })
-                            .eq('subject', section.name)
-                            .eq('exam_type', activeExam.id);
+                        const { count } = await (supabase as any).from('practice_questions').select('*', { count: 'exact', head: true }).eq('subject', section.name).eq('exam_type', activeExam.id);
                         realTotalQuestions = count || 0;
                     }
                 } else {
-                    const { count } = await (supabase as any)
-                        .from('practice_questions')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('subject', section.name)
-                        .eq('exam_type', activeExam.id);
+                    const { count } = await (supabase as any).from('practice_questions').select('*', { count: 'exact', head: true }).eq('subject', section.name).eq('exam_type', activeExam.id);
                     realTotalQuestions = count || 0;
+                }
+
+                // B. Calculate Solved/Accuracy (Numerator)
+                let attempts: any[] = [];
+                let specializedSubmissions: any[] = [];
+
+                if (activeExam.id === 'ielts-academic' && specializedData[section.name]) {
+                    // IELTS Specialized Sections
+                    specializedSubmissions = specializedData[section.name];
+                    solvedCount = specializedSubmissions.length;
+
+                    if (section.name === 'Academic Writing') {
+                        correctCount = specializedSubmissions.length;
+                    } else {
+                        const totalScore = specializedSubmissions.reduce((acc: number, curr: any) => acc + (curr.score || 0), 0);
+                        correctCount = totalScore;
+                    }
+                } else {
+                    // Standard Practice Questions
+                    attempts = practiceResponses?.filter((r: any) => r.subject === section.name) || [];
+                    const uniqueSolved = new Set(attempts.map((a: any) => a.question_id));
+                    solvedCount = uniqueSolved.size;
+                    correctCount = attempts.filter((a: any) => a.is_correct).length;
+                }
+
+                // Calculate Accuracy Percentage
+                let accuracy = 0;
+                if (activeExam.id === 'ielts-academic' && specializedData[section.name]) {
+                    if (solvedCount > 0) {
+                        if (section.name === 'Academic Writing') accuracy = 100;
+                        else accuracy = Math.round(correctCount / solvedCount);
+                    }
+                } else {
+                    if (attempts.length > 0) {
+                        accuracy = Math.round((correctCount / attempts.length) * 100);
+                    }
                 }
 
                 return {
                     subject: section.name,
                     description: getSubjectDescription(section.name),
-                    solved_count: masteryMap[section.name]?.solved || 0,
+                    solved_count: solvedCount,
                     total_questions: realTotalQuestions || section.questionCount * 10,
-                    accuracy: masteryMap[section.name]?.solved > 0
-                        ? Math.round((masteryMap[section.name].correct / masteryMap[section.name].solved) * 100)
-                        : 0,
+                    accuracy: accuracy,
                     icon: section.icon,
                     color: section.color,
                     studyGuide: getStudyGuide(section.name)
@@ -100,8 +137,11 @@ export default function Subjects() {
             }));
 
             setStats(subjectStats);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const getSubjectDescription = (name: string) => {

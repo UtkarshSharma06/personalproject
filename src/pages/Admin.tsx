@@ -38,6 +38,7 @@ import MockEvaluationManager from '@/components/admin/MockEvaluationManager';
 import UserManager from '@/components/admin/UserManager';
 import ConsultantManager from '@/components/admin/ConsultantManager';
 import NotificationManager from '@/components/admin/NotificationManager';
+import ResourceManager from '@/components/admin/ResourceManager';
 import MockResultsViewer from '@/components/admin/MockResultsViewer';
 import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog, Box, Bell, Trophy } from 'lucide-react';
 
@@ -51,6 +52,7 @@ interface MockSession {
     is_active: boolean;
     is_official: boolean;
     access_type: 'open' | 'request_required';
+    attempts_per_person?: number;
     registration_count?: number;
     config?: {
         reading_test_id?: string;
@@ -84,6 +86,7 @@ export default function Admin() {
         exam_type: 'cent-s-prep',
         access_type: 'open',
         is_official: false,
+        attempts_per_person: 1,
         reading_test_id: '',
         listening_test_id: '',
         writing_task1_id: '',
@@ -371,6 +374,7 @@ export default function Admin() {
             exam_type: formData.exam_type,
             access_type: formData.access_type,
             is_official: formData.is_official,
+            attempts_per_person: formData.attempts_per_person,
             is_active: true,
             config: formData.exam_type === 'ielts-academic' ? {
                 reading_test_id: formData.reading_test_id,
@@ -415,6 +419,7 @@ export default function Admin() {
             exam_type: 'cent-s-prep',
             access_type: 'open',
             is_official: false,
+            attempts_per_person: 1,
             reading_test_id: '',
             listening_test_id: '',
             writing_task1_id: '',
@@ -433,6 +438,7 @@ export default function Admin() {
             exam_type: session.exam_type,
             access_type: session.access_type || 'open',
             is_official: session.is_official,
+            attempts_per_person: session.attempts_per_person || 1,
             reading_test_id: (session as any).config?.reading_test_id || '',
             listening_test_id: (session as any).config?.listening_test_id || '',
             writing_task1_id: (session as any).config?.writing_task1_id || '',
@@ -517,11 +523,29 @@ export default function Admin() {
                             <TabsTrigger value="3d-labs" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
                                 3D Modules
                             </TabsTrigger>
+                            <TabsTrigger value="resources" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
+                                Resource Library
+                            </TabsTrigger>
                             <TabsTrigger value="notifications" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
                                 Notifications
                             </TabsTrigger>
                         </TabsList>
                     </div>
+
+                    <TabsContent value="resources">
+                        <div className="card-surface p-8 rounded-[3rem]">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <BookOpen className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black tracking-tight uppercase">Resource Library</h2>
+                                    <p className="text-sm text-muted-foreground">Manage downloadable study materials and PDFs.</p>
+                                </div>
+                            </div>
+                            <ResourceManager />
+                        </div>
+                    </TabsContent>
 
                     <TabsContent value="users">
                         <div className="card-surface p-8 rounded-[3rem]">
@@ -600,6 +624,19 @@ export default function Admin() {
                                                 <option value="open">🔓 Open for All</option>
                                                 <option value="request_required">🔒 Request Access Required</option>
                                             </select>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="attempts">Attempt Limit (Per Person)</Label>
+                                            <Input
+                                                id="attempts"
+                                                type="number"
+                                                min="1"
+                                                value={formData.attempts_per_person}
+                                                onChange={(e) => setFormData({ ...formData, attempts_per_person: parseInt(e.target.value) || 1 })}
+                                                required
+                                            />
+                                            <p className="text-[10px] text-muted-foreground">Number of times a user can take this exam.</p>
                                         </div>
 
                                         {formData.exam_type === 'ielts-academic' && (

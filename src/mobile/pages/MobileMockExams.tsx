@@ -5,13 +5,15 @@ import { useAuth } from '@/lib/auth';
 import { useExam } from '@/context/ExamContext';
 import {
     Calendar, Clock, Users, Globe, Play, ChevronRight,
-    Zap, Target, ShieldCheck, Loader2, Sparkles, AlertCircle
+    Zap, Target, ShieldCheck, Loader2, Sparkles, AlertCircle,
+    BookOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { differenceInHours, differenceInMinutes, isAfter, isBefore } from 'date-fns';
 import { usePlanAccess } from '@/hooks/usePlanAccess';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { Card, CardContent } from "@/components/ui/card";
+import { EXAMS } from '@/config/exams';
 
 export default function MobileMockExams() {
     const { user } = useAuth();
@@ -106,9 +108,9 @@ export default function MobileMockExams() {
                             <Card key={i} className="bg-secondary/20 border-border/40 rounded-[2.5rem] overflow-hidden border-b-4 shadow-xl">
                                 <CardContent className="p-6 space-y-6">
                                     <div className="flex justify-between items-start">
-                                        <div className={`px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-2 border ${session.isLive ? 'bg-red-500/10 text-red-500 border-red-500/20 animate-pulse' : 'bg-secondary text-muted-foreground border-border/50'
+                                        <div className={`px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-2 border ${session.isLive ? 'bg-red-500/10 text-red-500 border-red-500/20 animate-pulse' : session.isPast ? 'bg-secondary/50 text-muted-foreground border-border/30' : 'bg-secondary text-muted-foreground border-border/50'
                                             }`}>
-                                            {session.isLive ? <><div className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Live Now</> : 'Scheduled'}
+                                            {session.isLive ? <><div className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Live Now</> : session.isPast ? 'Ended' : 'Scheduled'}
                                         </div>
                                         <div className="text-right">
                                             <span className="block text-[7px] font-black text-muted-foreground uppercase opacity-40 mb-1">{session.isLive ? 'Closes' : 'Starts'} In</span>
@@ -118,7 +120,7 @@ export default function MobileMockExams() {
 
                                     <div className="space-y-1">
                                         <h3 className="text-lg font-black uppercase tracking-tight leading-tight">{session.title}</h3>
-                                        <div className="flex items-center gap-4 text-muted-foreground">
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground">
                                             <div className="flex items-center gap-1.5">
                                                 <Clock className="w-3.5 h-3.5" />
                                                 <span className="text-[9px] font-black uppercase tracking-widest">{session.duration} MIN</span>
@@ -127,7 +129,25 @@ export default function MobileMockExams() {
                                                 <Users className="w-3.5 h-3.5" />
                                                 <span className="text-[9px] font-black uppercase tracking-widest">Global Entry</span>
                                             </div>
+                                            {EXAMS[session.exam_type as keyof typeof EXAMS]?.sections && (
+                                                <div className="flex items-center gap-1.5">
+                                                    <BookOpen className="w-3.5 h-3.5 text-primary" />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest">
+                                                        {EXAMS[session.exam_type as keyof typeof EXAMS].sections.length} Sections
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
+
+                                        {EXAMS[session.exam_type as keyof typeof EXAMS]?.sections && (
+                                            <div className="flex flex-wrap gap-1 mt-2">
+                                                {EXAMS[session.exam_type as keyof typeof EXAMS].sections.map((s, idx) => (
+                                                    <span key={idx} className="px-2 py-0.5 bg-secondary/30 rounded text-[7px] font-bold uppercase tracking-tight text-muted-foreground/80">
+                                                        {s.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <Button
@@ -164,7 +184,7 @@ export default function MobileMockExams() {
                             Unlock official full-length exams and detailed performance reports.
                         </p>
                         {isExplorer && (
-                            <Button onClick={() => navigate('/onboarding')} className="bg-primary text-white w-full rounded-xl py-6 font-black text-[10px] uppercase tracking-widest">Upgrade to PRO</Button>
+                            <Button onClick={() => navigate('/pricing')} className="bg-primary text-white w-full rounded-xl py-6 font-black text-[10px] uppercase tracking-widest">Upgrade to PRO</Button>
                         )}
                     </div>
                 </div>

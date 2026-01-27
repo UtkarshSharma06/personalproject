@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import {
     BookOpen, Clock, ShieldX, CheckCircle, Calendar,
     ChevronRight, Target, Headphones, FileText, Mic,
-    Award, Filter, History as HistoryIcon, Search, Sparkles, ArrowRight
+    Award, Filter, History as HistoryIcon, Search, Sparkles, ArrowRight, Loader2
 } from 'lucide-react';
 import { useExam } from '@/context/ExamContext';
 import { Card, CardContent } from "@/components/ui/card";
@@ -161,7 +161,7 @@ export default function MobileHistory() {
                         <div className="absolute top-0 right-0 p-4 opacity-10"><Sparkles className="w-20 h-20 text-white" /></div>
                         <h3 className="text-white font-black text-lg uppercase tracking-tight relative z-10 leading-tight">Unlock Full Logs</h3>
                         <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest mt-2 relative z-10">You're seeing 2 recent entries only</p>
-                        <Button onClick={() => navigate('/onboarding')} className="mt-4 w-full bg-white text-primary hover:bg-white/90 font-black text-[10px] uppercase tracking-widest rounded-xl">Upgrade Protocol</Button>
+                        <Button onClick={() => navigate('/pricing')} className="mt-4 w-full bg-white text-primary hover:bg-white/90 font-black text-[10px] uppercase tracking-widest rounded-xl">Upgrade Protocol</Button>
                     </div>
                 )}
             </div>

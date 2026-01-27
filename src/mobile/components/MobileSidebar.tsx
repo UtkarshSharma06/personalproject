@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/auth';
 import {
     User, History, Bookmark, Microscope, Users,
     LogOut, ShieldCheck, ChevronRight, Settings, Info,
-    GraduationCap, Target, Globe, ChevronDown, BookOpen
+    GraduationCap, Target, Globe, ChevronDown, BookOpen, FileText
 } from 'lucide-react';
 import {
     Sheet,
@@ -37,8 +37,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onOpenChange }) =
         onOpenChange(false);
     };
 
-    const handleExamSwitch = (examId: string) => {
-        setActiveExam(examId);
+    const handleExamSwitch = async (examId: string) => {
+        await setActiveExam(examId);
         setIsExamSwitcherOpen(false);
         onOpenChange(false);
         navigate('/dashboard');
@@ -46,7 +46,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onOpenChange }) =
 
     const menuItems = [
         { icon: BookOpen, label: 'Subjects', path: '/subjects', color: 'text-blue-500' },
-        { icon: History, label: t('menu.history'), path: '/mobile/history', color: 'text-indigo-500' },
+        { icon: FileText, label: 'Resources', path: '/resources', color: 'text-pink-500' },
+        { icon: History, label: t('menu.history'), path: '/history', color: 'text-indigo-500' },
         { icon: Target, label: t('menu.mock'), path: '/mock-exams', color: 'text-rose-500' },
         { icon: Bookmark, label: t('menu.bookmarks'), path: '/bookmarks', color: 'text-amber-500' },
         { icon: Microscope, label: t('menu.labs'), path: '/labs', color: 'text-emerald-500' },
@@ -74,10 +75,12 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onOpenChange }) =
                         </Avatar>
                         <div className="flex-1 min-w-0">
                             <h3 className="font-black text-lg tracking-tight truncate leading-none mb-1">
-                                {profile?.display_name || "Student"}
+                                {profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || "Student"}
                             </h3>
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
-                                {profile?.selected_plan || 'Candidate'}
+                            <p className="text-[10px] font-black text-primary uppercase tracking-widest">
+                                {profile?.selected_plan === 'pro' ? 'Exam Prep Plan' :
+                                    profile?.selected_plan === 'elite' ? 'Global Admission Plan' :
+                                        profile?.selected_plan === 'explorer' ? 'Explorer Plan' : 'Candidate'}
                             </p>
                         </div>
                     </div>

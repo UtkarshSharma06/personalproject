@@ -21,6 +21,13 @@ import {
     SheetFooter,
     SheetClose
 } from "@/components/ui/sheet";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog";
 import ChatInterface from "@/components/chat/ChatInterface";
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -49,6 +56,13 @@ export default function MobileCommunity() {
     const [longPressedChat, setLongPressedChat] = useState<string | null>(null);
     const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
 
+    // Create Community State
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [newCommunityName, setNewCommunityName] = useState("");
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [isPrivate, setIsPrivate] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
+
     useEffect(() => {
         if (user) loadData();
     }, [user]);
@@ -56,44 +70,38 @@ export default function MobileCommunity() {
     const loadData = async () => {
         setIsLoading(true);
         try {
-            // 1. Fetch Communities
-            const { data: allComms } = await (supabase as any).from('communities').select('*').order('name');
-            setCommunities(allComms || []);
+            // Parallelize all independent initial loads
+            const [allCommsRes, membershipsRes, ownedCommsRes] = await Promise.all([
+                (supabase as any).from('communities').select('*').order('name'),
+                (supabase as any).from('community_members').select('community_id, is_pinned, status').eq('user_id', user.id),
+                (supabase as any).from('communities').select('id').eq('created_by', user.id)
+            ]);
 
-            // 2. Fetch Memberships
-            const { data: memberships } = await (supabase as any)
-                .from('community_members')
-                .select('community_id, is_pinned, status')
-                .eq('user_id', user.id);
+            const allComms = allCommsRes.data || [];
+            setCommunities(allComms);
 
-            if (memberships) {
-                const joined = new Set<string>(memberships.filter((m: any) => m.status === 'approved' || m.status === 'member').map((m: any) => m.community_id));
-                const pinned = new Set<string>(memberships.filter((m: any) => m.is_pinned).map((m: any) => m.community_id));
+            if (membershipsRes.data) {
+                const joined = new Set<string>(membershipsRes.data.filter((m: any) => m.status === 'approved' || m.status === 'member').map((m: any) => m.community_id));
+                const pinned = new Set<string>(membershipsRes.data.filter((m: any) => m.is_pinned).map((m: any) => m.community_id));
 
                 // Creators are members
-                allComms?.forEach((c: any) => { if (c.created_by === user.id) joined.add(c.id); });
+                allComms.forEach((c: any) => { if (c.created_by === user.id) joined.add(c.id); });
 
                 setJoinedIds(joined);
                 setPinnedIds(pinned);
             }
 
-            // 3. Fetch Admin Requests (if owner)
-            const { data: ownedComms } = await (supabase as any).from('communities').select('id').eq('created_by', user.id);
-            if (ownedComms && ownedComms.length > 0) {
+            if (ownedCommsRes.data && ownedCommsRes.data.length > 0) {
                 const { data: pending } = await (supabase as any)
                     .from('community_members')
                     .select('*, profiles:user_id(display_name, avatar_url), communities:community_id(name)')
-                    .in('community_id', ownedComms.map((c: any) => c.id))
+                    .in('community_id', ownedCommsRes.data.map((c: any) => c.id))
                     .eq('status', 'pending');
                 setRequests(pending || []);
             }
 
-            // 4. Fetch Unread (Mocked for now to prevent 404)
-            // const { data: unread } = await supabase.rpc('get_unread_counts', { p_user_id: user.id });
-            // if (unread) { ... }
-            const counts: any = {};
-            // Mock unread for demo
-            setUnreadCounts(counts);
+            // Unread counts (Mocked for now)
+            setUnreadCounts({});
 
         } catch (e) {
             console.error("Community Load Error:", e);
@@ -187,6 +195,55 @@ export default function MobileCommunity() {
         }
     };
 
+    const handleSaveCommunity = async () => {
+        if (!newCommunityName.trim() || !user) return;
+
+        setIsCreating(true);
+        try {
+            let imageUrl = null;
+
+            if (selectedImage) {
+                const fileExt = selectedImage.name.split('.').pop();
+                const filePath = `covers/${Date.now()}.${fileExt}`;
+                const { error: uploadError } = await supabase.storage
+                    .from('community-uploads')
+                    .upload(filePath, selectedImage);
+
+                if (uploadError) throw uploadError;
+
+                const { data } = supabase.storage
+                    .from('community-uploads')
+                    .getPublicUrl(filePath);
+                imageUrl = data.publicUrl;
+            }
+
+            const { data, error } = await (supabase as any)
+                .from('communities')
+                .insert({
+                    name: newCommunityName.trim(),
+                    created_by: user.id,
+                    image_url: imageUrl,
+                    is_private: isPrivate
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+            setCommunities(prev => [...prev, data]);
+            setJoinedIds(prev => new Set([...prev, data.id]));
+            toast({ title: "Success", description: "Community protocol established!" });
+
+            setIsCreateDialogOpen(false);
+            setNewCommunityName("");
+            setSelectedImage(null);
+            setIsPrivate(false);
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" });
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
     if (activeCommunityId) {
         return (
             <div className="fixed inset-0 z-[100] bg-background">
@@ -220,7 +277,22 @@ export default function MobileCommunity() {
             <header className="bg-primary dark:bg-card text-white pt-12 pb-0 shadow-sm shrink-0">
                 <div className="px-4 pb-4 flex justify-between items-center">
                     <h1 className="text-xl font-bold tracking-tight">Study Squads</h1>
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-white hover:bg-white/10 rounded-full h-9 w-9"
+                            onClick={() => {
+                                const canCreate = ['elite', 'global', 'admin', 'consultant'].includes(profile?.subscription_tier || profile?.role);
+                                if (!canCreate) {
+                                    toast({ title: "Restricted", description: "Upgrade to Elite or Global to create communities", variant: "destructive" });
+                                    return;
+                                }
+                                setIsCreateDialogOpen(true);
+                            }}
+                        >
+                            <Plus size={24} strokeWidth={2.5} />
+                        </Button>
                         <SearchIcon size={22} strokeWidth={2} />
                     </div>
                 </div>
@@ -360,6 +432,58 @@ export default function MobileCommunity() {
                     </div>
                 </SheetContent>
             </Sheet>
+            {/* Create Community Dialog */}
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogContent className="sm:max-w-md rounded-[2.5rem] border-0 shadow-2xl bg-background/95 backdrop-blur-xl p-8 mx-4">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-black uppercase tracking-tight text-center">New Squad</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6 py-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Squad Name</label>
+                            <Input
+                                placeholder="e.g. IELTS Warriors"
+                                value={newCommunityName}
+                                onChange={(e) => setNewCommunityName(e.target.value)}
+                                className="h-14 rounded-2xl bg-secondary/20 border-border/10 focus:border-primary focus:ring-0 text-lg font-bold"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cover Image</label>
+                            <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
+                                className="h-14 pt-3 rounded-2xl bg-secondary/20 border-border/10 cursor-pointer file:text-primary file:font-bold file:border-0 file:bg-transparent file:mr-4"
+                            />
+                        </div>
+
+                        {(['elite', 'global', 'admin', 'consultant'].includes(profile?.subscription_tier?.toLowerCase() || '') || profile?.role === 'admin') && (
+                            <div className="flex items-center gap-3 p-4 bg-secondary/10 rounded-2xl border border-border/5">
+                                <input
+                                    type="checkbox"
+                                    id="isPrivateMobile"
+                                    checked={isPrivate}
+                                    onChange={(e) => setIsPrivate(e.target.checked)}
+                                    className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary"
+                                />
+                                <label htmlFor="isPrivateMobile" className="text-xs font-bold uppercase tracking-wide cursor-pointer flex-1">
+                                    Private Squad <span className="block text-[9px] text-muted-foreground normal-case opacity-70">Approval required to join</span>
+                                </label>
+                            </div>
+                        )}
+
+                        <Button
+                            onClick={handleSaveCommunity}
+                            disabled={isCreating || !newCommunityName.trim()}
+                            className="w-full h-16 rounded-[1.5rem] bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-xs shadow-lg shadow-emerald-500/20 transition-all active:scale-95 mt-2"
+                        >
+                            {isCreating ? <Loader2 className="animate-spin" /> : "Establish Protocol"}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
         </div>
     );
 }

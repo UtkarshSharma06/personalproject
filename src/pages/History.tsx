@@ -498,7 +498,7 @@ export default function History() {
                 </p>
               </div>
               <Button
-                onClick={() => navigate('/onboarding')}
+                onClick={() => navigate('/pricing')}
                 className="h-16 px-10 rounded-2xl bg-white text-indigo-600 hover:bg-slate-50 font-black text-xs uppercase tracking-widest shadow-xl group/btn shrink-0"
               >
                 Upgrade Now

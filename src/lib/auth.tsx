@@ -81,6 +81,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           window.location.href = '/auth?banned=true';
           return;
         }
+
+        // Auto-sync Google avatar if missing
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        const googleAvatar = authUser?.user_metadata?.avatar_url;
+        if (!data.avatar_url && googleAvatar) {
+          await supabase.from('profiles').update({ avatar_url: googleAvatar }).eq('id', userId);
+          data.avatar_url = googleAvatar;
+        }
+
         setProfile(data);
       }
     } catch (error) {

@@ -160,13 +160,13 @@ export default function MobileAnalytics() {
             </div>
 
             <div className="flex-1 px-4 space-y-6">
-                {/* AI Score Oracle - Floating Glass Card */}
+                {/* AI Score Predictor - Floating Glass Card */}
                 <Card className="bg-slate-950 border-white/10 rounded-[2.5rem] overflow-hidden relative shadow-2xl">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent pointer-events-none" />
                     <CardHeader className="pb-2 relative z-10 text-center">
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10 mx-auto mb-2">
                             <Bot className="w-3 h-3 text-primary animate-pulse" />
-                            <span className="text-[8px] font-black text-primary-foreground uppercase tracking-[0.2em]">Neural Oracle v2</span>
+                            <span className="text-[8px] font-black text-primary-foreground uppercase tracking-[0.2em]">AI Predictor v1</span>
                         </div>
                         <CardTitle className="text-white text-md uppercase tracking-tighter">Projected Final Score</CardTitle>
                     </CardHeader>

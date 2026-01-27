@@ -1,17 +1,64 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Zap, Sparkles, Brain, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Check, Zap, Sparkles, Brain, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth';
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export default function MobilePricing() {
-    const { user } = useAuth();
+    const { user, profile, refreshProfile } = useAuth() as any;
     const navigate = useNavigate();
+    const { toast } = useToast();
+    const [isUpdating, setIsUpdating] = useState<string | null>(null);
+
+    const handlePlanSelect = async (planId: string) => {
+        if (!user) {
+            navigate('/auth');
+            return;
+        }
+
+        // Only show onboarding if user hasn't selected an exam yet (first time)
+        if (!profile?.selected_exam) {
+            navigate('/onboarding');
+            return;
+        }
+
+        setIsUpdating(planId);
+        try {
+            const tierMap: any = { 'explorer': 'initiate', 'pro': 'elite', 'elite': 'global' };
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    selected_plan: planId,
+                    subscription_tier: tierMap[planId] || 'initiate'
+                })
+                .eq('id', user.id);
+
+            if (error) throw error;
+
+            await refreshProfile();
+            toast({
+                title: "Plan Updated",
+                description: `You now have full access to the ${planId.toUpperCase()} tier features.`,
+            });
+            navigate('/dashboard');
+        } catch (error: any) {
+            toast({
+                title: "Update Failed",
+                description: error.message,
+                variant: "destructive"
+            });
+        } finally {
+            setIsUpdating(null);
+        }
+    };
 
     const tiers = [
         {
             id: 'explorer',
-            name: 'Explorer',
+            name: 'Explorer Plan',
             icon: Brain,
             color: 'bg-slate-500',
             features: ['15 Questions Daily', 'Basic Stats', 'Community Access'],
@@ -19,7 +66,7 @@ export default function MobilePricing() {
         },
         {
             id: 'pro',
-            name: 'Prep Pro',
+            name: 'Exam Prep Plan',
             icon: Zap,
             color: 'bg-indigo-600',
             badge: 'BETA UNLOCKED',
@@ -28,7 +75,7 @@ export default function MobilePricing() {
         },
         {
             id: 'elite',
-            name: 'Elite',
+            name: 'Global Admission Plan',
             icon: Sparkles,
             color: 'bg-amber-500',
             badge: 'ADMISSION PLUS',
@@ -43,8 +90,8 @@ export default function MobilePricing() {
             <div className="bg-primary p-10 pt-16 rounded-b-[4rem] text-white space-y-4 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12"><Sparkles size={120} /></div>
                 <div className="relative z-10 text-center">
-                    <h1 className="text-4xl font-black uppercase tracking-tight">Premium <span className="text-white/60">Access</span></h1>
-                    <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-70 mt-2">Membership Protocol</p>
+                    <h1 className="text-4xl font-black uppercase tracking-tight">Premium <span className="text-white/60">Plans</span></h1>
+                    <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-70 mt-2">Unlock your full potential</p>
                 </div>
             </div>
 
@@ -56,7 +103,7 @@ export default function MobilePricing() {
                     </div>
                     <div>
                         <p className="text-[11px] font-black uppercase tracking-tight leading-tight">Beta Exclusive Notice</p>
-                        <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase">All protocols are currently free for testing.</p>
+                        <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase">All plans are currently free for testing.</p>
                     </div>
                 </div>
 
@@ -85,11 +132,18 @@ export default function MobilePricing() {
                                 </div>
 
                                 <Button
-                                    onClick={() => navigate(user ? '/onboarding' : '/auth')}
+                                    onClick={() => handlePlanSelect(t.id)}
+                                    disabled={isUpdating !== null}
                                     className="w-full h-14 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black text-xs uppercase tracking-widest shadow-xl"
                                 >
-                                    {t.cta}
-                                    <ChevronRight className="ml-2 w-4 h-4" />
+                                    {isUpdating === t.id ? (
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    ) : (
+                                        <>
+                                            {t.cta}
+                                            <ChevronRight className="ml-2 w-4 h-4" />
+                                        </>
+                                    )}
                                 </Button>
                             </CardContent>
                         </Card>

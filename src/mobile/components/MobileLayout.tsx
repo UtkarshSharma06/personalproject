@@ -15,45 +15,41 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface NavButtonProps {
   to: string;
   icon: React.ReactNode;
-  label: string;
   badge?: boolean;
 }
 
-const NavButton: React.FC<NavButtonProps> = ({ to, icon, label, badge }) => {
+const NavButton: React.FC<NavButtonProps> = ({ to, icon, badge }) => {
+  const location = useLocation();
+
+  // Use a more predictable matching logic
+  const currentPath = location.pathname;
+  const isActive = currentPath === to ||
+    (to !== '/mobile/dashboard' && to !== '/' && currentPath.startsWith(to + '/')) ||
+    (to === '/mobile/practice' && currentPath.startsWith('/mobile/practice'));
+
   return (
-    <NavLink to={to} className="relative group">
-      {({ isActive }) => (
-        <div className="flex flex-col items-center justify-center py-2 px-1 relative">
-          <motion.div
-            initial={false}
-            animate={{
-              scale: isActive ? 1.2 : 1,
-              y: isActive ? -4 : 0,
-            }}
-            className={cn(
-              "relative p-3 rounded-2xl transition-colors duration-300",
-              isActive ? "bg-primary text-white shadow-lg shadow-primary/30" : "text-muted-foreground group-hover:text-foreground"
-            )}
-          >
-            {icon}
-            {badge && (
-              <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-background animate-pulse" />
-            )}
-          </motion.div>
-          <AnimatePresence>
-            {isActive && (
-              <motion.span
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 4 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="text-[8px] font-black uppercase tracking-widest text-primary absolute -bottom-2"
-              >
-                {label}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
+    <NavLink
+      to={to}
+      className="flex-1 flex flex-col items-center justify-center h-full relative"
+    >
+      <div className="flex items-center justify-center w-full h-full relative">
+        <motion.div
+          animate={{
+            y: isActive ? -4 : 0,
+            scale: isActive ? 1.2 : 1,
+          }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className={cn(
+            "relative p-3.5 rounded-2xl transition-colors duration-300 z-10",
+            isActive ? "bg-primary text-white shadow-lg shadow-primary/30" : "text-muted-foreground"
+          )}
+        >
+          {React.cloneElement(icon as React.ReactElement, { size: 24 })}
+          {badge && (
+            <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-background animate-pulse" />
+          )}
+        </motion.div>
+      </div>
     </NavLink>
   );
 };
@@ -171,13 +167,13 @@ const MobileLayout: React.FC = () => {
   // Map path to title
   const getPageTitle = (path: string) => {
     if (path.includes('dashboard')) return 'Dashboard';
-    if (path.includes('practice')) return 'Practice Arena';
-    if (path.includes('analytics')) return 'Statistics';
+    if (path.includes('practice')) return 'Practice';
+    if (path.includes('analytics')) return 'Analytics';
     if (path.includes('settings')) return 'Settings';
     if (path.includes('history')) return 'History';
     if (path.includes('learning')) return 'Study Portal';
     if (path.includes('labs')) return 'Virtual Labs';
-    if (path.includes('community')) return 'Study Squads';
+    if (path.includes('community')) return 'Community';
     return 'ITALOSTUDY';
   };
 
@@ -226,16 +222,15 @@ const MobileLayout: React.FC = () => {
       <MobileSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
 
       {/* Premium Floating Bottom Deck */}
-      <div className="fixed bottom-6 left-0 right-0 px-6 z-50 pointer-events-none">
-        <nav className="max-w-md mx-auto h-22 bg-background/80 backdrop-blur-3xl border border-white/20 rounded-[1.5rem] flex items-center justify-around px-4 shadow-[0_20px_50px_rgba(0,0,0,0.4)] pointer-events-auto">
-          <NavButton to="/mobile/dashboard" icon={<Home size={22} />} label="Home" />
-          <NavButton to="/mobile/practice" icon={<ClipboardList size={22} />} label="Arena" />
-          <NavButton to="/learning" icon={<Play size={22} />} label="Study" />
-          <NavButton to="/mobile/analytics" icon={<BarChart3 size={22} />} label="Data" />
+      <div className="fixed bottom-4 left-0 right-0 px-4 z-50 pointer-events-none">
+        <nav className="max-w-md mx-auto h-20 bg-background/95 backdrop-blur-3xl border border-white/20 rounded-[2rem] flex items-center justify-around px-1 shadow-[0_25px_60px_rgba(0,0,0,0.6)] pointer-events-auto overflow-hidden">
+          <NavButton to="/mobile/dashboard" icon={<Home />} />
+          <NavButton to="/mobile/practice" icon={<ClipboardList />} />
+          <NavButton to="/learning" icon={<Play />} />
+          <NavButton to="/mobile/analytics" icon={<BarChart3 />} />
           <NavButton
             to="/community"
-            icon={<Users size={22} />}
-            label="Squad"
+            icon={<Users />}
             badge={hasUnreadCommunity}
           />
         </nav>

@@ -19,6 +19,7 @@ export const MathText = ({ content, className }: MathTextProps) => {
             window.renderMathInElement(containerRef.current, {
                 delimiters: [
                     { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
                     { left: '\\(', right: '\\)', display: false },
                     { left: '\\[', right: '\\]', display: true }
                 ],

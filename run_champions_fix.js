@@ -1,8 +1,12 @@
--- Migration: Create RPC function to get top champions by practice questions solved
--- This function counts total practice questions answered by each user with real accuracy
+// Run this migration SQL directly on your Supabase dashboard
+// Go to: https://supabase.com/dashboard/project/jyjhpqtqbwtxxgijxetq/sql/new
 
--- Drop existing function first to allow changing return type
+const migrationSQL = `
+-- Fix get_champions_by_questions_solved function
+-- Drop old version and recreate with correct signature
+
 DROP FUNCTION IF EXISTS public.get_champions_by_questions_solved();
+DROP FUNCTION IF EXISTS public.get_champions_by_questions_solved(TEXT);
 
 CREATE OR REPLACE FUNCTION public.get_champions_by_questions_solved(target_exam_id TEXT DEFAULT NULL)
 RETURNS TABLE (
@@ -74,3 +78,8 @@ $$;
 -- Grant execute permissions
 GRANT EXECUTE ON FUNCTION public.get_champions_by_questions_solved(TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_champions_by_questions_solved(TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION public.get_champions_by_questions_solved(TEXT) TO anon;
+`;
+
+console.log('Copy and run this SQL in your Supabase SQL Editor:');
+console.log(migrationSQL);
