@@ -302,7 +302,7 @@ export default function MobileSettings() {
                     icon: CreditCard,
                     label: t('settings.subscription'),
                     sub: profile?.selected_plan || "Free Tier",
-                    onClick: () => navigate('/onboarding'),
+                    onClick: () => navigate('/pricing'),
                     iconClass: "bg-amber-500"
                 },
             ]

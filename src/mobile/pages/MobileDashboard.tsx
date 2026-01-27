@@ -338,7 +338,7 @@ const MobileDashboard: React.FC = () => {
                     <h2 className="font-black text-xs uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
                         <GraduationCap size={16} /> {t('dashboard.mastery')}
                     </h2>
-                    <Button onClick={() => navigate('/mobile/dashboard')} variant="ghost" size="sm" className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('dashboard.continue')}</Button>
+                    <Button onClick={() => navigate('/mobile/practice')} variant="ghost" size="sm" className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('dashboard.continue')}</Button>
                 </div>
                 <div className="space-y-6 bg-secondary/10 p-6 rounded-[2.5rem] border border-border/40 shadow-inner">
                     {subjectMastery.map((sub, i) => (

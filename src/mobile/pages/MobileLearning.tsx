@@ -49,9 +49,29 @@ export default function MobileLearning() {
     const [showQuizResult, setShowQuizResult] = useState(false);
     const [quizAvailability, setQuizAvailability] = useState<Record<string, boolean>>({});
 
+    // Deep Link State
+    const location = useLocation();
+
     useEffect(() => {
         fetchExams();
     }, [activeExam]);
+
+    // Handle Deep Linking
+    useEffect(() => {
+        const initDeepLink = async () => {
+            if (courses.length > 0 && location.state?.continueLearning && location.state?.courseId) {
+                const targetCourse = courses.find(c => c.id === location.state.courseId);
+                if (targetCourse) {
+                    await handleCourseSelect(targetCourse);
+                    // If contentId is present, we could try to auto-open it, but for now opening the course dashboard is a good start.
+                    // To auto-open video, we'd need to fetch units -> subunits -> content and find it. 
+                    // Let's at least get them to the course view.
+                }
+                // Clear state to prevent loop if desired, or just leave it.
+            }
+        };
+        initDeepLink();
+    }, [courses.length, location.state]);
 
     async function fetchExams() {
         setIsLoading(true);
