@@ -310,7 +310,8 @@ const App = () => {
 
         if (isNative) {
           setTheme('dark');
-          // Set overlay and style, but don't force hide here as we use native immersive mode
+          // Hide status bar and set overlay
+          await StatusBar.hide();
           await StatusBar.setOverlaysWebView({ overlay: true });
           await StatusBar.setStyle({ style: Style.Dark });
         } else {

@@ -17,6 +17,7 @@ public class MainActivity extends BridgeActivity {
         FirebaseApp.initializeApp(this);
 
         // Enable Sticky Immersive Mode
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         View decorView = getWindow().getDecorView();
         WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), decorView);
         if (controller != null) {
