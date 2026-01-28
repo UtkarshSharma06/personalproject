@@ -336,6 +336,9 @@ const App = () => {
         if (info.platform !== 'android' && info.platform !== 'ios') return;
 
         try {
+          // Debug Toast
+          toast.info("Initializing Notifications...");
+
           // Initialize
           OneSignal.initialize("3182ba70-b1a7-4522-88fc-ab4a3aac2bba");
 
