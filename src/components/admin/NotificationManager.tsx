@@ -48,7 +48,8 @@ export default function NotificationManager() {
         short_description: '',
         content_html: '',
         exam_type: '',
-        show_minimal: false
+        show_minimal: false,
+        send_push: true
     });
     const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -107,30 +108,13 @@ export default function NotificationManager() {
                     .limit(1)
                     .single();
 
-                toast.success('Notification created successfully');
-
                 // Trigger Push Notification
-                if (recentNotif && !formData.show_minimal) {
-                    try {
-                        const { error: pushError } = await supabase.functions.invoke('send-push', {
-                            body: {
-                                title: formData.title || 'New Announcement',
-                                body: formData.short_description || 'Check the app for details',
-                                topic: formData.exam_type || 'all_users',
-                                data: {
-                                    url: '/dashboard',
-                                    notification_id: recentNotif.id
-                                }
-                            }
-                        });
-                        if (pushError) console.error('Push Function Error:', pushError);
-                    } catch (pushErr) {
-                        console.error('Error invoking send-push:', pushErr);
-                    }
+                if (recentNotif && formData.send_push) {
+                    await handleSendPush(recentNotif);
                 }
             }
 
-            setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false });
+            setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false, send_push: true });
             setEditingId(null);
             fetchNotifications();
         } catch (error: any) {
@@ -146,7 +130,8 @@ export default function NotificationManager() {
             short_description: notif.short_description || '',
             content_html: notif.content_html,
             exam_type: notif.exam_type || '',
-            show_minimal: notif.show_minimal
+            show_minimal: notif.show_minimal,
+            send_push: true
         });
         setEditingId(notif.id);
         // Scroll to form
@@ -154,7 +139,7 @@ export default function NotificationManager() {
     };
 
     const handleCancelEdit = () => {
-        setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false });
+        setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false, send_push: true });
         setEditingId(null);
     };
 
@@ -173,6 +158,31 @@ export default function NotificationManager() {
             fetchNotifications();
         } catch (error: any) {
             toast.error('Error deleting notification: ' + error.message);
+        }
+    };
+
+    const handleSendPush = async (notif: any) => {
+        setIsSubmitting(true);
+        try {
+            const { error: pushError } = await supabase.functions.invoke('send-push', {
+                body: {
+                    title: notif.title || 'New Announcement',
+                    body: notif.short_description || 'Check the app for details',
+                    topic: notif.exam_type || 'all_users',
+                    data: {
+                        url: '/dashboard',
+                        notification_id: notif.id
+                    }
+                }
+            });
+
+            if (pushError) throw pushError;
+            toast.success('Push notification deployed successfully');
+        } catch (error: any) {
+            console.error('Push Error:', error);
+            toast.error('Push failed: ' + error.message);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -238,17 +248,31 @@ export default function NotificationManager() {
                             />
                         </div>
 
-                        <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <input
-                                type="checkbox"
-                                id="show_minimal"
-                                checked={formData.show_minimal}
-                                onChange={e => setFormData({ ...formData, show_minimal: e.target.checked })}
-                                className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                            />
-                            <label htmlFor="show_minimal" className="text-xs font-black text-slate-900 cursor-pointer uppercase tracking-tight">
-                                Show Minimal (No 3D Header/Title Box)
-                            </label>
+                        <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    id="show_minimal"
+                                    checked={formData.show_minimal}
+                                    onChange={e => setFormData({ ...formData, show_minimal: e.target.checked })}
+                                    className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                />
+                                <label htmlFor="show_minimal" className="text-[10px] font-black text-slate-900 cursor-pointer uppercase tracking-tight">
+                                    Minimal UI
+                                </label>
+                            </div>
+                            <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
+                                <input
+                                    type="checkbox"
+                                    id="send_push"
+                                    checked={formData.send_push}
+                                    onChange={e => setFormData({ ...formData, send_push: e.target.checked })}
+                                    className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                />
+                                <label htmlFor="send_push" className="text-[10px] font-black text-emerald-600 cursor-pointer uppercase tracking-tight">
+                                    Push (WhatsApp Style)
+                                </label>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
@@ -382,6 +406,14 @@ export default function NotificationManager() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={() => handleSendPush(notif)}
+                                                disabled={isSubmitting}
+                                                className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+                                                title="Re-send Push Notification"
+                                            >
+                                                <Bell className="w-4 h-4" />
+                                            </button>
                                             <button
                                                 onClick={() => handleEdit(notif)}
                                                 className="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors"
