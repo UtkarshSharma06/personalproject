@@ -91,10 +91,35 @@ serve(async (req: Request) => {
             const messagePayload = {
                 message: {
                     token,
-                    notification: { title, body },
+                    notification: {
+                        title: title || "New Update",
+                        body: body || "Check the app for details"
+                    },
                     data: {
                         url: "/community",
                         ...extraData
+                    },
+                    android: {
+                        priority: "high",
+                        notification: {
+                            channel_id: "default",
+                            sound: "default",
+                            notification_priority: "PRIORITY_MAX",
+                            default_sound: true,
+                            default_vibrate_timings: true
+                        }
+                    },
+                    apns: {
+                        payload: {
+                            aps: {
+                                alert: {
+                                    title: title || "New Update",
+                                    body: body || "Check the app for details"
+                                },
+                                sound: "default",
+                                "content-available": 1
+                            }
+                        }
                     }
                 }
             };

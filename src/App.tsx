@@ -293,7 +293,8 @@ const MobileRouter = () => (
 import { PremiumSplashScreen } from "@/mobile/components/PremiumSplashScreen";
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { PushNotifications } from '@capacitor/push-notifications';
-
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { Device } from '@capacitor/device';
 const App = () => {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [showSplash, setShowSplash] = useState(true);
@@ -352,25 +353,60 @@ const App = () => {
             }
           });
 
-          PushNotifications.addListener('pushNotificationReceived', (notification) => {
-            console.log('Push Received in foreground:', notification);
-          });
-
           PushNotifications.addListener('registrationError', (error) => {
             console.error('Push registration error:', error);
           });
 
           // 2. Check and request permissions
           const permStatus = await PushNotifications.checkPermissions();
+          const localPermStatus = await LocalNotifications.checkPermissions();
+
           if (permStatus.receive === 'prompt' || permStatus.receive === 'prompt-with-rationale') {
-            const result = await PushNotifications.requestPermissions();
-            if (result.receive !== 'granted') return;
-          } else if (permStatus.receive !== 'granted') {
-            return;
+            await PushNotifications.requestPermissions();
+          }
+          if (localPermStatus.display === 'prompt' || localPermStatus.display === 'prompt-with-rationale') {
+            await LocalNotifications.requestPermissions();
           }
 
           // 3. Register
           await PushNotifications.register();
+
+          // 4. Foreground handling
+          PushNotifications.addListener('pushNotificationReceived', async (notification) => {
+            console.log('Push Received in foreground:', notification);
+            // Schedule a local notification to show it in foreground
+            await LocalNotifications.schedule({
+              notifications: [
+                {
+                  title: notification.title || "New Message",
+                  body: notification.body || "Tap to view",
+                  id: Math.floor(Math.random() * 100000),
+                  extra: notification.data,
+                  smallIcon: 'ic_stat_name',
+                  actionTypeId: 'default',
+                  schedule: { at: new Date(Date.now() + 100) }
+                }
+              ]
+            });
+          });
+
+          PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+            console.log('Push action performed:', notification);
+            if (notification.notification.data?.url) {
+              // We could use a global event or navigate if we had access to the router here
+              // But since PushNotificationManager is inside the QueryClientProvider/AuthProvider
+              // we can't easily use useNavigate() from react-router if it's not wrapped yet.
+              // However, we can use window.location.hash = notification.notification.data.url
+              window.location.hash = notification.notification.data.url;
+            }
+          });
+
+          LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
+            console.log('Local notification action performed:', notification);
+            if (notification.notification.extra?.url) {
+              window.location.hash = notification.notification.extra.url;
+            }
+          });
 
           if (info.platform === 'android') {
             await PushNotifications.createChannel({
