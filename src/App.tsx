@@ -327,59 +327,43 @@ const App = () => {
     checkPlatform();
   }, []);
 
-  const OneSignalManager = () => {
-    const { user, profile } = useAuth();
 
-    // 1. Initialize OneSignal (Always run)
+  const OneSignalManager = () => {
     useEffect(() => {
       const initOneSignal = async () => {
         const info = await Device.getInfo();
-        if (info.platform !== 'android' && info.platform !== 'ios') return;
+
+        // Only run on mobile
+        if (info.platform !== 'android' && info.platform !== 'ios') {
+          console.log("OneSignal: Not on mobile platform, skipping");
+          return;
+        }
 
         try {
-          // Debug Toast
-          toast.info("Initializing Notifications...");
+          console.log("OneSignal: Starting initialization...");
 
-          // Initialize
+          // Step 1: Initialize OneSignal with your App ID
           OneSignal.initialize("3182ba70-b1a7-4522-88fc-ab4a3aac2bba");
+          console.log("OneSignal: Initialize called");
 
-          // Listeners
-          OneSignal.Notifications.addEventListener("foregroundWillDisplay", (event) => {
-            console.log("OneSignal: Foreground display", event);
-          });
+          // Step 2: Request permission (this shows the permission dialog)
+          const permissionResult = await OneSignal.Notifications.requestPermission(true);
+          console.log("OneSignal: Permission result:", permissionResult);
 
-          OneSignal.Notifications.addEventListener("click", (event) => {
-            console.log("OneSignal: Notification clicked", event);
-            const data = event.notification.additionalData;
-            if (data?.url) window.location.hash = data.url;
-          });
-
-          // Request Permission
-          await OneSignal.Notifications.requestPermission(true);
+          // Step 3: Log when device registers
+          console.log("OneSignal: Setup complete!");
 
         } catch (e) {
-          console.error("OneSignal Init Error", e);
+          console.error("OneSignal Error:", e);
         }
       };
 
       initOneSignal();
-    }, []);
-
-    // 2. Identify User (Run when user logs in)
-    useEffect(() => {
-      if (!user?.id) return;
-
-      try {
-        OneSignal.login(user.id);
-        if (profile?.selected_exam) OneSignal.User.addTag("selected_exam", profile.selected_exam);
-        if (profile?.selected_plan) OneSignal.User.addTag("selected_plan", profile.selected_plan);
-      } catch (e) {
-        console.error("OneSignal Login Error", e);
-      }
-    }, [user?.id, profile?.selected_exam, profile?.selected_plan]);
+    }, []); // Run once on mount
 
     return null;
   };
+
 
 
   if (showSplash && isMobile !== false) { // Show premium splash on mobile/init
