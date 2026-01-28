@@ -8,7 +8,6 @@ import { AuthProvider } from "@/lib/auth";
 import { useTheme } from "next-themes";
 import { lazy, Suspense, useEffect, useState } from "react";
 import SecurityEnforcer from "@/components/SecurityEnforcer";
-import { Device } from '@capacitor/device';
 
 import { ExamProvider } from "@/context/ExamContext";
 import { AIProvider } from "@/context/AIContext";
