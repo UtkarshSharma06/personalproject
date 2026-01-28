@@ -345,7 +345,7 @@ const MobileDashboard: React.FC = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
 
                 <div className="relative z-20 flex justify-between items-start">
-                    <h1 className="text-5xl font-black uppercase tracking-tighter text-foreground leading-[0.9] drop-shadow-sm">
+                    <h1 className="text-7xl font-black uppercase tracking-tighter text-foreground leading-[0.85] drop-shadow-sm">
                         {firstName} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Ready?</span>
                     </h1>
