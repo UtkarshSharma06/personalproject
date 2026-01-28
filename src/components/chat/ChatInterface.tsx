@@ -394,7 +394,8 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
                             sender_id: user.id,
                             data: {
                                 url: `/community`,
-                                community_id: communityId
+                                community_id: communityId,
+                                push_type: 'chat'
                             }
                         }
                     });

@@ -290,9 +290,9 @@ const MobileRouter = () => (
 );
 
 import { PremiumSplashScreen } from "@/mobile/components/PremiumSplashScreen";
+import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
+declare var OneSignal: any;
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { PushNotifications } from '@capacitor/push-notifications';
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { Device } from '@capacitor/device';
 const App = () => {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -326,112 +326,65 @@ const App = () => {
     checkPlatform();
   }, []);
 
-  const PushNotificationManager = () => {
-    const { user } = useAuth();
+  const OneSignalManager = () => {
+    const { user, profile } = useAuth();
 
     useEffect(() => {
       let isSubscribed = true;
 
-      const initPush = async () => {
+      const initOneSignal = async () => {
+        const info = await Device.getInfo();
+        if (info.platform !== 'android' && info.platform !== 'ios') return;
+
         try {
-          const info = await Device.getInfo();
-          if (info.platform !== 'android' && info.platform !== 'ios') return;
+          // 1. Initialize OneSignal (v5 API)
+          OneSignal.initialize("3182ba70-b1a7-4522-88fc-ab4a3aac2bba");
 
-          // 1. Set up listeners FIRST before registering
-          PushNotifications.removeAllListeners();
+          // 2. Handle Login / External ID Linking
+          if (user?.id) {
+            OneSignal.login(user.id);
+            // Set tags for segmentation (Deals/Exam targeting)
+            if (profile?.selected_exam) {
+              OneSignal.User.addTag("selected_exam", profile.selected_exam);
+            }
+            if (profile?.selected_plan) {
+              OneSignal.User.addTag("selected_plan", profile.selected_plan);
+            }
+          }
 
-          PushNotifications.addListener('registration', async (token) => {
-            console.log('Push Token Registered:', token.value);
-            if (isSubscribed && user?.id) {
-              const { error } = await supabase
-                .from('profiles')
-                .update({ fcm_token: token.value } as any)
-                .eq('id', user.id);
+          // 3. Foreground Notification Handling (v5 listener)
+          OneSignal.Notifications.addEventListener("foregroundWillDisplay", (event) => {
+            console.log("OneSignal: Foreground display", event);
+            // Notification is displayed by default in v5 unless prevented
+          });
 
-              if (error) console.error('Error updating fcm_token:', error);
+          // 4. Notification Click Handling (v5 listener)
+          OneSignal.Notifications.addEventListener("click", (event) => {
+            console.log("OneSignal: Notification clicked", event);
+            const data = event.notification.additionalData;
+            if (data?.url) {
+              window.location.hash = data.url;
             }
           });
 
-          PushNotifications.addListener('registrationError', (error) => {
-            console.error('Push registration error:', error);
+          // 5. Prompt for push permissions
+          OneSignal.Notifications.requestPermission(true).then((accepted) => {
+            console.log("OneSignal: Permission status:", accepted);
           });
 
-          // 2. Check and request permissions
-          const permStatus = await PushNotifications.checkPermissions();
-          const localPermStatus = await LocalNotifications.checkPermissions();
-
-          if (permStatus.receive === 'prompt' || permStatus.receive === 'prompt-with-rationale') {
-            await PushNotifications.requestPermissions();
-          }
-          if (localPermStatus.display === 'prompt' || localPermStatus.display === 'prompt-with-rationale') {
-            await LocalNotifications.requestPermissions();
-          }
-
-          // 3. Create Channel FIRST (Critical for Android 8+)
-          if (info.platform === 'android') {
-            await PushNotifications.createChannel({
-              id: 'default',
-              name: 'General Updates',
-              importance: 5,
-              visibility: 1,
-              sound: 'default_notification',
-              vibration: true
-            });
-          }
-
-          // 4. Register
-          await PushNotifications.register();
-
-          // 5. Foreground handling
-          PushNotifications.addListener('pushNotificationReceived', async (notification) => {
-            console.log('Push Received in foreground:', notification);
-            // Schedule a local notification to show it in foreground
-            await LocalNotifications.schedule({
-              notifications: [
-                {
-                  title: notification.title || "New Message",
-                  body: notification.body || "Tap to view",
-                  id: Math.floor(Math.random() * 100000),
-                  extra: notification.data,
-                  actionTypeId: 'default',
-                  schedule: { at: new Date(Date.now() + 100) }
-                }
-              ]
-            });
-          });
-
-          PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
-            console.log('Push action performed:', notification);
-            if (notification.notification.data?.url) {
-              window.location.hash = notification.notification.data.url;
-            }
-          });
-
-          LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
-            console.log('Local notification action performed:', notification);
-            if (notification.notification.extra?.url) {
-              window.location.hash = notification.notification.extra.url;
-            }
-          });
         } catch (e) {
-          console.error("Push Init Error", e);
+          console.error("OneSignal Init Error", e);
         }
       };
 
       if (user) {
-        initPush();
+        initOneSignal();
       }
 
       return () => {
         isSubscribed = false;
-        Device.getInfo().then(info => {
-          if (info.platform === 'android' || info.platform === 'ios') {
-            PushNotifications.removeAllListeners();
-            LocalNotifications.removeAllListeners();
-          }
-        });
       };
-    }, [user?.id]);
+    }, [user?.id, profile?.selected_exam, profile?.selected_plan]);
 
     return null;
   };
@@ -446,7 +399,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <PushNotificationManager />
+        <OneSignalManager />
         <AIProvider>
           <ExamProvider>
             <TooltipProvider>

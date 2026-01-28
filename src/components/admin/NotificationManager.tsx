@@ -49,7 +49,8 @@ export default function NotificationManager() {
         content_html: '',
         exam_type: '',
         show_minimal: false,
-        send_push: true
+        send_push: true,
+        push_type: 'announcement' // 'announcement' | 'deal' | 'warning'
     });
     const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -114,7 +115,15 @@ export default function NotificationManager() {
                 }
             }
 
-            setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false, send_push: true });
+            setFormData({
+                title: '',
+                short_description: '',
+                content_html: '',
+                exam_type: '',
+                show_minimal: false,
+                send_push: true,
+                push_type: 'announcement'
+            });
             setEditingId(null);
             fetchNotifications();
         } catch (error: any) {
@@ -131,7 +140,8 @@ export default function NotificationManager() {
             content_html: notif.content_html,
             exam_type: notif.exam_type || '',
             show_minimal: notif.show_minimal,
-            send_push: true
+            send_push: true,
+            push_type: notif.data?.push_type || 'announcement'
         });
         setEditingId(notif.id);
         // Scroll to form
@@ -139,7 +149,15 @@ export default function NotificationManager() {
     };
 
     const handleCancelEdit = () => {
-        setFormData({ title: '', short_description: '', content_html: '', exam_type: '', show_minimal: false, send_push: true });
+        setFormData({
+            title: '',
+            short_description: '',
+            content_html: '',
+            exam_type: '',
+            show_minimal: false,
+            send_push: true,
+            push_type: 'announcement'
+        });
         setEditingId(null);
     };
 
@@ -171,7 +189,8 @@ export default function NotificationManager() {
                     topic: notif.exam_type || 'all_users',
                     data: {
                         url: '/dashboard',
-                        notification_id: notif.id
+                        notification_id: notif.id,
+                        push_type: notif.push_type || 'announcement'
                     }
                 }
             });
@@ -246,6 +265,19 @@ export default function NotificationManager() {
                                 onChange={e => setFormData({ ...formData, short_description: e.target.value })}
                                 className="rounded-xl border-slate-100 focus:border-indigo-500 transition-all font-bold"
                             />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Push Category</label>
+                            <select
+                                value={formData.push_type}
+                                onChange={e => setFormData({ ...formData, push_type: e.target.value })}
+                                className="w-full rounded-xl border-slate-100 border p-2.5 focus:border-indigo-500 transition-all font-bold text-sm bg-white"
+                            >
+                                <option value="announcement">📢 Standard Announcement</option>
+                                <option value="deal">🏷️ Special Deal / Offer</option>
+                                <option value="warning">⚠️ Important Warning</option>
+                            </select>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
