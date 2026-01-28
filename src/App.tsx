@@ -428,7 +428,12 @@ const App = () => {
 
       return () => {
         isSubscribed = false;
-        PushNotifications.removeAllListeners();
+        Device.getInfo().then(info => {
+          if (info.platform === 'android' || info.platform === 'ios') {
+            PushNotifications.removeAllListeners();
+            LocalNotifications.removeAllListeners();
+          }
+        });
       };
     }, [user?.id]);
 
