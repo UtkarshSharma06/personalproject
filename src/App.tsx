@@ -325,70 +325,77 @@ const App = () => {
 
     checkPlatform();
   }, []);
+
   const PushNotificationManager = () => {
     const { user } = useAuth();
 
     useEffect(() => {
+      let isSubscribed = true;
+
       const initPush = async () => {
-        const info = await Device.getInfo();
-        if (info.platform !== 'android' && info.platform !== 'ios') return;
-
         try {
-          // Check permission status first
-          const permStatus = await PushNotifications.checkPermissions();
+          const info = await Device.getInfo();
+          if (info.platform !== 'android' && info.platform !== 'ios') return;
 
-          if (permStatus.receive === 'prompt' || permStatus.receive === 'prompt-with-rationale') {
-            const result = await PushNotifications.requestPermissions();
-            if (result.receive !== 'granted') {
-              console.log('Push notification permission denied');
-              return;
-            }
-          } else if (permStatus.receive !== 'granted') {
-            console.log('Push notifications not granted');
-            return;
-          }
-
-          await PushNotifications.register();
-          await PushNotifications.createChannel({
-            id: 'default',
-            name: 'General Updates',
-            importance: 5,
-            visibility: 1,
-            sound: 'default_notification',
-            vibration: true
-          });
+          // 1. Set up listeners FIRST before registering
+          PushNotifications.removeAllListeners();
 
           PushNotifications.addListener('registration', async (token) => {
             console.log('Push Token Registered:', token.value);
-            // We'll also store it in a global or local state if we need it later, 
-            // but the profile update is the critical part.
-            if (user?.id) {
+            if (isSubscribed && user?.id) {
               const { error } = await supabase
                 .from('profiles')
                 .update({ fcm_token: token.value } as any)
                 .eq('id', user.id);
 
               if (error) console.error('Error updating fcm_token:', error);
-              else console.log('fcm_token synchronized with profile');
             }
           });
 
           PushNotifications.addListener('pushNotificationReceived', (notification) => {
             console.log('Push Received in foreground:', notification);
-            // With presentationOptions in capacitor.config.ts, 
-            // the system will show the banner automatically.
           });
 
           PushNotifications.addListener('registrationError', (error) => {
             console.error('Push registration error:', error);
           });
+
+          // 2. Check and request permissions
+          const permStatus = await PushNotifications.checkPermissions();
+          if (permStatus.receive === 'prompt' || permStatus.receive === 'prompt-with-rationale') {
+            const result = await PushNotifications.requestPermissions();
+            if (result.receive !== 'granted') return;
+          } else if (permStatus.receive !== 'granted') {
+            return;
+          }
+
+          // 3. Register
+          await PushNotifications.register();
+
+          if (info.platform === 'android') {
+            await PushNotifications.createChannel({
+              id: 'default',
+              name: 'General Updates',
+              importance: 5,
+              visibility: 1,
+              sound: 'default_notification',
+              vibration: true
+            });
+          }
         } catch (e) {
           console.error("Push Init Error", e);
         }
       };
 
-      if (user) initPush();
-    }, [user]);
+      if (user) {
+        initPush();
+      }
+
+      return () => {
+        isSubscribed = false;
+        PushNotifications.removeAllListeners();
+      };
+    }, [user?.id]);
 
     return null;
   };

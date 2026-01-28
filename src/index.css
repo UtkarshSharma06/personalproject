@@ -109,6 +109,8 @@
     body {
         @apply bg-background text-foreground;
         font-feature-settings: "rlig" 1, "calt" 1;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
     }
 
     /* Ensure smooth dark mode transitions */
@@ -136,6 +138,13 @@
 
     .progress-fill {
         @apply h-full rounded-full transition-all duration-500 ease-out;
+    }
+
+    button, 
+    [role="button"],
+    header {
+        user-select: none;
+        -webkit-user-select: none;
     }
 
     .animate-float {

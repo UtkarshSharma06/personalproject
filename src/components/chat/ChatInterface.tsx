@@ -383,6 +383,24 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
                 if (dbErr) throw dbErr;
                 processedMessageIds.current.add(dbId);
                 setMessages(prev => prev.map(m => m.id === tempId ? { ...m, id: dbId, file_url: fileUrl } : m));
+
+                // Trigger Push Notification
+                try {
+                    supabase.functions.invoke('send-push', {
+                        body: {
+                            title: communityName || 'New Message',
+                            body: `${profile?.display_name || 'Someone'}: ${content || (f ? 'Shared a file' : 'New message')}`,
+                            community_id: communityId,
+                            sender_id: user.id,
+                            data: {
+                                url: `/community`,
+                                community_id: communityId
+                            }
+                        }
+                    });
+                } catch (pushErr) {
+                    console.error('Error triggering push notification:', pushErr);
+                }
             } catch (e: any) {
                 toast({ title: "Error", description: e.message, variant: "destructive" });
                 setMessages(prev => prev.filter(m => m.id !== tempId));

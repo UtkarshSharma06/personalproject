@@ -69,42 +69,29 @@ const MobileLayout: React.FC = () => {
 
     const checkUnreadAnnouncements = async () => {
       try {
-        let query = supabase
+        // Fetch only active notification IDs for this exam
+        const { data: activeNotifs } = await supabase
           .from('site_notifications')
-          .select('id', { count: 'exact', head: true })
-          .eq('is_active', true);
+          .select('id')
+          .eq('is_active', true)
+          .or(`exam_type.is.null,exam_type.eq.,exam_type.eq.${activeExam?.id}`);
 
-        if (activeExam?.id) {
-          query = query.or(`exam_type.is.null,exam_type.eq.,exam_type.eq.${activeExam.id}`);
-        } else {
-          query = query.or('exam_type.is.null,exam_type.eq.');
-        }
-
-        const { count: totalActive } = await query;
-
-        const { count: readCount } = await supabase
-          .from('user_notifications_read')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
-
-        // Simple check: if read count is less than total active notifications targeting user
-        // Note: This is an approximation. A more precise check would be:
-        const { data: activeIds } = await query.select('id');
-        const activeIdsList = (activeIds as any)?.map((n: any) => n.id) || [];
-
-        if (activeIdsList.length === 0) {
+        if (!activeNotifs || activeNotifs.length === 0) {
           setHasUnreadAnnouncement(false);
           return;
         }
 
-        const { data: readIds } = await supabase
+        const activeIds = activeNotifs.map(n => n.id);
+
+        // Check which of these have been read by the user
+        const { data: readNotifs } = await supabase
           .from('user_notifications_read')
           .select('notification_id')
           .eq('user_id', user.id)
-          .in('notification_id', activeIdsList);
+          .in('notification_id', activeIds);
 
-        const readIdsList = (readIds as any)?.map((n: any) => n.notification_id) || [];
-        setHasUnreadAnnouncement(activeIdsList.length > readIdsList.length);
+        const readIds = new Set((readNotifs as any)?.map((n: any) => n.notification_id) || []);
+        setHasUnreadAnnouncement(activeIds.length > readIds.size);
       } catch (err) {
         console.error('Error checking unread announcements:', err);
       }
@@ -180,49 +167,51 @@ const MobileLayout: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
       {/* Persistent Native Header */}
-      <header className="pt-[env(safe-area-inset-top)] h-[calc(4rem+env(safe-area-inset-top))] flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-0 z-40 shrink-0">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSidebarOpen(true)}
-            className="rounded-full hover:bg-secondary active:scale-90 transition-transform"
-          >
-            <Menu className="w-6 h-6" />
-          </Button>
-          <div className="flex flex-col">
-            <h1 className="text-sm font-black tracking-tight uppercase leading-none truncate max-w-[150px]">
-              {getPageTitle(location.pathname)}
-            </h1>
-            <span className="text-[8px] font-black text-primary uppercase tracking-[0.2em] mt-1 opacity-60">Student Portal</span>
+      <header className="pt-[env(safe-area-inset-top,20px)] h-auto flex flex-col justify-center px-4 bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-0 z-40 shrink-0">
+        <div className="h-16 flex items-center justify-between w-full">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarOpen(true)}
+              className="rounded-full hover:bg-secondary active:scale-90 transition-transform h-10 w-10"
+            >
+              <Menu className="w-6 h-6" />
+            </Button>
+            <div className="flex flex-col">
+              <h1 className="text-sm font-black tracking-tight uppercase leading-none truncate max-w-[120px] sm:max-w-[200px]">
+                {getPageTitle(location.pathname)}
+              </h1>
+              <span className="text-[8px] font-black text-primary uppercase tracking-[0.2em] mt-1 opacity-60">Student Portal</span>
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/mobile/notifications')}
-            className="relative rounded-full hover:bg-secondary active:scale-95 transition-transform"
-          >
-            <Bell className="w-5 h-5" />
-            {hasUnreadAnnouncement && (
-              <div className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-background animate-pulse" />
-            )}
-          </Button>
-          <LatestNotificationPopup />
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/mobile/notifications')}
+              className="relative rounded-full hover:bg-secondary active:scale-95 transition-transform h-10 w-10"
+            >
+              <Bell className="w-5 h-5" />
+              {hasUnreadAnnouncement && (
+                <div className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-background animate-pulse" />
+              )}
+            </Button>
+            <LatestNotificationPopup />
+          </div>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto pb-32">
+      <main className="flex-1 overflow-y-auto pb-32 safe-area-bottom">
         <Outlet />
       </main>
 
       <MobileSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
 
       {/* Premium Floating Bottom Deck */}
-      <div className="fixed bottom-0 left-0 right-0 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-50 pointer-events-none">
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-[calc(0.5rem+env(safe-area-inset-bottom,16px))] z-50 pointer-events-none">
         <nav className="max-w-md mx-auto h-20 bg-background/95 backdrop-blur-3xl border border-white/20 rounded-[2rem] flex items-center justify-around px-1 shadow-[0_25px_60px_rgba(0,0,0,0.6)] pointer-events-auto overflow-hidden">
           <NavButton to="/mobile/dashboard" icon={<Home />} />
           <NavButton to="/mobile/practice" icon={<ClipboardList />} />

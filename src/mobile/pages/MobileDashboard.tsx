@@ -254,51 +254,79 @@ const MobileDashboard: React.FC = () => {
 
     const fetchLastProgress = async () => {
         setLastProgress(null);
-        const { data: progresses } = await (supabase as any)
-            .from('learning_progress')
-            .select('*, content:learning_content(*)')
-            .eq('user_id', user?.id)
-            .order('last_accessed_at', { ascending: false })
-            .limit(10);
+        try {
+            // Optimized: Fetch recent progress with joined content and related unit/topic data
+            // To keep it simple but efficient, we fetch the 5 most recent and filter
+            const { data: progresses, error } = await supabase
+                .from('learning_progress')
+                .select(`
+                    *,
+                    content:learning_content(
+                        *,
+                        subunit:learning_subunits(
+                            unit:learning_units(
+                                topic:learning_topics(
+                                    course_id,
+                                    course:learning_courses(
+                                        learning_exams(name)
+                                    )
+                                )
+                            )
+                        ),
+                        unit:learning_units(
+                            topic:learning_topics(
+                                course_id,
+                                course:learning_courses(
+                                    learning_exams(name)
+                                )
+                            )
+                        ),
+                        topic:learning_topics(
+                            course_id,
+                            course:learning_courses(
+                                learning_exams(name)
+                            )
+                        )
+                    )
+                `)
+                .eq('user_id', user?.id)
+                .order('last_accessed_at', { ascending: false })
+                .limit(5);
 
-        if (!progresses || progresses.length === 0) return;
+            if (error || !progresses || progresses.length === 0) return;
 
-        for (const progress of progresses) {
-            if (!progress.content) continue;
-            let courseId = null;
-            const c = progress.content;
+            const brand = activeExam.id.split('-')[0].toLowerCase();
 
-            if (c.topic_id) {
-                const { data: topic } = await (supabase as any).from('learning_topics').select('course_id').eq('id', c.topic_id).single();
-                if (topic) courseId = topic.course_id;
-            } else if (c.unit_id) {
-                const { data: unit } = await (supabase as any).from('learning_units').select('topic_id').eq('id', c.unit_id).single();
-                if (unit) {
-                    const { data: topic } = await (supabase as any).from('learning_topics').select('course_id').eq('id', unit.topic_id).single();
-                    if (topic) courseId = topic.course_id;
+            for (const progress of progresses) {
+                const c = progress.content as any;
+                if (!c) continue;
+
+                // Determine course info through the hierarchy
+                let courseInfo = null;
+                if (c.subunit?.unit?.topic?.course) {
+                    courseInfo = c.subunit.unit.topic.course;
+                } else if (c.unit?.topic?.course) {
+                    courseInfo = c.unit.topic.course;
+                } else if (c.topic?.course) {
+                    courseInfo = c.topic.course;
                 }
-            } else if (c.subunit_id) {
-                const { data: subunit } = await (supabase as any).from('learning_subunits').select('unit_id').eq('id', c.subunit_id).single();
-                if (subunit) {
-                    const { data: unit } = await (supabase as any).from('learning_units').select('topic_id').eq('id', subunit.unit_id).single();
-                    if (unit) {
-                        const { data: topic } = await (supabase as any).from('learning_topics').select('course_id').eq('id', (unit as any).topic_id).single();
-                        if (topic) courseId = topic.course_id;
-                    }
-                }
-            }
 
-            if (courseId) {
-                const { data: course } = await (supabase as any).from('learning_courses').select('id, learning_exams(name)').eq('id', courseId).single();
-                if (course && course.learning_exams) {
-                    const brand = activeExam.id.split('-')[0].toLowerCase();
-                    const examName = course.learning_exams.name.toLowerCase();
+                if (courseInfo && courseInfo.learning_exams) {
+                    const examName = courseInfo.learning_exams.name.toLowerCase();
                     if (examName.includes(brand)) {
+                        // Extract courseId for the state
+                        let courseId = null;
+                        if (c.subunit?.unit?.topic?.course_id) courseId = c.subunit.unit.topic.course_id;
+                        else if (c.unit?.topic?.course_id) courseId = c.unit.topic.course_id;
+                        else if (c.topic?.course_id) courseId = c.topic.course_id;
+
                         setLastProgress({ ...progress, courseId });
                         return;
                     }
                 }
             }
+        } catch (err) {
+            console.error("Error fetching progress:", err);
         }
     };
 
@@ -317,15 +345,15 @@ const MobileDashboard: React.FC = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
 
                 <div className="relative z-20 flex justify-between items-start">
-                    <h1 className="text-7xl font-black uppercase tracking-tighter text-foreground leading-[0.85] drop-shadow-sm">
+                    <h1 className="text-5xl font-black uppercase tracking-tighter text-foreground leading-[0.9] drop-shadow-sm">
                         {firstName} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Ready?</span>
                     </h1>
                 </div>
 
-                <div className="relative z-20 w-full space-y-4">
+                <div className="relative z-20 w-full flex flex-row flex-wrap gap-2 mb-8">
                     {lastProgress ? (
-                        <div className="flex gap-4">
+                        <>
                             <Button
                                 onClick={() => navigate('/learning', {
                                     state: {
@@ -334,22 +362,22 @@ const MobileDashboard: React.FC = () => {
                                         contentId: lastProgress.content_id
                                     }
                                 })}
-                                className="flex-1 h-16 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
+                                className="flex-[1.5] min-w-[120px] h-14 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all px-4"
                             >
-                                <Play size={16} className="mr-2 fill-current" /> Resume Learning
+                                <Play size={14} className="mr-2 fill-current" /> Resume
                             </Button>
                             <Button
                                 variant="outline"
                                 onClick={() => navigate('/mobile/practice')}
-                                className="h-16 px-8 rounded-2xl border-border bg-background/50 backdrop-blur-sm text-foreground hover:bg-muted font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
+                                className="flex-1 min-w-[100px] h-14 rounded-2xl border-border bg-background/50 backdrop-blur-sm text-foreground hover:bg-muted font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all px-4"
                             >
-                                <ClipboardList size={16} className="mr-2" /> Practice
+                                <ClipboardList size={14} className="mr-2" /> Practice
                             </Button>
-                        </div>
+                        </>
                     ) : (
                         <Button
                             onClick={() => navigate('/mobile/practice')}
-                            className="w-full h-16 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
+                            className="w-full h-14 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-95 transition-all"
                         >
                             <Zap size={16} className="mr-2 fill-current" /> Start Learning
                         </Button>
@@ -538,9 +566,9 @@ const MiniStat = ({ icon: Icon, val, label, color }: any) => (
 const HubItem = ({ icon, label, sub, onClick, color }: { icon: any, label: string, sub: string, onClick: () => void, color: string }) => (
     <div
         onClick={onClick}
-        className="p-5 bg-card/50 rounded-[2rem] border border-border/10 active:bg-secondary/20 transition-all flex items-center gap-4 group"
+        className="p-5 bg-card/50 rounded-[2rem] border border-border/10 active:bg-secondary/20 transition-all flex items-center gap-4 group min-w-0"
     >
-        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-active:scale-90", color)}>
+        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform group-active:scale-90", color)}>
             {icon}
         </div>
         <div className="min-w-0">

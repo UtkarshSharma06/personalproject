@@ -98,19 +98,35 @@ export default function NotificationManager() {
                     }]);
 
                 if (error) throw error;
-                const { data } = await supabase.from('site_notifications').select().eq('id', (await supabase.from('site_notifications').select('id').order('created_at', { ascending: false }).limit(1).single()).data?.id).single();
+
+                // Fetch the newly created notification to ensure we have the correct data
+                const { data: recentNotif } = await supabase
+                    .from('site_notifications')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
 
                 toast.success('Notification created successfully');
 
                 // Trigger Push Notification
-                if (data && !formData.show_minimal) {
-                    supabase.functions.invoke('send-push', {
-                        body: {
-                            title: formData.title || 'New Announcement',
-                            body: formData.short_description || 'Check the app for details',
-                            topic: formData.exam_type || 'all_users'
-                        }
-                    });
+                if (recentNotif && !formData.show_minimal) {
+                    try {
+                        const { error: pushError } = await supabase.functions.invoke('send-push', {
+                            body: {
+                                title: formData.title || 'New Announcement',
+                                body: formData.short_description || 'Check the app for details',
+                                topic: formData.exam_type || 'all_users',
+                                data: {
+                                    url: '/dashboard',
+                                    notification_id: recentNotif.id
+                                }
+                            }
+                        });
+                        if (pushError) console.error('Push Function Error:', pushError);
+                    } catch (pushErr) {
+                        console.error('Error invoking send-push:', pushErr);
+                    }
                 }
             }
 

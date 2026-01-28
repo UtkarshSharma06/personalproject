@@ -62,6 +62,7 @@ export default function MobileCommunity() {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [isPrivate, setIsPrivate] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
+    const [isSearchVisible, setIsSearchVisible] = useState(false);
 
     useEffect(() => {
         if (user) loadData();
@@ -276,25 +277,67 @@ export default function MobileCommunity() {
             {/* WhatsApp Header */}
             <header className="bg-primary dark:bg-card text-white pt-12 pb-0 shadow-sm shrink-0">
                 <div className="px-4 pb-4 flex justify-between items-center">
-                    <h1 className="text-xl font-bold tracking-tight">Study Squads</h1>
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-white hover:bg-white/10 rounded-full h-9 w-9"
-                            onClick={() => {
-                                const canCreate = ['elite', 'global', 'admin', 'consultant'].includes(profile?.subscription_tier || profile?.role);
-                                if (!canCreate) {
-                                    toast({ title: "Restricted", description: "Upgrade to Elite or Global to create communities", variant: "destructive" });
-                                    return;
-                                }
-                                setIsCreateDialogOpen(true);
-                            }}
-                        >
-                            <Plus size={24} strokeWidth={2.5} />
-                        </Button>
-                        <SearchIcon size={22} strokeWidth={2} />
-                    </div>
+                    {!isSearchVisible ? (
+                        <>
+                            <h1 className="text-xl font-bold tracking-tight">Study Squads</h1>
+                            <div className="flex items-center gap-3">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-white hover:bg-white/10 rounded-full h-9 w-9"
+                                    onClick={() => {
+                                        const canCreate = ['elite', 'global', 'admin', 'consultant'].includes(profile?.subscription_tier || profile?.role);
+                                        if (!canCreate) {
+                                            toast({ title: "Restricted", description: "Upgrade to Elite or Global to create communities", variant: "destructive" });
+                                            return;
+                                        }
+                                        setIsCreateDialogOpen(true);
+                                    }}
+                                >
+                                    <Plus size={24} strokeWidth={2.5} />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-white hover:bg-white/10 rounded-full h-9 w-9"
+                                    onClick={() => setIsSearchVisible(true)}
+                                >
+                                    <Search size={22} strokeWidth={2} />
+                                </Button>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex items-center gap-3 w-full bg-background/10 rounded-xl px-3 py-1 animate-in slide-in-from-right duration-300">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-white h-8 w-8 hover:bg-transparent"
+                                onClick={() => {
+                                    setIsSearchVisible(false);
+                                    setSearchQuery("");
+                                }}
+                            >
+                                <ArrowLeft size={20} />
+                            </Button>
+                            <Input
+                                autoFocus
+                                placeholder="Search squads..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-9"
+                            />
+                            {searchQuery && (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-white h-8 w-8"
+                                    onClick={() => setSearchQuery("")}
+                                >
+                                    <X size={18} />
+                                </Button>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Tabs */}
@@ -434,8 +477,8 @@ export default function MobileCommunity() {
             </Sheet>
             {/* Create Community Dialog */}
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogContent className="sm:max-w-md rounded-[2.5rem] border-0 shadow-2xl bg-background/95 backdrop-blur-xl p-8 mx-4">
-                    <DialogHeader>
+                <DialogContent className="sm:max-w-md rounded-[2.5rem] border-0 shadow-2xl bg-background/95 backdrop-blur-xl p-6 sm:p-8 mx-0 sm:mx-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                    <DialogHeader className="mb-2">
                         <DialogTitle className="text-2xl font-black uppercase tracking-tight text-center">New Squad</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-6 py-4">
