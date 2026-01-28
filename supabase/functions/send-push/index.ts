@@ -56,12 +56,15 @@ serve(async (req: Request) => {
                 return new Response(JSON.stringify({ success: true, message: "No target users" }), { headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' } });
             }
 
-            payload.include_external_user_ids = targetUserIds;
+            // Use include_aliases for v5 API
+            payload.include_aliases = {
+                external_id: targetUserIds
+            };
         }
         // 2. Handle Promotional / Topic based (Targeted by Segments or Tags)
         else if (topic) {
             if (topic === 'all_users') {
-                payload.included_segments = ["Subscribed Users", "Active Users"];
+                payload.included_segments = ["Subscribed Users"];
             } else {
                 // Target users using tags set in App.tsx
                 payload.filters = [
@@ -81,6 +84,12 @@ serve(async (req: Request) => {
         });
 
         const result = await response.json();
+        console.log("OneSignal Result:", result);
+
+        if (response.status !== 200) {
+            console.error("OneSignal Error:", result);
+            return new Response(JSON.stringify({ error: "OneSignal API Error", details: result }), { status: 400, headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' } });
+        }
 
         return new Response(JSON.stringify({ success: true, result }), {
             headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' }
