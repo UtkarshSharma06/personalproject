@@ -329,61 +329,49 @@ const App = () => {
   const OneSignalManager = () => {
     const { user, profile } = useAuth();
 
+    // 1. Initialize OneSignal (Always run)
     useEffect(() => {
-      let isSubscribed = true;
-
       const initOneSignal = async () => {
         const info = await Device.getInfo();
         if (info.platform !== 'android' && info.platform !== 'ios') return;
 
         try {
-          // 1. Initialize OneSignal (v5 API)
+          // Initialize
           OneSignal.initialize("3182ba70-b1a7-4522-88fc-ab4a3aac2bba");
 
-          // 2. Handle Login / External ID Linking
-          if (user?.id) {
-            OneSignal.login(user.id);
-            // Set tags for segmentation (Deals/Exam targeting)
-            if (profile?.selected_exam) {
-              OneSignal.User.addTag("selected_exam", profile.selected_exam);
-            }
-            if (profile?.selected_plan) {
-              OneSignal.User.addTag("selected_plan", profile.selected_plan);
-            }
-          }
-
-          // 3. Foreground Notification Handling (v5 listener)
+          // Listeners
           OneSignal.Notifications.addEventListener("foregroundWillDisplay", (event) => {
             console.log("OneSignal: Foreground display", event);
-            // Notification is displayed by default in v5 unless prevented
           });
 
-          // 4. Notification Click Handling (v5 listener)
           OneSignal.Notifications.addEventListener("click", (event) => {
             console.log("OneSignal: Notification clicked", event);
             const data = event.notification.additionalData;
-            if (data?.url) {
-              window.location.hash = data.url;
-            }
+            if (data?.url) window.location.hash = data.url;
           });
 
-          // 5. Prompt for push permissions
-          OneSignal.Notifications.requestPermission(true).then((accepted) => {
-            console.log("OneSignal: Permission status:", accepted);
-          });
+          // Request Permission
+          await OneSignal.Notifications.requestPermission(true);
 
         } catch (e) {
           console.error("OneSignal Init Error", e);
         }
       };
 
-      if (user) {
-        initOneSignal();
-      }
+      initOneSignal();
+    }, []);
 
-      return () => {
-        isSubscribed = false;
-      };
+    // 2. Identify User (Run when user logs in)
+    useEffect(() => {
+      if (!user?.id) return;
+
+      try {
+        OneSignal.login(user.id);
+        if (profile?.selected_exam) OneSignal.User.addTag("selected_exam", profile.selected_exam);
+        if (profile?.selected_plan) OneSignal.User.addTag("selected_plan", profile.selected_plan);
+      } catch (e) {
+        console.error("OneSignal Login Error", e);
+      }
     }, [user?.id, profile?.selected_exam, profile?.selected_plan]);
 
     return null;
