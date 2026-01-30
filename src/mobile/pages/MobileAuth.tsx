@@ -4,7 +4,19 @@ import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, User, Shield, ChevronLeft, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Shield, ChevronLeft, Loader2, ShieldCheck } from 'lucide-react';
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+} from "@/components/ui/input-otp";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
 
 export default function MobileAuth() {
     const [isLogin, setIsLogin] = useState(true);
@@ -13,7 +25,13 @@ export default function MobileAuth() {
     const [displayName, setDisplayName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const { signIn, signUp, signInWithGoogle } = useAuth() as any;
+    // MFA State
+    const [requiresMFA, setRequiresMFA] = useState(false);
+    const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+    const [mfaCode, setMfaCode] = useState("");
+    const [mfaError, setMfaError] = useState("");
+
+    const { signIn, signUp, signInWithGoogle, mfa, signOut } = useAuth() as any;
     const navigate = useNavigate();
     const { toast } = useToast();
 
@@ -22,12 +40,28 @@ export default function MobileAuth() {
         setIsLoading(true);
         try {
             if (isLogin) {
-                const { error } = await signIn(email, password);
+                const { data, error } = await signIn(email, password);
                 if (error) throw error;
+
+                // Check if MFA is required
+                const session = data?.session;
+                if (session) {
+                    const currentAAL = session.authenticator_assurance_level;
+                    const { data: factorsData } = await mfa.listFactors();
+                    const totpFactor = factorsData?.all?.find((f: any) => f.factor_type === 'totp' && f.status === 'verified');
+
+                    if (totpFactor && currentAAL !== 'aal2') {
+                        setMfaFactorId(totpFactor.id);
+                        setRequiresMFA(true);
+                        setIsLoading(false);
+                        return;
+                    }
+                }
+
                 toast({ title: "Login Successful", description: "Welcome back!" });
                 navigate('/dashboard');
             } else {
-                const { error } = signUp(email, password, displayName);
+                const { error } = await signUp(email, password, displayName);
                 if (error) throw error;
                 toast({ title: "Account Created", description: "Let's get started!" });
                 navigate('/onboarding');
@@ -47,6 +81,37 @@ export default function MobileAuth() {
             toast({ title: "Sync failed", variant: "destructive" });
             setIsLoading(false);
         }
+    };
+
+    const handleMFAVerify = async () => {
+        if (!mfaFactorId) return;
+        if (mfaCode.length !== 6) {
+            setMfaError("ENTER 6-DIGIT CODE");
+            return;
+        }
+
+        setIsLoading(true);
+        setMfaError("");
+        try {
+            const { error } = await mfa.challengeAndVerify(mfaFactorId, mfaCode);
+            if (error) {
+                setMfaError("INVALID CODE");
+                toast({ title: "Verification Failed", description: "Code is incorrect", variant: "destructive" });
+            } else {
+                toast({ title: "MFA Verified", description: "Welcome back!" });
+                setRequiresMFA(false);
+                navigate('/dashboard');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleMFACancel = () => {
+        signOut();
+        setRequiresMFA(false);
+        setMfaCode("");
+        setMfaError("");
     };
 
     return (
@@ -150,6 +215,63 @@ export default function MobileAuth() {
                     <span className="text-[8px] font-black uppercase tracking-widest">Encrypted</span>
                 </div>
             </footer>
+
+            {/* MFA SECURITY OVERLAY */}
+            <Dialog open={requiresMFA} onOpenChange={(open) => !open && handleMFACancel()}>
+                <DialogContent className="w-[90%] max-w-sm bg-background border-border/40 rounded-[2.5rem] p-8 shadow-2xl">
+                    <DialogHeader className="items-center text-center space-y-4">
+                        <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center border border-primary/20">
+                            <ShieldCheck className="w-8 h-8 text-primary" />
+                        </div>
+                        <DialogTitle className="text-2xl font-black uppercase tracking-tight">Security Check</DialogTitle>
+                        <DialogDescription className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                            Enter the 6-digit code from your authenticator app to authorize this device.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="py-8 flex flex-col items-center space-y-6">
+                        <InputOTP
+                            maxLength={6}
+                            value={mfaCode}
+                            onChange={(val) => {
+                                setMfaCode(val);
+                                setMfaError("");
+                            }}
+                        >
+                            <InputOTPGroup className="gap-2">
+                                {[0, 1, 2, 3, 4, 5].map((idx) => (
+                                    <InputOTPSlot
+                                        key={idx}
+                                        index={idx}
+                                        className="w-10 h-14 bg-secondary/20 border-border/40 rounded-xl text-lg font-black text-primary focus:ring-primary"
+                                    />
+                                ))}
+                            </InputOTPGroup>
+                        </InputOTP>
+
+                        {mfaError && (
+                            <span className="text-[9px] font-black text-destructive uppercase tracking-widest animate-pulse">
+                                {mfaError}
+                            </span>
+                        )}
+
+                        <Button
+                            onClick={handleMFAVerify}
+                            disabled={isLoading || mfaCode.length < 6}
+                            className="w-full h-14 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-2xl active:scale-95 transition-all"
+                        >
+                            {isLoading ? <Loader2 className="animate-spin" /> : 'Authorize Link'}
+                        </Button>
+
+                        <button
+                            onClick={handleMFACancel}
+                            className="text-[9px] font-black text-muted-foreground uppercase tracking-widest hover:text-primary transition-colors"
+                        >
+                            Cancel Authentication
+                        </button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

@@ -175,14 +175,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async (redirectTo?: string) => {
     const isNative = Capacitor.isNativePlatform();
-    const { error } = await supabase.auth.signInWithOAuth({
+
+    // For native, we want to ensure the redirect is handled by the app
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: redirectTo || (isNative
           ? 'com.italostudy.app://google-auth'
-          : `${window.location.origin}/dashboard`)
+          : `${window.location.origin}/dashboard`),
+        skipBrowserRedirect: isNative // Try to keep control on native
       }
     });
+
+    // If skipBrowserRedirect worked, we handle the URL manually
+    if (isNative && data?.url) {
+      window.location.assign(data.url);
+    }
+
     return { error: error as Error | null };
   };
 
