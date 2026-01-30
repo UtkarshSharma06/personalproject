@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/input-otp";
 import { ImageCropper } from '@/components/ui/ImageCropper';
 import { useTheme } from 'next-themes';
+import OneSignal from 'onesignal-cordova-plugin';
+import { Device } from '@capacitor/device';
 
 type SettingsView = 'main' | 'account' | 'language' | 'security';
 
@@ -69,6 +71,7 @@ export default function MobileSettings() {
     const [isVerifyingMFA, setIsVerifyingMFA] = useState(false);
     const [mfaPurpose, setMfaPurpose] = useState<'enroll' | 'unenroll'>('enroll');
     const [unenrollFactorId, setUnenrollFactorId] = useState<string | null>(null);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
     useEffect(() => {
         if (profile) {
@@ -82,7 +85,20 @@ export default function MobileSettings() {
         if (mfa) {
             fetchMFAFactors();
         }
+        checkNotificationStatus();
     }, [mfa]);
+
+    const checkNotificationStatus = async () => {
+        const info = await Device.getInfo();
+        if (info.platform !== 'android' && info.platform !== 'ios') return;
+
+        try {
+            const hasPermission = await OneSignal.Notifications.hasPermission();
+            setNotificationsEnabled(hasPermission);
+        } catch (e) {
+            console.error("Error checking OneSignal status:", e);
+        }
+    };
 
     const fetchMFAFactors = async () => {
         const { data, error } = await mfa.listFactors();
@@ -281,6 +297,36 @@ export default function MobileSettings() {
         setTheme(newTheme);
     };
 
+    const handleToggleNotifications = async () => {
+        const info = await Device.getInfo();
+        if (info.platform !== 'android' && info.platform !== 'ios') {
+            toast({ title: "Mobile Only", description: "Notifications can only be managed on the mobile app." });
+            return;
+        }
+
+        try {
+            if (notificationsEnabled) {
+                // If currently enabled, opt out
+                await OneSignal.User.pushSubscription.optOut();
+                setNotificationsEnabled(false);
+                toast({ title: "Notifications Off", description: "You will no longer receive push alerts." });
+            } else {
+                // If currently disabled, opt in / request permission
+                const permission = await OneSignal.Notifications.requestPermission(true);
+                if (permission) {
+                    await OneSignal.User.pushSubscription.optIn();
+                    setNotificationsEnabled(true);
+                    toast({ title: "Notifications On", description: "Standard push protocol active." });
+                } else {
+                    toast({ title: "Permission Denied", description: "Please enable notifications in Android settings.", variant: "destructive" });
+                }
+            }
+        } catch (e) {
+            console.error("Toggle Error:", e);
+            toast({ title: "Error", description: "Could not sync with notification server.", variant: "destructive" });
+        }
+    };
+
     const settingsGroups = [
         {
             items: [
@@ -316,6 +362,8 @@ export default function MobileSettings() {
                     label: t('settings.notifications'),
                     sub: t('settings.notifications_sub'),
                     toggle: true,
+                    checked: notificationsEnabled,
+                    onClick: handleToggleNotifications,
                     iconClass: "bg-rose-500"
                 },
                 {

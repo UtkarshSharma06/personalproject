@@ -337,26 +337,19 @@ const App = () => {
     useEffect(() => {
       const initOneSignal = async () => {
         const info = await Device.getInfo();
-
-        // Only run on mobile
-        if (info.platform !== 'android' && info.platform !== 'ios') {
-          console.log("OneSignal: Not on mobile platform, skipping");
-          return;
-        }
+        if (info.platform !== 'android' && info.platform !== 'ios') return;
 
         try {
-          console.log("OneSignal: Starting initialization...");
-
-          // Step 1: Initialize OneSignal with your App ID
+          console.log("OneSignal: Initializing with ID: 36b31128-46ae-4b7c-a5ab-b4c483327a59");
           OneSignal.initialize("36b31128-46ae-4b7c-a5ab-b4c483327a59");
-          console.log("OneSignal: Initialize called");
 
-          // Step 2: Request permission (this shows the permission dialog)
-          const permissionResult = await OneSignal.Notifications.requestPermission(true);
-          console.log("OneSignal: Permission result:", permissionResult);
-
-          // Step 3: Log when device registers
-          console.log("OneSignal: Setup complete!");
+          // Request permission immediately on launch for Android 13+
+          // Adding a small timeout to ensure the native layer is ready
+          setTimeout(async () => {
+            console.log("OneSignal: Requesting permissions...");
+            const permission = await OneSignal.Notifications.requestPermission(true);
+            console.log("OneSignal: Permission result:", permission);
+          }, 1000);
 
         } catch (e) {
           console.error("OneSignal Error:", e);
@@ -364,7 +357,7 @@ const App = () => {
       };
 
       initOneSignal();
-    }, []); // Run once on mount
+    }, []);
 
     return null;
   };
