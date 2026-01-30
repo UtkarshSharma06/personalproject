@@ -68,6 +68,7 @@ export default function Learning() {
     const [comments, setComments] = useState<any[]>([]);
     const [newComment, setNewComment] = useState('');
     const [replyTo, setReplyTo] = useState<any>(null);
+    const [userProgress, setUserProgress] = useState<Set<string>>(new Set());
 
     // Quiz States
     const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
@@ -149,6 +150,7 @@ export default function Learning() {
     async function restoreSession(courseId: string, contentId: string) {
         setIsLoading(true);
         try {
+            await fetchProgress();
             // 1. Fetch Course details
             const { data: course } = await (supabase as any)
                 .from('learning_courses')
@@ -237,11 +239,33 @@ export default function Learning() {
             .upsert({
                 user_id: user.id,
                 content_id: contentId,
+                is_completed: true,
                 last_accessed_at: new Date().toISOString()
             }, { onConflict: 'user_id,content_id' });
 
-        if (error) console.error('Failed to save progress:', error);
+        if (!error) {
+            setUserProgress(prev => {
+                const next = new Set(prev);
+                next.add(contentId);
+                return next;
+            });
+        } else {
+            console.error('Failed to save progress:', error);
+        }
     };
+
+    async function fetchProgress() {
+        if (!user) return;
+        const { data } = await supabase
+            .from('learning_progress')
+            .select('content_id')
+            .eq('user_id', user.id)
+            .eq('is_completed', true);
+
+        if (data) {
+            setUserProgress(new Set(data.map((p: any) => p.content_id)));
+        }
+    }
 
     async function saveQuizProgress(parentId: string, level: string, score: number, total: number) {
         if (!user) return;
@@ -342,6 +366,7 @@ export default function Learning() {
             if (activeTopics.length > 0) {
                 await fetchUnitDashboard(activeTopics[0]);
             }
+            await fetchProgress();
         }
         setIsLoading(false);
     };
@@ -939,24 +964,46 @@ export default function Learning() {
                                                                     <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Primary Intel</h3>
                                                                 </div>
                                                                 <div className="space-y-2.5 sm:space-y-3">
-                                                                    {topic.directContent.map((video: any) => (
-                                                                        <button
-                                                                            key={video.id}
-                                                                            onClick={() => handleVideoSelect(video, topic)}
-                                                                            className="w-full p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-white dark:bg-card border border-slate-100 dark:border-border shadow-sm hover:border-indigo-600 hover:shadow-lg hover:shadow-indigo-500/5 transition-all flex items-center justify-between group text-left active:scale-[0.98]"
-                                                                        >
-                                                                            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                                                                                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 dark:bg-muted flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all transform group-hover:rotate-6">
-                                                                                    {video.content_type === 'article' ? <FileText className="w-4 h-4 sm:w-5 sm:h-5" /> : <Video className="w-4 h-4 sm:w-5 sm:h-5" />}
+                                                                    {topic.directContent.map((video: any) => {
+                                                                        const isActuallyVideo = video.video_url && video.video_url.trim().length > 5;
+                                                                        const isDoc = video.content_type === 'doc' || video.content_type === 'article' || !isActuallyVideo;
+                                                                        const isCompleted = userProgress.has(video.id);
+
+                                                                        return (
+                                                                            <button
+                                                                                key={video.id}
+                                                                                onClick={() => handleVideoSelect(video, topic)}
+                                                                                className={cn(
+                                                                                    "w-full p-4 sm:p-5 rounded-xl sm:rounded-2xl border shadow-sm transition-all flex items-center justify-between group text-left active:scale-[0.98]",
+                                                                                    isCompleted
+                                                                                        ? "bg-emerald-500/5 border-emerald-500/30 hover:border-emerald-500/50 shadow-sm"
+                                                                                        : "bg-white dark:bg-card border-slate-100 dark:border-border hover:border-indigo-600 hover:shadow-lg hover:shadow-indigo-500/5"
+                                                                                )}
+                                                                            >
+                                                                                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                                                                                    <div className={cn(
+                                                                                        "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all transform group-hover:rotate-6",
+                                                                                        isCompleted
+                                                                                            ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600"
+                                                                                            : "bg-slate-50 dark:bg-muted text-slate-400 group-hover:bg-indigo-600 group-hover:text-white"
+                                                                                    )}>
+                                                                                        {isCompleted ? <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" /> : (isDoc ? <FileText className="w-4 h-4 sm:w-5 sm:h-5" /> : <Video className="w-4 h-4 sm:w-5 sm:h-5" />)}
+                                                                                    </div>
+                                                                                    <div className="min-w-0">
+                                                                                        <p className={cn(
+                                                                                            "text-[11px] sm:text-xs font-black uppercase tracking-tight truncate",
+                                                                                            isCompleted ? "text-emerald-700/80" : "text-slate-800 dark:text-slate-100"
+                                                                                        )}>{video.title}</p>
+                                                                                        <span className={cn(
+                                                                                            "text-[7px] sm:text-[8px] font-black uppercase tracking-widest",
+                                                                                            isCompleted ? "text-emerald-500/60" : "text-indigo-500"
+                                                                                        )}>{isDoc ? 'Intelligence Document' : 'Mastery Content'}</span>
+                                                                                    </div>
                                                                                 </div>
-                                                                                <div className="min-w-0">
-                                                                                    <p className="text-[11px] sm:text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight truncate">{video.title}</p>
-                                                                                    <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-indigo-500">Mastery Content</span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all shrink-0" />
-                                                                        </button>
-                                                                    ))}
+                                                                                <ChevronRight className={cn("w-4 h-4 transition-all shrink-0", isCompleted ? "text-emerald-500/40" : "text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-1")} />
+                                                                            </button>
+                                                                        );
+                                                                    })}
                                                                 </div>
                                                             </div>
                                                             {/* Quiz Placeholder for direct content */}
@@ -1027,23 +1074,41 @@ export default function Learning() {
                                                                     </div>
                                                                 </div>
                                                                 <div className="space-y-2">
-                                                                    {subunit.content && subunit.content.map((video: any) => (
-                                                                        <button
-                                                                            key={video.id}
-                                                                            onClick={() => handleVideoSelect(video, subunit)}
-                                                                            className="w-full p-3.5 rounded-xl bg-white dark:bg-card border border-slate-100 dark:border-border hover:border-indigo-600 hover:shadow-md transition-all flex items-center justify-between group text-left active:scale-[0.99]"
-                                                                        >
-                                                                            <div className="flex items-center gap-3 min-w-0">
-                                                                                {video.content_type === 'article' ? (
-                                                                                    <FileText className="w-3 h-3 text-slate-600 dark:text-slate-400 group-hover:text-emerald-600" />
-                                                                                ) : (
-                                                                                    <Play className="w-3 h-3 text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 fill-current" />
+                                                                    {subunit.content && subunit.content.map((video: any) => {
+                                                                        const isActuallyVideo = video.video_url && video.video_url.trim().length > 5;
+                                                                        const isDoc = video.content_type === 'doc' || video.content_type === 'article' || !isActuallyVideo;
+                                                                        const isCompleted = userProgress.has(video.id);
+
+                                                                        return (
+                                                                            <button
+                                                                                key={video.id}
+                                                                                onClick={() => handleVideoSelect(video, subunit)}
+                                                                                className={cn(
+                                                                                    "w-full p-3.5 rounded-xl transition-all flex items-center justify-between group text-left active:scale-[0.99] border",
+                                                                                    isCompleted
+                                                                                        ? "bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40 shadow-sm"
+                                                                                        : "bg-white dark:bg-card border-slate-100 dark:border-border hover:border-indigo-600 hover:shadow-md"
                                                                                 )}
-                                                                                <p className="text-[10px] sm:text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-tight truncate">{video.title}</p>
-                                                                            </div>
-                                                                            <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-indigo-600 transition-transform group-hover:translate-x-0.5" />
-                                                                        </button>
-                                                                    ))}
+                                                                            >
+                                                                                <div className="flex items-center gap-3 min-w-0">
+                                                                                    {isCompleted ? (
+                                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                                                                    ) : (
+                                                                                        isDoc ? (
+                                                                                            <FileText className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400 group-hover:text-emerald-600" />
+                                                                                        ) : (
+                                                                                            <Play className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 fill-current" />
+                                                                                        )
+                                                                                    )}
+                                                                                    <p className={cn(
+                                                                                        "text-[10px] sm:text-[11px] font-black uppercase tracking-tight truncate",
+                                                                                        isCompleted ? "text-emerald-700/70" : "text-slate-700 dark:text-slate-300"
+                                                                                    )}>{video.title}</p>
+                                                                                </div>
+                                                                                <ChevronRight className={cn("w-3 h-3 transition-transform", isCompleted ? "text-emerald-500/40" : "text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-0.5")} />
+                                                                            </button>
+                                                                        );
+                                                                    })}
                                                                 </div>
                                                             </div>
                                                         ))}
@@ -1164,142 +1229,96 @@ export default function Learning() {
                                 <div className="absolute inset-0 bg-indigo-500/5 animate-pulse" />
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-indigo-600/10 rounded-full blur-[80px] sm:blur-[120px] opacity-30 pointer-events-none" />
 
-                                {selectedVideo.content_type === 'article' ? (
-                                    <div className="relative z-10 w-full max-w-3xl bg-white dark:bg-card rounded-2xl md:rounded-[2rem] shadow-xl shadow-slate-200/50 p-6 sm:p-10 lg:p-16 space-y-8 lg:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                                        <div className="pb-6 lg:pb-8 border-b border-slate-100 dark:border-border">
-                                            <div className="flex items-center gap-3 mb-4 lg:mb-6">
-                                                <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[8px] lg:text-[10px] font-black uppercase tracking-widest border border-indigo-100 dark:border-indigo-900/40">
-                                                    Article
-                                                </span>
-                                                <span className="text-slate-400 text-[8px] lg:text-[10px] font-black uppercase tracking-widest">
-                                                    {selectedVideo.reading_time || '5 min read'}
-                                                </span>
-                                            </div>
-                                            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-tight lg:leading-[1.1]">
-                                                {selectedVideo.title}
-                                            </h1>
-                                        </div>
-                                        <div className="prose prose-slate prose-sm sm:prose-base lg:prose-lg max-w-none">
-                                            {selectedVideo.text_content ? (() => {
-                                                // Auto-detect content format: HTML or Markdown
-                                                const isHTML = /<\/?[a-z][\s\S]*>/i.test(selectedVideo.text_content);
+                                {(() => {
+                                    const isActuallyVideo = selectedVideo.video_url && selectedVideo.video_url.trim().length > 5;
+                                    const isDoc = selectedVideo.content_type === 'doc' || selectedVideo.content_type === 'article' || !isActuallyVideo;
 
-                                                if (isHTML) {
-                                                    // Render HTML content (from TinyMCE)
-                                                    const sanitized = DOMPurify.sanitize(selectedVideo.text_content, {
-                                                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                                                            'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'code', 'pre', 'table', 'thead',
-                                                            'tbody', 'tr', 'th', 'td', 'div', 'span', 'figure', 'figcaption'],
-                                                        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel'],
-                                                        ALLOW_DATA_ATTR: false
-                                                    });
-
-                                                    return (
-                                                        <MathText
-                                                            isHtml={true}
-                                                            content={sanitized}
-                                                            className="tinymce-content font-['Inter'] text-slate-800 dark:text-slate-200"
-                                                            style={{
-                                                                fontSize: '1rem',
-                                                                lineHeight: '1.7'
-                                                            }}
-                                                        />
-                                                    );
-                                                } else {
-                                                    // Render Markdown content (legacy support)
-                                                    return (
-                                                        <div className="font-['Inter'] text-slate-800 dark:text-slate-200">
-                                                            {selectedVideo.text_content.split('\n').map((line: string, i: number) => {
-                                                                // Helper for inline formatting (Bold)
-                                                                const formatText = (text: string) => {
-                                                                    const parts = text.split(/\*\*(.*?)\*\*/g);
-                                                                    return parts.map((part, index) =>
-                                                                        index % 2 === 1 ? <strong key={index} className="font-black text-slate-900 dark:text-slate-100">{part}</strong> : part
-                                                                    );
-                                                                };
-
-                                                                const imgMatch = line.match(/^!\[(.*?)\]\((.*?)\)/);
-                                                                if (imgMatch) {
-                                                                    return (
-                                                                        <figure key={i} className="my-6 lg:my-8">
-                                                                            <img
-                                                                                src={imgMatch[2]}
-                                                                                alt={imgMatch[1]}
-                                                                                className="w-full rounded-xl lg:rounded-2xl shadow-lg border border-slate-100 dark:border-border"
-                                                                            />
-                                                                        </figure>
-                                                                    );
-                                                                }
-
-                                                                const h1Match = line.match(/^# (.*)/);
-                                                                if (h1Match) return <h2 key={i} className="text-2xl lg:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100 mt-8 lg:mt-12 mb-4 lg:mb-6">{h1Match[1]}</h2>;
-
-                                                                const h2Match = line.match(/^## (.*)/);
-                                                                if (h2Match) return <h3 key={i} className="text-xl lg:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-6 lg:mt-10 mb-3 lg:mb-5">{h2Match[1]}</h3>;
-
-                                                                const h3Match = line.match(/^### (.*)/);
-                                                                if (h3Match) return <h4 key={i} className="text-lg lg:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-4 lg:mt-8 mb-2 lg:mb-4">{h3Match[1]}</h4>;
-
-                                                                // Bullet List
-                                                                const bulbMatch = line.match(/^-\s+(.*)/);
-                                                                if (bulbMatch) {
-                                                                    return (
-                                                                        <div key={i} className="flex gap-3 mb-2 lg:mb-3 ml-2 lg:ml-4">
-                                                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 lg:mt-2.5 shrink-0" />
-                                                                            <p className="leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">{formatText(bulbMatch[1])}</p>
-                                                                        </div>
-                                                                    );
-                                                                }
-
-                                                                // Numbered List
-                                                                const numMatch = line.match(/^(\d+)\.\s+(.*)/);
-                                                                if (numMatch) {
-                                                                    return (
-                                                                        <div key={i} className="flex gap-3 mb-2 lg:mb-3 ml-2 lg:ml-4">
-                                                                            <span className="font-black text-indigo-500 mt-0 sm:mt-0.5">{numMatch[1]}.</span>
-                                                                            <p className="leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">{formatText(numMatch[2])}</p>
-                                                                        </div>
-                                                                    );
-                                                                }
-
-                                                                if (!line.trim()) return <div key={i} className="h-2 lg:h-4" />;
-
-                                                                return (
-                                                                    <p key={i} className="mb-3 lg:mb-4 leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">
-                                                                        {formatText(line)}
-                                                                    </p>
-                                                                );
-                                                            })}
+                                    if (isDoc) {
+                                        return (
+                                            <div className="relative z-10 w-full max-w-4xl bg-white dark:bg-card rounded-2xl md:rounded-[2rem] shadow-2xl shadow-slate-900/20 p-8 sm:p-12 lg:p-20 space-y-10 lg:space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 border border-slate-100 dark:border-white/5">
+                                                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                                                    <FileText size={200} />
+                                                </div>
+                                                <div className="pb-10 lg:pb-12 border-b border-slate-100 dark:border-white/10 relative z-10">
+                                                    <div className="flex items-center gap-4 mb-8">
+                                                        <div className="w-16 h-16 bg-indigo-600/10 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
+                                                            <FileText size={32} />
                                                         </div>
-                                                    );
-                                                }
-                                            })() : (
-                                                <p className="text-slate-500 italic text-sm">No content available.</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="relative z-10 w-full max-w-5xl aspect-video rounded-xl sm:rounded-[2rem] lg:rounded-[3rem] overflow-hidden border border-white/10 shadow-[0_16px_64px_-8px_rgba(0,0,0,0.8)] lg:shadow-[0_32px_128px_-16px_rgba(0,0,0,0.8)]">
-                                        <iframe
-                                            className="w-full h-full"
-                                            src={(() => {
-                                                const url = selectedVideo.video_url || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
-                                                // Convert YouTube watch URLs to embed format
-                                                if (url.includes('youtube.com/watch')) {
-                                                    const videoId = new URLSearchParams(new URL(url).search).get('v');
-                                                    return `https://www.youtube.com/embed/${videoId}`;
-                                                } else if (url.includes('youtu.be/')) {
-                                                    const videoId = url.split('youtu.be/')[1].split('?')[0];
-                                                    return `https://www.youtube.com/embed/${videoId}`;
-                                                }
-                                                return url; // Already in embed format or external
-                                            })()}
-                                            title={selectedVideo.title}
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        />
-                                    </div>
-                                )}
+                                                        <div>
+                                                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em] opacity-80">Intelligence Briefing</span>
+                                                            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-[1.05] mt-2">
+                                                                {selectedVideo.title}
+                                                            </h1>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-3">
+                                                        <div className="px-4 py-1.5 bg-indigo-600/10 rounded-full text-[9px] font-black uppercase tracking-widest text-indigo-600 border border-indigo-600/20">Classified Intel</div>
+                                                        <div className="px-4 py-1.5 bg-slate-100 dark:bg-white/5 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-500">Document V.1.0</div>
+                                                        <div className="px-4 py-1.5 bg-emerald-500/10 rounded-full text-[9px] font-black uppercase tracking-widest text-emerald-600 border border-emerald-500/20 flex items-center gap-2">
+                                                            <Clock size={10} />
+                                                            {selectedVideo.reading_time || '5 min read'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="prose prose-slate prose-sm sm:prose-base lg:prose-lg max-w-none relative z-10">
+                                                    {selectedVideo.text_content ? (
+                                                        <div className="font-['Inter'] text-slate-800 dark:text-slate-200 leading-relaxed lg:leading-[1.8]">
+                                                            {/* Render Article Content logic moved here */}
+                                                            {(() => {
+                                                                const isHTML = /<\/?[a-z][\s\S]*>/i.test(selectedVideo.text_content);
+                                                                if (isHTML) {
+                                                                    const sanitized = DOMPurify.sanitize(selectedVideo.text_content, {
+                                                                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                                                                            'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'code', 'pre', 'table', 'thead',
+                                                                            'tbody', 'tr', 'th', 'td', 'div', 'span', 'figure', 'figcaption'],
+                                                                        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel']
+                                                                    });
+                                                                    return <MathText isHtml={true} content={sanitized} className="tinymce-content" />;
+                                                                } else {
+                                                                    return (
+                                                                        <div className="space-y-6">
+                                                                            {selectedVideo.text_content.split('\n').map((line: string, i: number) => {
+                                                                                if (!line.trim()) return <div key={i} className="h-4" />;
+                                                                                return <p key={i}>{line}</p>;
+                                                                            })}
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                            })()}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-col items-center justify-center p-20 border-2 border-dashed border-slate-100 dark:border-white/5 rounded-[2rem]">
+                                                            <FileText size={48} className="text-slate-200 mb-4" />
+                                                            <p className="text-slate-400 font-black uppercase tracking-widest text-xs">No Content Found in Archive</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    } else {
+                                        return (
+                                            <div className="relative z-10 w-full max-w-6xl aspect-video rounded-xl sm:rounded-[2rem] lg:rounded-[3rem] overflow-hidden border-4 border-white/5 shadow-[0_32px_128px_-16px_rgba(0,0,0,0.9)]">
+                                                <iframe
+                                                    className="w-full h-full"
+                                                    src={(() => {
+                                                        const url = selectedVideo.video_url || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+                                                        if (url.includes('youtube.com/watch')) {
+                                                            const videoId = new URLSearchParams(new URL(url).search).get('v');
+                                                            return `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1`;
+                                                        } else if (url.includes('youtu.be/')) {
+                                                            const videoId = url.split('youtu.be/')[1].split('?')[0];
+                                                            return `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1`;
+                                                        }
+                                                        return url;
+                                                    })()}
+                                                    title={selectedVideo.title}
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                />
+                                            </div>
+                                        );
+                                    }
+                                })()}
                             </div>
 
                             {/* PLAYER CONTROLS / INFO */}
