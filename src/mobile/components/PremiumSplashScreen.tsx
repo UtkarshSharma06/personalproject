@@ -58,7 +58,7 @@ export const PremiumSplashScreen = ({ onComplete }: { onComplete: () => void }) 
 
             <div className="absolute bottom-10 text-center">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse">
-                    Initializing Neural Link...
+                    Starting Application...
                 </p>
             </div>
         </div>

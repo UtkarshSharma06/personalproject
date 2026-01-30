@@ -192,8 +192,8 @@ export default function MobileSpeakingLobby() {
                                 </div>
                                 <div className="p-4 bg-secondary/20 border border-border/40 rounded-3xl text-left space-y-1">
                                     <ShieldCheck className="w-4 h-4 text-emerald-500 mb-2" />
-                                    <p className="text-[8px] font-black uppercase tracking-widest opacity-40">Protocol</p>
-                                    <p className="text-[10px] font-black uppercase tracking-tight">Verified P2P</p>
+                                    <p className="text-[8px] font-black uppercase tracking-widest opacity-40">Security</p>
+                                    <p className="text-[10px] font-black uppercase tracking-tight">Standard</p>
                                 </div>
                             </div>
 

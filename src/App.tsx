@@ -130,7 +130,7 @@ const queryClient = new QueryClient();
 const PageLoader = () => (
   <div className="h-screen w-full flex items-center justify-center bg-background">
     <div className="flex flex-col items-center gap-4">
-      <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       <p className="text-muted-foreground font-medium animate-pulse">Loading ITALOSTUDY...</p>
     </div>
   </div>
@@ -318,26 +318,41 @@ const App = () => {
   const { setTheme } = useTheme();
 
   useEffect(() => {
+    let mounted = true;
+
     const checkPlatform = async () => {
+      // Safety Timeout: Force load if platform check hangs
+      const timeoutId = setTimeout(() => {
+        if (mounted) {
+          setIsMobile(prev => prev ?? (window.innerWidth <= 768));
+          setOnboardingCompleted(prev => prev ?? true);
+          setIsNative(prev => prev || false);
+        }
+      }, 1000);
+
       try {
         const info = await Device.getInfo();
         const native = info.platform === 'android' || info.platform === 'ios';
-        setIsNative(native);
-        setIsMobile(native || window.innerWidth <= 768);
 
-        if (native) {
-          const { value } = await Preferences.get({ key: 'onboarding_completed' });
-          setOnboardingCompleted(value === 'true');
-          setTheme('dark');
-          // Hide status bar and set overlay
-          await StatusBar.hide();
-          await StatusBar.setOverlaysWebView({ overlay: true });
-          await StatusBar.setStyle({ style: Style.Dark });
-        } else {
-          setTheme('light');
+        if (mounted) {
+          setIsNative(native);
+          setIsMobile(native || window.innerWidth <= 768);
+
+          if (native) {
+            const { value } = await Preferences.get({ key: 'onboarding_completed' });
+            setOnboardingCompleted(value === 'true');
+            setTheme('dark');
+            // Hide status bar and set overlay
+            await StatusBar.hide();
+            await StatusBar.setOverlaysWebView({ overlay: true });
+            await StatusBar.setStyle({ style: Style.Dark });
+          } else {
+            setOnboardingCompleted(true);
+            setTheme('light');
+          }
         }
+        clearTimeout(timeoutId);
       } catch (e) {
-        console.error("Native Setup Error", e);
         setIsMobile(window.innerWidth < 768);
       }
     };
@@ -433,14 +448,15 @@ const AuthBridge = ({ isNative, onboardingCompleted, setOnboardingCompleted, isM
           <NetworkStatus />
           <Toaster />
           <ToasterProvider />
-          <SecurityEnforcer />
           <Suspense fallback={<PageLoader />}>
             {isMobile ? (
               <HashRouter>
+                <SecurityEnforcer />
                 <MobileRouter user={user} />
               </HashRouter>
             ) : (
               <BrowserRouter>
+                <SecurityEnforcer />
                 <WebRouter />
               </BrowserRouter>
             )}
