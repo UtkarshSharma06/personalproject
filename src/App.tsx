@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth";
 import { useTheme } from "next-themes";
 import { lazy, Suspense, useEffect, useState } from "react";
@@ -14,6 +14,7 @@ import { ExamProvider } from "@/context/ExamContext";
 import { AIProvider } from "@/context/AIContext";
 import OneSignal from 'onesignal-cordova-plugin';
 import { Device } from '@capacitor/device';
+import { App as CapApp } from '@capacitor/app';
 import { PremiumSplashScreen } from "@/mobile/components/PremiumSplashScreen";
 import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -447,10 +448,19 @@ const AuthBridge = ({ isNative, onboardingCompleted, setOnboardingCompleted, isM
           <ToasterProvider />
           <Suspense fallback={<PageLoader />}>
             {isMobile ? (
-              <HashRouter>
-                <SecurityEnforcer />
-                <MobileRouter user={user} isNative={isNative} />
-              </HashRouter>
+              // Use HashRouter ONLY for Native APK, BrowserRouter for Mobile Web
+              isNative ? (
+                <HashRouter>
+                  <SecurityEnforcer />
+                  <DeepLinkHandler />
+                  <MobileRouter user={user} isNative={isNative} />
+                </HashRouter>
+              ) : (
+                <BrowserRouter>
+                  <SecurityEnforcer />
+                  <MobileRouter user={user} isNative={isNative} />
+                </BrowserRouter>
+              )
             ) : (
               <BrowserRouter>
                 <SecurityEnforcer />
@@ -471,6 +481,45 @@ const ToasterProvider = () => {
       <Sonner />
     </>
   );
+};
+
+// Component to handle native deep links and auth redirects
+const DeepLinkHandler = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    CapApp.addListener('appUrlOpen', async (data: { url: string }) => {
+      console.log('App opened with URL:', data.url);
+
+      const url = new URL(data.url);
+      const hash = url.hash.substring(1); // remove '#'
+      const params = new URLSearchParams(hash);
+
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+
+      if (accessToken && refreshToken) {
+        console.log('DeepLink: Tokens detected, setting session...');
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (!error) {
+          console.log('DeepLink: Session set, redirecting to dashboard');
+          navigate('/mobile/dashboard');
+        } else {
+          console.error('DeepLink Error:', error.message);
+        }
+      }
+    });
+
+    return () => {
+      CapApp.removeAllListeners();
+    };
+  }, [navigate]);
+
+  return null;
 };
 
 export default App;

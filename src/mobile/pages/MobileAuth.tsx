@@ -218,18 +218,18 @@ export default function MobileAuth() {
 
             {/* MFA SECURITY OVERLAY */}
             <Dialog open={requiresMFA} onOpenChange={(open) => !open && handleMFACancel()}>
-                <DialogContent className="w-[90%] max-w-sm bg-background border-border/40 rounded-[2.5rem] p-8 shadow-2xl">
-                    <DialogHeader className="items-center text-center space-y-4">
-                        <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center border border-primary/20">
-                            <ShieldCheck className="w-8 h-8 text-primary" />
+                <DialogContent className="w-[92%] max-w-[340px] bg-background border-border/40 rounded-[2.5rem] p-6 shadow-2xl overflow-hidden">
+                    <DialogHeader className="items-center text-center space-y-3">
+                        <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20">
+                            <ShieldCheck className="w-7 h-7 text-primary" />
                         </div>
-                        <DialogTitle className="text-2xl font-black uppercase tracking-tight">Security Check</DialogTitle>
-                        <DialogDescription className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                        <DialogTitle className="text-xl font-black uppercase tracking-tight">Security Check</DialogTitle>
+                        <DialogDescription className="text-[9px] font-black uppercase tracking-widest opacity-60 leading-relaxed px-2">
                             Enter the 6-digit code from your authenticator app to authorize this device.
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="py-8 flex flex-col items-center space-y-6">
+                    <div className="py-6 flex flex-col items-center space-y-6">
                         <InputOTP
                             maxLength={6}
                             value={mfaCode}
@@ -238,12 +238,12 @@ export default function MobileAuth() {
                                 setMfaError("");
                             }}
                         >
-                            <InputOTPGroup className="gap-2">
+                            <InputOTPGroup className="gap-1.5">
                                 {[0, 1, 2, 3, 4, 5].map((idx) => (
                                     <InputOTPSlot
                                         key={idx}
                                         index={idx}
-                                        className="w-10 h-14 bg-secondary/20 border-border/40 rounded-xl text-lg font-black text-primary focus:ring-primary"
+                                        className="w-9 h-12 bg-secondary/20 border-border/40 rounded-xl text-lg font-black text-primary focus:ring-primary"
                                     />
                                 ))}
                             </InputOTPGroup>

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 interface AuthContextType {
   user: User | null;
@@ -189,7 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // If skipBrowserRedirect worked, we handle the URL manually
     if (isNative && data?.url) {
-      window.location.assign(data.url);
+      await Browser.open({ url: data.url, windowName: '_self' });
     }
 
     return { error: error as Error | null };
