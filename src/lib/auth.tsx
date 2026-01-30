@@ -180,8 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       options: {
         redirectTo: redirectTo || (isNative
           ? 'com.italostudy.app://google-auth'
-          : `${window.location.origin}/dashboard`),
-        skipBrowserRedirect: isNative // Keep browser open for native to handle callback via deep link
+          : `${window.location.origin}/dashboard`)
       }
     });
     return { error: error as Error | null };
