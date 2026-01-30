@@ -349,6 +349,28 @@ export default function MobileStartTest() {
                     </div>
                 </section>
 
+                {/* Time Limit Grid */}
+                <section>
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Time Limit (Minutes)</h3>
+                        <span className="text-[9px] font-black text-primary uppercase">{timeLimit} Mins Selected</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                        {[10, 15, 20, 30, 45, 60].map((t) => (
+                            <button
+                                key={t}
+                                onClick={() => setTimeLimit(t)}
+                                className={cn(
+                                    "h-14 rounded-2xl border-2 font-black text-xs transition-all active:scale-95",
+                                    timeLimit === t ? "border-primary bg-primary/5 text-primary" : "border-border/50 bg-secondary/10 opacity-60"
+                                )}
+                            >
+                                {t}m
+                            </button>
+                        ))}
+                    </div>
+                </section>
+
                 {/* Difficulty Blocks */}
                 <section>
                     <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Select Difficulty</h3>

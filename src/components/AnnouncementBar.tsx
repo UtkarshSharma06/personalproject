@@ -21,7 +21,9 @@ export default function AnnouncementBar() {
 
             // 2. Check dismissal
             const isDismissed = localStorage.getItem('announcement-dismissed');
-            if (!isDismissed) {
+            if (isDismissed === 'true') {
+                setIsVisible(false);
+            } else {
                 setIsVisible(true);
             }
         };

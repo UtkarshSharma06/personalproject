@@ -222,6 +222,7 @@ const WebRouter = () => (
 
 const MobileRouter = ({ user, isNative }: { user: any, isNative: boolean }) => (
   <AppUpdateChecker>
+    {!isNative && <AnnouncementBar />}
     <Routes>
       <Route path="/" element={user ? <Navigate to="/mobile/dashboard" replace /> : (isNative ? <Navigate to="/auth" replace /> : <MobileIndex />)} />
       <Route path="/auth" element={<MobileAuth />} />
@@ -305,6 +306,7 @@ const MobileRouter = ({ user, isNative }: { user: any, isNative: boolean }) => (
       <Route path="/consultant/activate" element={<ConsultantActivation />} />
       <Route path="/consultant/apply" element={<ConsultantApply />} />
 
+      <Route path="/download-app" element={<DownloadApp />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </AppUpdateChecker>
