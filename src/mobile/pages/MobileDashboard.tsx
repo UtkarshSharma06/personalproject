@@ -6,7 +6,8 @@ import {
     Loader2, Sparkles, Clock as HistoryIcon, User,
     BarChart3, Bookmark, FlaskConical, GraduationCap,
     Award, ChevronRight, Bell, Dna, Brain, Calculator,
-    Languages, Database, Microscope, ClipboardList
+    Languages, Database, Microscope, ClipboardList,
+    Headphones, PenTool, Mic, MessageSquare
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { useAuth } from '@/lib/auth';
@@ -91,6 +92,14 @@ const MobileDashboard: React.FC = () => {
         if (s.includes('phys')) return <div className="p-2 bg-cyan-500/20 text-cyan-500 rounded-lg"><Database size={16} /></div>;
         if (s.includes('math')) return <div className="p-2 bg-amber-500/20 text-amber-500 rounded-lg"><Calculator size={16} /></div>;
         if (s.includes('logic')) return <div className="p-2 bg-indigo-500/20 text-indigo-500 rounded-lg"><Brain size={16} /></div>;
+
+        // IELTS Specific Colorful Icons
+        if (s.includes('read')) return <div className="p-2 bg-sky-500/20 text-sky-500 rounded-lg"><BookOpen size={16} /></div>;
+        if (s.includes('listen')) return <div className="p-2 bg-amber-500/20 text-amber-500 rounded-lg"><Headphones size={16} /></div>;
+        if (s.includes('writ')) return <div className="p-2 bg-emerald-500/20 text-emerald-500 rounded-lg"><PenTool size={16} /></div>;
+        if (s.includes('speak')) return <div className="p-2 bg-rose-500/20 text-rose-500 rounded-lg"><Mic size={16} /></div>;
+        if (s.includes('comm')) return <div className="p-2 bg-violet-500/20 text-violet-500 rounded-lg"><MessageSquare size={16} /></div>;
+
         if (s.includes('read') || s.includes('listen') || s.includes('writ') || s.includes('speak')) return <div className="p-2 bg-violet-500/20 text-violet-500 rounded-lg"><Languages size={16} /></div>;
         return <div className="p-2 bg-slate-500/20 text-slate-500 rounded-lg"><BookOpen size={16} /></div>;
     };
@@ -404,42 +413,49 @@ const MobileDashboard: React.FC = () => {
                 <h2 className="px-6 font-black text-xs uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
                     <Trophy size={14} className="text-amber-500" /> Top Performers
                 </h2>
-                <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-4 snap-x">
-                    {topStudents.map((student, i) => (
-                        <div
-                            key={student.id}
-                            onClick={() => navigate(`/mobile/student/${student.id}`)}
-                            className="snap-start shrink-0 w-32 aspect-[3/4] bg-gradient-to-b from-muted/50 to-transparent p-1 rounded-2xl relative group overflow-visible border border-border/10 active:scale-95 transition-all"
-                        >
-                            {/* Ranking Badge */}
-                            <div className={cn(
-                                "absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center font-black text-xs z-20 border shadow-lg",
-                                i === 0 ? "bg-amber-500 text-black border-amber-300 shadow-amber-500/20" :
-                                    i === 1 ? "bg-slate-300 text-black border-slate-100" :
-                                        i === 2 ? "bg-orange-700 text-white border-orange-500" : "bg-background text-foreground border-border"
-                            )}>
-                                {i + 1}
-                            </div>
-
-                            {/* Crown for #1 */}
-                            {i === 0 && (
-                                <div className="absolute -top-4 -right-1 z-30 transform rotate-12 drop-shadow-lg text-3xl animate-pulse">
-                                    👑
+                <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-4 snap-x min-h-[160px] items-center">
+                    {topStudents.length > 0 ? (
+                        topStudents.map((student, i) => (
+                            <div
+                                key={student.id}
+                                onClick={() => navigate(`/mobile/student/${student.id}`)}
+                                className="snap-start shrink-0 w-32 aspect-[3/4] bg-gradient-to-b from-muted/50 to-transparent p-1 rounded-2xl relative group overflow-visible border border-border/10 active:scale-95 transition-all"
+                            >
+                                {/* Ranking Badge */}
+                                <div className={cn(
+                                    "absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center font-black text-xs z-20 border shadow-lg",
+                                    i === 0 ? "bg-amber-500 text-black border-amber-300 shadow-amber-500/20" :
+                                        i === 1 ? "bg-slate-300 text-black border-slate-100" :
+                                            i === 2 ? "bg-orange-700 text-white border-orange-500" : "bg-background text-foreground border-border"
+                                )}>
+                                    {i + 1}
                                 </div>
-                            )}
 
-                            <div className="w-full h-full rounded-xl overflow-hidden relative bg-card">
-                                <StudentAvatar student={student} />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                                <div className="absolute bottom-3 left-3 right-3">
-                                    <h4 className="font-bold text-[10px] text-white truncate">{student.display_name}</h4>
-                                    <p className="text-[8px] font-black text-emerald-400">
-                                        {student.total_score} / {student.exam_total ?? 0}
-                                    </p>
+                                {/* Crown for #1 */}
+                                {i === 0 && (
+                                    <div className="absolute -top-4 -right-1 z-30 transform rotate-12 drop-shadow-lg text-3xl animate-pulse">
+                                        👑
+                                    </div>
+                                )}
+
+                                <div className="w-full h-full rounded-xl overflow-hidden relative bg-card">
+                                    <StudentAvatar student={student} />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                                    <div className="absolute bottom-3 left-3 right-3">
+                                        <h4 className="font-bold text-[10px] text-white truncate">{student.display_name}</h4>
+                                        <p className="text-[8px] font-black text-emerald-400">
+                                            {student.total_score} / {student.exam_total ?? 0}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
+                        ))
+                    ) : (
+                        <div className="w-full py-8 text-center bg-card/50 rounded-[2rem] border border-dashed border-border/50">
+                            <Sparkles className="w-8 h-8 mx-auto text-primary/30 mb-2 animate-pulse" />
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Data still calculating...</p>
                         </div>
-                    ))}
+                    )}
                 </div>
             </section>
 

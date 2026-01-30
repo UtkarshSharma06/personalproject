@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { MessageItem, Message } from "./MessageItem";
 import { MessageInput } from "./MessageInput";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Hash, Users, ChevronLeft, Lock, Unlock, Shield, Trash2, Ban, Pin, Phone, Video, Mic, Search, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { Loader2, Hash, Users, ChevronLeft, Lock, Unlock, Shield, Trash2, Ban, Pin, Phone, Video, Mic, Search, Image as ImageIcon, Link as LinkIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlanAccess } from '@/hooks/usePlanAccess';
 import { UpgradeModal } from '@/components/UpgradeModal';
