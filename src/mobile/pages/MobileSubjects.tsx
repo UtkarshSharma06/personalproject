@@ -267,14 +267,14 @@ export default function MobileSubjects() {
                                             </div>
                                             <div className="space-y-4">
                                                 {activeExam.syllabus[stat.subject]?.map((topic: any, idx: number) => (
-                                                    <div key={idx} className="p-4 rounded-2xl border border-border/10 bg-white/50">
-                                                        <h4 className="font-black text-[11px] uppercase tracking-tight mb-3 flex justify-between">
+                                                    <div key={idx} className="p-5 rounded-3xl border border-border/10 bg-muted/20">
+                                                        <h4 className="font-black text-[11px] uppercase tracking-widest mb-4 flex justify-between items-center text-foreground/90">
                                                             {topic.name}
-                                                            <span className="text-[8px] opacity-30">{topic.subtopics.length} SUB-TOPICS</span>
+                                                            <span className="text-[8px] opacity-40 font-bold">{topic.subtopics.length} UNITS</span>
                                                         </h4>
-                                                        <div className="flex flex-wrap gap-1.5">
+                                                        <div className="flex flex-wrap gap-2">
                                                             {topic.subtopics.map((sub: string, sIdx: number) => (
-                                                                <span key={sIdx} className="bg-secondary/40 text-muted-foreground px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-tight">
+                                                                <span key={sIdx} className="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-tight border border-primary/5">
                                                                     {sub}
                                                                 </span>
                                                             ))}
