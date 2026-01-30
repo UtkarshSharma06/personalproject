@@ -421,7 +421,7 @@ const MobileDashboard: React.FC = () => {
                                 {i + 1}
                             </div>
 
-                            {/* Crown for #1 - Explicitly visible outside overflow if needed, but we used overflow-visible above */}
+                            {/* Crown for #1 */}
                             {i === 0 && (
                                 <div className="absolute -top-4 -right-1 z-30 transform rotate-12 drop-shadow-lg text-3xl animate-pulse">
                                     👑
@@ -429,13 +429,7 @@ const MobileDashboard: React.FC = () => {
                             )}
 
                             <div className="w-full h-full rounded-xl overflow-hidden relative bg-card">
-                                {student.avatar_url ? (
-                                    <img src={student.avatar_url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                ) : (
-                                    <div className={cn("w-full h-full flex items-center justify-center", generateAvatarColor(student.display_name))}>
-                                        <span className="font-black text-2xl uppercase opacity-80">{(student.display_name || 'Student').charAt(0)}</span>
-                                    </div>
-                                )}
+                                <StudentAvatar student={student} />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                                 <div className="absolute bottom-3 left-3 right-3">
                                     <h4 className="font-bold text-[10px] text-white truncate">{student.display_name}</h4>
@@ -569,17 +563,37 @@ const MiniStat = ({ icon: Icon, val, label, color }: any) => (
 const HubItem = ({ icon, label, sub, onClick, color }: { icon: any, label: string, sub: string, onClick: () => void, color: string }) => (
     <div
         onClick={onClick}
-        className="p-5 bg-card/50 rounded-[2rem] border border-border/10 active:bg-secondary/20 transition-all flex items-center gap-4 group min-w-0"
+        className="p-3 bg-card/50 rounded-[1.5rem] border border-border/10 active:bg-secondary/20 transition-all flex items-center gap-2 group min-w-0"
     >
-        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform group-active:scale-90", color)}>
-            {icon}
+        <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform group-active:scale-90", color)}>
+            {React.cloneElement(icon as React.ReactElement, { size: 16 })}
         </div>
-        <div className="min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-tight truncate text-foreground">{label}</p>
-            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-0.5 truncate">{sub}</p>
+        <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-black uppercase tracking-tight truncate text-foreground leading-tight">{label}</p>
+            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-0.5 truncate opacity-60 leading-tight">{sub}</p>
         </div>
-        <ChevronRight size={12} className="ml-auto text-muted-foreground/20 group-hover:text-foreground transition-all" />
+        <ChevronRight size={10} className="ml-auto text-muted-foreground/20 group-hover:text-foreground transition-all shrink-0" />
     </div>
 );
+
+const StudentAvatar = ({ student }: { student: TopStudent }) => {
+    const [hasError, setHasError] = useState(false);
+
+    if (student.avatar_url && !hasError) {
+        return (
+            <img
+                src={student.avatar_url}
+                onError={() => setHasError(true)}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+        );
+    }
+
+    return (
+        <div className={cn("w-full h-full flex items-center justify-center", generateAvatarColor(student.display_name))}>
+            <span className="font-black text-2xl uppercase opacity-80">{(student.display_name || 'Student').charAt(0)}</span>
+        </div>
+    );
+};
 
 export default MobileDashboard;

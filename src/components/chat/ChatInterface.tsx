@@ -529,6 +529,36 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
                 </div>
             </div>
 
+            <AnimatePresence>
+                {showSearch && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-white dark:bg-[#202c33] px-4 py-2 border-b border-slate-200 dark:border-slate-700 z-10"
+                    >
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Input
+                                autoFocus
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search messages..."
+                                className="pl-10 h-10 bg-slate-100 dark:bg-[#2a3942] border-none rounded-xl"
+                            />
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => { setShowSearch(false); setSearchQuery(""); }}
+                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <div className="flex-1 overflow-y-auto px-4 py-4 z-10 space-y-4" ref={scrollRef}>
                 {pinnedMessage && (
                     <div className="sticky top-2 z-20 bg-white/90 dark:bg-slate-800/90 backdrop-blur p-2 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-2 mb-4">
