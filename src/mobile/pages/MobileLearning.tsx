@@ -47,6 +47,7 @@ export default function MobileLearning() {
     const [selectedVideo, setSelectedVideo] = useState<any>(null);
     const [comments, setComments] = useState<any[]>([]);
     const [newComment, setNewComment] = useState('');
+    const [userProgress, setUserProgress] = useState<Set<string>>(new Set());
 
     // Quiz States
     const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
@@ -126,7 +127,21 @@ export default function MobileLearning() {
         if (activeTopics.length > 0) {
             await fetchUnitDashboard(activeTopics[0], 0);
         }
+        await fetchProgress();
         setIsLoading(false);
+    }
+
+    async function fetchProgress() {
+        if (!user) return;
+        const { data } = await supabase
+            .from('learning_progress')
+            .select('content_id')
+            .eq('user_id', user.id)
+            .eq('is_completed', true);
+
+        if (data) {
+            setUserProgress(new Set(data.map((p: any) => p.content_id)));
+        }
     }
 
     async function fetchUnitDashboard(topic: any, index?: number) {
@@ -244,6 +259,29 @@ export default function MobileLearning() {
         setSelectedVideo(video);
         setView('video');
         fetchComments(video.id);
+
+        // Mark as completed in DB
+        if (user) {
+            try {
+                await supabase
+                    .from('learning_progress')
+                    .upsert({
+                        user_id: user.id,
+                        content_id: video.id,
+                        is_completed: true,
+                        last_accessed_at: new Date().toISOString()
+                    }, { onConflict: 'user_id,content_id' });
+
+                // Update local state for immediate feedback
+                setUserProgress(prev => {
+                    const next = new Set(prev);
+                    next.add(video.id);
+                    return next;
+                });
+            } catch (e) {
+                console.error("Progress update error:", e);
+            }
+        }
     }
 
     async function fetchComments(contentId: string) {
@@ -377,22 +415,32 @@ export default function MobileLearning() {
                                     {unit.directContent?.map((content: any) => {
                                         const isActuallyVideo = content.video_url && content.video_url.trim().length > 5;
                                         const isDoc = content.content_type === 'doc' || !isActuallyVideo;
+                                        const isCompleted = userProgress.has(content.id);
                                         return (
                                             <button
                                                 key={content.id}
                                                 onClick={() => handleVideoSelect(content)}
-                                                className="w-full flex items-center gap-4 p-5 bg-secondary/15 rounded-[2rem] border border-border/10 active:scale-[0.98] transition-all text-left group"
+                                                className={cn(
+                                                    "w-full flex items-center gap-4 p-5 bg-secondary/15 rounded-[2rem] border transition-all text-left group",
+                                                    isCompleted ? "border-green-500/50 bg-green-500/5" : "border-border/10 active:scale-[0.98]"
+                                                )}
                                             >
-                                                <div className="w-12 h-12 rounded-2xl bg-background flex items-center justify-center text-primary shadow-sm group-active:bg-primary/10 transition-colors">
-                                                    {isDoc ? <FileText size={20} /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
+                                                <div className={cn(
+                                                    "w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm transition-colors",
+                                                    isCompleted ? "bg-green-500/20 text-green-500" : "bg-background text-primary group-active:bg-primary/10"
+                                                )}>
+                                                    {isCompleted ? <CheckCircle2 size={20} /> : (isDoc ? <FileText size={20} /> : <Play size={20} fill="currentColor" className="ml-0.5" />)}
                                                 </div>
                                                 <div className="flex-1">
-                                                    <p className="text-xs font-black uppercase tracking-tight">{content.title}</p>
+                                                    <p className={cn(
+                                                        "text-xs font-black uppercase tracking-tight",
+                                                        isCompleted ? "text-green-500/90" : "text-foreground"
+                                                    )}>{content.title}</p>
                                                     <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.1em] mt-1 opacity-60">
                                                         {isDoc ? 'Intelligence Document' : 'Video Transmission'}
                                                     </p>
                                                 </div>
-                                                <ChevronRight size={14} className="opacity-10 group-active:opacity-100 group-active:translate-x-1 transition-all" />
+                                                <ChevronRight size={14} className={cn("transition-all", isCompleted ? "text-green-500/50" : "opacity-10 group-active:opacity-100 group-active:translate-x-1")} />
                                             </button>
                                         );
                                     })}
@@ -408,18 +456,29 @@ export default function MobileLearning() {
                                             {sub.content?.map((content: any) => {
                                                 const isActuallyVideo = content.video_url && content.video_url.trim().length > 5;
                                                 const isDoc = content.content_type === 'doc' || !isActuallyVideo;
+                                                const isCompleted = userProgress.has(content.id);
                                                 return (
                                                     <button
                                                         key={content.id}
                                                         onClick={() => handleVideoSelect(content)}
-                                                        className="w-full flex items-center gap-4 p-4 bg-secondary/10 rounded-[1.5rem] active:bg-primary/5 active:scale-[0.98] transition-all text-left border border-transparent active:border-primary/20"
-                                                    >
-                                                        {isDoc ? (
-                                                            <FileText size={16} className="text-primary opacity-60" />
-                                                        ) : (
-                                                            <Play size={16} className="text-primary opacity-60" fill="currentColor" />
+                                                        className={cn(
+                                                            "w-full flex items-center gap-4 p-4 rounded-[1.5rem] transition-all text-left border",
+                                                            isCompleted ? "bg-green-500/5 border-green-500/30" : "bg-secondary/10 active:bg-primary/5 active:scale-[0.98] border-transparent active:border-primary/20"
                                                         )}
-                                                        <p className="text-[11px] font-black uppercase tracking-tight flex-1">{content.title}</p>
+                                                    >
+                                                        {isCompleted ? (
+                                                            <CheckCircle2 size={16} className="text-green-500" />
+                                                        ) : (
+                                                            isDoc ? (
+                                                                <FileText size={16} className="text-primary opacity-60" />
+                                                            ) : (
+                                                                <Play size={16} className="text-primary opacity-60" fill="currentColor" />
+                                                            )
+                                                        )}
+                                                        <p className={cn(
+                                                            "text-[11px] font-black uppercase tracking-tight flex-1",
+                                                            isCompleted ? "text-green-500/80" : "text-foreground"
+                                                        )}>{content.title}</p>
                                                     </button>
                                                 );
                                             })}
