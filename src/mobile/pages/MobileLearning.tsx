@@ -17,6 +17,9 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { MathText } from '@/components/MathText';
 import { UpgradeModal } from '@/components/UpgradeModal';
+import { Suspense, lazy } from 'react';
+
+const AnnouncementBar = lazy(() => import('@/components/AnnouncementBar'));
 
 type View = 'selection' | 'dashboard' | 'video' | 'quiz' | 'resources';
 
@@ -152,7 +155,7 @@ export default function MobileLearning() {
                     .from('learning_content')
                     .select('*')
                     .eq('subunit_id', sub.id);
-                return { ...sub, content: (contentData || []).sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0)) };
+                return { ...sub, content: (contentData || []).filter((c: any) => c.is_active !== false).sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0)) };
             }));
 
             const { data: unitContent } = await (supabase as any)
@@ -163,9 +166,29 @@ export default function MobileLearning() {
             return {
                 ...unit,
                 subunits: subunitsWithContent,
-                directContent: (unitContent || []).sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
+                directContent: (unitContent || []).filter((c: any) => c.is_active !== false).sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
             };
         }));
+
+        // Fetch topic-level direct content
+        const { data: topicContent } = await (supabase as any)
+            .from('learning_content')
+            .select('*')
+            .eq('topic_id', topic.id);
+
+        const activeTopicContent = (topicContent || []).filter((c: any) => c.is_active !== false).sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0));
+
+        // If there's topic-level content, prepend a virtual unit for it
+        const finalStructure = [...richLessons];
+        if (activeTopicContent.length > 0) {
+            finalStructure.unshift({
+                id: 'topic-direct',
+                name: 'Overview & Fundamentals',
+                description: 'Introductory content for this topic',
+                subunits: [],
+                directContent: activeTopicContent
+            });
+        }
 
         const { data: quizData } = await (supabase as any)
             .from('learning_quiz_questions')
@@ -180,7 +203,7 @@ export default function MobileLearning() {
         });
         setQuizAvailability(availability);
 
-        setTopics(richLessons);
+        setTopics(finalStructure);
         setIsLoading(false);
     }
 
@@ -351,22 +374,27 @@ export default function MobileLearning() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    {unit.directContent?.map((content: any) => (
-                                        <button
-                                            key={content.id}
-                                            onClick={() => handleVideoSelect(content)}
-                                            className="w-full flex items-center gap-4 p-4 bg-secondary/20 rounded-3xl border border-transparent active:border-primary/30 active:bg-primary/5 transition-all text-left"
-                                        >
-                                            <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center text-primary">
-                                                <Play size={18} fill="currentColor" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <p className="text-xs font-bold uppercase tracking-tight">{content.title}</p>
-                                                <p className="text-[8px] text-muted-foreground uppercase tracking-widest mt-1">Video Transmission</p>
-                                            </div>
-                                            <ChevronRight size={14} className="opacity-20" />
-                                        </button>
-                                    ))}
+                                    {unit.directContent?.map((content: any) => {
+                                        const isDoc = content.content_type === 'doc';
+                                        return (
+                                            <button
+                                                key={content.id}
+                                                onClick={() => handleVideoSelect(content)}
+                                                className="w-full flex items-center gap-4 p-4 bg-secondary/20 rounded-3xl border border-transparent active:border-primary/30 active:bg-primary/5 transition-all text-left"
+                                            >
+                                                <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center text-primary">
+                                                    {isDoc ? <FileText size={18} /> : <Play size={18} fill="currentColor" />}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-xs font-bold uppercase tracking-tight">{content.title}</p>
+                                                    <p className="text-[8px] text-muted-foreground uppercase tracking-widest mt-1">
+                                                        {isDoc ? 'Intelligence Document' : 'Video Transmission'}
+                                                    </p>
+                                                </div>
+                                                <ChevronRight size={14} className="opacity-20" />
+                                            </button>
+                                        );
+                                    })}
 
                                     {unit.subunits?.map((sub: any) => (
                                         <div key={sub.id} className="ml-4 space-y-3 pl-4 border-l border-border/50">
@@ -376,16 +404,23 @@ export default function MobileLearning() {
                                                     <button onClick={() => startQuiz(sub.id, 'subunit')} className="text-[7px] font-black text-primary uppercase tracking-[0.2em] underline">Quiz</button>
                                                 )}
                                             </div>
-                                            {sub.content?.map((content: any) => (
-                                                <button
-                                                    key={content.id}
-                                                    onClick={() => handleVideoSelect(content)}
-                                                    className="w-full flex items-center gap-4 p-4 bg-secondary/10 rounded-3xl active:bg-primary/5 transition-all text-left"
-                                                >
-                                                    <Play size={14} className="text-primary opacity-40" />
-                                                    <p className="text-[11px] font-bold uppercase tracking-tight flex-1">{content.title}</p>
-                                                </button>
-                                            ))}
+                                            {sub.content?.map((content: any) => {
+                                                const isDoc = content.content_type === 'doc';
+                                                return (
+                                                    <button
+                                                        key={content.id}
+                                                        onClick={() => handleVideoSelect(content)}
+                                                        className="w-full flex items-center gap-4 p-4 bg-secondary/10 rounded-3xl active:bg-primary/5 transition-all text-left"
+                                                    >
+                                                        {isDoc ? (
+                                                            <FileText size={14} className="text-primary opacity-40" />
+                                                        ) : (
+                                                            <Play size={14} className="text-primary opacity-40" />
+                                                        )}
+                                                        <p className="text-[11px] font-bold uppercase tracking-tight flex-1">{content.title}</p>
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     ))}
                                 </div>
@@ -403,35 +438,65 @@ export default function MobileLearning() {
                 <ArrowLeft size={14} /> Unit Intelligence
             </button>
 
-            <div className="aspect-video bg-black relative group shadow-2xl overflow-hidden mb-8 mx-4 rounded-[2rem]">
-                <iframe
-                    className="w-full h-full"
-                    src={(() => {
-                        const url = selectedVideo?.video_url || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
-                        if (url.includes('youtube.com/watch')) {
-                            const videoId = new URLSearchParams(new URL(url).search).get('v');
-                            return `https://www.youtube.com/embed/${videoId}`;
-                        } else if (url.includes('youtu.be/')) {
-                            const videoId = url.split('youtu.be/')[1].split('?')[0];
-                            return `https://www.youtube.com/embed/${videoId}`;
-                        }
-                        return url;
-                    })()}
-                    title={selectedVideo?.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                ></iframe>
-            </div>
+            {selectedVideo?.content_type !== 'doc' ? (
+                <div className="aspect-video bg-black relative group shadow-2xl overflow-hidden mb-8 mx-4 rounded-[2rem]">
+                    <iframe
+                        className="w-full h-full"
+                        src={(() => {
+                            const url = selectedVideo?.video_url || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+                            if (url.includes('youtube.com/watch')) {
+                                const videoId = new URLSearchParams(new URL(url).search).get('v');
+                                return `https://www.youtube.com/embed/${videoId}`;
+                            } else if (url.includes('youtu.be/')) {
+                                const videoId = url.split('youtu.be/')[1].split('?')[0];
+                                return `https://www.youtube.com/embed/${videoId}`;
+                            }
+                            return url;
+                        })()}
+                        title={selectedVideo?.title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    ></iframe>
+                </div>
+            ) : (
+                <div className="bg-primary/5 border border-primary/10 mx-4 p-8 rounded-[2rem] mb-8 shadow-xl">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary">
+                            <FileText size={24} />
+                        </div>
+                        <div>
+                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Briefing Document</span>
+                            <h3 className="text-lg font-black uppercase tracking-tight">{selectedVideo.title}</h3>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="px-6 space-y-6">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <Video size={14} className="text-primary" />
-                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">Neural Stream Loaded</span>
+                        {selectedVideo?.content_type === 'doc' ? (
+                            <FileText size={14} className="text-primary" />
+                        ) : (
+                            <Video size={14} className="text-primary" />
+                        )}
+                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">
+                            {selectedVideo?.content_type === 'doc' ? 'Intelligence Data Decrypted' : 'Neural Stream Loaded'}
+                        </span>
                     </div>
                     <h2 className="text-2xl font-black uppercase tracking-tight leading-tight">{selectedVideo?.title}</h2>
-                    <p className="text-xs text-muted-foreground mt-4 leading-relaxed font-bold uppercase opacity-60">
+
+                    {/* Main Article Content */}
+                    <div className="mt-8 space-y-4">
+                        <MathText
+                            isHtml={true}
+                            content={selectedVideo?.text_content || ""}
+                            className="text-sm font-bold leading-relaxed text-foreground/90 prose prose-invert max-w-none"
+                        />
+                    </div>
+
+                    <p className="text-[10px] text-muted-foreground mt-8 leading-relaxed font-bold uppercase opacity-60 italic">
                         {selectedVideo?.description || 'Access specialized architectural training data for this mission sector.'}
                     </p>
                 </div>
@@ -562,6 +627,9 @@ export default function MobileLearning() {
 
     return (
         <div className="min-h-full bg-background animate-in fade-in duration-500">
+            <Suspense fallback={null}>
+                <AnnouncementBar />
+            </Suspense>
             {view === 'selection' && renderSelection()}
             {view === 'dashboard' && renderDashboard()}
             {view === 'video' && renderVideo()}

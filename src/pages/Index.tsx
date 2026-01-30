@@ -16,6 +16,7 @@ import SEO from '@/components/SEO';
 
 // Lazy load heavy components
 const AuthModal = lazy(() => import('@/components/auth/AuthModal'));
+const AnnouncementBar = lazy(() => import('@/components/AnnouncementBar'));
 
 const CountryCodes = [
     'US', 'DE', 'IT', 'NG', 'EG', 'AT', 'RS', 'KW', 'BR',
@@ -119,6 +120,10 @@ export default function Index() {
                 <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
             </Suspense>
 
+            <Suspense fallback={null}>
+                <AnnouncementBar />
+            </Suspense>
+
             <SEO
                 title="ItaloStudy | Free IMAT Practice & Unlimited Free Mocks"
                 description="Experience the world's most advanced study simulator for IMAT, SAT, CEnT-S and IELTS preparation. Get free practice questions and unlimited free mocks for your exam success."
@@ -170,10 +175,10 @@ export default function Index() {
 
             {/* Navbar */}
             <header className={cn(
-                "fixed left-0 right-0 z-40 transition-all duration-300 px-4 md:px-12",
+                "sticky left-0 right-0 z-40 transition-all duration-300 px-4 md:px-12",
                 scrolled
-                    ? "top-0 py-3 md:py-4"
-                    : "top-4 md:top-8 py-0"
+                    ? "top-0 py-3 md:py-4 bg-[#030014]/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl"
+                    : "top-0 py-0 bg-transparent border-none shadow-none"
             )}>
                 <div className="container mx-auto flex items-center justify-between">
                     {/* Logo */}

@@ -244,12 +244,12 @@ export default function NotificationDropdown() {
                                                 </div>
 
                                                 <div className="flex-1 min-w-0">
-                                                    <h5 className="text-[14px] font-[1000] text-slate-800 leading-none tracking-tight truncate uppercase italic">
+                                                    <h5 className="text-[14px] font-[1000] text-slate-800 leading-tight tracking-tight truncate uppercase italic">
                                                         {notification.title || 'Update'}
                                                     </h5>
 
                                                     {notification.short_description && (
-                                                        <p className="text-[11px] font-bold text-slate-400 mt-1 line-clamp-1 leading-none tracking-tight">
+                                                        <p className="text-[11px] font-bold text-slate-400 mt-1.5 line-clamp-1 leading-snug tracking-tight">
                                                             {notification.short_description}
                                                         </p>
                                                     )}

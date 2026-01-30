@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, Suspense, lazy } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,8 @@ import {
     FlaskConical,
     Bookmark,
     Hash,
-    FileText
+    FileText,
+    Smartphone
 } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import { useState, useEffect, useCallback } from 'react';
@@ -41,6 +42,8 @@ import { MandatoryFeedbackModal } from './MandatoryFeedbackModal';
 import { useMandatoryFeedback } from '@/hooks/useMandatoryFeedback';
 import { FeedbackDialog } from './FeedbackDialog';
 import { AuthModal } from '@/components/auth/AuthModal';
+
+const AnnouncementBar = lazy(() => import('./AnnouncementBar'));
 
 interface LayoutProps {
     children: ReactNode;
@@ -152,27 +155,31 @@ export default function Layout({ children, showFooter = true, showHeader = true 
     // DESKTOP RENDER
     return (
         <div className={`bg-slate-50 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900 ${location.pathname.startsWith('/community') ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+            <Suspense fallback={null}>
+                <AnnouncementBar />
+            </Suspense>
             {showFeedback && <MandatoryFeedbackModal onComplete={markFeedbackComplete} />}
             {showHeader && (
                 <header className="sticky top-0 z-50 w-full bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border-b border-indigo-500/10 transition-all duration-300 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
-                    <div className="container mx-auto px-6 h-18 flex items-center justify-between py-4">
-                        <div className="flex items-center gap-12">
+                    <div className="container mx-auto px-4 h-18 flex items-center justify-between py-4">
+                        <div className="flex items-center gap-4">
                             <Link to="/dashboard" className="flex items-center gap-4 shrink-0 hover:opacity-80 transition-opacity">
                                 <img src="/italostudy-logo.png" alt="italostudy" className="h-10 w-auto" />
                             </Link>
 
-                            <nav className="hidden lg:flex items-center bg-slate-100/50 dark:bg-slate-800/50 p-1.5 rounded-2xl border border-indigo-500/5 shadow-inner">
+                            <nav className="hidden lg:flex items-center bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-2xl border border-indigo-500/5 shadow-inner">
                                 {displayedNavItems.slice(0, 5).map((item) => (
                                     <Link
                                         key={item.path}
                                         to={item.path}
-                                        className={`px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2.5 ${location.pathname === item.path
+                                        className={`px-3 xl:px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 ${location.pathname === item.path
                                             ? 'bg-white dark:bg-slate-900 text-indigo-600 shadow-sm border border-indigo-500/5'
                                             : 'text-slate-400 hover:text-slate-900 dark:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800'
                                             }`}
                                     >
-                                        <item.icon className="w-3.5 h-3.5" />
-                                        {item.label}
+                                        <item.icon className="w-3 h-3" />
+                                        <span className="hidden xl:inline">{item.label}</span>
+                                        <span className="xl:hidden">{item.label.slice(0, 3)}</span>
                                     </Link>
                                 ))}
                             </nav>
@@ -181,9 +188,20 @@ export default function Layout({ children, showFooter = true, showHeader = true 
                         <div className="flex items-center gap-4">
                             {!isMobile && (
                                 <div className="hidden md:flex items-center gap-2 mr-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => navigate('/download-app')}
+                                        className="h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border-indigo-500/10 hover:border-indigo-500/30 transition-all shadow-sm flex items-center gap-2 group"
+                                    >
+                                        <div className="w-5 h-5 bg-indigo-50 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <Smartphone className="w-3 h-3 text-indigo-600" />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-slate-100">App</span>
+                                    </Button>
+
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="outline" className="h-10 px-4 rounded-xl bg-white dark:bg-slate-800 border-indigo-500/10 hover:border-indigo-500/30 transition-all shadow-sm flex items-center gap-2">
+                                            <Button variant="outline" className="h-10 px-3 rounded-xl bg-white dark:bg-slate-800 border-indigo-500/10 hover:border-indigo-500/30 transition-all shadow-sm flex items-center gap-2">
                                                 <div className="w-5 h-5 bg-indigo-50 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center">
                                                     <Globe className="w-3 h-3 text-indigo-600" />
                                                 </div>

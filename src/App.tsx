@@ -76,6 +76,9 @@ const GetAdmission = lazy(() => import("./pages/GetAdmission"));
 const ConsultantApplicationReview = lazy(() => import("./pages/ConsultantApplicationReview"));
 const ConsultantApplicationChat = lazy(() => import("./pages/ConsultantApplicationChat"));
 const ConsultantApplicationOffer = lazy(() => import("./pages/ConsultantApplicationOffer"));
+const StudentProfile = lazy(() => import("./pages/StudentProfile"));
+const DownloadApp = lazy(() => import("./pages/DownloadApp"));
+const AnnouncementBar = lazy(() => import("./components/AnnouncementBar"));
 
 const Resources = lazy(() => import("./pages/Resources"));
 
@@ -195,6 +198,8 @@ const WebRouter = () => (
     <Route path="/consultant/application/:id/chat" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationChat /></ProtectedRoute>} />
     <Route path="/consultant/application/:id/offer" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationOffer /></ProtectedRoute>} />
 
+    <Route path="/student/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><StudentProfile /></ProtectedRoute>} />
+    <Route path="/download-app" element={<DownloadApp />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy" element={<Privacy />} />
     <Route path="/terms" element={<Terms />} />
@@ -343,7 +348,7 @@ const App = () => {
           console.log("OneSignal: Starting initialization...");
 
           // Step 1: Initialize OneSignal with your App ID
-          OneSignal.initialize("3182ba70-b1a7-4522-88fc-ab4a3aac2bba");
+          OneSignal.initialize("36b31128-46ae-4b7c-a5ab-b4c483327a59");
           console.log("OneSignal: Initialize called");
 
           // Step 2: Request permission (this shows the permission dialog)
@@ -382,7 +387,6 @@ const App = () => {
               <NetworkStatus />
               <Toaster />
               <Sonner />
-              <VercelAnalytics />
               {isMobile ? (
                 <HashRouter>
                   <SecurityEnforcer />

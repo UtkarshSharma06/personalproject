@@ -220,7 +220,12 @@ export default function Analytics() {
             const restrictedSubjectData = isExplorer ? dynamicSubjectData.slice(0, 2) : dynamicSubjectData;
             setSubjectData(restrictedSubjectData);
 
-            // 2. Fetch Overall Metrics
+            // 2. Fetch Ranking & Points from Unified Champions RPC
+            const { data: championsData } = await (supabase as any).rpc('get_champions_by_questions_solved', {
+                target_exam_id: activeExam.id
+            });
+
+            // 3. Fetch User Tests (Needed for Time Spent and Projection Confidence)
             const { data: userTests } = await (supabase as any)
                 .from('tests')
                 .select('*')
@@ -228,25 +233,27 @@ export default function Analytics() {
                 .eq('exam_type', activeExam.id)
                 .eq('status', 'completed');
 
-            const totalPoints = userTests?.reduce((acc: number, t: any) => acc + (t.correct_answers || 0), 0) || 0;
-            setPoints(totalPoints);
+            let userRank = championsData ? (championsData.findIndex((c: any) => c.user_id === user.id) + 1) : 0;
+            const sortedScores = championsData?.map((c: any) => c.questions_solved) || [];
 
-            // 3. Calculate Rank
-            const { data: allExamTests } = await (supabase as any)
-                .from('tests')
-                .select('user_id, correct_answers')
-                .eq('exam_type', activeExam.id)
-                .eq('status', 'completed');
-
-            const userScores: Record<string, number> = {};
-            allExamTests?.forEach((t: any) => {
-                userScores[t.user_id] = (userScores[t.user_id] || 0) + (t.correct_answers || 0);
-            });
-
-            const sortedScores = Object.values(userScores).sort((a, b) => b - a);
-            const currentUserScore = userScores[user.id] || 0;
-            const userRank = sortedScores.indexOf(currentUserScore) + 1;
-            setRank(userRank || (sortedScores.length + 1));
+            if (championsData) {
+                const userChampion = championsData.find((c: any) => c.user_id === user.id);
+                if (userChampion) {
+                    setPoints(userChampion.questions_solved || 0);
+                    if (userRank === 0) userRank = championsData.length + 1;
+                    setRank(userRank);
+                } else {
+                    // Fallback to minimal stats if not in champions list yet
+                    const { count: solvedCount } = await (supabase as any)
+                        .from('user_practice_responses')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('user_id', user.id)
+                        .eq('exam_type', activeExam.id);
+                    setPoints(solvedCount || 0);
+                    userRank = championsData.length + 1;
+                    setRank(userRank);
+                }
+            }
 
             // 4. Growth Velocity
             const daysToFetch = timeframe === '6m' ? 180 : timeframe === '30d' ? 30 : 7;

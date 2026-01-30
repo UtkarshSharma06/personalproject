@@ -89,7 +89,8 @@ const SubjectMasteryItem = memo(({ subject }: { subject: SubjectMastery }) => (
 ));
 
 const ChampionItem = memo(({ student, index }: { student: TopStudent, index: number }) => (
-    <div
+    <Link
+        to={`/student/${student.id}`}
         className={`group flex items-center gap-3 p-3.5 rounded-3xl transition-all duration-300 hover:-translate-y-1 ${index === 0
             ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800 shadow-xl shadow-amber-200/20'
             : 'bg-white/50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-700/50 hover:shadow-lg'
@@ -131,7 +132,7 @@ const ChampionItem = memo(({ student, index }: { student: TopStudent, index: num
                 {student.total_score}/{student.tests_taken || 0}
             </p>
         </div>
-    </div>
+    </Link>
 ));
 
 export default function Dashboard() {
@@ -222,7 +223,7 @@ export default function Dashboard() {
                 accuracy: champion.accuracy, // Real accuracy percentage
             }));
 
-            setTopStudents(studentsWithScores.slice(0, 4));
+            setTopStudents(studentsWithScores.slice(0, 5));
         } catch (err) {
             console.error("Failed to load champions", err);
         }
@@ -566,10 +567,10 @@ export default function Dashboard() {
                                     <Button
                                         variant="outline"
                                         onClick={() => navigate('/practice')}
-                                        className="h-14 sm:h-20 w-full sm:w-20 rounded-2xl border-2 border-slate-100 dark:border-border hover:border-indigo-100 hover:bg-indigo-50 flex sm:flex-col flex-row gap-2 items-center justify-center group"
+                                        className="h-14 sm:h-20 w-full sm:w-28 rounded-2xl border-2 border-slate-100 dark:border-border hover:border-indigo-100 hover:bg-indigo-50 flex sm:flex-col flex-row gap-2 items-center justify-center group"
                                     >
                                         <Zap className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover:text-indigo-600">Practice Arena</span>
+                                        <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-tight sm:tracking-normal text-slate-400 group-hover:text-indigo-600 text-center leading-tight">Practice Arena</span>
                                     </Button>
                                 </div>
                             ) : (
@@ -660,7 +661,7 @@ export default function Dashboard() {
                                 </div>
 
                                 <div className="flex-1 space-y-8">
-                                    {subjectMastery.slice(0, 4).map((subject, i) => (
+                                    {subjectMastery.slice(0, 5).map((subject, i) => (
                                         <SubjectMasteryItem key={i} subject={subject} />
                                     ))}
                                 </div>
@@ -681,7 +682,7 @@ export default function Dashboard() {
 
                                 {/* Champions List */}
                                 <div className="flex-1 space-y-3">
-                                    {topStudents.slice(0, 4).map((student, i) => (
+                                    {topStudents.slice(0, 5).map((student, i) => (
                                         <ChampionItem key={student.id} student={student} index={i} />
                                     ))}
 

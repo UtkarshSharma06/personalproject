@@ -95,9 +95,29 @@ export default function MobileAnalytics() {
 
             setSubjectData(profile?.selected_plan === 'explorer' ? processedData.slice(0, 2) : processedData);
 
-            // Fetch Overall Stats
-            const { data: userTests } = await (supabase as any).from('tests').select('*').eq('user_id', user.id).eq('exam_type', activeExam.id).eq('status', 'completed');
-            setPoints(userTests?.reduce((acc: number, t: any) => acc + (t.correct_answers || 0), 0) || 0);
+            // 2. Fetch Ranking & Points from Unified Champions RPC
+            const { data: championsData } = await (supabase as any).rpc('get_champions_by_questions_solved', {
+                target_exam_id: activeExam.id
+            });
+
+            // 3. Fetch User Tests (Needed for Time Spent)
+            const { data: userTests } = await (supabase as any)
+                .from('tests')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('exam_type', activeExam.id)
+                .eq('status', 'completed');
+
+            if (championsData) {
+                const userChampion = championsData.find((c: any) => c.user_id === user.id);
+                if (userChampion) {
+                    setPoints(userChampion.questions_solved || 0);
+                    const userRank = championsData.findIndex((c: any) => c.user_id === user.id) + 1;
+                    setRank(userRank);
+                } else {
+                    setRank(championsData.length + 1);
+                }
+            }
 
 
             // --- NEW GROWTH VELOCITY LOGIC ---

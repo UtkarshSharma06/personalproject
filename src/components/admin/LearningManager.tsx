@@ -30,6 +30,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MathText } from '@/components/MathText';
+import TinyEditor from './TinyEditor';
 
 type Level = 'exams' | 'courses' | 'topics' | 'units' | 'subunits' | 'content';
 
@@ -728,19 +729,19 @@ export default function LearningManager() {
                             {currentLevel === 'content' && (editingItem ? editContentType : newItemContentType) === 'article' && (
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Article Content (Markdown)</Label>
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Article Content (Rich Text)</Label>
                                         <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
-                                            * Paste text to preserve layout. Use Markdown for bold/headers.
+                                            * Paste formatted content directly - formatting will be preserved
                                         </span>
                                     </div>
-                                    <Textarea
-                                        id="article-editor"
-                                        value={editingItem ? editTextContent : newItemTextContent}
-                                        onChange={(e) => editingItem ? setEditTextContent(e.target.value) : setNewItemTextContent(e.target.value)}
-                                        placeholder="# Topic Header\n\nContent goes here..."
-                                        className="rounded-xl border-slate-100 dark:border-border text-xs font-medium min-h-[600px] font-mono p-6 leading-relaxed"
-                                    />
-                                    <div className="flex items-center gap-2">
+                                    <div className="rounded-xl border border-slate-100 dark:border-border overflow-hidden">
+                                        <TinyEditor
+                                            value={editingItem ? editTextContent : newItemTextContent}
+                                            onChange={(content) => editingItem ? setEditTextContent(content) : setNewItemTextContent(content)}
+                                            height={600}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2 pt-2">
                                         <input
                                             type="file"
                                             id="img-upload"
@@ -753,7 +754,7 @@ export default function LearningManager() {
                                             className={cn("cursor-pointer px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-[9px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2 transition-colors", isUploading && "opacity-50 pointer-events-none")}
                                         >
                                             {isUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                            Insert Image at Cursor
+                                            Or Upload Image via Button
                                         </Label>
                                     </div>
                                 </div>

@@ -42,6 +42,7 @@ import { useToast } from '@/hooks/use-toast';
 import { MathText } from '@/components/MathText';
 import { usePlanAccess } from '@/hooks/usePlanAccess';
 import { UpgradeModal } from '@/components/UpgradeModal';
+import DOMPurify from 'dompurify';
 
 type View = 'selection' | 'dashboard' | 'video' | 'quiz';
 type SelectionLevel = 'exam' | 'course';
@@ -1179,71 +1180,100 @@ export default function Learning() {
                                             </h1>
                                         </div>
                                         <div className="prose prose-slate prose-sm sm:prose-base lg:prose-lg max-w-none">
-                                            {selectedVideo.text_content ? (
-                                                <div className="font-['Inter'] text-slate-800 dark:text-slate-200">
-                                                    {selectedVideo.text_content.split('\n').map((line: string, i: number) => {
-                                                        // Helper for inline formatting (Bold)
-                                                        const formatText = (text: string) => {
-                                                            const parts = text.split(/\*\*(.*?)\*\*/g);
-                                                            return parts.map((part, index) =>
-                                                                index % 2 === 1 ? <strong key={index} className="font-black text-slate-900 dark:text-slate-100">{part}</strong> : part
-                                                            );
-                                                        };
+                                            {selectedVideo.text_content ? (() => {
+                                                // Auto-detect content format: HTML or Markdown
+                                                const isHTML = /<\/?[a-z][\s\S]*>/i.test(selectedVideo.text_content);
 
-                                                        const imgMatch = line.match(/^!\[(.*?)\]\((.*?)\)/);
-                                                        if (imgMatch) {
-                                                            return (
-                                                                <figure key={i} className="my-6 lg:my-8">
-                                                                    <img
-                                                                        src={imgMatch[2]}
-                                                                        alt={imgMatch[1]}
-                                                                        className="w-full rounded-xl lg:rounded-2xl shadow-lg border border-slate-100 dark:border-border"
-                                                                    />
-                                                                </figure>
-                                                            );
-                                                        }
+                                                if (isHTML) {
+                                                    // Render HTML content (from TinyMCE)
+                                                    const sanitized = DOMPurify.sanitize(selectedVideo.text_content, {
+                                                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                                                            'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'code', 'pre', 'table', 'thead',
+                                                            'tbody', 'tr', 'th', 'td', 'div', 'span', 'figure', 'figcaption'],
+                                                        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel'],
+                                                        ALLOW_DATA_ATTR: false
+                                                    });
 
-                                                        const h1Match = line.match(/^# (.*)/);
-                                                        if (h1Match) return <h2 key={i} className="text-2xl lg:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100 mt-8 lg:mt-12 mb-4 lg:mb-6">{h1Match[1]}</h2>;
+                                                    return (
+                                                        <MathText
+                                                            isHtml={true}
+                                                            content={sanitized}
+                                                            className="tinymce-content font-['Inter'] text-slate-800 dark:text-slate-200"
+                                                            style={{
+                                                                fontSize: '1rem',
+                                                                lineHeight: '1.7'
+                                                            }}
+                                                        />
+                                                    );
+                                                } else {
+                                                    // Render Markdown content (legacy support)
+                                                    return (
+                                                        <div className="font-['Inter'] text-slate-800 dark:text-slate-200">
+                                                            {selectedVideo.text_content.split('\n').map((line: string, i: number) => {
+                                                                // Helper for inline formatting (Bold)
+                                                                const formatText = (text: string) => {
+                                                                    const parts = text.split(/\*\*(.*?)\*\*/g);
+                                                                    return parts.map((part, index) =>
+                                                                        index % 2 === 1 ? <strong key={index} className="font-black text-slate-900 dark:text-slate-100">{part}</strong> : part
+                                                                    );
+                                                                };
 
-                                                        const h2Match = line.match(/^## (.*)/);
-                                                        if (h2Match) return <h3 key={i} className="text-xl lg:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-6 lg:mt-10 mb-3 lg:mb-5">{h2Match[1]}</h3>;
+                                                                const imgMatch = line.match(/^!\[(.*?)\]\((.*?)\)/);
+                                                                if (imgMatch) {
+                                                                    return (
+                                                                        <figure key={i} className="my-6 lg:my-8">
+                                                                            <img
+                                                                                src={imgMatch[2]}
+                                                                                alt={imgMatch[1]}
+                                                                                className="w-full rounded-xl lg:rounded-2xl shadow-lg border border-slate-100 dark:border-border"
+                                                                            />
+                                                                        </figure>
+                                                                    );
+                                                                }
 
-                                                        const h3Match = line.match(/^### (.*)/);
-                                                        if (h3Match) return <h4 key={i} className="text-lg lg:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-4 lg:mt-8 mb-2 lg:mb-4">{h3Match[1]}</h4>;
+                                                                const h1Match = line.match(/^# (.*)/);
+                                                                if (h1Match) return <h2 key={i} className="text-2xl lg:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100 mt-8 lg:mt-12 mb-4 lg:mb-6">{h1Match[1]}</h2>;
 
-                                                        // Bullet List
-                                                        const bulbMatch = line.match(/^-\s+(.*)/);
-                                                        if (bulbMatch) {
-                                                            return (
-                                                                <div key={i} className="flex gap-3 mb-2 lg:mb-3 ml-2 lg:ml-4">
-                                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 lg:mt-2.5 shrink-0" />
-                                                                    <p className="leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">{formatText(bulbMatch[1])}</p>
-                                                                </div>
-                                                            );
-                                                        }
+                                                                const h2Match = line.match(/^## (.*)/);
+                                                                if (h2Match) return <h3 key={i} className="text-xl lg:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-6 lg:mt-10 mb-3 lg:mb-5">{h2Match[1]}</h3>;
 
-                                                        // Numbered List
-                                                        const numMatch = line.match(/^(\d+)\.\s+(.*)/);
-                                                        if (numMatch) {
-                                                            return (
-                                                                <div key={i} className="flex gap-3 mb-2 lg:mb-3 ml-2 lg:ml-4">
-                                                                    <span className="font-black text-indigo-500 mt-0 sm:mt-0.5">{numMatch[1]}.</span>
-                                                                    <p className="leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">{formatText(numMatch[2])}</p>
-                                                                </div>
-                                                            );
-                                                        }
+                                                                const h3Match = line.match(/^### (.*)/);
+                                                                if (h3Match) return <h4 key={i} className="text-lg lg:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-4 lg:mt-8 mb-2 lg:mb-4">{h3Match[1]}</h4>;
 
-                                                        if (!line.trim()) return <div key={i} className="h-2 lg:h-4" />;
+                                                                // Bullet List
+                                                                const bulbMatch = line.match(/^-\s+(.*)/);
+                                                                if (bulbMatch) {
+                                                                    return (
+                                                                        <div key={i} className="flex gap-3 mb-2 lg:mb-3 ml-2 lg:ml-4">
+                                                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 lg:mt-2.5 shrink-0" />
+                                                                            <p className="leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">{formatText(bulbMatch[1])}</p>
+                                                                        </div>
+                                                                    );
+                                                                }
 
-                                                        return (
-                                                            <p key={i} className="mb-3 lg:mb-4 leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">
-                                                                {formatText(line)}
-                                                            </p>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ) : (
+                                                                // Numbered List
+                                                                const numMatch = line.match(/^(\d+)\.\s+(.*)/);
+                                                                if (numMatch) {
+                                                                    return (
+                                                                        <div key={i} className="flex gap-3 mb-2 lg:mb-3 ml-2 lg:ml-4">
+                                                                            <span className="font-black text-indigo-500 mt-0 sm:mt-0.5">{numMatch[1]}.</span>
+                                                                            <p className="leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">{formatText(numMatch[2])}</p>
+                                                                        </div>
+                                                                    );
+                                                                }
+
+                                                                if (!line.trim()) return <div key={i} className="h-2 lg:h-4" />;
+
+                                                                return (
+                                                                    <p key={i} className="mb-3 lg:mb-4 leading-relaxed lg:leading-7 text-base lg:text-lg font-medium text-slate-700 dark:text-slate-300">
+                                                                        {formatText(line)}
+                                                                    </p>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    );
+                                                }
+                                            })() : (
                                                 <p className="text-slate-500 italic text-sm">No content available.</p>
                                             )}
                                         </div>
