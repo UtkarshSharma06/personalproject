@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ export default function MobileAuth() {
     const [requiresMFA, setRequiresMFA] = useState(false);
     const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
     const [mfaCode, setMfaCode] = useState("");
+    const [mfaError, setMfaError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const { user, signIn, signUp, signInWithGoogle, mfa, signOut } = useAuth() as any;
     const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function MobileAuth() {
     // Auto-redirect if user gets logged in (e.g. by native Google Auth)
     useEffect(() => {
         if (user) {
-            navigate('/dashboard');
+            navigate('/mobile/dashboard');
         }
     }, [user, navigate]);
     const { toast } = useToast();
