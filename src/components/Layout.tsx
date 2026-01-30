@@ -168,7 +168,17 @@ export default function Layout({ children, showFooter = true, showHeader = true 
                             </Link>
 
                             <nav className="hidden lg:flex items-center bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-2xl border border-indigo-500/5 shadow-inner">
-                                {displayedNavItems.slice(0, 5).map((item) => (
+                                {(() => {
+                                    // Move Mock Exams after Learning for Web Browser Header
+                                    const items = [...displayedNavItems];
+                                    const mockIdx = items.findIndex(i => i.path === '/mock-exams');
+                                    const learningIdx = items.findIndex(i => i.path === '/learning');
+                                    if (mockIdx > -1 && learningIdx > -1) {
+                                        const [mockItem] = items.splice(mockIdx, 1);
+                                        items.splice(learningIdx + 1, 0, mockItem);
+                                    }
+                                    return items.slice(0, 5);
+                                })().map((item) => (
                                     <Link
                                         key={item.path}
                                         to={item.path}
