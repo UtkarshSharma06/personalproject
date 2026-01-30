@@ -12,6 +12,8 @@ import SecurityEnforcer from "@/components/SecurityEnforcer";
 
 import { ExamProvider } from "@/context/ExamContext";
 import { AIProvider } from "@/context/AIContext";
+import OneSignal from 'onesignal-cordova-plugin';
+import { Device } from '@capacitor/device';
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
