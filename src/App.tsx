@@ -119,6 +119,7 @@ const MobileLayout = lazy(() => import("./mobile/components/MobileLayout"));
 const MobileIELTSPlayer = lazy(() => import("./mobile/pages/MobileIELTSPlayer"));
 const MobileSpeakingLobby = lazy(() => import("./mobile/pages/MobileSpeakingLobby"));
 const MobileSpeakingSession = lazy(() => import("./mobile/pages/MobileSpeakingSession"));
+import { AppUpdateChecker } from "./mobile/components/AppUpdateChecker";
 
 const queryClient = new QueryClient();
 
@@ -217,90 +218,92 @@ const WebRouter = () => (
 );
 
 const MobileRouter = () => (
-  <Routes>
-    <Route path="/" element={<MobileIndex />} />
-    <Route path="/auth" element={<MobileAuth />} />
+  <AppUpdateChecker>
+    <Routes>
+      <Route path="/" element={<MobileIndex />} />
+      <Route path="/auth" element={<MobileAuth />} />
 
-    <Route element={<MobileLayout />}>
-      {/* Premium Custom Mobile Pages */}
-      <Route path="/mobile/dashboard" element={<ProtectedRoute allowedRoles={['user', 'admin']}><MobileDashboard /></ProtectedRoute>} />
-      <Route path="/mobile/practice" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobilePractice /></ProtectedRoute>} />
-      <Route path="/mobile/analytics" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileAnalytics /></ProtectedRoute>} />
-      <Route path="/mobile/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSettings /></ProtectedRoute>} />
-      <Route path="/mobile/student/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStudentProfile /></ProtectedRoute>} />
-      <Route path="/mobile/notifications" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileNotifications /></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSettings /></ProtectedRoute>} />
+      <Route element={<MobileLayout />}>
+        {/* Premium Custom Mobile Pages */}
+        <Route path="/mobile/dashboard" element={<ProtectedRoute allowedRoles={['user', 'admin']}><MobileDashboard /></ProtectedRoute>} />
+        <Route path="/mobile/practice" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobilePractice /></ProtectedRoute>} />
+        <Route path="/mobile/analytics" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileAnalytics /></ProtectedRoute>} />
+        <Route path="/mobile/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSettings /></ProtectedRoute>} />
+        <Route path="/mobile/student/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStudentProfile /></ProtectedRoute>} />
+        <Route path="/mobile/notifications" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileNotifications /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSettings /></ProtectedRoute>} />
 
-      {/* Coverage for all other features */}
-      <Route path="/onboarding" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileOnboarding /></ProtectedRoute>} />
-      <Route path="/resources" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResources /></ProtectedRoute>} />
-      <Route path="/community" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileCommunity /></ProtectedRoute>} />
-      <Route path="/community/upgrade" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileCommunityUpgrade /></ProtectedRoute>} />
-      <Route path="/subjects" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSubjects /></ProtectedRoute>} />
-      <Route path="/pricing" element={<MobilePricing />} />
+        {/* Coverage for all other features */}
+        <Route path="/onboarding" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileOnboarding /></ProtectedRoute>} />
+        <Route path="/resources" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResources /></ProtectedRoute>} />
+        <Route path="/community" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileCommunity /></ProtectedRoute>} />
+        <Route path="/community/upgrade" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileCommunityUpgrade /></ProtectedRoute>} />
+        <Route path="/subjects" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSubjects /></ProtectedRoute>} />
+        <Route path="/pricing" element={<MobilePricing />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/learning/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileLearning /></ProtectedRoute>} />
+        <Route path="/mock-exams" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileMockExams /></ProtectedRoute>} />
+        <Route path="/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
+        <Route path="/bookmarks" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileBookmarks /></ProtectedRoute>} />
+
+        {/* History Synced to Mobile History */}
+        <Route path="/reading/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
+        <Route path="/listening/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
+        <Route path="/writing/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
+
+        {/* IELTS & Exam Specifics */}
+        <Route path="/exams/imat" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamIMAT /></ProtectedRoute>} />
+        <Route path="/exams/cent-s" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamCENTS /></ProtectedRoute>} />
+
+        {/* Consultant & University (Mobile Native) */}
+        <Route path="/apply-university" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConcierge /></ProtectedRoute>} />
+        <Route path="/apply-university/status/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStudentApplicationStatus /></ProtectedRoute>} />
+
+        <Route path="/get-admission" element={<GetAdmission />} />
+        <Route path="/consultant/dashboard" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantDashboard /></ProtectedRoute>} />
+        <Route path="/apply-university/upgrade" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ConciergeUpgrade /></ProtectedRoute>} />
+
+        {/* Redirects */}
+        <Route path="/dashboard" element={<Navigate to="/mobile/dashboard" replace />} />
+        <Route path="/practice" element={<Navigate to="/mobile/practice" replace />} />
+        <Route path="/analytics" element={<Navigate to="/mobile/analytics" replace />} />
+      </Route>
+
+      {/* Immersive Mobile Experiences (Outside shared layout) */}
+      <Route path="/labs" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileLabs /></ProtectedRoute>} />
+      <Route path="/test/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileTest /></ProtectedRoute>} />
+      <Route path="/sectioned-test/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSectionedTest /></ProtectedRoute>} />
+      <Route path="/results/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResults /></ProtectedRoute>} />
+      <Route path="/mock-results/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResults /></ProtectedRoute>} />
+      <Route path="/waiting-room/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileMockWaitingRoom /></ProtectedRoute>} />
+      <Route path="/start-test" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStartTest /></ProtectedRoute>} />
+      <Route path="/reading/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
+      <Route path="/listening/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
+      <Route path="/writing/:taskId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
+      <Route path="/speaking" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSpeakingLobby /></ProtectedRoute>} />
+      <Route path="/speaking/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSpeakingSession /></ProtectedRoute>} />
+      <Route path="/ielts-flow/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><IELTSFlow /></ProtectedRoute>} />
+      <Route path="/apply-university/apply" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConciergeApply /></ProtectedRoute>} />
+      <Route path="/apply-university/apply/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConciergeApply /></ProtectedRoute>} />
+
+      <Route path="/institutional" element={<Institutional />} />
+      <Route path="/syllabus" element={<Syllabus />} />
+      <Route path="/method" element={<Method />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/learning" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileLearning /></ProtectedRoute>} />
-      <Route path="/mock-exams" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileMockExams /></ProtectedRoute>} />
-      <Route path="/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
-      <Route path="/bookmarks" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileBookmarks /></ProtectedRoute>} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/contact" element={<MobileContact />} />
 
-      {/* History Synced to Mobile History */}
-      <Route path="/reading/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
-      <Route path="/listening/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
-      <Route path="/writing/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
+      {/* Consultant & Application Parity */}
+      <Route path="/apply-university/application/:id" element={<ProtectedRoute allowedRoles={['consultant', 'admin', 'user']}><ApplicationDetail /></ProtectedRoute>} />
+      <Route path="/consultant/application/:id" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationReview /></ProtectedRoute>} />
+      <Route path="/consultant/application/:id/chat" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationChat /></ProtectedRoute>} />
+      <Route path="/consultant/application/:id/offer" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationOffer /></ProtectedRoute>} />
+      <Route path="/consultant/activate" element={<ConsultantActivation />} />
+      <Route path="/consultant/apply" element={<ConsultantApply />} />
 
-      {/* IELTS & Exam Specifics */}
-      <Route path="/exams/imat" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamIMAT /></ProtectedRoute>} />
-      <Route path="/exams/cent-s" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamCENTS /></ProtectedRoute>} />
-
-      {/* Consultant & University (Mobile Native) */}
-      <Route path="/apply-university" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConcierge /></ProtectedRoute>} />
-      <Route path="/apply-university/status/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStudentApplicationStatus /></ProtectedRoute>} />
-
-      <Route path="/get-admission" element={<GetAdmission />} />
-      <Route path="/consultant/dashboard" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantDashboard /></ProtectedRoute>} />
-      <Route path="/apply-university/upgrade" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ConciergeUpgrade /></ProtectedRoute>} />
-
-      {/* Redirects */}
-      <Route path="/dashboard" element={<Navigate to="/mobile/dashboard" replace />} />
-      <Route path="/practice" element={<Navigate to="/mobile/practice" replace />} />
-      <Route path="/analytics" element={<Navigate to="/mobile/analytics" replace />} />
-    </Route>
-
-    {/* Immersive Mobile Experiences (Outside shared layout) */}
-    <Route path="/labs" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileLabs /></ProtectedRoute>} />
-    <Route path="/test/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileTest /></ProtectedRoute>} />
-    <Route path="/sectioned-test/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSectionedTest /></ProtectedRoute>} />
-    <Route path="/results/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResults /></ProtectedRoute>} />
-    <Route path="/mock-results/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResults /></ProtectedRoute>} />
-    <Route path="/waiting-room/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileMockWaitingRoom /></ProtectedRoute>} />
-    <Route path="/start-test" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStartTest /></ProtectedRoute>} />
-    <Route path="/reading/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
-    <Route path="/listening/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
-    <Route path="/writing/:taskId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
-    <Route path="/speaking" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSpeakingLobby /></ProtectedRoute>} />
-    <Route path="/speaking/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSpeakingSession /></ProtectedRoute>} />
-    <Route path="/ielts-flow/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><IELTSFlow /></ProtectedRoute>} />
-    <Route path="/apply-university/apply" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConciergeApply /></ProtectedRoute>} />
-    <Route path="/apply-university/apply/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConciergeApply /></ProtectedRoute>} />
-
-    <Route path="/institutional" element={<Institutional />} />
-    <Route path="/syllabus" element={<Syllabus />} />
-    <Route path="/method" element={<Method />} />
-    <Route path="/reset-password" element={<ResetPassword />} />
-    <Route path="/privacy" element={<Privacy />} />
-    <Route path="/contact" element={<MobileContact />} />
-
-    {/* Consultant & Application Parity */}
-    <Route path="/apply-university/application/:id" element={<ProtectedRoute allowedRoles={['consultant', 'admin', 'user']}><ApplicationDetail /></ProtectedRoute>} />
-    <Route path="/consultant/application/:id" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationReview /></ProtectedRoute>} />
-    <Route path="/consultant/application/:id/chat" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationChat /></ProtectedRoute>} />
-    <Route path="/consultant/application/:id/offer" element={<ProtectedRoute allowedRoles={['consultant', 'admin']}><ConsultantApplicationOffer /></ProtectedRoute>} />
-    <Route path="/consultant/activate" element={<ConsultantActivation />} />
-    <Route path="/consultant/apply" element={<ConsultantApply />} />
-
-    <Route path="*" element={<NotFound />} />
-  </Routes>
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </AppUpdateChecker>
 );
 
 
