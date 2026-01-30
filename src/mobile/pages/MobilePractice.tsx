@@ -17,7 +17,7 @@ export default function MobilePractice() {
     const [userSubmissions, setUserSubmissions] = useState<any[]>([]);
     const [isLoadingTests, setIsLoadingTests] = useState(false);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-    const { hasReachedSubjectLimit, getRemainingQuestions, isExplorer } = usePlanAccess();
+    const { hasReachedSubjectLimit, getRemainingQuestions, isExplorer, getSubjectCount } = usePlanAccess();
 
     const remaining = getRemainingQuestions(selectedSubject);
 
@@ -109,7 +109,7 @@ export default function MobilePractice() {
                                     {subject.name}
                                 </h3>
                                 <div className="mt-3 text-[10px] font-black text-muted-foreground uppercase opacity-60">
-                                    0/{subject.total} <span className="text-[8px]">ITEM</span>
+                                    {getSubjectCount(subject.name)}/{subject.total} <span className="text-[8px]">DONE</span>
                                 </div>
                                 <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <ChevronRight className="w-4 h-4 text-primary" />

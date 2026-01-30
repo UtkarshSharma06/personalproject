@@ -116,6 +116,9 @@ const MobileNotifications = lazy(() => import("./mobile/pages/MobileNotification
 const MobileResources = lazy(() => import("./mobile/pages/MobileResources"));
 const MobileBookmarks = lazy(() => import("./mobile/pages/MobileBookmarks"));
 const MobileLayout = lazy(() => import("./mobile/components/MobileLayout"));
+const MobileIELTSPlayer = lazy(() => import("./mobile/pages/MobileIELTSPlayer"));
+const MobileSpeakingLobby = lazy(() => import("./mobile/pages/MobileSpeakingLobby"));
+const MobileSpeakingSession = lazy(() => import("./mobile/pages/MobileSpeakingSession"));
 
 const queryClient = new QueryClient();
 
@@ -272,11 +275,11 @@ const MobileRouter = () => (
     <Route path="/mock-results/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResults /></ProtectedRoute>} />
     <Route path="/waiting-room/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileMockWaitingRoom /></ProtectedRoute>} />
     <Route path="/start-test" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileStartTest /></ProtectedRoute>} />
-    <Route path="/reading/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileTest /></ProtectedRoute>} />
-    <Route path="/listening/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileTest /></ProtectedRoute>} />
-    <Route path="/writing/:taskId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileTest /></ProtectedRoute>} />
-    <Route path="/speaking" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><SpeakingLobby /></ProtectedRoute>} />
-    <Route path="/speaking/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><SpeakingSession /></ProtectedRoute>} />
+    <Route path="/reading/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
+    <Route path="/listening/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
+    <Route path="/writing/:taskId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
+    <Route path="/speaking" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSpeakingLobby /></ProtectedRoute>} />
+    <Route path="/speaking/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSpeakingSession /></ProtectedRoute>} />
     <Route path="/ielts-flow/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><IELTSFlow /></ProtectedRoute>} />
     <Route path="/apply-university/apply" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConciergeApply /></ProtectedRoute>} />
     <Route path="/apply-university/apply/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConciergeApply /></ProtectedRoute>} />

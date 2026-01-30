@@ -7,6 +7,8 @@ import ReadingTest from './reading/ReadingTest';
 import ListeningTest from './listening/ListeningTest';
 import WritingTest from './writing/WritingTest';
 import { Button } from '@/components/ui/button';
+import { Device } from '@capacitor/device';
+import MobileIELTSPlayer from '@/mobile/pages/MobileIELTSPlayer';
 
 type IELTSStep = 'loading' | 'listening' | 'reading' | 'writing' | 'finished';
 
@@ -27,6 +29,15 @@ export default function IELTSFlow() {
     const [step, setStep] = useState<IELTSStep>('loading');
     const [session, setSession] = useState<MockSession | null>(null);
     const [mockSubmissionId, setMockSubmissionId] = useState<string | null>(null);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = async () => {
+            const info = await Device.getInfo();
+            setIsMobile(info.platform !== 'web');
+        };
+        checkMobile();
+    }, []);
 
     useEffect(() => {
         if (sessionId) {
@@ -120,32 +131,60 @@ export default function IELTSFlow() {
     return (
         <div className="min-h-screen bg-background">
             {step === 'listening' && session?.config.listening_test_id && (
-                <ListeningTest
-                    // @ts-ignore
-                    overrideId={session.config.listening_test_id}
-                    onComplete={handleStepComplete}
-                    isMockSession={true}
-                    mockSubmissionId={mockSubmissionId}
-                />
+                isMobile ? (
+                    <MobileIELTSPlayer
+                        overrideId={session.config.listening_test_id}
+                        isMockSession={true}
+                        mockSubmissionId={mockSubmissionId}
+                        onComplete={handleStepComplete}
+                    />
+                ) : (
+                    <ListeningTest
+                        // @ts-ignore
+                        overrideId={session.config.listening_test_id}
+                        onComplete={handleStepComplete}
+                        isMockSession={true}
+                        mockSubmissionId={mockSubmissionId}
+                    />
+                )
             )}
             {step === 'reading' && session?.config.reading_test_id && (
-                <ReadingTest
-                    // @ts-ignore
-                    overrideId={session.config.reading_test_id}
-                    onComplete={handleStepComplete}
-                    isMockSession={true}
-                    mockSubmissionId={mockSubmissionId}
-                />
+                isMobile ? (
+                    <MobileIELTSPlayer
+                        overrideId={session.config.reading_test_id}
+                        isMockSession={true}
+                        mockSubmissionId={mockSubmissionId}
+                        onComplete={handleStepComplete}
+                    />
+                ) : (
+                    <ReadingTest
+                        // @ts-ignore
+                        overrideId={session.config.reading_test_id}
+                        onComplete={handleStepComplete}
+                        isMockSession={true}
+                        mockSubmissionId={mockSubmissionId}
+                    />
+                )
             )}
             {step === 'writing' && session?.config.writing_task1_id && (
-                <WritingTest
-                    // @ts-ignore
-                    overrideId={session.config.writing_task1_id}
-                    overrideId2={session.config.writing_task2_id}
-                    onComplete={handleStepComplete}
-                    isMockSession={true}
-                    mockSubmissionId={mockSubmissionId}
-                />
+                isMobile ? (
+                    <MobileIELTSPlayer
+                        overrideId={session.config.writing_task1_id}
+                        overrideId2={session.config.writing_task2_id}
+                        isMockSession={true}
+                        mockSubmissionId={mockSubmissionId}
+                        onComplete={handleStepComplete}
+                    />
+                ) : (
+                    <WritingTest
+                        // @ts-ignore
+                        overrideId={session.config.writing_task1_id}
+                        overrideId2={session.config.writing_task2_id}
+                        onComplete={handleStepComplete}
+                        isMockSession={true}
+                        mockSubmissionId={mockSubmissionId}
+                    />
+                )
             )}
         </div>
     );

@@ -6,10 +6,11 @@ import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Mic, MicOff, Video, VideoOff, PhoneOff, RefreshCcw, FileText, CheckCircle2 } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, PhoneOff, RefreshCcw, FileText, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Device } from '@capacitor/device';
 
 // Setup WebRTC config
 const rtcConfig = {
@@ -37,6 +38,7 @@ export default function SpeakingSession() {
 
     // Scoring State (Interviewer Only)
     const [scores, setScores] = useState({ fluency: 6.0, vocab: 6.0, grammar: 6.0, pron: 6.0 });
+    const [permissionError, setPermissionError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!sessionId || !user) return;
@@ -64,14 +66,20 @@ export default function SpeakingSession() {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             localStream.current = stream;
             if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+            setPermissionError(null);
 
             // 4. Setup Peer Connection
             setupWebRTC(session.interviewer_id === user?.id);
 
         } catch (err: any) {
             console.error(err);
-            toast({ title: 'Connection Error', description: err.message, variant: 'destructive' });
-            navigate('/speaking');
+            const info = await Device.getInfo();
+            if (info.platform !== 'web') {
+                setPermissionError("Camera/Microphone access was denied. Please check your app permissions in Settings.");
+            } else {
+                setPermissionError(err.message);
+            }
+            toast({ title: 'Hardware Error', description: "Permission denied. Tap the retry button.", variant: 'destructive' });
         }
     };
 
@@ -160,6 +168,22 @@ export default function SpeakingSession() {
                 <div className="flex-1 relative bg-black/40 lg:m-4 lg:rounded-[2rem] overflow-hidden flex items-center justify-center border border-white/5 shadow-2xl">
                     {/* Background Texture for "Studio" feel */}
                     <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+
+                    {permissionError && (
+                        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/90 backdrop-blur-md p-6 text-center">
+                            <div className="w-20 h-20 rounded-3xl bg-red-500/10 flex items-center justify-center mb-6">
+                                <AlertTriangle className="w-10 h-10 text-red-500" />
+                            </div>
+                            <h2 className="text-xl font-black uppercase tracking-tight mb-2">Access Required</h2>
+                            <p className="text-sm text-muted-foreground max-w-xs mb-8">{permissionError}</p>
+                            <Button
+                                onClick={() => initializeSession()}
+                                className="h-14 px-8 rounded-2xl bg-primary text-white font-black uppercase tracking-widest gap-2"
+                            >
+                                <RefreshCcw className="w-5 h-5" /> Retry Connection
+                            </Button>
+                        </div>
+                    )}
 
                     {/* Remote Participant Video */}
                     <video

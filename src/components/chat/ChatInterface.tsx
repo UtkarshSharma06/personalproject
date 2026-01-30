@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { MessageItem, Message } from "./MessageItem";
@@ -449,6 +449,18 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
         );
     }
 
+    const filteredMessages = useMemo(() => {
+        return messages.filter(msg => {
+            if (showSearch && searchQuery) {
+                return msg.content?.toLowerCase().includes(searchQuery.toLowerCase());
+            }
+            if (activeTab === 'chat') return true;
+            if (activeTab === 'media') return msg.file_url && (msg.file_type?.startsWith('image/') || msg.file_type?.startsWith('video/'));
+            if (activeTab === 'links') return msg.content?.includes('http');
+            return true;
+        });
+    }, [messages, showSearch, searchQuery, activeTab]);
+
     if (isLoading || accessStatus === 'loading') {
         return <div className="flex h-full items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-indigo-600" /></div>;
     }
@@ -467,9 +479,52 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
                         <h1 className="font-bold text-base truncate">{communityName}</h1>
                         <div className="text-[11px] text-slate-500 truncate">{isConnected ? (creatorName ? `Created by ${creatorName}` : 'online') : 'connecting...'}</div>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={handleStartCall}><Phone className="h-5 w-5" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setShowSearch(!showSearch)}><Search className="h-5 w-5" /></Button>
+                    <div className="flex items-center gap-1 md:gap-2">
+                        <Button variant="ghost" size="icon" onClick={() => setShowSearch(!showSearch)} className="h-9 w-9 text-slate-500">
+                            <Search className="h-5 w-5" />
+                        </Button>
+
+                        <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
+
+                        <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 gap-1">
+                            <Button
+                                variant={activeTab === 'chat' ? 'secondary' : 'ghost'}
+                                size="icon"
+                                onClick={() => setActiveTab('chat')}
+                                className={`h-8 w-8 rounded-lg ${activeTab === 'chat' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-500' : 'text-slate-500'}`}
+                            >
+                                <Hash className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={activeTab === 'media' ? 'secondary' : 'ghost'}
+                                size="icon"
+                                onClick={() => setActiveTab('media')}
+                                className={`h-8 w-8 rounded-lg ${activeTab === 'media' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-500' : 'text-slate-500'}`}
+                            >
+                                <ImageIcon className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={activeTab === 'links' ? 'secondary' : 'ghost'}
+                                size="icon"
+                                onClick={() => setActiveTab('links')}
+                                className={`h-8 w-8 rounded-lg ${activeTab === 'links' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-500' : 'text-slate-500'}`}
+                            >
+                                <LinkIcon className="h-4 w-4" />
+                            </Button>
+                        </div>
+
+                        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
+
+                        {(isAdmin || isCreator) && (
+                            <div className="flex items-center gap-1">
+                                <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500">
+                                    {isPrivate ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-9 w-9 text-red-500/70 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20">
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -486,13 +541,13 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
                     </div>
                 )}
 
-                {messages.length === 0 ? (
+                {filteredMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full opacity-50">
                         <Hash className="h-12 w-12 mb-2" />
                         <p>No messages yet. Start the conversation!</p>
                     </div>
                 ) : (
-                    messages.map((msg, i) => (
+                    filteredMessages.map((msg, i) => (
                         <MessageItem
                             key={msg.id}
                             message={msg}
