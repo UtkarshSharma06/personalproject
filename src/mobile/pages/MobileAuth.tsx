@@ -128,7 +128,12 @@ export default function MobileAuth() {
                     onClick={handleGoogle}
                     className="w-full h-14 rounded-2xl border-border/50 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 active:bg-secondary/20"
                 >
-                    <img src="https://www.google.com/favicon.ico" className="w-4 h-4 grayscale" alt="Google" />
+                    <svg className="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M21.35 11.1h-9.17v2.98h5.24c-.22 1.17-.88 2.16-1.87 2.82v2.34h3.03c1.77-1.63 2.79-4.04 2.79-6.84 0-.69-.06-1.35-.19-1.99z" className="text-[#4285F4]" />
+                        <path fill="currentColor" d="M12.18 21.02c2.58 0 4.75-.85 6.33-2.31l-3.03-2.34c-.85.57-1.94.91-3.3.91-2.48 0-4.58-1.67-5.33-3.92H3.69v2.46C5.26 18.96 8.47 21.02 12.18 21.02z" className="text-[#34A853]" />
+                        <path fill="currentColor" d="M6.85 13.36a5.45 5.45 0 0 1 0-3.41V7.49H3.69c-1.64 3.25-1.64 7.12 0 10.38l3.16-2.46z" className="text-[#FBBC05]" />
+                        <path fill="currentColor" d="M12.18 5.76c1.37-.03 2.68.49 3.65 1.42l2.71-2.71C16.89 2.91 14.62 1.95 12.18 2c-3.71 0-6.91 2.06-8.49 5.49l3.16 2.46c.75-2.25 2.85-3.92 5.33-3.92z" className="text-[#EA4335]" />
+                    </svg>
                     Continue with Google
                 </Button>
             </form>
@@ -142,7 +147,7 @@ export default function MobileAuth() {
                 </button>
                 <div className="mt-8 flex items-center justify-center gap-2 opacity-20">
                     <Shield size={12} />
-                    <span className="text-[8px] font-black uppercase tracking-widest">Secure Connection</span>
+                    <span className="text-[8px] font-black uppercase tracking-widest">Encrypted</span>
                 </div>
             </footer>
         </div>

@@ -290,29 +290,28 @@ export default function Auth() {
 
     return (
         <div className="h-screen lg:overflow-hidden bg-slate-50 dark:bg-muted flex selection:bg-indigo-100 selection:text-indigo-900 font-sans overflow-y-auto lg:overflow-y-hidden">
-            {/* Left side - Branding (Sleek Modern) */}
-            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-white dark:bg-card border-r border-slate-100 dark:border-border justify-center items-center h-full">
-                <AuthBackground />
+            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-background border-r border-border justify-center items-center h-full">
+                <div className="absolute inset-0 bg-[#F5F5F7] dark:bg-card" />
 
                 <div className="relative z-10 flex flex-col justify-center px-24 max-w-2xl">
-                    <div className="flex items-center gap-4 mb-12">
-                        <img src="/logo.png" alt="Italostudy Logo" className="h-16 w-auto object-contain" />
+                    <div className="mb-12">
+                        <img src="/logo.png" alt="Italostudy Logo" className="h-12 w-auto object-contain" />
                     </div>
 
-                    <h1 className="text-7xl font-black text-slate-900 dark:text-slate-100 mb-10 leading-[0.9] tracking-tighter uppercase">
+                    <h1 className="text-6xl font-black text-foreground mb-8 leading-[0.9] tracking-tighter">
                         Mastery <br />
-                        <span className="text-indigo-600">Simulated.</span>
+                        <span className="text-primary">Simplified.</span>
                     </h1>
 
-                    <p className="text-xl text-slate-400 font-bold mb-16 max-w-lg leading-relaxed tracking-tight">
-                        Experience the most advanced adaptive preparation ecosystem for global academic success.
+                    <p className="text-lg text-muted-foreground font-medium mb-12 max-w-md leading-relaxed">
+                        The advanced preparation ecosystem for global academic success.
                     </p>
 
                     <div className="space-y-4">
                         {[
-                            { text: 'Dynamic Adaptive Testing', color: 'bg-indigo-50', textCol: 'text-indigo-600' },
-                            { text: 'Live Proctoring System', color: 'bg-slate-50', textCol: 'text-slate-600' },
-                            { text: 'Deep Performance Analytics', color: 'bg-indigo-50', textCol: 'text-indigo-600' },
+                            { text: 'Adaptive Testing', color: 'bg-primary/5', textCol: 'text-primary' },
+                            { text: 'Live Proctoring', color: 'bg-secondary', textCol: 'text-muted-foreground' },
+                            { text: 'Deep Analytics', color: 'bg-primary/5', textCol: 'text-primary' },
                         ].map((feature, i) => (
                             <FeatureItem key={i} feature={feature} />
                         ))}
@@ -320,10 +319,8 @@ export default function Auth() {
                 </div>
             </div>
 
-            {/* Right side - Auth Form (Sleek Modern) */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-12 relative overflow-hidden bg-slate-50 dark:bg-muted h-full">
-                <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-100/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-200/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+            {/* Right side - Auth Form (Clean Minimal) */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-12 relative bg-background h-full">
 
                 <div className="w-full max-w-md relative z-10">
                     {/* Mobile Logo Branding */}
@@ -345,26 +342,14 @@ export default function Auth() {
                         </div>
                     )}
 
-                    <div className="bg-white dark:bg-card rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 lg:p-12 border border-slate-100 dark:border-border shadow-2xl shadow-indigo-100/50 max-h-[95vh] overflow-y-auto no-scrollbar">
+                    <div className="w-full max-w-[400px]">
                         <div className="text-center mb-10">
-                            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 mb-2 tracking-tighter">
-                                {requiresMFA ? 'Security Verification' : (isForgotPassword ? 'Reset Password' : (isLogin ? 'Welcome Back' : 'Get Started'))}
+                            <h2 className="text-3xl font-bold tracking-tight mb-2">
+                                {requiresMFA ? 'Security Check' : (isForgotPassword ? 'Reset Password' : (isLogin ? 'Sign In' : 'Create Account'))}
                             </h2>
-                            <p className="text-slate-400 font-bold uppercase text-[9px] sm:text-[10px] tracking-[0.2em]">
-                                {requiresMFA ? 'Enter code from your authenticator app' : (isForgotPassword ? 'Enter your email to receive a recovery link' : (isLogin ? 'Sign in to your Italostudy account' : 'Join the Italostudy community'))}
+                            <p className="text-muted-foreground text-sm">
+                                {requiresMFA ? 'Enter code from authenticator' : (isForgotPassword ? 'Enter your email for recovery' : (isLogin ? 'Access your student dashboard' : 'Join the platform'))}
                             </p>
-
-                            {!isForgotPassword && (
-                                <div className="mt-6 flex justify-center">
-                                    <Link
-                                        to="/consultant/activate"
-                                        className="group flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-2xl transition-all"
-                                    >
-                                        <ShieldAlert className="w-3.5 h-3.5 text-indigo-600 group-hover:scale-110 transition-transform" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Certified Expert Gateway</span>
-                                    </Link>
-                                </div>
-                            )}
                         </div>
 
                         <div className="space-y-6">
