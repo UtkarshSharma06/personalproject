@@ -61,9 +61,9 @@ export const APKOnboarding: React.FC<APKOnboardingProps> = ({ onComplete }) => {
 
     return (
         <div className="fixed inset-0 z-[100] bg-[#030014] flex flex-col items-center justify-center p-8 overflow-hidden">
-            {/* Background Glows */}
-            <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-indigo-500/10 blur-[120px] rounded-full animate-pulse" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-violet-600/10 blur-[120px] rounded-full" />
+            {/* Background Glows - Simplified for performance */}
+            <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-indigo-500/10 rounded-full" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-violet-600/10 rounded-full" />
 
             <AnimatePresence initial={false} custom={page}>
                 <motion.div
@@ -74,14 +74,14 @@ export const APKOnboarding: React.FC<APKOnboardingProps> = ({ onComplete }) => {
                     animate="center"
                     exit="exit"
                     transition={{
-                        x: { type: "spring", stiffness: 300, damping: 30 },
-                        opacity: { duration: 0.2 },
-                        scale: { duration: 0.4 }
+                        x: { type: "spring", stiffness: 500, damping: 40 },
+                        opacity: { duration: 0.15 },
+                        scale: { duration: 0.2 }
                     }}
                     className="flex flex-col items-center text-center w-full"
                 >
                     <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[2rem] flex items-center justify-center mb-12 shadow-2xl relative">
-                        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+                        <div className="absolute inset-0 bg-primary/20 rounded-full" />
                         {pages[page].icon}
                     </div>
 

@@ -220,10 +220,10 @@ const WebRouter = () => (
   </Routes>
 );
 
-const MobileRouter = ({ user }: { user: any }) => (
+const MobileRouter = ({ user, isNative }: { user: any, isNative: boolean }) => (
   <AppUpdateChecker>
     <Routes>
-      <Route path="/" element={user ? <Navigate to="/mobile/dashboard" replace /> : <MobileIndex />} />
+      <Route path="/" element={user ? <Navigate to="/mobile/dashboard" replace /> : (isNative ? <Navigate to="/auth" replace /> : <MobileIndex />)} />
       <Route path="/auth" element={<MobileAuth />} />
 
       <Route element={<MobileLayout />}>
@@ -284,6 +284,7 @@ const MobileRouter = ({ user }: { user: any }) => (
       <Route path="/listening/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
       <Route path="/writing/:taskId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileIELTSPlayer /></ProtectedRoute>} />
       <Route path="/speaking" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSpeakingLobby /></ProtectedRoute>} />
+      <Route path="/speaking/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
       <Route path="/speaking/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSpeakingSession /></ProtectedRoute>} />
       <Route path="/ielts-flow/:sessionId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><IELTSFlow /></ProtectedRoute>} />
       <Route path="/apply-university/apply" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConciergeApply /></ProtectedRoute>} />
@@ -311,7 +312,6 @@ const MobileRouter = ({ user }: { user: any }) => (
 
 
 const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [isNative, setIsNative] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
@@ -409,11 +409,6 @@ const App = () => {
   };
 
 
-
-  if (showSplash && isMobile !== false) {
-    return <PremiumSplashScreen onComplete={() => setShowSplash(false)} />;
-  }
-
   if (isMobile === null || onboardingCompleted === null) return <PageLoader />;
 
   return (
@@ -452,7 +447,7 @@ const AuthBridge = ({ isNative, onboardingCompleted, setOnboardingCompleted, isM
             {isMobile ? (
               <HashRouter>
                 <SecurityEnforcer />
-                <MobileRouter user={user} />
+                <MobileRouter user={user} isNative={isNative} />
               </HashRouter>
             ) : (
               <BrowserRouter>

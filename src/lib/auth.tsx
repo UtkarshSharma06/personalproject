@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { Capacitor } from '@capacitor/core';
 
 interface AuthContextType {
   user: User | null;
@@ -173,10 +174,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithGoogle = async (redirectTo?: string) => {
+    const isNative = Capacitor.isNativePlatform();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: redirectTo || `${window.location.origin}/dashboard`
+        redirectTo: redirectTo || (isNative
+          ? 'com.italostudy.app://google-auth'
+          : `${window.location.origin}/dashboard`),
+        skipBrowserRedirect: isNative // Keep browser open for native to handle callback via deep link
       }
     });
     return { error: error as Error | null };
