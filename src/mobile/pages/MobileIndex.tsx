@@ -104,21 +104,6 @@ export default function MobileIndex() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Native App Logic
-    useEffect(() => {
-        const checkNative = async () => {
-            if (authLoading || user) return;
-            try {
-                const { Device } = await import('@capacitor/device');
-                const info = await Device.getInfo();
-                if (info.platform === 'android' || info.platform === 'ios') {
-                    // Force login for native app initially to set session
-                    navigate('/auth', { replace: true });
-                }
-            } catch (e) { }
-        };
-        checkNative();
-    }, [authLoading, user, navigate]);
 
     // Show loading state while checking authentication
     if (authLoading) {

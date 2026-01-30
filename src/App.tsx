@@ -17,12 +17,15 @@ import { Device } from '@capacitor/device';
 import { PremiumSplashScreen } from "@/mobile/components/PremiumSplashScreen";
 import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { OneSignalManager } from "@/components/OneSignalManager";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import NetworkStatus from "@/components/NetworkStatus";
 import AdminRoute from "@/components/auth/AdminRoute";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { Preferences } from '@capacitor/preferences';
+import { APKOnboarding } from "@/mobile/components/APKOnboarding";
 
 // Lazy Load Pages
 const Index = lazy(() => import("./pages/Index"));
@@ -217,10 +220,10 @@ const WebRouter = () => (
   </Routes>
 );
 
-const MobileRouter = () => (
+const MobileRouter = ({ user }: { user: any }) => (
   <AppUpdateChecker>
     <Routes>
-      <Route path="/" element={<MobileIndex />} />
+      <Route path="/" element={user ? <Navigate to="/mobile/dashboard" replace /> : <MobileIndex />} />
       <Route path="/auth" element={<MobileAuth />} />
 
       <Route element={<MobileLayout />}>
@@ -308,20 +311,23 @@ const MobileRouter = () => (
 
 
 const App = () => {
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [showSplash, setShowSplash] = useState(true);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [isNative, setIsNative] = useState(false);
+  const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
   const { setTheme } = useTheme();
 
   useEffect(() => {
     const checkPlatform = async () => {
       try {
         const info = await Device.getInfo();
-        const isNative = info.platform === 'android' || info.platform === 'ios';
-        const isSmallScreen = window.innerWidth < 768;
+        const native = info.platform === 'android' || info.platform === 'ios';
+        setIsNative(native);
+        setIsMobile(native || window.innerWidth <= 768);
 
-        setIsMobile(isNative || isSmallScreen);
-
-        if (isNative) {
+        if (native) {
+          const { value } = await Preferences.get({ key: 'onboarding_completed' });
+          setOnboardingCompleted(value === 'true');
           setTheme('dark');
           // Hide status bar and set overlay
           await StatusBar.hide();
@@ -389,42 +395,68 @@ const App = () => {
 
 
 
-  if (showSplash && isMobile !== false) { // Show premium splash on mobile/init
+  if (showSplash && isMobile !== false) {
     return <PremiumSplashScreen onComplete={() => setShowSplash(false)} />;
   }
 
-  if (isMobile === null) return <PageLoader />;
+  if (isMobile === null || onboardingCompleted === null) return <PageLoader />;
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <OneSignalManager />
-        <AIProvider>
-          <ExamProvider>
-            <TooltipProvider>
-              <NetworkStatus />
-              <Toaster />
-              <Sonner />
-              {isMobile ? (
-                <HashRouter>
-                  <SecurityEnforcer />
-                  <Suspense fallback={<PageLoader />}>
-                    <MobileRouter />
-                  </Suspense>
-                </HashRouter>
-              ) : (
-                <BrowserRouter>
-                  <SecurityEnforcer />
-                  <Suspense fallback={<PageLoader />}>
-                    <WebRouter />
-                  </Suspense>
-                </BrowserRouter>
-              )}
-            </TooltipProvider>
-          </ExamProvider>
-        </AIProvider>
+        <AuthBridge
+          isNative={isNative}
+          onboardingCompleted={onboardingCompleted}
+          setOnboardingCompleted={setOnboardingCompleted}
+          isMobile={isMobile}
+        />
       </AuthProvider>
     </QueryClientProvider>
+  );
+};
+
+// Internal component to handle auth-sensitive routing
+const AuthBridge = ({ isNative, onboardingCompleted, setOnboardingCompleted, isMobile }: any) => {
+  const { user, loading: authLoading } = useAuth();
+
+  if (authLoading) return <PageLoader />;
+
+  if (isNative && !onboardingCompleted && !user) {
+    return <APKOnboarding onComplete={() => setOnboardingCompleted(true)} />;
+  }
+
+  return (
+    <AIProvider>
+      <ExamProvider>
+        <TooltipProvider>
+          <OneSignalManager user={user} />
+          <NetworkStatus />
+          <Toaster />
+          <ToasterProvider />
+          <SecurityEnforcer />
+          <Suspense fallback={<PageLoader />}>
+            {isMobile ? (
+              <HashRouter>
+                <MobileRouter user={user} />
+              </HashRouter>
+            ) : (
+              <BrowserRouter>
+                <WebRouter />
+              </BrowserRouter>
+            )}
+          </Suspense>
+        </TooltipProvider>
+      </ExamProvider>
+    </AIProvider>
+  );
+};
+
+const ToasterProvider = () => {
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+    </>
   );
 };
 

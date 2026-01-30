@@ -25,7 +25,7 @@ export default function MobileSpeakingSession() {
     // Session State
     const [sessionData, setSessionData] = useState<any>(null);
     const [role, setRole] = useState<'interviewer' | 'candidate' | 'observer'>('observer');
-    const [connectionStatus, setConnectionStatus] = useState('Initializing...');
+    const [connectionStatus, setConnectionStatus] = useState('Starting...');
     const [isInterfaceVisible, setIsInterfaceVisible] = useState(true);
 
     // Media State
@@ -172,7 +172,7 @@ export default function MobileSpeakingSession() {
                             <div className="flex items-center gap-3">
                                 <div className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-emerald-500' : 'bg-yellow-500 animate-pulse'}`} />
                                 <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                                    {connectionStatus === 'connected' ? 'Secure Protocol' : 'Linking...'}
+                                    {connectionStatus === 'connected' ? 'Secure Connection' : 'Connecting...'}
                                 </span>
                             </div>
                             <Button variant="ghost" size="icon" className="text-white bg-white/10 rounded-full" onClick={handleLeave}>
@@ -198,7 +198,7 @@ export default function MobileSpeakingSession() {
                     <DrawerHeader>
                         <div className="flex items-center justify-between w-full px-2">
                             <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest">
-                                {role === 'interviewer' ? 'Protocol: Interviewer' : 'Protocol: Candidate'}
+                                {role === 'interviewer' ? 'Role: Interviewer' : 'Role: Candidate'}
                             </span>
                             <Button variant="ghost" size="sm" onClick={handleSwapRoles} className="h-8 gap-2 text-[10px] font-black uppercase tracking-widest">
                                 <RefreshCcw className="w-3 h-3" /> Swap
@@ -256,7 +256,7 @@ export default function MobileSpeakingSession() {
                                                         overall_score: Number(((scores.fluency + scores.vocab + scores.grammar + scores.pron) / 4).toFixed(1))
                                                     });
                                                     if (error) throw error;
-                                                    toast({ title: 'Protocol Evaluated' });
+                                                    toast({ title: 'Session Evaluated' });
                                                     handleSwapRoles();
                                                     setIsDrawerOpen(false);
                                                 } catch (e) { toast({ title: 'System Error', variant: 'destructive' }); }
@@ -324,10 +324,10 @@ export default function MobileSpeakingSession() {
                     <div className="w-20 h-20 bg-red-500/10 rounded-[2rem] flex items-center justify-center mb-6">
                         <AlertTriangle className="w-10 h-10 text-red-500" />
                     </div>
-                    <h2 className="text-2xl font-black uppercase tracking-tight italic mb-2">Protocol Failure</h2>
-                    <p className="text-xs text-muted-foreground mb-8">Audio/Video access was denied. Please check device settings.</p>
+                    <h2 className="text-2xl font-black uppercase tracking-tight italic mb-2">Access Denied</h2>
+                    <p className="text-xs text-muted-foreground mb-8">Audio/Video access was reserved. Please check device settings.</p>
                     <Button onClick={initializeSession} className="h-14 px-10 rounded-2xl bg-primary text-white font-black uppercase tracking-widest gap-2">
-                        <RefreshCcw className="w-5 h-5" /> Retry Sync
+                        <RefreshCcw className="w-5 h-5" /> Retry Connection
                     </Button>
                 </div>
             )}

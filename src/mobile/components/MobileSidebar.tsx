@@ -131,7 +131,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onOpenChange }) =
                 </div>
 
                 {/* Navigation Menu */}
-                <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 flex flex-col">
+                <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 flex flex-col will-change-scroll">
                     <div className="space-y-1">
                         <h4 className="px-3 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-3">{t('menu.main')}</h4>
                         {menuItems.map((item) => (
