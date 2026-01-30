@@ -386,10 +386,14 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
 
                 // Trigger Push Notification
                 try {
+                    const previewText = content
+                        ? (content.length > 60 ? content.substring(0, 60) + '...' : content)
+                        : (f ? 'Shared a file' : 'New message');
+
                     supabase.functions.invoke('send-push', {
                         body: {
                             title: communityName || 'New Message',
-                            body: `${profile?.display_name || 'Someone'}: ${content || (f ? 'Shared a file' : 'New message')}`,
+                            body: `${profile?.display_name || 'Someone'}: ${previewText}`,
                             community_id: communityId,
                             sender_id: user.id,
                             data: {

@@ -335,6 +335,8 @@ const App = () => {
 
 
   const OneSignalManager = () => {
+    const { user } = useAuth();
+
     useEffect(() => {
       const initOneSignal = async () => {
         const info = await Device.getInfo();
@@ -345,11 +347,9 @@ const App = () => {
           OneSignal.initialize("36b31128-46ae-4b7c-a5ab-b4c483327a59");
 
           // Request permission immediately on launch for Android 13+
-          // Adding a small timeout to ensure the native layer is ready
           setTimeout(async () => {
             console.log("OneSignal: Requesting permissions...");
-            const permission = await OneSignal.Notifications.requestPermission(true);
-            console.log("OneSignal: Permission result:", permission);
+            await OneSignal.Notifications.requestPermission(true);
           }, 1000);
 
         } catch (e) {
@@ -359,6 +359,24 @@ const App = () => {
 
       initOneSignal();
     }, []);
+
+    // Link Supabase User ID to OneSignal External ID
+    useEffect(() => {
+      const syncExternalId = async () => {
+        const info = await Device.getInfo();
+        if (info.platform !== 'android' && info.platform !== 'ios') return;
+
+        if (user?.id) {
+          console.log("OneSignal: Syncing External ID:", user.id);
+          OneSignal.login(user.id);
+        } else {
+          console.log("OneSignal: Logging out/Removing External ID");
+          OneSignal.logout();
+        }
+      };
+
+      syncExternalId();
+    }, [user?.id]);
 
     return null;
   };
