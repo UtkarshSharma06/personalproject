@@ -689,7 +689,7 @@ export default function MobileSettings() {
     }
 
     return (
-        <div className="flex flex-col min-h-full bg-background pb-20 animate-in fade-in duration-500 overflow-y-auto">
+        <div className="flex flex-col min-h-full bg-background pb-4 animate-in fade-in duration-500 overflow-y-auto">
             {/* Header / Profile Row */}
             <div className="px-4 py-10 mt-2">
                 <button
@@ -789,9 +789,9 @@ export default function MobileSettings() {
             </div>
 
             {/* Branding Footer */}
-            <div className="mt-8 mb-12 text-center">
+            <div className="mt-8 mb-4 text-center">
                 <p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary/20">ItaloStudy Protocol</p>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] mt-2 text-muted-foreground opacity-30">Ver 2.0.4 Premium Neural Link</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] mt-2 text-muted-foreground opacity-30">Ver 2.0.4</p>
             </div>
         </div>
     );

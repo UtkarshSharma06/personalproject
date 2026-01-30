@@ -244,7 +244,7 @@ const MobileRouter = ({ user }: { user: any }) => (
         <Route path="/subjects" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSubjects /></ProtectedRoute>} />
         <Route path="/pricing" element={<MobilePricing />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/learning/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileLearning /></ProtectedRoute>} />
+        <Route path="/learning" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileLearning /></ProtectedRoute>} />
         <Route path="/mock-exams" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileMockExams /></ProtectedRoute>} />
         <Route path="/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
         <Route path="/bookmarks" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileBookmarks /></ProtectedRoute>} />

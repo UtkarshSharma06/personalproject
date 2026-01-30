@@ -148,26 +148,25 @@ export default function MobileSubjects() {
     return (
         <div className="flex flex-col min-h-full bg-background pb-32 animate-in fade-in duration-500">
             {/* Premium Header Section */}
-            <header className="px-6 pt-12 pb-6 sticky top-0 bg-background/80 backdrop-blur-xl z-20 border-b border-border/10">
-                <div className="flex items-center gap-4 mb-6">
+            <header className="px-6 pt-4 pb-2 sticky top-0 bg-background/80 backdrop-blur-xl z-20 border-b border-border/10">
+                <div className="flex items-center gap-4 mb-2">
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => navigate(-1)}
-                        className="rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+                        className="rounded-full bg-secondary/50 hover:bg-secondary transition-colors w-8 h-8"
                     >
-                        <ArrowLeft className="w-5 h-5" />
+                        <ArrowLeft className="w-4 h-4" />
                     </Button>
                     <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Subject Overview</span>
+                        <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Overview</span>
                     </div>
                 </div>
-                <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">
-                    Course <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">Syllabus</span>
+                <h1 className="text-2xl font-black tracking-tighter uppercase leading-none">
+                    Course <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">Syllabus</span>
                 </h1>
-                <p className="text-[10px] font-black text-muted-foreground mt-4 opacity-40 uppercase tracking-widest leading-relaxed">
+                <p className="text-[10px] font-black text-muted-foreground mt-1 opacity-40 uppercase tracking-widest leading-relaxed">
                     Learning performance for <span className="text-foreground">{activeExam.name}</span>
                 </p>
             </header>
@@ -300,15 +299,7 @@ export default function MobileSubjects() {
                 )}
             </div>
 
-            {/* Interactive Footer Banner */}
-            <div className="px-4 mt-8">
-                <div className="bg-foreground text-background p-8 rounded-[3rem] shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12"><BookOpen size={80} /></div>
-                    <h4 className="text-xl font-black uppercase tracking-tight relative z-10 leading-tight">Master <br />the Syllabus</h4>
-                    <p className="text-[10px] font-bold uppercase opacity-60 mt-2 relative z-10">Personalized tracking enabled</p>
-                    <Button variant="secondary" className="mt-4 rounded-xl bg-white text-black hover:bg-white/90 font-black text-[10px] uppercase tracking-widest px-6 h-10">Support</Button>
-                </div>
-            </div>
+
         </div>
     );
 }
