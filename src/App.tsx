@@ -14,6 +14,9 @@ import { ExamProvider } from "@/context/ExamContext";
 import { AIProvider } from "@/context/AIContext";
 import OneSignal from 'onesignal-cordova-plugin';
 import { Device } from '@capacitor/device';
+import { PremiumSplashScreen } from "@/mobile/components/PremiumSplashScreen";
+import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -297,11 +300,7 @@ const MobileRouter = () => (
   </Routes>
 );
 
-import { PremiumSplashScreen } from "@/mobile/components/PremiumSplashScreen";
-import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
-declare var OneSignal: any;
-import { StatusBar, Style } from '@capacitor/status-bar';
-import { Device } from '@capacitor/device';
+
 const App = () => {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [showSplash, setShowSplash] = useState(true);
