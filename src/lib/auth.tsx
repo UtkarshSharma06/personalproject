@@ -177,21 +177,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = async (redirectTo?: string) => {
     const isNative = Capacitor.isNativePlatform();
 
-    // For native, we want to ensure the redirect is handled by the app
+    if (isNative) {
+      try {
+        const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth');
+        const googleUser = await GoogleAuth.signIn();
+
+        if (googleUser && googleUser.authentication.idToken) {
+          const { data, error } = await supabase.auth.signInWithIdToken({
+            provider: 'google',
+            token: googleUser.authentication.idToken,
+          });
+          return { error: error as Error | null };
+        }
+        return { error: new Error("Google Sign-In failed: No ID Token received") };
+      } catch (err: any) {
+        console.error("Native Google Auth Error:", err);
+        // If user cancelled, it's not really an "error" we want to toast harshly usually
+        if (err.message?.includes("cancelled") || err.code === "CANCELLED") {
+          return { error: null };
+        }
+        return { error: err as Error };
+      }
+    }
+
+    // Web Browser Flow
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: redirectTo || (isNative
-          ? 'com.italostudy.app://google-auth'
-          : `${window.location.origin}/dashboard`),
-        skipBrowserRedirect: isNative // Try to keep control on native
+        redirectTo: redirectTo || `${window.location.origin}/dashboard`
       }
     });
-
-    // If skipBrowserRedirect worked, we handle the URL manually
-    if (isNative && data?.url) {
-      await Browser.open({ url: data.url, windowName: '_self' });
-    }
 
     return { error: error as Error | null };
   };

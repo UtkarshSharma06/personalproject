@@ -177,7 +177,7 @@ export default function Layout({ children, showFooter = true, showHeader = true 
                                         const [mockItem] = items.splice(mockIdx, 1);
                                         items.splice(learningIdx + 1, 0, mockItem);
                                     }
-                                    return items.slice(0, 5);
+                                    return items.slice(0, 6);
                                 })().map((item) => (
                                     <Link
                                         key={item.path}

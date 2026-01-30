@@ -23,16 +23,21 @@ export default function MobileAuth() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
     // MFA State
     const [requiresMFA, setRequiresMFA] = useState(false);
     const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
     const [mfaCode, setMfaCode] = useState("");
-    const [mfaError, setMfaError] = useState("");
-
-    const { signIn, signUp, signInWithGoogle, mfa, signOut } = useAuth() as any;
+    const [isLoading, setIsLoading] = useState(false);
+    const { user, signIn, signUp, signInWithGoogle, mfa, signOut } = useAuth() as any;
     const navigate = useNavigate();
+
+    // Auto-redirect if user gets logged in (e.g. by native Google Auth)
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
     const { toast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -76,9 +81,16 @@ export default function MobileAuth() {
     const handleGoogle = async () => {
         setIsLoading(true);
         try {
-            await signInWithGoogle();
-        } catch (e: any) {
-            toast({ title: "Sync failed", variant: "destructive" });
+            const { error } = await signInWithGoogle();
+            if (error) {
+                toast({
+                    title: "Authentication Error",
+                    description: error.message,
+                    variant: "destructive",
+                });
+            }
+            // Note: If successful, the useEffect above handles the redirect
+        } finally {
             setIsLoading(false);
         }
     };
