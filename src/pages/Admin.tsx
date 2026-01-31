@@ -39,8 +39,9 @@ import UserManager from '@/components/admin/UserManager';
 import ConsultantManager from '@/components/admin/ConsultantManager';
 import NotificationManager from '@/components/admin/NotificationManager';
 import ResourceManager from '@/components/admin/ResourceManager';
+import BlogManager from '@/components/admin/BlogManager';
 import MockResultsViewer from '@/components/admin/MockResultsViewer';
-import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog, Box, Bell, Trophy } from 'lucide-react';
+import { Layers, Database, BookOpen, Headphones, PenTool, Rocket, MessageSquare, Award, Users as UsersIcon, UserCog, Box, Bell, Trophy, Newspaper } from 'lucide-react';
 
 interface MockSession {
     id: string;
@@ -487,6 +488,9 @@ export default function Admin() {
                             <TabsTrigger value="sessions" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
                                 Mock Simulations
                             </TabsTrigger>
+                            <TabsTrigger value="blog" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
+                                Blog Management
+                            </TabsTrigger>
                             <TabsTrigger value="users" className="rounded-xl font-black text-xs uppercase tracking-widest px-4 lg:px-8 py-2.5 data-[state=active]:bg-white dark:bg-card data-[state=active]:text-indigo-600 data-[state=active]:shadow-md transition-all whitespace-nowrap">
                                 User Management
                             </TabsTrigger>
@@ -544,6 +548,21 @@ export default function Admin() {
                                 </div>
                             </div>
                             <ResourceManager />
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="blog">
+                        <div className="card-surface p-8 rounded-[3rem]">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <Newspaper className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black tracking-tight uppercase">Blog Authority</h2>
+                                    <p className="text-sm text-muted-foreground">Create SEO-optimized articles to drive organic traffic.</p>
+                                </div>
+                            </div>
+                            <BlogManager />
                         </div>
                     </TabsContent>
 

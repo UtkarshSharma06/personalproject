@@ -175,9 +175,9 @@ export default function NotificationDropdown() {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="relative p-2.5 rounded-xl bg-white dark:bg-card border border-slate-100 dark:border-border hover:border-indigo-200 dark:hover:border-indigo-900 transition-all group shadow-sm hover:shadow-lg active:scale-95"
+                className="relative w-[30px] h-[30px] rounded-full border border-slate-200 hover:bg-slate-50 transition-all flex items-center justify-center group shadow-sm active:scale-95 bg-white"
             >
-                <Bell className={`w-5 h-5 transition-colors ${unreadCount > 0 ? 'text-indigo-600' : 'text-slate-600 dark:text-slate-400 group-hover:text-indigo-600'}`} />
+                <Bell className={`w-3.5 h-3.5 transition-colors ${unreadCount > 0 ? 'text-indigo-600' : 'text-slate-600 dark:text-slate-400 group-hover:text-indigo-600'}`} />
                 {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-lg animate-pulse ring-2 ring-white dark:ring-slate-900">
                         {unreadCount}

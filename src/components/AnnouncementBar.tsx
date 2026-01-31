@@ -3,7 +3,7 @@ import { X, Download, Smartphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function AnnouncementBar() {
-    const [isVisible, setIsVisible] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
         const checkVisibility = async () => {
@@ -20,11 +20,9 @@ export default function AnnouncementBar() {
             }
 
             // 2. Check dismissal
-            const isDismissed = localStorage.getItem('announcement-dismissed');
+            const isDismissed = localStorage.getItem('announcement-dismissed-v2');
             if (isDismissed === 'true') {
                 setIsVisible(false);
-            } else {
-                setIsVisible(true);
             }
         };
 
@@ -35,14 +33,14 @@ export default function AnnouncementBar() {
         e.preventDefault();
         e.stopPropagation();
         setIsVisible(false);
-        localStorage.setItem('announcement-dismissed', 'true');
+        localStorage.setItem('announcement-dismissed-v2', 'true');
     };
 
     if (!isVisible) return null;
 
     return (
-        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white group relative z-[100]">
-            <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-3">
+        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white group relative z-[100] border-b border-white/10 shadow-sm">
+            <div className="container mx-auto px-4 py-1.5 flex items-center justify-between gap-3">
                 {/* Visual indicator (optional/static) */}
                 <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/20 items-center justify-center border border-white/30 shrink-0">
                     <Smartphone size={16} className="text-white" />
