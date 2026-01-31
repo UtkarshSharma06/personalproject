@@ -1,6 +1,10 @@
 {
     "rewrites": [
         {
+            "source": "/assets/(.*)",
+            "destination": "https://jyjhpqtqbwtxxgijxetq.supabase.co/storage/v1/object/public/$1"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }

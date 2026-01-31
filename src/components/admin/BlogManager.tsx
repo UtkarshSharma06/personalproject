@@ -30,13 +30,20 @@ interface BlogPost {
     content: any;
     status: 'draft' | 'published';
     featured_image: string;
+    category_id?: string;
     published_at: string;
     created_at: string;
+}
+
+interface Category {
+    id: string;
+    name: string;
 }
 
 export default function BlogManager() {
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
     const { toast } = useToast();
@@ -47,12 +54,19 @@ export default function BlogManager() {
         excerpt: '',
         content: '',
         status: 'draft',
-        featured_image: ''
+        featured_image: '',
+        category_id: ''
     });
 
     useEffect(() => {
         fetchPosts();
+        fetchCategories();
     }, []);
+
+    const fetchCategories = async () => {
+        const { data } = await supabase.from('blog_categories').select('*');
+        if (data) setCategories(data);
+    };
 
     const fetchPosts = async () => {
         setIsLoading(true);
@@ -84,6 +98,7 @@ export default function BlogManager() {
             content: { body: formData.content },
             status: formData.status,
             featured_image: formData.featured_image,
+            category_id: formData.category_id || null,
             published_at: formData.status === 'published' ? new Date().toISOString() : null
         };
 
@@ -123,22 +138,32 @@ export default function BlogManager() {
             excerpt: '',
             content: '',
             status: 'draft',
-            featured_image: ''
+            featured_image: '',
+            category_id: ''
         });
         setEditingPost(null);
     };
 
-    const handleEditClick = (post: BlogPost) => {
+    const handleEditClick = (post: any) => {
         setEditingPost(post);
         setFormData({
             title: post.title,
             slug: post.slug,
             excerpt: post.excerpt || '',
-            content: typeof post.content === 'object' && post.content?.body
-                ? post.content.body
-                : typeof post.content === 'string'
-                    ? post.content
-                    : '',
+            category_id: post.category_id || '',
+            content: (() => {
+                const raw = post.content;
+                if (typeof raw === 'object' && raw?.body) return raw.body;
+                if (typeof raw === 'string') {
+                    try {
+                        const parsed = JSON.parse(raw);
+                        return parsed.body || raw;
+                    } catch (e) {
+                        return raw;
+                    }
+                }
+                return '';
+            })(),
             status: post.status,
             featured_image: post.featured_image || ''
         });
@@ -237,6 +262,21 @@ export default function BlogManager() {
                         </div>
 
                         <div className="space-y-2">
+                            <Label htmlFor="post-category" className="font-bold text-slate-500 uppercase tracking-widest text-xs ml-1">Category</Label>
+                            <select
+                                id="post-category"
+                                className="flex h-[52px] w-full rounded-2xl border-2 border-slate-50 bg-background px-6 py-2 text-sm font-bold focus:border-indigo-400 focus:ring-0 transition-all font-sans"
+                                value={formData.category_id}
+                                onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                            >
+                                <option value="">Select Category</option>
+                                {categories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="space-y-2">
                             <Label htmlFor="post-content" className="font-bold text-slate-500 uppercase tracking-widest text-xs ml-1">The Full Story (Rich Text & Math)</Label>
                             <div className="rounded-2xl border-2 border-slate-50 overflow-hidden focus-within:border-indigo-400 focus-within:ring-0 transition-all">
                                 <Editor
@@ -258,7 +298,21 @@ export default function BlogManager() {
                                             'bold italic forecolor backcolor | alignleft aligncenter ' +
                                             'alignright alignjustify | bullist numlist outdent indent | ' +
                                             'removeformat | help | code',
-                                        content_style: 'body { font-family:Inter,sans-serif; font-size:16px }',
+                                        content_style: `
+                                            @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+                                            body { 
+                                                font-family: 'Plus Jakarta Sans', Inter, sans-serif; 
+                                                font-size: 16px; 
+                                                line-height: 1.6; 
+                                                color: #0f172a; 
+                                                padding: 20px;
+                                                max-width: 800px;
+                                                margin: 0 auto;
+                                            }
+                                            h1, h2, h3, h4, h5, h6 { font-weight: 800; color: #0f172a; }
+                                            p { margin-bottom: 1em; }
+                                            img { max-width: 100%; border-radius: 20px; }
+                                        `,
                                         placeholder: "Write your hearts out! Use $...$ for inline math...",
 
                                         // Preserve ALL HTML and styles
@@ -321,7 +375,7 @@ export default function BlogManager() {
                             <Eye className="w-4 h-4" /> Live Preview
                         </h4>
                         <div
-                            className="[&_.katex]:text-lg bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"
+                            className="prose prose-slate max-w-none [&_.katex]:text-lg [&_.katex]:font-serif prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-600 prose-a:text-indigo-600 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm"
                             style={{
                                 fontSize: '16px',
                                 lineHeight: '1.6',
@@ -329,9 +383,12 @@ export default function BlogManager() {
                             }}
                             dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(
-                                    formData.content.includes('<')
-                                        ? formData.content
-                                        : formData.content.replace(/\n/g, '<br />'),
+                                    (() => {
+                                        const content = formData.content;
+                                        return content.includes('<')
+                                            ? content
+                                            : content.replace(/\n/g, '<br />');
+                                    })(),
                                     { ADD_ATTR: ['style', 'class', 'target'], ADD_TAGS: ['iframe'] }
                                 )
                             }}

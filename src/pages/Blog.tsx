@@ -16,6 +16,7 @@ import {
     PenTool
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getProxiedUrl } from '@/lib/url';
 
 interface BlogPost {
     id: string;
@@ -24,7 +25,8 @@ interface BlogPost {
     excerpt: string;
     featured_image: string;
     published_at: string;
-    category?: {
+    created_at: string;
+    blog_categories?: {
         name: string;
     };
 }
@@ -44,8 +46,7 @@ export default function Blog() {
             const { data, error } = await supabase
                 .from('blog_posts')
                 .select('*')
-                .eq('status', 'published')
-                .order('published_at', { ascending: false });
+                .order('created_at', { ascending: false });
 
             if (error) {
                 console.error('Error fetching blog posts:', error);
@@ -191,7 +192,7 @@ export default function Blog() {
                                         <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] mb-6 shadow-sm group-hover:shadow-md transition-all">
                                             {post.featured_image ? (
                                                 <img
-                                                    src={post.featured_image}
+                                                    src={getProxiedUrl(post.featured_image)}
                                                     alt={post.title}
                                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                 />
@@ -200,18 +201,16 @@ export default function Blog() {
                                                     📖
                                                 </div>
                                             )}
-                                            {post.category && (
-                                                <div className="absolute top-4 left-4">
-                                                    <span className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-600 shadow-sm border border-slate-100">
-                                                        {post.category.name}
-                                                    </span>
-                                                </div>
-                                            )}
+                                            <div className="absolute top-4 left-4">
+                                                <span className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-600 shadow-sm border border-slate-100">
+                                                    {(post as any).blog_categories?.name || (post as any).category_name || "Study Tip"}
+                                                </span>
+                                            </div>
                                         </div>
 
                                         <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
                                             <Calendar className="w-3.5 h-3.5" />
-                                            {format(new Date(post.published_at), 'MMM dd, yyyy')}
+                                            {format(new Date(post.published_at || post.created_at), 'MMM dd, yyyy')}
                                         </div>
 
                                         <h2 className="text-2xl font-black text-slate-900 leading-tight mb-4 group-hover:text-indigo-600 transition-colors">
@@ -280,7 +279,7 @@ export default function Blog() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </Layout>
+            </div >
+        </Layout >
     );
 }

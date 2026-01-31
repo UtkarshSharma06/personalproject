@@ -14,13 +14,20 @@ import {
     Clock,
     User,
     ChevronLeft,
-    Sparkles
+    Sparkles,
+    MessageCircle,
+    Instagram,
+    MessageSquare,
+    HelpCircle,
+    Link as LinkIcon
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import DOMPurify from 'dompurify';
 import 'katex/dist/katex.min.css';
 // @ts-ignore
 import renderMathInElement from 'katex/dist/contrib/auto-render';
+import { getProxiedUrl } from '@/lib/url';
 
 interface BlogPost {
     id: string;
@@ -29,6 +36,7 @@ interface BlogPost {
     excerpt: string;
     featured_image: string;
     published_at: string;
+    created_at: string;
     status: string;
     author_id: string;
 }
@@ -36,6 +44,7 @@ interface BlogPost {
 export default function BlogPost() {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const { toast } = useToast();
     const [post, setPost] = useState<BlogPost | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const contentRef = (node: HTMLDivElement | null) => {
@@ -126,7 +135,7 @@ export default function BlogPost() {
                             <div className="h-4 w-[1px] bg-slate-100 mx-2" />
                             <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
                                 <Calendar className="w-3.5 h-3.5" />
-                                {format(new Date(post.published_at), 'MMMM dd, yyyy')}
+                                {format(new Date(post.published_at || post.created_at), 'MMMM dd, yyyy')}
                             </div>
                         </div>
 
@@ -156,7 +165,7 @@ export default function BlogPost() {
                                 className="aspect-[16/10] rounded-[2.5rem] overflow-hidden mb-16 shadow-lg border-4 border-slate-50"
                             >
                                 <img
-                                    src={post.featured_image}
+                                    src={getProxiedUrl(post.featured_image)}
                                     alt={post.title}
                                     className="w-full h-full object-cover"
                                 />
@@ -166,7 +175,7 @@ export default function BlogPost() {
                         {/* Content area */}
                         <div
                             ref={contentRef}
-                            className="[&_.katex]:text-lg [&_.katex]:font-serif"
+                            className="prose prose-slate max-w-none [&_.katex]:text-lg [&_.katex]:font-serif prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-600 prose-a:text-indigo-600 prose-img:rounded-[2.5rem] prose-img:shadow-xl"
                             style={{
                                 fontSize: '16px',
                                 lineHeight: '1.6',
@@ -175,12 +184,22 @@ export default function BlogPost() {
                             dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(
                                     (() => {
-                                        const contentBody = typeof post.content === 'object' && post.content?.body
-                                            ? post.content.body
-                                            : typeof post.content === 'string'
-                                                ? post.content
-                                                : '';
+                                        let contentBody = '';
+                                        const rawContent = post.content;
 
+                                        if (typeof rawContent === 'object' && rawContent !== null) {
+                                            contentBody = rawContent.body || JSON.stringify(rawContent);
+                                        } else if (typeof rawContent === 'string') {
+                                            try {
+                                                // Try to parse if it's a JSON string
+                                                const parsed = JSON.parse(rawContent);
+                                                contentBody = parsed.body || rawContent;
+                                            } catch (e) {
+                                                contentBody = rawContent;
+                                            }
+                                        }
+
+                                        // If it's just plain text, replace newlines with <br />
                                         return contentBody.includes('<')
                                             ? contentBody
                                             : contentBody.replace(/\n/g, '<br />');
@@ -190,21 +209,44 @@ export default function BlogPost() {
                             }}
                         />
 
-                        {/* Fun Share Box */}
-                        <div className="mt-20 p-8 rounded-[2.5rem] bg-indigo-50 border-2 border-indigo-100 flex flex-col items-center text-center gap-6">
-                            <div>
-                                <h4 className="text-xl font-black text-indigo-900 mb-2">Did you find this helpful? 🎒</h4>
-                                <p className="text-indigo-600 font-bold">Share the magic with your study buddies!</p>
+                        {/* Fun Share Box - Designed to match user request */}
+                        <div className="mt-20 p-12 rounded-[3.5rem] bg-[#EEF2FF] border-2 border-indigo-100 flex flex-col items-center text-center">
+                            <div className="mb-10">
+                                <h4 className="text-3xl font-black text-indigo-950 mb-3 flex items-center justify-center gap-3">
+                                    Did you find this helpful? 🎒
+                                </h4>
+                                <p className="text-indigo-600 font-bold text-lg">Share the magic with your study buddies!</p>
                             </div>
-                            <div className="flex items-center gap-4">
-                                {['Twitter', 'Facebook', 'Linkedin', 'Share2'].map((icon, idx) => (
+
+                            <div className="flex flex-wrap items-center justify-center gap-4">
+                                {[
+                                    { name: 'WhatsApp', icon: MessageCircle, color: 'text-[#25D366]', url: `https://api.whatsapp.com/send?text=Check out this amazing study tip on Italostudy! ${window.location.href}` },
+                                    { name: 'Instagram', icon: Instagram, color: 'text-[#E4405F]', action: 'copy' },
+                                    { name: 'Facebook', icon: Facebook, color: 'text-[#1877F2]', url: `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}` },
+                                    { name: 'Twitter', icon: Twitter, color: 'text-[#1DA1F2]', url: `https://twitter.com/intent/tweet?url=${window.location.href}&text=Check out this awesome study tip on Italostudy!` },
+                                    { name: 'Reddit', icon: MessageSquare, color: 'text-[#FF4500]', url: `https://www.reddit.com/submit?url=${window.location.href}&title=${post.title}` },
+                                    { name: 'Quora', icon: HelpCircle, color: 'text-[#B92B27]', url: `https://www.quora.com/share?url=${window.location.href}` },
+                                    { name: 'Copy Link', icon: LinkIcon, color: 'text-slate-900', action: 'copy' },
+                                ].map((platform) => (
                                     <motion.button
-                                        key={icon}
-                                        whileHover={{ scale: 1.1, y: -5 }}
+                                        key={platform.name}
+                                        whileHover={{ scale: 1.15, y: -8 }}
                                         whileTap={{ scale: 0.9 }}
-                                        className="w-12 h-12 rounded-2xl bg-white text-indigo-600 flex items-center justify-center shadow-md transition-all hover:bg-indigo-600 hover:text-white"
+                                        onClick={() => {
+                                            if (platform.action === 'copy') {
+                                                navigator.clipboard.writeText(window.location.href);
+                                                toast({
+                                                    title: "Link Copied! ✨",
+                                                    description: platform.name === 'Instagram' ? "Paste it in your bio or DM it to friends!" : "Share it anywhere!",
+                                                });
+                                            } else if (platform.url) {
+                                                window.open(platform.url, '_blank');
+                                            }
+                                        }}
+                                        className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg shadow-indigo-100/50 hover:shadow-2xl transition-all duration-300 group"
+                                        title={`Share on ${platform.name}`}
                                     >
-                                        <Share2 className="w-5 h-5" />
+                                        <platform.icon className={`w-7 h-7 ${platform.color} transition-transform group-hover:scale-110`} />
                                     </motion.button>
                                 ))}
                             </div>
