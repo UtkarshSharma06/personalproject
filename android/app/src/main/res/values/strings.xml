@@ -4,4 +4,5 @@
     <string name="title_activity_main">ITALOSTUDY</string>
     <string name="package_name">com.italostudy.app</string>
     <string name="custom_url_scheme">com.italostudy.app</string>
+    <string name="google_client_id">243486405781-pb7iiqt4efkamq9lmipcvbisinehs2o7.apps.googleusercontent.com</string>
 </resources>

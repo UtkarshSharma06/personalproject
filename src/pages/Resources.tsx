@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/lib/auth';
 import { useExam } from '@/context/ExamContext';
+import { ResourcesGridSkeleton } from '@/components/SkeletonLoader';
 import {
     FileText,
     Search,
@@ -94,10 +95,7 @@ export default function Resources() {
 
                 {/* Content */}
                 {isLoading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-4" />
-                        <p className="text-slate-400 font-medium">Accessing secure archives...</p>
-                    </div>
+                    <ResourcesGridSkeleton />
                 ) : filteredResources.length === 0 ? (
                     <div className="bg-white dark:bg-card rounded-[2rem] p-12 text-center border border-dashed border-slate-200">
                         <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -110,8 +108,12 @@ export default function Resources() {
                     </div>
                 ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredResources.map((resource) => (
-                            <div key={resource.id} className="group bg-white dark:bg-card rounded-3xl p-6 border border-slate-100 dark:border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                        {filteredResources.map((resource, index) => (
+                            <div
+                                key={resource.id}
+                                className="group bg-white dark:bg-card rounded-3xl p-6 border border-slate-100 dark:border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden animate-fadeIn"
+                                style={{ animationDelay: `${index * 50}ms` }}
+                            >
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-50/50 to-transparent rounded-bl-[3rem] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
 
                                 <div className="relative flex items-start justify-between mb-4">

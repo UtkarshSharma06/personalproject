@@ -129,15 +129,83 @@ import { AppUpdateChecker } from "./mobile/components/AppUpdateChecker";
 
 const queryClient = new QueryClient();
 
-// Loading Fallback
-const PageLoader = () => (
-  <div className="h-screen w-full flex items-center justify-center bg-background">
-    <div className="flex flex-col items-center gap-4">
-      <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-      <p className="text-muted-foreground font-medium animate-pulse">Loading ITALOSTUDY...</p>
+// Premium Loading Fallback
+const PageLoader = () => {
+  const [messageIndex, setMessageIndex] = useState(0);
+  const loadingMessages = [
+    "Preparing your learning experience...",
+    "Loading ITALOSTUDY...",
+    "Setting up your workspace...",
+    "Almost ready...",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50 dark:from-slate-950 dark:via-indigo-950/20 dark:to-slate-950 relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+
+      <div className="flex flex-col items-center gap-6 relative z-10">
+        {/* Logo Animation Container */}
+        <div className="relative">
+          {/* Outer Pulse Ring */}
+          <div className="absolute inset-0 rounded-full bg-indigo-500/20 animate-ping" />
+
+          {/* Logo Container */}
+          <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30 animate-pulse">
+            <svg
+              className="w-10 h-10 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
+            </svg>
+          </div>
+        </div>
+
+        {/* Loading Text */}
+        <div className="flex flex-col items-center gap-3">
+          <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+            ITALOSTUDY
+          </h2>
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 animate-pulse transition-all duration-300">
+            {loadingMessages[messageIndex]}
+          </p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-48 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-indigo-600 to-blue-600 rounded-full animate-[loading_1.5s_ease-in-out_infinite]" />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes loading {
+          0%, 100% { width: 0%; margin-left: 0%; }
+          50% { width: 75%; margin-left: 12.5%; }
+        }
+        .delay-1000 {
+          animation-delay: 1s;
+        }
+      `}</style>
     </div>
-  </div>
-);
+  );
+};
 
 const WebRouter = () => (
   <Routes>
