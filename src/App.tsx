@@ -90,6 +90,8 @@ const DownloadApp = lazy(() => import("./pages/DownloadApp"));
 const AnnouncementBar = lazy(() => import("./components/AnnouncementBar"));
 
 const Resources = lazy(() => import("./pages/Resources"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
 
 const MobileIndex = lazy(() => import("./mobile/pages/MobileIndex"));
 const MobileAuth = lazy(() => import("./mobile/pages/MobileAuth"));
@@ -213,6 +215,8 @@ const WebRouter = () => (
 
     <Route path="/student/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><StudentProfile /></ProtectedRoute>} />
     <Route path="/download-app" element={<DownloadApp />} />
+    <Route path="/blog" element={<Blog />} />
+    <Route path="/blog/:slug" element={<BlogPost />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy" element={<Privacy />} />
     <Route path="/terms" element={<Terms />} />
@@ -370,38 +374,85 @@ const App = () => {
     useEffect(() => {
       const initOneSignal = async () => {
         const info = await Device.getInfo();
-        if (info.platform !== 'android' && info.platform !== 'ios') return;
+        const isNative = info.platform === 'android' || info.platform === 'ios';
 
-        try {
-          console.log("OneSignal: Initializing with ID: 36b31128-46ae-4b7c-a5ab-b4c483327a59");
-          OneSignal.initialize("36b31128-46ae-4b7c-a5ab-b4c483327a59");
+        if (isNative) {
+          // --- Native Mobile Initialization (Capacitor) ---
+          try {
+            console.log("OneSignal Native: Initializing...");
+            OneSignal.initialize("36b31128-46ae-4b7c-a5ab-b4c483327a59");
 
-          // Request permission immediately on launch for Android 13+
-          setTimeout(async () => {
-            console.log("OneSignal: Requesting permissions...");
-            await OneSignal.Notifications.requestPermission(true);
-          }, 1000);
+            // Request permission immediately on launch for Android 13+
+            setTimeout(async () => {
+              console.log("OneSignal Native: Requesting permissions...");
+              await OneSignal.Notifications.requestPermission(true);
+            }, 1000);
 
-        } catch (e) {
-          console.error("OneSignal Error:", e);
+          } catch (e) {
+            console.error("OneSignal Native Error:", e);
+          }
+        } else {
+          // --- Web Initialization (Script Injection) ---
+          try {
+            console.log("OneSignal Web: Initializing...");
+            // @ts-ignore
+            window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+            // Check if script is already present
+            if (!document.getElementById('onesignal-web-sdk')) {
+              const script = document.createElement('script');
+              script.id = 'onesignal-web-sdk';
+              script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+              script.defer = true;
+              document.head.appendChild(script);
+            }
+
+            // @ts-ignore
+            OneSignalDeferred.push(async function (OneSignal) {
+              await OneSignal.init({
+                appId: "ee77513f-5ea1-45a1-af9b-826f56acd2ef",
+              });
+              // Prompt for permission on web immediately
+              OneSignal.Slidedown.promptPush();
+            });
+
+          } catch (e) {
+            console.error("OneSignal Web Error:", e);
+          }
         }
       };
 
       initOneSignal();
     }, []);
 
-    // Link Supabase User ID to OneSignal External ID
+    // Link Supabase User ID to OneSignal External ID (Works for both!)
     useEffect(() => {
       const syncExternalId = async () => {
         const info = await Device.getInfo();
-        if (info.platform !== 'android' && info.platform !== 'ios') return;
+        const isNative = info.platform === 'android' || info.platform === 'ios';
 
         if (user?.id) {
-          console.log("OneSignal: Syncing External ID:", user.id);
-          OneSignal.login(user.id);
+          if (isNative) {
+            OneSignal.login(user.id);
+          } else {
+            // @ts-ignore
+            window.OneSignalDeferred = window.OneSignalDeferred || [];
+            // @ts-ignore
+            window.OneSignalDeferred.push(function (OneSignal) {
+              OneSignal.login(user.id);
+            });
+          }
         } else {
-          console.log("OneSignal: Logging out/Removing External ID");
-          OneSignal.logout();
+          if (isNative) {
+            OneSignal.logout();
+          } else {
+            // @ts-ignore
+            window.OneSignalDeferred = window.OneSignalDeferred || [];
+            // @ts-ignore
+            window.OneSignalDeferred.push(function (OneSignal) {
+              OneSignal.logout();
+            });
+          }
         }
       };
 
