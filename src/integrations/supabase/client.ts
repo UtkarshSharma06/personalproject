@@ -14,6 +14,6 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: CapacitorStorage,
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: false, // Important for mobile to avoid hash conflict
+    detectSessionInUrl: true,
   }
 });
