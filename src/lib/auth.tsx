@@ -187,24 +187,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             provider: 'google',
             token: googleUser.authentication.idToken,
           });
-          return { error: error as Error | null };
+          if (!error) return { error: null };
+          console.error("Native Token Sign-In failed:", error);
         }
-        return { error: new Error("Google Sign-In failed: No ID Token received") };
       } catch (err: any) {
-        console.error("Native Google Auth Error:", err);
-        // If user cancelled, it's not really an "error" we want to toast harshly usually
+        console.warn("Native Google Auth Error/Cancelled, trying browser flow:", err);
         if (err.message?.includes("cancelled") || err.code === "CANCELLED") {
           return { error: null };
         }
-        return { error: err as Error };
       }
     }
 
-    // Web Browser Flow
+    // Web Browser Flow (or Fallback for Native)
+    const finalRedirect = isNative ? 'com.italostudy.app://google-auth' : (redirectTo || `${window.location.origin}/dashboard`);
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: redirectTo || `${window.location.origin}/dashboard`
+        redirectTo: finalRedirect,
+        skipBrowserRedirect: false
       }
     });
 
