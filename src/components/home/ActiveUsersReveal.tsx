@@ -2,7 +2,7 @@ import React from 'react';
 
 const ActiveUsersReveal = () => {
   return (
-    <div className="w-full flex flex-col items-center justify-center p-8 min-h-[400px]">
+    <div className="w-full flex flex-col items-center justify-center p-4 md:p-8 min-h-[250px] md:min-h-[400px]">
       <style>{`
         .reveal-container {
           display: grid;
@@ -48,8 +48,14 @@ const ActiveUsersReveal = () => {
         .reveal-digit {
           display: flex;
           height: 100%;
-          padding: 4rem 1rem;
+          padding: 2rem 0.5rem;   /* Reduced from 4rem 1rem */
           position: relative;
+        }
+
+        @media (min-width: 768px) {
+          .reveal-digit {
+            padding: 4rem 1rem;
+          }
         }
 
         .reveal-digit:focus-visible {

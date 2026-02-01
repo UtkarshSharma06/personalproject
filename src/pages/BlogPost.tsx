@@ -81,6 +81,9 @@ export default function BlogPost() {
 
         setPost(data);
         setIsLoading(false);
+
+        // Increment view count safely
+        await supabase.rpc('increment_blog_view', { post_id: data.id });
     };
 
     if (isLoading) {
@@ -124,7 +127,7 @@ export default function BlogPost() {
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </motion.div>
-                        Back to Study Corner
+                        Back to Blog
                     </Link>
                 </div>
 

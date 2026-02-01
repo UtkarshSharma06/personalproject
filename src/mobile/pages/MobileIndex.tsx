@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '@/components/SEO';
+import GlobalChallenge from '@/components/home/GlobalChallenge';
 
 // Lazy load heavy components
 const AuthModal = lazy(() => import('@/components/auth/AuthModal'));
@@ -129,10 +130,7 @@ export default function MobileIndex() {
 
             {/* Navbar */}
             <header className={cn(
-                "fixed left-0 right-0 z-40 transition-all duration-300 px-4",
-                scrolled
-                    ? "top-0 py-3 bg-[#030014]/80 backdrop-blur-3xl border-b border-white/10 shadow-2xl"
-                    : "top-4 py-0"
+                "fixed top-0 left-0 right-0 z-40 transition-all duration-300 px-4 py-3 bg-[#030014]/80 backdrop-blur-3xl border-b border-white/10 shadow-2xl"
             )}>
                 <div className="flex items-center justify-between">
                     {/* Logo (Centered for Mobile) */}
@@ -176,17 +174,15 @@ export default function MobileIndex() {
                                 { name: 'Method', path: '/method' },
                                 { name: 'Syllabus', path: '/syllabus' },
                                 { name: 'Pricing', path: '/pricing' },
-                                { name: 'Institutional', path: '/institutional' },
+                                { name: 'Blog', path: '/blog' },
                                 { name: 'Contact', path: '/contact' },
-                                { name: 'Get Admission', path: '/get-admission', isSpecial: true }
                             ].map((item) => (
                                 <Link
                                     key={item.name}
                                     to={item.path}
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className={cn(
-                                        "text-lg font-black tracking-tight",
-                                        item.isSpecial ? "text-blue-400" : "text-white/70"
+                                        "text-lg font-black tracking-tight text-white/70"
                                     )}
                                 >
                                     <div className="flex items-center gap-2">
@@ -230,10 +226,10 @@ export default function MobileIndex() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-6xl font-black text-white mb-6 tracking-tighter leading-[0.95]"
+                        className="text-5xl font-black text-white mb-6 tracking-tighter leading-[0.95]"
                     >
-                        ItaloStudy for <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500">Education.</span>
+                        Master Your <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500">Global Admissions.</span>
                     </motion.h1>
 
                     <motion.p
@@ -253,14 +249,14 @@ export default function MobileIndex() {
                     >
                         <Button
                             onClick={() => setIsAuthModalOpen(true)}
-                            className="w-full h-16 bg-transparent text-white font-black text-xs rounded-full border-2 border-cyan-400/50 uppercase tracking-widest shadow-[0_0_30px_rgba(34,211,238,0.2)]"
+                            className="w-full h-16 bg-indigo-600 text-white font-black text-xs rounded-full hover:bg-indigo-700 transition-all uppercase tracking-widest shadow-[0_0_30px_rgba(79,70,229,0.3)] mb-4"
                         >
                             FREE GET started
                             <ArrowRight className="w-4 h-4 ml-3" />
                         </Button>
-                        <Link to="/get-admission" className="w-full">
-                            <Button variant="outline" className="w-full h-16 bg-white text-slate-900 border-none font-black text-xs rounded-full uppercase tracking-widest">
-                                Get Admission
+                        <Link to="/blog" className="w-full">
+                            <Button variant="outline" className="w-full h-16 bg-white/10 backdrop-blur-md text-white border-white/20 font-black text-xs rounded-full uppercase tracking-widest">
+                                Read Blog
                             </Button>
                         </Link>
                     </motion.div>
@@ -293,7 +289,10 @@ export default function MobileIndex() {
                         </motion.div>
                     ))}
                 </div>
-            </section >
+            </section>
+
+            {/* Global Challenge Section */}
+            <GlobalChallenge onPracticeMore={() => setIsAuthModalOpen(true)} />
 
             {/* Testimonials */}
             < section className="py-24" >
@@ -332,7 +331,7 @@ export default function MobileIndex() {
                 <div className="flex flex-col items-center gap-12">
                     <img src="/logo.png" className="h-8 w-auto brightness-0 invert opacity-40" />
                     <div className="flex flex-wrap justify-center gap-6">
-                        {['Method', 'Syllabus', 'Pricing', 'Institutional', 'Contact'].map(item => (
+                        {['Method', 'Syllabus', 'Pricing', 'Blog', 'Contact'].map(item => (
                             <Link key={item} to={`/${item.toLowerCase()}`} className="text-[9px] font-black text-white/30 hover:text-blue-400 transition-colors uppercase tracking-widest">{item}</Link>
                         ))}
                     </div>

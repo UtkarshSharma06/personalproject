@@ -213,12 +213,11 @@ export default function Index() {
             <AcademicBackground />
 
             {/* Navbar */}
-            <header className={cn(
-                "sticky top-0 left-0 right-0 z-50 transition-all duration-300 px-4 md:px-12",
-                scrolled
-                    ? "py-3 md:py-4 bg-[#030014]/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl"
-                    : "py-4 md:py-6 bg-transparent border-none shadow-none"
-            )}>
+            <header
+                className={cn(
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 md:px-12 py-3 md:py-4 bg-[#030014]/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl"
+                )}
+            >
                 <div className="container mx-auto flex items-center justify-between">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group">
@@ -245,19 +244,13 @@ export default function Index() {
                                 { name: 'Syllabus', path: '/syllabus' },
                                 { name: 'Resources', path: '/resources' },
                                 { name: 'Pricing', path: '/pricing' },
-                                { name: 'Institutional', path: '/institutional' },
+                                { name: 'Blog', path: '/blog' },
                                 { name: 'Contact', path: '/contact' },
-                                { name: 'Get Admission', path: '/get-admission', isSpecial: true }
                             ].map((item) => (
                                 <Link
                                     key={item.name}
                                     to={item.path}
-                                    className={cn(
-                                        "text-[12px] font-bold tracking-tight transition-colors",
-                                        item.isSpecial
-                                            ? "text-blue-400 hover:text-blue-300"
-                                            : "text-white/70 hover:text-white"
-                                    )}
+                                    className="text-[12px] font-bold tracking-tight transition-colors text-white/70 hover:text-white"
                                 >
                                     <div className="flex items-center gap-1.5">
                                         {item.name}
@@ -302,18 +295,14 @@ export default function Index() {
                                 { name: 'Method', path: '/method' },
                                 { name: 'Syllabus', path: '/syllabus' },
                                 { name: 'Pricing', path: '/pricing' },
-                                { name: 'Institutional', path: '/institutional' },
+                                { name: 'Blog', path: '/blog' },
                                 { name: 'Contact', path: '/contact' },
-                                { name: 'Get Admission', path: '/get-admission', isSpecial: true }
                             ].map((item) => (
                                 <Link
                                     key={item.name}
                                     to={item.path}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={cn(
-                                        "text-lg font-black tracking-tight",
-                                        item.isSpecial ? "text-blue-400" : "text-white/70"
-                                    )}
+                                    className="text-lg font-black tracking-tight text-white/70"
                                 >
                                     <div className="flex items-center gap-2">
                                         {item.name}
@@ -385,10 +374,10 @@ export default function Index() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 tracking-tighter leading-[0.95] md:leading-[0.9]"
+                        className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 tracking-tighter leading-[0.95] md:leading-[0.9]"
                     >
-                        ItaloStudy for <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500">Education.</span>
+                        Master Your <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500">Global Admissions.</span>
                     </motion.h1>
 
                     <motion.p
@@ -425,16 +414,16 @@ export default function Index() {
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <Button
                                 onClick={() => setIsAuthModalOpen(true)}
-                                className="h-14 md:h-16 px-8 md:px-10 bg-transparent text-white font-black text-base md:text-lg rounded-full border-2 border-cyan-400/50 hover:bg-cyan-400/10 transition-all group shadow-[0_0_30px_rgba(34,211,238,0.2)]"
+                                className="h-14 md:h-16 px-8 md:px-10 bg-indigo-600 text-white font-black text-base md:text-lg rounded-full hover:bg-indigo-700 transition-all group shadow-[0_0_30px_rgba(79,70,229,0.3)]"
                             >
                                 FREE GET started
                                 <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" />
                             </Button>
                         </motion.div>
-                        <Link to="/get-admission">
+                        <Link to="/blog">
                             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                <Button variant="outline" className="h-14 md:h-16 px-8 md:px-10 bg-white text-slate-900 border-none font-black text-base md:text-lg rounded-full hover:bg-white/90 transition-all shadow-xl">
-                                    Get Admission
+                                <Button variant="outline" className="h-14 md:h-16 px-8 md:px-10 bg-white/10 backdrop-blur-md text-white border-white/20 font-black text-base md:text-lg rounded-full hover:bg-white/20 transition-all shadow-xl">
+                                    Read Blog
                                 </Button>
                             </motion.div>
                         </Link>
@@ -477,7 +466,7 @@ export default function Index() {
                 </section>
 
                 {/* Global Challenge Section */}
-                <GlobalChallenge />
+                <GlobalChallenge onPracticeMore={() => setIsAuthModalOpen(true)} />
 
                 {/* Testimonials */}
                 < section className="py-32 bg-[#030014]/50 relative z-10" >
@@ -556,7 +545,7 @@ export default function Index() {
                                     { name: 'Method', path: '/method' },
                                     { name: 'Syllabus', path: '/syllabus' },
                                     { name: 'Pricing', path: '/pricing' },
-                                    { name: 'Institutional', path: '/institutional' },
+                                    { name: 'Blog', path: '/blog' },
                                     { name: 'Contact Us', path: '/contact' }
                                 ].map(item => (
                                     <Link

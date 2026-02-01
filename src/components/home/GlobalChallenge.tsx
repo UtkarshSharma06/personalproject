@@ -19,14 +19,15 @@ interface Question {
 }
 
 // Interactive Data with updated badges
+// Interactive Data with updated badges
 const QUESTIONS: Question[] = [
     {
         subject: "Logic & Reasoning",
         icon: Brain,
         badge: "Rank Match",
-        question: "Three friends - Alice, Bob, and Charlie - are in a race. Alice finished before Bob but after Charlie. Who finished last?",
-        options: ["Alice", "Bob", "Charlie", "Alice and Bob tied"],
-        correct: 1 // Bob
+        question: "If you are running a race and you pass the person in second place, what place are you in?",
+        options: ["First", "Second", "Third", "Last"],
+        correct: 1 // Second
     },
     {
         subject: "Mathematics",
@@ -64,8 +65,11 @@ const QUESTIONS: Question[] = [
 
 // Countries list removed as it is no longer used
 
+interface GlobalChallengeProps {
+    onPracticeMore?: () => void;
+}
 
-const GlobalChallenge = () => {
+const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
     // State
     const [currentQ, setCurrentQ] = useState(0);
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -105,7 +109,7 @@ const GlobalChallenge = () => {
     };
 
     return (
-        <section className="py-24 relative overflow-hidden transform-gpu" style={{ background: 'hsl(0 0% 0%)' }}>
+        <section className="py-24 relative transform-gpu" style={{ background: 'hsl(0 0% 0%)' }}>
             {/* Dark Grid Background Pattern */}
             <div className="absolute inset-0 pointer-events-none" style={{
                 background: `
@@ -302,9 +306,10 @@ const GlobalChallenge = () => {
                                                 Try Again
                                             </Button>
                                             <Button
+                                                onClick={onPracticeMore}
                                                 className="flex-1 h-14 bg-white text-slate-900 rounded-2xl font-bold hover:bg-slate-100 shadow-xl shadow-white/20"
                                             >
-                                                View Analysis
+                                                Practice More
                                             </Button>
                                         </div>
 

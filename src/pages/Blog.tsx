@@ -99,7 +99,7 @@ export default function Blog() {
                 <BlogHeader />
 
                 {/* Friendly Hero Section */}
-                <div className="relative overflow-hidden bg-gradient-to-b from-yellow-50/50 via-white to-transparent pt-24 pb-16 lg:pt-32 lg:pb-24">
+                <div className="relative overflow-hidden bg-gradient-to-b from-yellow-50/50 via-white to-transparent pt-12 pb-16 lg:pt-20 lg:pb-24">
                     <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none bg-[radial-gradient(#E2E8F0_1px,transparent_1px)] [background-size:20px_20px]" />
 
                     <div className="container relative mx-auto px-4 text-center">
@@ -116,9 +116,10 @@ export default function Blog() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-5xl lg:text-7xl font-black text-slate-900 tracking-tight leading-tight mb-6"
+                            className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight mb-6"
                         >
-                            The Study <span className="text-indigo-600">Corner</span> 🎒
+                            The Study Blog for <br />
+                            <span className="text-indigo-600">IMAT, CEnT-S, SAT & IELTS</span> 🎒
                         </motion.h1>
 
                         <motion.p

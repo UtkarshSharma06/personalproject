@@ -33,6 +33,7 @@ interface BlogPost {
     category_id?: string;
     published_at: string;
     created_at: string;
+    views: number;
 }
 
 interface Category {
@@ -447,9 +448,13 @@ export default function BlogManager() {
                                                     }`}>
                                                     {post.status}
                                                 </span>
-                                                <span className="text-xs font-bold text-slate-400">
+                                                <span className="text-xs font-bold text-slate-400 border-l border-slate-200 pl-3">
                                                     {format(new Date(post.created_at), 'MMM dd')}
                                                 </span>
+                                                <div className="flex items-center gap-1 text-slate-400 border-l border-slate-200 pl-3">
+                                                    <Eye className="w-3 h-3" />
+                                                    <span className="text-xs font-bold">{post.views || 0}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

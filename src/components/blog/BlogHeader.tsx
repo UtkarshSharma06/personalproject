@@ -20,17 +20,13 @@ export default function BlogHeader() {
                     transition={{ duration: 0.5 }}
                     className="flex items-center gap-4"
                 >
-                    <Link to="/" className="flex items-center gap-2 group">
-                        <motion.div
-                            whileHover={{ rotate: 12, scale: 1.1 }}
-                            className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 transition-transform"
-                        >
-                            <GraduationCap className="w-6 h-6" />
-                        </motion.div>
-                        <div className="flex flex-col">
-                            <span className="text-sm font-black text-slate-900 uppercase tracking-tighter leading-none">Italostudy</span>
-                            <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest leading-none">Journal</span>
-                        </div>
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <img
+                            src="/logo.png"
+                            alt="Italostudy Logo"
+                            className="h-10 w-auto object-contain"
+                            loading="eager"
+                        />
                     </Link>
                 </motion.div>
 
@@ -52,12 +48,12 @@ export default function BlogHeader() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${location.pathname === '/blog'
-                                    ? 'bg-white text-indigo-600 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
+                                ? 'bg-white text-indigo-600 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
                                 }`}
                         >
                             <Sparkles className="w-3 h-3" />
-                            The Corner
+                            Blog
                         </motion.div>
                     </Link>
 
