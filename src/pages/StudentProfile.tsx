@@ -101,23 +101,46 @@ export default function StudentProfile() {
                 createdAt = profileData.created_at || createdAt;
             }
 
-            // 3. Calculate Streak
-            const { data: userTests } = await supabase
-                .from('tests')
-                .select('created_at')
-                .eq('user_id', id)
-                .order('created_at', { ascending: false });
+            // 3. Aggregate Activity for Accurate Streak
+            const [
+                { data: userTests },
+                { data: userPractice },
+                { data: userLearning }
+            ] = await Promise.all([
+                supabase.from('tests').select('created_at').eq('user_id', id),
+                supabase.from('user_practice_responses').select('created_at').eq('user_id', id),
+                supabase.from('learning_progress').select('last_accessed_at').eq('user_id', id)
+            ]);
 
-            if (userTests) {
-                const activeDates = new Set(userTests.map((t: any) => format(new Date(t.created_at), 'yyyy-MM-dd')));
-                let calculatedStreak = 0;
-                let checkDate = new Date();
-                while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
-                    calculatedStreak++;
-                    checkDate = subDays(checkDate, 1);
-                }
-                streak = calculatedStreak;
+            const activityDates = new Set<string>();
+            userTests?.forEach(t => activityDates.add(format(new Date(t.created_at), 'yyyy-MM-dd')));
+            userPractice?.forEach(p => activityDates.add(format(new Date(p.created_at), 'yyyy-MM-dd')));
+            userLearning?.forEach(l => activityDates.add(format(new Date(l.last_accessed_at), 'yyyy-MM-dd')));
+
+            let calculatedStreak = 0;
+            let checkDate = new Date();
+            // Start from today or yesterday (to allow for the day not being over)
+            if (!activityDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                checkDate = subDays(checkDate, 1);
             }
+
+            while (activityDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                calculatedStreak++;
+                checkDate = subDays(checkDate, 1);
+            }
+            streak = calculatedStreak;
+
+            // 4. Calculate Real Training Time
+            // Sum time_taken_seconds from tests + 3 min per unique practice question
+            const { data: testTimes } = await supabase
+                .from('tests')
+                .select('time_taken_seconds')
+                .eq('user_id', id)
+                .eq('status', 'completed');
+
+            const actualTestSeconds = testTimes?.reduce((sum, t) => sum + (t.time_taken_seconds || 0), 0) || 0;
+            const practiceEstimatedSeconds = questionsSolved * 180; // 3 minutes per question
+            const totalHours = Math.round((actualTestSeconds + practiceEstimatedSeconds) / 3600);
 
             // 4. Fallback counts if not in leaderboard
             if (!champion) {
@@ -141,7 +164,7 @@ export default function StudentProfile() {
                 streak,
                 questions_solved: questionsSolved,
                 accuracy,
-                hours_trained: Math.floor(questionsSolved * 0.05),
+                hours_trained: Math.max(1, totalHours), // Show at least 1h if they have solved questions
                 plan,
                 created_at: createdAt
             });

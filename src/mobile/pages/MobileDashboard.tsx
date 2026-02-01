@@ -7,7 +7,7 @@ import {
     BarChart3, Bookmark, FlaskConical, GraduationCap,
     Award, ChevronRight, Bell, Dna, Brain, Calculator,
     Languages, Database, Microscope, ClipboardList,
-    Headphones, PenTool, Mic, MessageSquare
+    Headphones, PenTool, Mic, MessageSquare, MessageCircle
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { useAuth } from '@/lib/auth';
@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { usePlanAccess } from '@/hooks/usePlanAccess';
 import { UpgradeModal } from '@/components/UpgradeModal';
+import { FeedbackDialog } from '@/components/FeedbackDialog';
 
 interface SubjectMastery {
     subject: string;
@@ -161,12 +162,39 @@ const MobileDashboard: React.FC = () => {
                 const totalQ = (testsRes.data as any[]).reduce((acc: number, t: any) => acc + (t.total_questions || 0), 0);
 
                 // Calculate streak
-                const activeDates = new Set((testsRes.data as any[]).map((t: any) => format(new Date(t.created_at), 'yyyy-MM-dd')));
+                const { data: learningProgress } = await supabase
+                    .from('learning_progress')
+                    .select('last_accessed_at')
+                    .eq('user_id', user!.id);
+
+                const activeDates = new Set([
+                    ...(testsRes.data as any[]).map((t: any) => format(new Date(t.created_at), 'yyyy-MM-dd')),
+                    ...(learningProgress || []).map((p: any) => format(new Date(p.last_accessed_at), 'yyyy-MM-dd'))
+                ]);
+
                 let streak = 0;
                 let checkDate = new Date();
-                while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
-                    streak++;
-                    checkDate = subDays(checkDate, 1);
+
+                // Check if user was active today or yesterday to continue/start streak
+                const today = format(new Date(), 'yyyy-MM-dd');
+                const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+
+                if (activeDates.has(today)) {
+                    // Streak is active including today
+                    while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                        streak++;
+                        checkDate = subDays(checkDate, 1);
+                    }
+                } else if (activeDates.has(yesterday)) {
+                    // Streak was active until yesterday, but not today (yet)
+                    checkDate = subDays(new Date(), 1);
+                    while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                        streak++;
+                        checkDate = subDays(checkDate, 1);
+                    }
+                } else {
+                    // No activity today or yesterday, streak is 0
+                    streak = 0;
                 }
 
                 const mockSolved = (testsRes.data as any[]).filter((t: any) => t.test_type === 'mock').length;
@@ -513,7 +541,7 @@ const MobileDashboard: React.FC = () => {
                             </div>
                             <div>
                                 <h3 className="text-xl font-black uppercase tracking-tight leading-none">Upgrade to <span className="text-amber-400">PRO</span></h3>
-                                <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mt-2">Unlock unlimited missions & expert intel.</p>
+                                <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mt-2">Unlock unlimited practice & expert insights.</p>
                             </div>
                             <Button className="w-full bg-white text-indigo-600 hover:bg-white/90 font-black text-[10px] uppercase tracking-widest h-12 rounded-xl">
                                 Unlock Premium Access
@@ -558,11 +586,66 @@ const MobileDashboard: React.FC = () => {
                 </div>
             </section>
 
+            {/* Compact WhatsApp & Feedback Hub (Mobile) */}
+            <section className="mt-10 px-4 pb-10 space-y-3">
+                <div
+                    onClick={() => window.open('https://chat.whatsapp.com/HMrIISJM6LUEIxgTxSMQp7', '_blank')}
+                    className="group relative flex items-center justify-between p-4 rounded-3xl bg-[#075E54] text-white cursor-pointer shadow-xl shadow-emerald-900/10 active:scale-[0.98] transition-all border border-white/10 overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-400/10 blur-2xl rounded-full -mr-12 -mt-12" />
+
+                    <div className="relative z-10 flex items-center gap-4">
+                        <div className="shrink-0 w-11 h-11 rounded-2xl bg-white text-[#075E54] flex items-center justify-center shadow-lg group-active:rotate-12 transition-transform">
+                            <MessageCircle size={22} />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                                <h4 className="text-sm font-black uppercase tracking-tight">WhatsApp Squad</h4>
+                                <div className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse" />
+                            </div>
+                            <p className="text-[10px] font-bold text-emerald-100/60 uppercase tracking-widest truncate">
+                                2000+ Students Preparing 🎒
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="relative z-10 shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    </div>
+                </div>
+
+                {/* Compact Feedback Form Card */}
+                <FeedbackDialog trigger={
+                    <div
+                        className="group relative flex items-center gap-4 p-4 rounded-[2rem] bg-gradient-to-br from-indigo-600 via-violet-600 to-slate-900 text-white cursor-pointer shadow-xl shadow-indigo-900/10 active:scale-[0.98] transition-all border border-white/5 overflow-hidden"
+                    >
+                        <div className="shrink-0 w-12 h-12 rounded-2xl bg-white text-indigo-600 flex items-center justify-center shadow-lg group-active:scale-110 transition-transform">
+                            <ClipboardList size={24} />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <h4 className="text-sm font-black uppercase tracking-tight">Help us Improve</h4>
+                                <div className="h-1 w-1 rounded-full bg-indigo-400 animate-pulse" />
+                            </div>
+                            <p className="text-[9px] font-bold text-indigo-100/60 uppercase tracking-widest truncate">
+                                Share your Feedback 🌟
+                            </p>
+                        </div>
+
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                            <ChevronRight size={16} />
+                        </div>
+                    </div>
+                } />
+            </section>
+
             <UpgradeModal
                 isOpen={isUpgradeModalOpen}
                 onClose={() => setIsUpgradeModalOpen(false)}
-                title="Premium Protocol"
-                description="Your current authorization level is Explorer. Upgrade to PRO to access full spectrum analysis and unlimited practice sessions."
+                title="Premium Platform"
+                description="Your current access level is Explorer. Upgrade to PRO to access full performance analysis and unlimited practice sessions."
                 feature="Full Platform Access"
             />
         </div>

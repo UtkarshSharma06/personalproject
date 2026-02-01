@@ -1,8 +1,9 @@
-import { motion } from 'framer-motion';
-import { Download, ShieldCheck, Smartphone, Lock, ExternalLink, CheckCircle2, Globe, FileText, Sun, Moon, ArrowDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Download, ShieldCheck, Smartphone, Lock, ExternalLink, CheckCircle2, Globe, FileText, Sun, Moon, ArrowDown, X, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const lightScreenshots = [
     { id: 'dashboard', url: '/screenshot-dashboard.jpg', title: 'Dashboard' },
@@ -41,7 +42,9 @@ const PhoneFrame = ({ imgUrl, className }: { imgUrl: string, className?: string 
 
 export default function DownloadApp() {
     const navigate = useNavigate();
+    const { toast } = useToast();
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isNative, setIsNative] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -103,17 +106,16 @@ export default function DownloadApp() {
                     </div>
 
                     <div className="space-y-6">
-                        <a
-                            href={APK_DOWNLOAD_URL}
-                            download="italostudy-v1.0.0-release.apk"
-                            className="inline-flex items-center gap-4 px-8 py-5 bg-slate-900 text-white rounded-2xl shadow-xl shadow-slate-200 hover:bg-black hover:-translate-y-1 transition-all group"
+                        <button
+                            onClick={() => setIsDialogOpen(true)}
+                            className="inline-flex items-center gap-4 px-8 py-5 bg-[#00a884] text-white rounded-2xl shadow-xl shadow-emerald-500/20 hover:bg-[#008f6f] hover:-translate-y-1 transition-all group w-full sm:w-auto"
                         >
                             <Download size={20} className="group-hover:animate-bounce" />
                             <div className="text-left">
                                 <div className="text-sm font-bold leading-none mb-1">Download Official APK</div>
-                                <div className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Version 1.0.0 • 17.7 MB</div>
+                                <div className="text-[8px] font-bold text-white/70 uppercase tracking-widest">Version 1.0.0 • 17.7 MB</div>
                             </div>
-                        </a>
+                        </button>
 
                         <div className="flex flex-wrap gap-6 pt-2">
                             <div className="flex items-center gap-2 text-emerald-600">
@@ -291,6 +293,64 @@ export default function DownloadApp() {
                     />
                 </div>
             </footer>
+
+            <AnimatePresence>
+                {isDialogOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsDialogOpen(false)}
+                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-sm bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-emerald-100"
+                        >
+                            <div className="bg-emerald-500 p-10 flex flex-col items-center text-white relative">
+                                <div className="absolute top-6 right-6">
+                                    <button
+                                        onClick={() => setIsDialogOpen(false)}
+                                        className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                                <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mb-6 backdrop-blur-md border border-white/30 animate-pulse">
+                                    <Clock size={40} className="text-white" />
+                                </div>
+                                <h3 className="text-2xl font-black uppercase tracking-tight text-center leading-tight">
+                                    Build in <br />Progress
+                                </h3>
+                            </div>
+                            <div className="p-10 text-center space-y-8">
+                                <div className="space-y-3">
+                                    <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">App development in progress</p>
+                                    <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
+                                        We are currently optimizing the Google Sign-in flow and push notification protocol. The official APK will be available for download shortly.
+                                    </p>
+                                </div>
+
+                                <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100/50">
+                                    <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest leading-normal">
+                                        "We will update you soon <br />via global protocol"
+                                    </p>
+                                </div>
+
+                                <button
+                                    onClick={() => setIsDialogOpen(false)}
+                                    className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-slate-200 hover:bg-black transition-all"
+                                >
+                                    Understood
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
             <style>{`
                 @keyframes hue-rotate {

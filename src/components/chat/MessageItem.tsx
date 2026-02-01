@@ -70,6 +70,7 @@ interface MessageItemProps {
     searchQuery?: string;
     reactions?: any[];
     batchMessages?: Message[];
+    onView?: () => void;
 }
 
 const REACTION_OPTIONS = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
@@ -123,11 +124,33 @@ const renderContent = (content: string, isOwn: boolean, searchQuery?: string) =>
     });
 };
 
-export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isAdmin, isPinned, onPin, onUnpin, onImageClick, searchQuery, reactions = [], batchMessages }: MessageItemProps) {
+export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isAdmin, isPinned, onPin, onUnpin, onImageClick, searchQuery, reactions = [], batchMessages, onView }: MessageItemProps) {
     const { user } = useAuth();
     const isOwn = user?.id === message.user_id;
     const [showReactionPicker, setShowReactionPicker] = useState(false);
     const longPressTimer = useRef<NodeJS.Timeout | null>(null); // Timer ref
+    const messageRef = useRef<HTMLDivElement>(null);
+
+    // View Tracking
+    useEffect(() => {
+        if (!onView || message.is_deleted) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    onView();
+                    observer.disconnect();
+                }
+            },
+            { threshold: 0.5 }
+        );
+
+        if (messageRef.current) {
+            observer.observe(messageRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [message.id, onView, message.is_deleted]);
 
     const handleReaction = async (emoji: string) => {
         try {
@@ -218,6 +241,7 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
             onTouchStart={startLongPress}
             onTouchEnd={endLongPress}
             onTouchMove={cancelLongPress}
+            ref={messageRef}
         >
             {/* Forward Action (Outside Bubble) */}
             {(message.file_url || (batchMessages && batchMessages.length > 0)) && (
@@ -446,8 +470,8 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
 
                     {/* Reaction Picker Overlay - Outside overflow-hidden bubble */}
                     {showReactionPicker && (
-                        <div className={`absolute top-[-44px] ${isOwn ? 'right-0' : 'left-0'} z-50 animate-in zoom-in duration-200`}>
-                            <div className="flex items-center gap-1 bg-white dark:bg-[#202c33] p-1.5 rounded-full shadow-xl border border-slate-200 dark:border-slate-700">
+                        <div className={`absolute top-[-50px] ${isOwn ? 'right-0' : 'left-0'} z-[100] animate-in zoom-in duration-200`}>
+                            <div className="flex items-center gap-1.5 bg-white dark:bg-[#202c33] p-2 rounded-full shadow-2xl border border-slate-200 dark:border-slate-700">
                                 {REACTION_OPTIONS.map(emoji => (
                                     <button
                                         key={emoji}
@@ -455,13 +479,13 @@ export function MessageItem({ message, onReply, onDelete, onBan, onRestrict, isA
                                             e.stopPropagation();
                                             handleReaction(emoji);
                                         }}
-                                        className="text-lg hover:scale-125 transition-transform px-1"
+                                        className="text-xl hover:scale-150 transition-transform px-1 hover:brightness-110 active:scale-95"
                                     >
                                         {emoji}
                                     </button>
                                 ))}
                             </div>
-                            <div className="fixed inset-0 z-[-1]" onClick={(e) => {
+                            <div className="fixed inset-0 z-[-1] cursor-default" onClick={(e) => {
                                 e.stopPropagation();
                                 setShowReactionPicker(false);
                             }} />

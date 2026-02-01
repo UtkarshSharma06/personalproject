@@ -123,7 +123,7 @@ export const APKOnboarding: React.FC<APKOnboardingProps> = ({ onComplete }) => {
             </div>
 
             <div className="absolute bottom-10 opacity-20">
-                <p className="text-[8px] font-black text-white uppercase tracking-[0.5em]">Italostudy Systems • Mobile Protocol</p>
+                <p className="text-[8px] font-black text-white uppercase tracking-[0.5em]">Italostudy Platform • Mobile App</p>
             </div>
         </div>
     );

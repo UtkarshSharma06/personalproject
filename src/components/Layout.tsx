@@ -252,16 +252,16 @@ export default function Layout({ children, showFooter = true, showHeader = true 
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-64 p-3 rounded-[2rem] border-indigo-500/10 shadow-2xl backdrop-blur-3xl bg-white/90">
                                     <div className="px-4 py-3 mb-2 border-b border-slate-50">
-                                        <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest mb-1">Authenticated Entry</p>
+                                        <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest mb-1">Active Account</p>
                                         <p className="text-[10px] font-black text-slate-900 dark:text-white truncate">{profile?.full_name || user?.user_metadata?.full_name || displayName}</p>
                                     </div>
                                     <DropdownMenuItem onClick={() => navigate('/settings')} className="rounded-xl p-3 cursor-pointer hover:bg-slate-50 flex items-center gap-3 group">
                                         <Settings className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Settings Console</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Settings</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={handleSignOut} className="rounded-xl p-3 cursor-pointer hover:bg-rose-50 flex items-center gap-3 group">
                                         <LogOut className="w-4 h-4 text-slate-400 group-hover:text-rose-600 transition-colors" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Terminate Session</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Log Out</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

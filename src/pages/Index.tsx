@@ -10,9 +10,11 @@ import {
     Dna, Scroll, Globe2, Hourglass, Landmark
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import VoltageButton from '@/components/ui/VoltageButton';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '@/components/SEO';
+import GlobalChallenge from '@/components/home/GlobalChallenge';
 
 // Lazy load heavy components
 const AuthModal = lazy(() => import('@/components/auth/AuthModal'));
@@ -127,7 +129,7 @@ export default function Index() {
             <SEO
                 title="ItaloStudy | Free IMAT Practice & Unlimited Free Mocks"
                 description="Experience the world's most advanced study simulator for IMAT, SAT, CEnT-S and IELTS preparation. Get free practice questions and unlimited free mocks for your exam success."
-                keywords="Free IMAT Practice, Unlimited Free IMAT Mocks, Free SAT Prep, Free IELTS Preparation, Study in Italy, Medical Admission Italy, Free Academic Practice, ItaloStudy Free Mocks"
+                keywords="IMAT preparation, IMAT free practice tests, IMAT past papers online, IMAT study guide, IMAT exam tips, IMAT preparation Italy, CEnT-S preparation, CEnT-S free practice, CEnT-S exam guide, CEnT-S past papers, SAT preparation free, SAT practice tests online, SAT study guide free, SAT exam tips, SAT preparation for international students, IELTS preparation free, IELTS practice tests online, IELTS study guide free, IELTS exam tips, IELTS preparation for study abroad, study abroad Italy, free study abroad preparation, international university admissions, Italy medical school admissions, study abroad exam prep, best universities in Italy for medicine, how to apply to Italian universities, study abroad scholarships Italy, study abroad entrance exams, study abroad preparation platform, free exam preparation website, online exam practice free, international exam preparation, global student admissions support, exam prep made simple, free study resources online, online learning for exams, exam success tips, best exam preparation platform, free exam prep for students, how to prepare for IMAT exam free, best free IMAT practice tests online, free SAT preparation for Indian students, IELTS preparation for beginners free, CEnT-S exam preparation step by step, IMAT exam preparation for medical school Italy, SAT preparation tips for international students, IELTS free resources for study abroad, CEnT-S preparation for global students, IMAT exam preparation made simple, Italian university admissions guide, free admissions support Italy, international student admissions Italy, medical school entrance exam Italy, study abroad admissions simplified, how to apply for IMAT exam, admissions preparation for global students, Italy medical school entrance exam prep, international admissions preparation free, study abroad admissions platform, free IMAT preparation online, free SAT practice tests, free IELTS practice tests, free CEnT-S exam prep, study abroad exam preparation free, best free exam prep website, online study abroad preparation free, free exam prep for medical students, admissions support for international students, free exam prep made easy, IMAT blog preparation tips, SAT blog study guide, IELTS blog free resources, CEnT-S blog exam tips, study abroad blog Italy, medical school blog Italy admissions, free exam prep blog, international student blog admissions, study abroad blog exam prep, global student blog resources, IMAT vs SAT preparation, IELTS vs TOEFL preparation free, CEnT-S vs IMAT exam guide, SAT vs ACT preparation free, study abroad vs local admissions, free exam prep vs paid courses, IMAT exam difficulty guide, SAT exam difficulty tips, IELTS exam difficulty explained, CEnT-S exam difficulty guide, join free IMAT preparation, sign up free SAT prep, register free IELTS practice, enroll free CEnT-S prep, start free exam preparation today, free exam prep for study abroad students, free IMAT preparation for medical school, free SAT preparation for global students, free IELTS preparation for international admissions, free CEnT-S preparation for study abroad, Free IMAT Practice, Unlimited Free IMAT Mocks, Free SAT Prep, Free IELTS Preparation, Study in Italy, Medical Admission Italy, Free Academic Practice, ItaloStudy Free Mocks"
                 schema={{
                     "@context": "https://schema.org",
                     "@graph": [
@@ -141,7 +143,7 @@ export default function Index() {
                                 "https://www.instagram.com/italostudy",
                                 "https://twitter.com/italostudy"
                             ],
-                            "description": "The #1 Platform for Abroad Universities Admission and Exam Preparation."
+                            "description": "Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified. The ultimate platform for abroad university entrance exam preparation."
                         },
                         {
                             "@type": "WebSite",
@@ -151,11 +153,48 @@ export default function Index() {
                             "publisher": {
                                 "@id": "https://italostudy.com/#organization"
                             },
-                            "potentialAction": {
-                                "@type": "SearchAction",
-                                "target": "https://italostudy.com/search?q={search_term_string}",
-                                "query-input": "required name=search_term_string"
-                            }
+                            "potentialAction": [
+                                {
+                                    "@type": "SearchAction",
+                                    "target": "https://italostudy.com/search?q={search_term_string}",
+                                    "query-input": "required name=search_term_string"
+                                }
+                            ]
+                        },
+                        {
+                            "@type": "SiteNavigationElement",
+                            "name": "Login",
+                            "url": "https://italostudy.com/auth"
+                        },
+                        {
+                            "@type": "SiteNavigationElement",
+                            "name": "Pricing",
+                            "url": "https://italostudy.com/pricing"
+                        },
+                        {
+                            "@type": "SiteNavigationElement",
+                            "name": "Free Resources",
+                            "url": "https://italostudy.com/resources"
+                        },
+                        {
+                            "@type": "SiteNavigationElement",
+                            "name": "Method",
+                            "url": "https://italostudy.com/method"
+                        },
+                        {
+                            "@type": "SiteNavigationElement",
+                            "name": "Blog",
+                            "url": "https://italostudy.com/blog"
+                        },
+                        {
+                            "@type": "SiteNavigationElement",
+                            "name": "Contact",
+                            "url": "https://italostudy.com/contact"
+                        },
+                        {
+                            "@type": "SiteNavigationElement",
+                            "name": "Exam Syllabus",
+                            "url": "https://italostudy.com/syllabus"
                         },
                         {
                             "@type": "BreadcrumbList",
@@ -175,10 +214,10 @@ export default function Index() {
 
             {/* Navbar */}
             <header className={cn(
-                "sticky left-0 right-0 z-40 transition-all duration-300 px-4 md:px-12",
+                "sticky top-0 left-0 right-0 z-50 transition-all duration-300 px-4 md:px-12",
                 scrolled
-                    ? "top-0 py-3 md:py-4 bg-[#030014]/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl"
-                    : "top-0 py-0 bg-transparent border-none shadow-none"
+                    ? "py-3 md:py-4 bg-[#030014]/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl"
+                    : "py-4 md:py-6 bg-transparent border-none shadow-none"
             )}>
                 <div className="container mx-auto flex items-center justify-between">
                     {/* Logo */}
@@ -204,6 +243,7 @@ export default function Index() {
                             {[
                                 { name: 'Method', path: '/method' },
                                 { name: 'Syllabus', path: '/syllabus' },
+                                { name: 'Resources', path: '/resources' },
                                 { name: 'Pricing', path: '/pricing' },
                                 { name: 'Institutional', path: '/institutional' },
                                 { name: 'Contact', path: '/contact' },
@@ -234,13 +274,11 @@ export default function Index() {
 
                     {/* Right Section */}
                     <div className="flex items-center gap-4">
-                        <Button
-                            onClick={() => setIsAuthModalOpen(true)}
-                            className="hidden sm:flex group relative overflow-hidden h-12 px-8 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black rounded-full shadow-[0_0_20px_rgba(99,102,241,0.3)] text-xs transition-all hover:scale-105 border-none uppercase tracking-widest"
-                        >
-                            <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-violet-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            <span className="relative z-10">Log in</span>
-                        </Button>
+                        <div className="hidden sm:block">
+                            <VoltageButton onClick={() => setIsAuthModalOpen(true)}>
+                                Log in
+                            </VoltageButton>
+                        </div>
 
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -287,16 +325,15 @@ export default function Index() {
                                     </div>
                                 </Link>
                             ))}
-                            <Button
+                            <VoltageButton
                                 onClick={() => {
                                     setIsAuthModalOpen(true);
                                     setIsMobileMenuOpen(false);
                                 }}
-                                className="group relative overflow-hidden w-full h-14 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black rounded-2xl uppercase text-sm tracking-widest mt-4"
+                                className="w-full mt-4"
                             >
-                                <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-violet-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                <span className="relative z-10">Log in</span>
-                            </Button>
+                                Log in
+                            </VoltageButton>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -437,7 +474,10 @@ export default function Index() {
                             ))}
                         </div>
                     </div>
-                </section >
+                </section>
+
+                {/* Global Challenge Section */}
+                <GlobalChallenge />
 
                 {/* Testimonials */}
                 < section className="py-32 bg-[#030014]/50 relative z-10" >

@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Clock, Users, Target, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SEO from '@/components/SEO';
 
 export default function ExamIMAT() {
     return (
         <div className="min-h-screen bg-[#f0f4f8] font-sans">
+            <SEO
+                title="IMAT Preparation | Italy Medical Admission Exam | ItaloStudy"
+                description="Everything you need to master the IMAT (International Medical Admissions Test). Free practice questions, exam structure overview, and study guides for Italian medical schools."
+                keywords="IMAT prep, study medicine in Italy, IMAT score calculator, IMAT past papers, Italy medical admission, IMAT biology, IMAT chemistry"
+            />
             {/* Header */}
             <div className="bg-white dark:bg-card border-b-2 border-slate-900 sticky top-0 z-50">
                 <div className="container mx-auto px-4 py-4">

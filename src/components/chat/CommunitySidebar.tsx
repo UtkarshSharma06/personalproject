@@ -283,8 +283,14 @@ export function CommunitySidebar({ activeCommunityId, onSelectCommunity }: Commu
             });
 
             setUnreadCounts(counts);
-        } catch (err) {
-            console.error('Error fetching unread counts:', err);
+        } catch (err: any) {
+            console.error('Error fetching unread counts details:', {
+                message: err.message,
+                details: err.details,
+                hint: err.hint,
+                code: err.code,
+                error: err
+            });
         }
     };
 

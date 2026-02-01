@@ -9,6 +9,7 @@ import {
     Check, ArrowRight, Brain, Globe,
     GraduationCap, Target, Sparkles, Zap, ChevronLeft
 } from 'lucide-react';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const exams = [
     { id: 'imat-prep', name: 'IMAT', fullName: 'Medicine Admission', icon: Target, color: 'bg-violet-600' },
@@ -21,7 +22,7 @@ const plans = [
     {
         id: 'explorer',
         name: 'Explorer Plan',
-        price: 'FREE',
+        price: 0,
         icon: Brain,
         color: 'bg-slate-500',
         features: ['15 Questions Daily', 'Basic Stats', 'Community Access']
@@ -29,7 +30,7 @@ const plans = [
     {
         id: 'pro',
         name: 'Exam Prep Plan',
-        price: 'BETA €0',
+        price: 5,
         icon: Zap,
         color: 'bg-indigo-600',
         features: ['Unlimited Practice', 'Full Simulations', 'AI Explanations', 'All Lectures']
@@ -37,7 +38,7 @@ const plans = [
     {
         id: 'elite',
         name: 'Global Admission Plan',
-        price: 'BETA €0',
+        price: 10,
         icon: Sparkles,
         color: 'bg-amber-500',
         features: ['Everything in Pro', 'Admission Support', 'Visa Guidance', 'University Shortlist']
@@ -49,6 +50,7 @@ export default function MobileOnboarding() {
     const { setActiveExam } = useExam();
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { formatPrice } = useCurrency();
     const [step, setStep] = useState(1);
     const [selectedExam, setSelectedExam] = useState<string | null>(null);
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export default function MobileOnboarding() {
             if (error) throw error;
             await refreshProfile();
             await setActiveExam(selectedExam);
-            toast({ title: "Protocol Armed", description: "Your journey begins now." });
+            toast({ title: "Ready for Study", description: "Your journey begins now." });
             navigate('/dashboard');
         } catch (e: any) {
             toast({ title: "Setup Failed", description: e.message, variant: "destructive" });
@@ -93,7 +95,7 @@ export default function MobileOnboarding() {
                             <GraduationCap className="text-primary w-8 h-8" />
                         </div>
                         <h1 className="text-4xl font-black tracking-tight uppercase">Choose <span className="text-primary">Path</span></h1>
-                        <p className="text-[10px] uppercase font-black tracking-[0.3em] text-muted-foreground opacity-50 mt-2">Protocol Identification</p>
+                        <p className="text-[10px] uppercase font-black tracking-[0.3em] text-muted-foreground opacity-50 mt-2">Study Setup</p>
                     </header>
 
                     <div className="space-y-4 flex-1">
@@ -129,7 +131,7 @@ export default function MobileOnboarding() {
                     <header className="mb-8 text-center relative">
                         <button onClick={() => setStep(1)} className="absolute left-0 top-0 p-2 text-muted-foreground"><ChevronLeft /></button>
                         <h1 className="text-4xl font-black tracking-tight uppercase">Select <span className="text-primary">Access</span></h1>
-                        <p className="text-[10px] uppercase font-black tracking-[0.3em] text-muted-foreground opacity-50 mt-2">Resource Allocation</p>
+                        <p className="text-[10px] uppercase font-black tracking-[0.3em] text-muted-foreground opacity-50 mt-2">Access Level</p>
                     </header>
 
                     <div className="space-y-4 flex-1 overflow-y-auto no-scrollbar pb-6">
@@ -147,7 +149,16 @@ export default function MobileOnboarding() {
                                         </div>
                                         <h3 className="font-black text-xl uppercase leading-none">{p.name}</h3>
                                     </div>
-                                    <span className="text-primary font-black text-xs">{p.price}</span>
+                                    <div className="flex flex-col items-end">
+                                        {p.price > 0 ? (
+                                            <>
+                                                <span className="text-[10px] font-black text-muted-foreground/60 line-through tracking-tight">{formatPrice(p.price)}</span>
+                                                <span className="text-primary font-black text-xs">FREE</span>
+                                            </>
+                                        ) : (
+                                            <span className="text-primary font-black text-xs">FREE</span>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     {p.features.map((f, i) => (
@@ -167,7 +178,7 @@ export default function MobileOnboarding() {
                         onClick={handleConfirm}
                         className="h-16 rounded-[2rem] bg-primary text-white font-black text-sm uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 transition-all"
                     >
-                        {isSubmitting ? 'Armed...' : 'Begin Protocol'}
+                        {isSubmitting ? 'Readying...' : 'Begin Study'}
                     </Button>
                 </div>
             )}

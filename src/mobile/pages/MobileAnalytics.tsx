@@ -153,17 +153,60 @@ export default function MobileAnalytics() {
             setVelocityData(velocityChartData);
 
 
-            // Stats calculation
-            const overallAccuracy = solvedBySubject && solvedBySubject.length > 0 ? Math.round((solvedBySubject.filter((q: any) => q.is_correct).length / solvedBySubject.length) * 100) : 0;
-            setStats({
-                accuracy: `${overallAccuracy}%`,
-                timeSpent: `${Math.round((userTests?.reduce((acc: number, t: any) => acc + (t.time_taken_seconds || 0), 0) || 0) / 3600)}h`,
-                verifiedSkills: `${processedData.filter(d => d.accuracy >= 70).length} Mastered`,
-                percentile: 'Top 10%'
-            });
+            // 5. Score Projection & Final Stats
+            const overallAccuracyVal = solvedBySubject && solvedBySubject.length > 0
+                ? (solvedBySubject.filter((q: any) => q.is_correct).length / solvedBySubject.length)
+                : 0;
 
-            const targetScore = isIELTS ? 9 : 60;
-            setProjection({ score: Number(((overallAccuracy / 100) * targetScore).toFixed(1)), target: targetScore, confidence: 85, trajectory: 'Improving' });
+            const targetScoreVal = isIELTS ? 9 : 60;
+            const currentPercentile = 10; // Placeholder until ranking logic is unified
+
+            if (isIELTS) {
+                const ieltsScores = [processedData[0]?.score || 0, processedData[1]?.score || 0, (processedData[2]?.score || 0) / 11.1, (processedData[3]?.score || 0) / 11.1].filter(s => s > 0);
+                const computedAvg = ieltsScores.length > 0 ? (ieltsScores.reduce((a, b) => a + b, 0) / ieltsScores.length).toFixed(1) : '0';
+
+                const totalTestTime = userTests?.reduce((acc: number, t: any) => acc + (t.time_taken_seconds || 0), 0) || 0;
+                const totalPracticeCount = solvedBySubject?.length || 0;
+                const estPracticeTime = totalPracticeCount * 180;
+                const computedHours = Math.round((totalTestTime + estPracticeTime) / 3600);
+
+                setStats({
+                    accuracy: `${computedAvg} Band`,
+                    timeSpent: `${Math.max(1, computedHours)}h`,
+                    verifiedSkills: processedData.filter(d => d.score > 0).length + ' Modules',
+                    percentile: `Top ${Math.max(1, 100 - currentPercentile)}%`
+                });
+            } else if (solvedBySubject && solvedBySubject.length > 0) {
+                const totalCorrectCount = solvedBySubject.filter((q: any) => q.is_correct).length;
+                const computedAccuracy = Math.round((totalCorrectCount / solvedBySubject.length) * 100);
+                const totalMastered = processedData.filter(d => d.accuracy >= 70).length;
+
+                const totalTestTime = userTests?.reduce((acc: number, t: any) => acc + (t.time_taken_seconds || 0), 0) || 0;
+                const totalPracticeCount = solvedBySubject?.length || 0;
+                const estPracticeTime = totalPracticeCount * 180;
+                const computedHours = Math.round((totalTestTime + estPracticeTime) / 3600);
+
+                setStats({
+                    accuracy: `${computedAccuracy}%`,
+                    timeSpent: `${Math.max(1, computedHours)}h`,
+                    verifiedSkills: `${totalMastered} Subjects Mastered`,
+                    percentile: `Top ${Math.max(1, 100 - currentPercentile)}%`
+                });
+            } else {
+                setStats({
+                    accuracy: '0%',
+                    timeSpent: '0h',
+                    verifiedSkills: '0 Subjects Mastered',
+                    percentile: 'Top 100%'
+                });
+            }
+
+            setProjection({
+                score: Number((overallAccuracyVal * targetScoreVal).toFixed(1)),
+                target: targetScoreVal,
+                confidence: 85,
+                trajectory: 'Improving'
+            });
         };
 
         fetchAnalytics();

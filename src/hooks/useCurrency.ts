@@ -6,6 +6,12 @@ interface CurrencyInfo {
     country: string;
 }
 
+const DEFAULT_CURRENCY: CurrencyInfo = {
+    code: 'EUR',
+    symbol: '€',
+    country: 'IT'
+};
+
 const CURRENCY_MAP: Record<string, { code: string; symbol: string }> = {
     // Europe
     IT: { code: 'EUR', symbol: '€' },
@@ -35,12 +41,9 @@ const CURRENCY_MAP: Record<string, { code: string; symbol: string }> = {
     NP: { code: 'NPR', symbol: '₨' },
     KR: { code: 'KRW', symbol: '₩' },
     HU: { code: 'HUF', symbol: 'Ft' },
-};
-
-const DEFAULT_CURRENCY: CurrencyInfo = {
-    code: 'EUR',
-    symbol: '€',
-    country: 'IT'
+    CA: { code: 'CAD', symbol: 'C$' },
+    AU: { code: 'AUD', symbol: 'A$' },
+    SG: { code: 'SGD', symbol: 'S$' },
 };
 
 export function useCurrency() {
@@ -53,29 +56,54 @@ export function useCurrency() {
                 // Check localStorage cache first
                 const cached = localStorage.getItem('userCurrency');
                 if (cached) {
-                    const parsedCache = JSON.parse(cached);
-                    const cacheAge = Date.now() - parsedCache.timestamp;
-                    // Cache for 24 hours
-                    if (cacheAge < 24 * 60 * 60 * 1000) {
-                        setCurrency(parsedCache.data);
-                        setIsLoading(false);
-                        return;
+                    try {
+                        const parsedCache = JSON.parse(cached);
+                        const cacheAge = Date.now() - parsedCache.timestamp;
+                        // Cache for 24 hours
+                        if (parsedCache.data && cacheAge < 24 * 60 * 60 * 1000) {
+                            setCurrency(parsedCache.data);
+                            setIsLoading(false);
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('Failed to parse cached currency');
                     }
                 }
 
-                // Fetch from IP geolocation API (ipwhois.io - no API key required)
-                const response = await fetch('https://ipwhois.app/json/');
-                const data = await response.json();
+                // PRIMARY API: ipwhois.app
+                let data;
+                try {
+                    const response = await fetch('https://ipwhois.app/json/');
+                    data = await response.json();
+                } catch (e) {
+                    // SECONDARY API FALLBACK: ipapi.co
+                    console.log('Primary IP API failed, trying fallback...');
+                    const response = await fetch('https://ipapi.co/json/');
+                    data = await response.json();
+                }
 
-                if (data.success !== false && data.country_code) {
-                    const countryCode = data.country_code;
-                    const currencyData = CURRENCY_MAP[countryCode] || DEFAULT_CURRENCY;
+                if (data && (data.success !== false || data.status !== 'fail')) {
+                    const countryCode = data.country_code || data.country;
 
-                    const currencyInfo: CurrencyInfo = {
-                        code: currencyData.code,
-                        symbol: currencyData.symbol,
-                        country: countryCode
-                    };
+                    // Prioritize API returned currency info if available
+                    const apiCurrencyCode = data.currency_code || data.currency;
+                    const apiCurrencySymbol = data.currency_symbol || data.symbol;
+
+                    let currencyInfo: CurrencyInfo;
+
+                    if (apiCurrencyCode && apiCurrencySymbol) {
+                        currencyInfo = {
+                            code: apiCurrencyCode,
+                            symbol: apiCurrencySymbol,
+                            country: countryCode || 'XX'
+                        };
+                    } else {
+                        const mappedCurrency = CURRENCY_MAP[countryCode] || DEFAULT_CURRENCY;
+                        currencyInfo = {
+                            ...mappedCurrency,
+                            country: countryCode || 'XX'
+                        };
+                    }
 
                     // Cache the result
                     localStorage.setItem('userCurrency', JSON.stringify({
@@ -88,7 +116,7 @@ export function useCurrency() {
                     setCurrency(DEFAULT_CURRENCY);
                 }
             } catch (error) {
-                console.error('Currency detection failed:', error);
+                console.error('Currency detection totally failed:', error);
                 setCurrency(DEFAULT_CURRENCY);
             } finally {
                 setIsLoading(false);
@@ -98,41 +126,44 @@ export function useCurrency() {
         detectCurrency();
     }, []);
 
-    const formatPrice = (priceInINR: number): string => {
-        if (priceInINR === 0) {
-            return 'Free';
-        }
+    const formatPrice = (priceInEUR: number): string => {
+        if (priceInEUR === 0) return 'Free';
 
-        // Exchange rates (approximate, INR as base)
+        // Exchange rates (approximate, EUR as base)
         const exchangeRates: Record<string, number> = {
-            'INR': 1,
-            'EUR': 0.011,    // 1 INR ≈ 0.011 EUR
-            'USD': 0.012,    // 1 INR ≈ 0.012 USD
-            'GBP': 0.0095,   // 1 INR ≈ 0.0095 GBP
-            'NGN': 18.5,     // 1 INR ≈ 18.5 NGN
-            'EGP': 0.60,     // 1 INR ≈ 0.60 EGP
-            'PKR': 3.35,     // 1 INR ≈ 3.35 PKR
-            'BDT': 1.32,     // 1 INR ≈ 1.32 BDT
-            'TRY': 0.41,     // 1 INR ≈ 0.41 TRY
-            'BRL': 0.070,    // 1 INR ≈ 0.070 BRL
-            'KWD': 0.0037,   // 1 INR ≈ 0.0037 KWD
-            'RSD': 1.30,     // 1 INR ≈ 1.30 RSD
-            'MAD': 0.12,     // 1 INR ≈ 0.12 MAD
-            'NPR': 1.60,     // 1 INR ≈ 1.60 NPR
-            'KRW': 16.2,     // 1 INR ≈ 16.2 KRW
-            'HUF': 4.30,     // 1 INR ≈ 4.30 HUF
+            'EUR': 1,
+            'USD': 1.08,    // 1 EUR ≈ 1.08 USD
+            'GBP': 0.86,    // 1 EUR ≈ 0.86 GBP
+            'INR': 90.5,    // 1 EUR ≈ 90.5 INR
+            'NGN': 1650,    // 1 EUR ≈ 1650 NGN (Volatile)
+            'EGP': 55,      // 1 EUR ≈ 55 EGP
+            'PKR': 305,     // 1 EUR ≈ 305 PKR
+            'BDT': 120,     // 1 EUR ≈ 120 BDT
+            'TRY': 33,      // 1 EUR ≈ 33 TRY
+            'BRL': 5.4,     // 1 EUR ≈ 5.4 BRL
+            'KWD': 0.33,    // 1 EUR ≈ 0.33 KWD
+            'RSD': 117,     // 1 EUR ≈ 117 RSD
+            'MAD': 10.8,    // 1 EUR ≈ 10.8 MAD
+            'NPR': 145,     // 1 EUR ≈ 145 NPR
+            'KRW': 1450,    // 1 EUR ≈ 1450 KRW
+            'HUF': 390,     // 1 EUR ≈ 390 HUF
+            'CAD': 1.46,    // 1 EUR ≈ 1.46 CAD
+            'AUD': 1.65,    // 1 EUR ≈ 1.65 AUD
+            'SGD': 1.45,    // 1 EUR ≈ 1.45 SGD
         };
 
-        const rate = exchangeRates[currency.code] || 1;
-        const convertedPrice = priceInINR * rate;
+        const rate = exchangeRates[currency.code] || exchangeRates['USD']; // Fallback to USD if unknown
+        const convertedPrice = priceInEUR * rate;
 
-        // Format based on currency
-        if (['JPY', 'KRW'].includes(currency.code)) {
-            // No decimals for these currencies
-            return `${currency.symbol}${Math.round(convertedPrice)}`;
+        // Special formatting for high-value currencies
+        if (['KRW', 'JPY', 'VND'].includes(currency.code)) {
+            return `${currency.symbol}${Math.round(convertedPrice).toLocaleString()}`;
         }
 
-        return `${currency.symbol}${convertedPrice.toFixed(2)}`;
+        return `${currency.symbol}${convertedPrice.toLocaleString(undefined, {
+            minimumFractionDigits: rate > 10 ? 0 : 2,
+            maximumFractionDigits: rate > 10 ? 0 : 2
+        })}`;
     };
 
     return {

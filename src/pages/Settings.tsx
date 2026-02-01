@@ -42,12 +42,14 @@ import {
 } from "@/components/ui/input-otp";
 import { ImageCropper } from '@/components/ui/ImageCropper';
 import MFAGuide from '../components/MFAGuide';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export default function Settings() {
     const { user, profile, refreshProfile } = useAuth() as any;
     const isGoogleUser = user?.app_metadata?.provider === 'google';
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { formatPrice } = useCurrency();
     const [loading, setLoading] = useState(false);
 
     // Form States
@@ -645,29 +647,29 @@ export default function Settings() {
                                 {[
                                     {
                                         id: 'explorer',
-                                        name: 'Explorer',
+                                        name: 'Explorer Plan',
                                         icon: Brain,
                                         color: 'slate',
                                         desc: 'Essential daily study habit.',
-                                        price: 'Free',
+                                        price: 0,
                                         features: ['10-15 Questions Daily', 'Basic Stats', 'Sample Intro Videos']
                                     },
                                     {
                                         id: 'pro',
-                                        name: 'Exam Prep',
+                                        name: 'Exam Prep Plan',
                                         icon: Zap,
                                         color: 'indigo',
                                         desc: 'Everything for exam confidence.',
-                                        price: 'Free (BETA)',
+                                        price: 5,
                                         features: ['Unlimited Practice', 'Full Simulations', 'Detailed Explanations', 'Full Learning Library']
                                     },
                                     {
                                         id: 'elite',
-                                        name: 'Global Admission',
+                                        name: 'Global Admission Plan',
                                         icon: Sparkles,
                                         color: 'amber',
                                         desc: 'Full support to university.',
-                                        price: 'Free (BETA)',
+                                        price: 10,
                                         features: ['Everything in Pro', 'Admission Strategy', 'Visa & Paperwork support', 'Elite Priority']
                                     }
                                 ].map((plan) => (
@@ -685,7 +687,16 @@ export default function Settings() {
                                             <div className="flex-1">
                                                 <div className="flex items-center justify-between">
                                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{plan.name}</h3>
-                                                    <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{plan.price}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        {plan.price > 0 ? (
+                                                            <>
+                                                                <span className="text-[10px] font-black text-slate-400 line-through uppercase tracking-widest">{formatPrice(plan.price)}</span>
+                                                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">FREE</span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Free</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">{plan.desc}</p>
                                             </div>

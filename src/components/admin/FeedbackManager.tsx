@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Star, MessageSquare, HelpCircle, Lightbulb, Calendar, User, Filter, CheckCircle, Clock, AlertCircle, Bug, ThumbsUp, Trash2, Edit, X } from 'lucide-react';
+import { Star, MessageSquare, HelpCircle, Lightbulb, Calendar, User, Filter, CheckCircle, Clock, AlertCircle, Bug, ThumbsUp, Trash2, Edit, X, BookOpen, Video, Monitor, ShieldCheck } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -36,19 +36,14 @@ interface Feedback {
     created_at: string;
     user_email?: string;
     // Enhanced fields
-    content_quality_rating?: number | null;
-    explanation_accuracy_rating?: number | null;
-    navigation_ease_rating?: number | null;
-    performance_rating?: number | null;
-    features_used?: string[] | null;
-    most_useful_feature?: string | null;
-    liked_most?: string | null;
-    frustrations?: string | null;
+    question_quality_rating?: number | null;
+    mocktest_quality_rating?: number | null;
+    video_lectures_rating?: number | null;
+    security_rating?: number | null;
+    ui_ux_rating?: number | null;
     bugs_experienced?: boolean | null;
     bug_details?: string | null;
     nps_score?: number | null;
-    nps_reason?: string | null;
-    likelihood_to_continue?: string | null;
 }
 
 export default function FeedbackManager() {
@@ -173,6 +168,10 @@ export default function FeedbackManager() {
                     category: editingFeedback.category,
                     rating: editingFeedback.rating,
                     review: editingFeedback.review,
+                    question_quality_rating: editingFeedback.question_quality_rating,
+                    mocktest_quality_rating: editingFeedback.mocktest_quality_rating,
+                    ui_ux_rating: editingFeedback.ui_ux_rating,
+                    nps_score: editingFeedback.nps_score,
                 })
                 .eq('id', editingFeedback.id);
 
@@ -212,8 +211,20 @@ export default function FeedbackManager() {
         avgRating: feedback.length > 0
             ? (feedback.reduce((sum, f) => sum + f.rating, 0) / feedback.length).toFixed(1)
             : '0',
-        avgContentQuality: feedback.filter(f => f.content_quality_rating).length > 0
-            ? (feedback.reduce((sum, f) => sum + (f.content_quality_rating || 0), 0) / feedback.filter(f => f.content_quality_rating).length).toFixed(1)
+        avgQuestionQuality: feedback.filter(f => f.question_quality_rating).length > 0
+            ? (feedback.reduce((sum, f) => sum + (f.question_quality_rating || 0), 0) / feedback.filter(f => f.question_quality_rating).length).toFixed(1)
+            : '0',
+        avgMockQuality: feedback.filter(f => f.mocktest_quality_rating).length > 0
+            ? (feedback.reduce((sum, f) => sum + (f.mocktest_quality_rating || 0), 0) / feedback.filter(f => f.mocktest_quality_rating).length).toFixed(1)
+            : '0',
+        avgVideoQuality: feedback.filter(f => f.video_lectures_rating).length > 0
+            ? (feedback.reduce((sum, f) => sum + (f.video_lectures_rating || 0), 0) / feedback.filter(f => f.video_lectures_rating).length).toFixed(1)
+            : '0',
+        avgUiUx: feedback.filter(f => f.ui_ux_rating).length > 0
+            ? (feedback.reduce((sum, f) => sum + (f.ui_ux_rating || 0), 0) / feedback.filter(f => f.ui_ux_rating).length).toFixed(1)
+            : '0',
+        avgSecurity: feedback.filter(f => f.security_rating).length > 0
+            ? (feedback.reduce((sum, f) => sum + (f.security_rating || 0), 0) / feedback.filter(f => f.security_rating).length).toFixed(1)
             : '0',
         avgNPS: feedback.filter(f => f.nps_score !== null).length > 0
             ? (feedback.reduce((sum, f) => sum + (f.nps_score || 0), 0) / feedback.filter(f => f.nps_score !== null).length).toFixed(1)
@@ -250,59 +261,62 @@ export default function FeedbackManager() {
     return (
         <div className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 border border-indigo-100 dark:border-indigo-900/50">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Total</p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-2">{stats.total}</p>
-                        </div>
-                        <MessageSquare className="w-8 h-8 text-indigo-600/30" />
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-border shadow-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-slate-100 mt-1">{stats.total}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-border shadow-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Overall</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-xl font-black text-slate-900 dark:text-slate-100">{stats.avgRating}</span>
+                        <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                     </div>
                 </div>
 
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/50 dark:to-orange-950/50 border border-yellow-100 dark:border-yellow-900/50">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-widest">Avg Rating</p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-2 flex items-center gap-2">
-                                {stats.avgRating}
-                                <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                            </p>
-                        </div>
+                <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-border shadow-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Questions</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-xl font-black text-slate-900 dark:text-slate-100">{stats.avgQuestionQuality}</span>
+                        <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
                     </div>
                 </div>
 
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-black text-blue-600 uppercase tracking-widest">Quality</p>
-                            <p className="text-2xl font-black text-slate-900 mt-2 flex items-center gap-2">
-                                {stats.avgContentQuality}
-                                <Star className="w-5 h-5 fill-blue-400 text-blue-400" />
-                            </p>
-                        </div>
-                        <CheckCircle className="w-8 h-8 text-blue-600/30" />
+                <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-border shadow-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Videos</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-xl font-black text-slate-900 dark:text-slate-100">{stats.avgVideoQuality}</span>
+                        <Video className="w-3.5 h-3.5 text-purple-600" />
                     </div>
                 </div>
 
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-black text-green-600 uppercase tracking-widest">Avg NPS</p>
-                            <p className="text-2xl font-black text-slate-900 mt-2">{stats.avgNPS}</p>
-                        </div>
-                        <ThumbsUp className="w-8 h-8 text-green-600/30" />
+                <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-border shadow-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">UI/UX</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-xl font-black text-slate-900 dark:text-slate-100">{stats.avgUiUx}</span>
+                        <Monitor className="w-3.5 h-3.5 text-emerald-600" />
                     </div>
                 </div>
 
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-red-50 to-rose-50 border border-red-100">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-black text-red-600 uppercase tracking-widest">Bug Reports</p>
-                            <p className="text-2xl font-black text-slate-900 mt-2">{stats.bugReports}</p>
-                        </div>
-                        <Bug className="w-8 h-8 text-red-600/30" />
+                <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-border shadow-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Security</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-xl font-black text-slate-900 dark:text-slate-100">{stats.avgSecurity}</span>
+                        <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+                    </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-border shadow-sm">
+                    <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">NPS</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-slate-100 mt-1">{stats.avgNPS}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/50 shadow-sm">
+                    <p className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Bugs</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-xl font-black text-rose-700 dark:text-rose-300">{stats.bugReports}</span>
+                        <Bug className="w-3.5 h-3.5 text-rose-600" />
                     </div>
                 </div>
             </div>
@@ -452,20 +466,68 @@ export default function FeedbackManager() {
                                     </div>
                                 )}
 
+                                {/* Diagnostic Ratings Grid */}
+                                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+                                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Questions</p>
+                                        <div className="flex gap-0.5">
+                                            {[1, 2, 3, 4, 5].map(s => (
+                                                <Star key={s} className={cn("w-2.5 h-2.5", (item.question_quality_rating || 0) >= s ? "fill-indigo-600 text-indigo-600" : "text-slate-200")} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Mock Test</p>
+                                        <div className="flex gap-0.5">
+                                            {[1, 2, 3, 4, 5].map(s => (
+                                                <Star key={s} className={cn("w-2.5 h-2.5", (item.mocktest_quality_rating || 0) >= s ? "fill-blue-600 text-blue-600" : "text-slate-200")} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Videos</p>
+                                        <div className="flex gap-0.5">
+                                            {[1, 2, 3, 4, 5].map(s => (
+                                                <Star key={s} className={cn("w-2.5 h-2.5", (item.video_lectures_rating || 0) >= s ? "fill-purple-600 text-purple-600" : "text-slate-200")} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">UI/UX</p>
+                                        <div className="flex gap-0.5">
+                                            {[1, 2, 3, 4, 5].map(s => (
+                                                <Star key={s} className={cn("w-2.5 h-2.5", (item.ui_ux_rating || 0) >= s ? "fill-emerald-600 text-emerald-600" : "text-slate-200")} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Security</p>
+                                        <div className="flex gap-0.5">
+                                            {[1, 2, 3, 4, 5].map(s => (
+                                                <Star key={s} className={cn("w-2.5 h-2.5", (item.security_rating || 0) >= s ? "fill-teal-600 text-teal-600" : "text-slate-200")} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">NPS Score</p>
+                                        <span className="text-sm font-black text-slate-900 dark:text-white">{item.nps_score ?? 'N/A'}</span>
+                                    </div>
+                                </div>
+
                                 {/* Questions & Suggestions */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {item.major_questions && (
-                                        <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+                                    {item.bug_details && (
+                                        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/50">
                                             <div className="flex items-center gap-2 mb-2">
-                                                <HelpCircle className="w-4 h-4 text-blue-600" />
-                                                <span className="text-xs font-black text-blue-600 uppercase">Questions</span>
+                                                <Bug className="w-4 h-4 text-red-600" />
+                                                <span className="text-xs font-black text-red-600 uppercase">Bug Details</span>
                                             </div>
-                                            <p className="text-sm text-slate-700 dark:text-slate-300">{item.major_questions}</p>
+                                            <p className="text-sm text-slate-700 dark:text-slate-300">{item.bug_details}</p>
                                         </div>
                                     )}
 
                                     {item.suggestions && (
-                                        <div className="p-4 rounded-xl bg-green-50 border border-green-100">
+                                        <div className="p-4 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/50">
                                             <div className="flex items-center gap-2 mb-2">
                                                 <Lightbulb className="w-4 h-4 text-green-600" />
                                                 <span className="text-xs font-black text-green-600 uppercase">Suggestions</span>
@@ -474,21 +536,6 @@ export default function FeedbackManager() {
                                         </div>
                                     )}
                                 </div>
-
-                                {/* Likelihood to Continue */}
-                                {item.likelihood_to_continue && (
-                                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-border flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Likelihood to Continue</span>
-                                        <span className={cn(
-                                            "px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider",
-                                            item.likelihood_to_continue === 'very-likely' ? "bg-indigo-100 text-indigo-700" :
-                                                item.likelihood_to_continue === 'likely' ? "bg-blue-100 text-blue-700" :
-                                                    "bg-slate-100 text-slate-700"
-                                        )}>
-                                            {item.likelihood_to_continue.replace('-', ' ')}
-                                        </span>
-                                    </div>
-                                )}
 
                                 {/* Actions */}
                                 <div className="flex gap-2 pt-4 border-t border-slate-100 dark:border-border mt-4">
@@ -599,6 +646,49 @@ export default function FeedbackManager() {
                                         max={5}
                                         value={editingFeedback.rating}
                                         onChange={(e) => setEditingFeedback({ ...editingFeedback, rating: parseInt(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>NPS Score (0-10)</Label>
+                                    <Input
+                                        type="number"
+                                        min={0}
+                                        max={10}
+                                        value={editingFeedback.nps_score || 0}
+                                        onChange={(e) => setEditingFeedback({ ...editingFeedback, nps_score: parseInt(e.target.value) })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase">Questions</Label>
+                                    <Input
+                                        type="number"
+                                        min={0}
+                                        max={5}
+                                        value={editingFeedback.question_quality_rating || 0}
+                                        onChange={(e) => setEditingFeedback({ ...editingFeedback, question_quality_rating: parseInt(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase">Mock Test</Label>
+                                    <Input
+                                        type="number"
+                                        min={0}
+                                        max={5}
+                                        value={editingFeedback.mocktest_quality_rating || 0}
+                                        onChange={(e) => setEditingFeedback({ ...editingFeedback, mocktest_quality_rating: parseInt(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase">UI/UX</Label>
+                                    <Input
+                                        type="number"
+                                        min={0}
+                                        max={5}
+                                        value={editingFeedback.ui_ux_rating || 0}
+                                        onChange={(e) => setEditingFeedback({ ...editingFeedback, ui_ux_rating: parseInt(e.target.value) })}
                                     />
                                 </div>
                             </div>

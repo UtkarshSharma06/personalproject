@@ -790,7 +790,7 @@ export default function MobileSettings() {
 
             {/* Branding Footer */}
             <div className="mt-8 mb-4 text-center">
-                <p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary/20">ItaloStudy Protocol</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary/20">ItaloStudy System</p>
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] mt-2 text-muted-foreground opacity-30">Ver 2.0.4</p>
             </div>
         </div>

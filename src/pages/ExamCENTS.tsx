@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Clock, Users, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SEO from '@/components/SEO';
 
 export default function ExamCENTS() {
     return (
         <div className="min-h-screen bg-[#f0f4f8] font-sans">
+            <SEO
+                title="CENT-S Preparation | CISIA Medical Entrance Exam | ItaloStudy"
+                description="Everything you need to ace the CENT-S (CISIA Medical Entrance Test) for Italian public universities. Free practice questions, structure overview, and preparation guides."
+                keywords="CENT-S prep, CISIA medical test, study medicine Sapienza, CENT-S biology, CENT-S chemistry, Italy medical entrance CENT-S"
+            />
             {/* Header */}
             <div className="bg-white dark:bg-card border-b-2 border-slate-900 sticky top-0 z-50">
                 <div className="container mx-auto px-4 py-4">

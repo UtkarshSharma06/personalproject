@@ -9,6 +9,7 @@ import { AuthProvider } from "@/lib/auth";
 import { useTheme } from "next-themes";
 import { lazy, Suspense, useEffect, useState } from "react";
 import SecurityEnforcer from "@/components/SecurityEnforcer";
+import PencilLoader from '@/components/PencilLoader';
 
 import { ExamProvider } from "@/context/ExamContext";
 import { AIProvider } from "@/context/AIContext";
@@ -231,7 +232,7 @@ const WebRouter = () => (
     <Route path="/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><History /></ProtectedRoute>} />
     <Route path="/settings" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Settings /></ProtectedRoute>} />
     <Route path="/bookmarks" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Bookmarks /></ProtectedRoute>} />
-    <Route path="/resources" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Resources /></ProtectedRoute>} />
+    <Route path="/resources" element={<Resources />} />
 
     {/* Public Pages */}
     <Route path="/pricing" element={<Pricing />} />
@@ -242,8 +243,8 @@ const WebRouter = () => (
     <Route path="/waiting-room/:sessionId" element={<InternationalMockWaitingRoom />} />
 
     {/* Study Modules */}
-    <Route path="/exams/imat" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamIMAT /></ProtectedRoute>} />
-    <Route path="/exams/cent-s" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamCENTS /></ProtectedRoute>} />
+    <Route path="/exams/imat" element={<ExamIMAT />} />
+    <Route path="/exams/cent-s" element={<ExamCENTS />} />
     <Route path="/learning" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><Learning /></ProtectedRoute>} />
     <Route path="/reading/:testId" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ReadingTest /></ProtectedRoute>} />
     <Route path="/reading/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ReadingHistory /></ProtectedRoute>} />
@@ -312,7 +313,7 @@ const MobileRouter = ({ user, isNative }: { user: any, isNative: boolean }) => (
 
         {/* Coverage for all other features */}
         <Route path="/onboarding" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileOnboarding /></ProtectedRoute>} />
-        <Route path="/resources" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileResources /></ProtectedRoute>} />
+        {/* Resources is now public below */}
         <Route path="/community" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileCommunity /></ProtectedRoute>} />
         <Route path="/community/upgrade" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileCommunityUpgrade /></ProtectedRoute>} />
         <Route path="/subjects" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileSubjects /></ProtectedRoute>} />
@@ -328,9 +329,7 @@ const MobileRouter = ({ user, isNative }: { user: any, isNative: boolean }) => (
         <Route path="/listening/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
         <Route path="/writing/history" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileHistory /></ProtectedRoute>} />
 
-        {/* IELTS & Exam Specifics */}
-        <Route path="/exams/imat" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamIMAT /></ProtectedRoute>} />
-        <Route path="/exams/cent-s" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><ExamCENTS /></ProtectedRoute>} />
+        {/* Exam Specifics now public below */}
 
         {/* Consultant & University (Mobile Native) */}
         <Route path="/apply-university" element={<ProtectedRoute allowedRoles={['user', 'admin', 'consultant']}><MobileConcierge /></ProtectedRoute>} />
@@ -379,6 +378,11 @@ const MobileRouter = ({ user, isNative }: { user: any, isNative: boolean }) => (
       <Route path="/consultant/activate" element={<ConsultantActivation />} />
       <Route path="/consultant/apply" element={<ConsultantApply />} />
 
+      <Route path="/resources" element={<MobileResources />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/exams/imat" element={<ExamIMAT />} />
+      <Route path="/exams/cent-s" element={<ExamCENTS />} />
       <Route path="/download-app" element={<DownloadApp />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -531,7 +535,7 @@ const App = () => {
   };
 
 
-  if (isMobile === null || onboardingCompleted === null) return <PageLoader />;
+  if (isMobile === null || onboardingCompleted === null) return <PencilLoader />;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -551,7 +555,7 @@ const App = () => {
 const AuthBridge = ({ isNative, onboardingCompleted, setOnboardingCompleted, isMobile }: any) => {
   const { user, loading: authLoading } = useAuth();
 
-  if (authLoading) return <PageLoader />;
+  if (authLoading) return <PencilLoader />;
 
   if (isNative && !onboardingCompleted && !user) {
     return <APKOnboarding onComplete={() => setOnboardingCompleted(true)} />;
@@ -565,7 +569,7 @@ const AuthBridge = ({ isNative, onboardingCompleted, setOnboardingCompleted, isM
           <NetworkStatus />
           <Toaster />
           <ToasterProvider />
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={null}>
             {isMobile ? (
               // Use HashRouter ONLY for Native APK, BrowserRouter for Mobile Web
               isNative ? (

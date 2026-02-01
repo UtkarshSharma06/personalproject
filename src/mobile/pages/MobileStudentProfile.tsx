@@ -99,23 +99,34 @@ const StudentProfile = () => {
                 plan = directProfile.selected_plan || plan;
             }
 
-            // Calculate real streak from tests
-            const { data: userTests } = await (supabase as any)
-                .from('tests')
-                .select('created_at')
-                .eq('user_id', id)
-                .order('created_at', { ascending: false });
+            // 3. Aggregate Activity for Accurate Streak
+            const [
+                { data: userTests },
+                { data: userPractice },
+                { data: userLearning }
+            ] = await Promise.all([
+                supabase.from('tests').select('created_at').eq('user_id', id),
+                supabase.from('user_practice_responses').select('created_at').eq('user_id', id),
+                supabase.from('learning_progress').select('last_accessed_at').eq('user_id', id)
+            ]);
 
-            if (userTests) {
-                const activeDates = new Set(userTests.map((t: any) => format(new Date(t.created_at), 'yyyy-MM-dd')));
-                let calculatedStreak = 0;
-                let checkDate = new Date();
-                while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
-                    calculatedStreak++;
-                    checkDate = subDays(checkDate, 1);
-                }
-                streak = calculatedStreak;
+            const activityDates = new Set<string>();
+            userTests?.forEach(t => activityDates.add(format(new Date(t.created_at), 'yyyy-MM-dd')));
+            userPractice?.forEach(p => activityDates.add(format(new Date(p.created_at), 'yyyy-MM-dd')));
+            userLearning?.forEach(l => activityDates.add(format(new Date(l.last_accessed_at), 'yyyy-MM-dd')));
+
+            let calculatedStreak = 0;
+            let checkDate = new Date();
+            // Start from today or yesterday (to allow for the day not being over)
+            if (!activityDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                checkDate = subDays(checkDate, 1);
             }
+
+            while (activityDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                calculatedStreak++;
+                checkDate = subDays(checkDate, 1);
+            }
+            streak = calculatedStreak;
 
             // If we still don't have stats from RPC (e.g. user not in top list), try direct count
             // Note: This might fail depending on RLS, but it's the backup
@@ -152,8 +163,16 @@ const StudentProfile = () => {
                     : 0;
             }
 
-            // Calculate pseudo-hours
-            const hours = Math.floor(questionsSolved * 0.05);
+            // 4. Calculate Real Training Time
+            const { data: testTimes } = await supabase
+                .from('tests')
+                .select('time_taken_seconds')
+                .eq('user_id', id)
+                .eq('status', 'completed');
+
+            const actualTestSeconds = testTimes?.reduce((sum, t) => sum + (t.time_taken_seconds || 0), 0) || 0;
+            const practiceEstimatedSeconds = questionsSolved * 180; // 3 minutes per question
+            const totalHours = Math.round((actualTestSeconds + practiceEstimatedSeconds) / 3600);
 
             setStats({
                 display_name: displayName,
@@ -161,7 +180,7 @@ const StudentProfile = () => {
                 streak: streak,
                 questions_solved: questionsSolved,
                 accuracy: accuracy,
-                hours_trained: hours,
+                hours_trained: Math.max(1, totalHours), // Show at least 1h if they have solved questions
                 plan: plan
             });
 

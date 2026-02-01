@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout';
 import BlogHeader from '@/components/blog/BlogHeader';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import {
@@ -27,7 +28,9 @@ interface BlogPost {
     published_at: string;
     created_at: string;
     blog_categories?: {
+        id: string;
         name: string;
+        slug: string;
     };
 }
 
@@ -35,6 +38,7 @@ export default function Blog() {
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('all');
 
     useEffect(() => {
         fetchPosts();
@@ -45,7 +49,14 @@ export default function Blog() {
         try {
             const { data, error } = await supabase
                 .from('blog_posts')
-                .select('*')
+                .select(`
+                    *,
+                    blog_categories (
+                        id,
+                        name,
+                        slug
+                    )
+                `)
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -66,14 +77,24 @@ export default function Blog() {
 
     const filteredPosts = posts.filter(post => {
         const query = searchQuery.toLowerCase();
-        return (
+        const matchesSearch = (
             (post.title?.toLowerCase() || '').includes(query) ||
             (post.excerpt?.toLowerCase() || '').includes(query)
         );
+
+        const matchesCategory = selectedCategory === 'all' ||
+            (post.blog_categories?.slug === selectedCategory);
+
+        return matchesSearch && matchesCategory;
     });
 
     return (
         <Layout showHeader={false}>
+            <SEO
+                title="Study Abroad Tips & Exam Guides | ItaloStudy Blog"
+                description="Expert tips for CEnT-S, IMAT, SAT, and IELTS. Read our guides on studying in Italy and Europe, exam preparation secrets, and student life abroad."
+                keywords="IMAT preparation, IMAT free practice tests, IMAT past papers online, IMAT study guide, IMAT exam tips, IMAT preparation Italy, CEnT-S preparation, CEnT-S free practice, CEnT-S exam guide, CEnT-S past papers, SAT preparation free, SAT practice tests online, SAT study guide free, SAT exam tips, SAT preparation for international students, IELTS preparation free, IELTS practice tests online, IELTS study guide free, IELTS exam tips, IELTS preparation for study abroad, study abroad Italy, free study abroad preparation, international university admissions, Italy medical school admissions, study abroad exam prep, best universities in Italy for medicine, how to apply to Italian universities, study abroad scholarships Italy, study abroad entrance exams, study abroad preparation platform, free exam preparation website, online exam practice free, international exam preparation, global student admissions support, exam prep made simple, free study resources online, online learning for exams, exam success tips, best exam preparation platform, free exam prep for students, how to prepare for IMAT exam free, best free IMAT practice tests online, free SAT preparation for Indian students, IELTS preparation for beginners free, CEnT-S exam preparation step by step, IMAT exam preparation for medical school Italy, SAT preparation tips for international students, IELTS free resources for study abroad, CEnT-S preparation for global students, IMAT exam preparation made simple, Italian university admissions guide, free admissions support Italy, international student admissions Italy, medical school entrance exam Italy, study abroad admissions simplified, how to apply for IMAT exam, admissions preparation for global students, Italy medical school entrance exam prep, international admissions preparation free, study abroad admissions platform, free IMAT preparation online, free SAT practice tests, free IELTS practice tests, free CEnT-S exam prep, study abroad exam preparation free, best free exam prep website, online study abroad preparation free, free exam prep for medical students, admissions support for international students, free exam prep made easy, IMAT blog preparation tips, SAT blog study guide, IELTS blog free resources, CEnT-S blog exam tips, study abroad blog Italy, medical school blog Italy admissions, free exam prep blog, international student blog admissions, study abroad blog exam prep, global student blog resources, IMAT vs SAT preparation, IELTS vs TOEFL preparation free, CEnT-S vs IMAT exam guide, SAT vs ACT preparation free, study abroad vs local admissions, free exam prep vs paid courses, IMAT exam difficulty guide, SAT exam difficulty tips, IELTS exam difficulty explained, CEnT-S exam difficulty guide, join free IMAT preparation, sign up free SAT prep, register free IELTS practice, enroll free CEnT-S prep, start free exam preparation today, free exam prep for study abroad students, free IMAT preparation for medical school, free SAT preparation for global students, free IELTS preparation for international admissions, free CEnT-S preparation for study abroad, study abroad blog, IMAT tips, CEnT-S guides, SAT strategy, IELTS preparation blog, study in Italy tips, student life in Europe"
+            />
             <div className="min-h-screen bg-[#FAFAFA]">
                 <BlogHeader />
 
@@ -136,17 +157,25 @@ export default function Blog() {
                 {/* Categories Simplified */}
                 <div className="container mx-auto px-4 mb-12">
                     <div className="flex flex-wrap justify-center gap-3">
-                        {['All Posts', 'Exams', 'Life Abroad'].map((cat, idx) => (
+                        {[
+                            { label: 'All Posts', slug: 'all', emoji: '📚' },
+                            { label: 'Exams', slug: 'exams', emoji: '📝' },
+                            { label: 'Life Abroad', slug: 'life-abroad', emoji: '🌍' }
+                        ].map((cat, idx) => (
                             <motion.button
-                                key={cat}
+                                key={cat.slug}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4 + (idx * 0.1) }}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className={`px-6 py-3 rounded-2xl bg-white border-2 border-slate-100 text-slate-600 font-black text-xs uppercase tracking-widest hover:border-indigo-400 hover:text-indigo-600 transition-all shadow-sm`}
+                                onClick={() => setSelectedCategory(cat.slug)}
+                                className={`px-6 py-3 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all shadow-sm ${selectedCategory === cat.slug
+                                    ? 'bg-indigo-600 border-indigo-600 text-white'
+                                    : 'bg-white border-slate-100 text-slate-600 hover:border-indigo-400 hover:text-indigo-600'
+                                    }`}
                             >
-                                {idx === 0 ? '📚' : idx === 1 ? '📝' : '🌍'} {cat}
+                                {cat.emoji} {cat.label}
                             </motion.button>
                         ))}
                     </div>

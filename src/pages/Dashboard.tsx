@@ -25,11 +25,14 @@ import {
     Bookmark,
     FlaskConical,
     FileText,
-    ClipboardList
+    ClipboardList,
+    MessageCircle,
+    ArrowRight
 } from 'lucide-react';
 import { subDays } from 'date-fns';
 import { useExam } from '@/context/ExamContext';
 import LatestNotificationPopup from '@/components/LatestNotificationPopup';
+import { FeedbackDialog } from '@/components/FeedbackDialog';
 
 interface SubjectMastery {
     subject: string;
@@ -243,12 +246,44 @@ export default function Dashboard() {
                 ? Math.round(completedTests.reduce((acc: number, t: any) => acc + (t.time_taken_seconds || 0), 0) / completedTests.length)
                 : 0;
 
-            const activeDates = new Set(tests.map((t: any) => format(new Date(t.created_at), 'yyyy-MM-dd')));
+            // 1.1 Fetch All Activity for Streak
+            const [
+                { data: learningProgress },
+                { data: practiceProgress }
+            ] = await Promise.all([
+                supabase.from('learning_progress').select('last_accessed_at').eq('user_id', user!.id),
+                supabase.from('user_practice_responses').select('created_at').eq('user_id', user!.id)
+            ]);
+
+            const activeDates = new Set([
+                ...(tests || []).map((t: any) => format(new Date(t.created_at), 'yyyy-MM-dd')),
+                ...(learningProgress || []).map((p: any) => format(new Date(p.last_accessed_at), 'yyyy-MM-dd')),
+                ...(practiceProgress || []).map((p: any) => format(new Date(p.created_at), 'yyyy-MM-dd'))
+            ]);
+
             let streak = 0;
             let checkDate = new Date();
-            while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
-                streak++;
-                checkDate = subDays(checkDate, 1);
+
+            // Check if user was active today or yesterday to continue/start streak
+            const today = format(new Date(), 'yyyy-MM-dd');
+            const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+
+            if (activeDates.has(today)) {
+                // Streak is active including today
+                while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                    streak++;
+                    checkDate = subDays(checkDate, 1);
+                }
+            } else if (activeDates.has(yesterday)) {
+                // Streak was active until yesterday, but not today (yet)
+                checkDate = subDays(new Date(), 1);
+                while (activeDates.has(format(checkDate, 'yyyy-MM-dd'))) {
+                    streak++;
+                    checkDate = subDays(checkDate, 1);
+                }
+            } else {
+                // No activity today or yesterday, streak is 0
+                streak = 0;
             }
 
             const mockSolved = tests.filter((t: any) => t.test_type === 'mock').length;
@@ -445,17 +480,17 @@ export default function Dashboard() {
     const overallAccuracy = stats.accuracy;
     const oracleProjection = overallAccuracy.toString();
 
-    const missionText = weakestSubject && weakestSubject.solved > 0
+    const practiceText = weakestSubject && weakestSubject.solved > 0
         ? (
             <>
                 Focus on <span className="underline decoration-indigo-300 underline-offset-4 decoration-2">{weakestSubject.subject}</span>.
                 Recent data suggests a {100 - weakestSubject.accuracy}% logic gap in this sector.
             </>
         ) : (
-            "Complete 3 practice missions to unlock advanced performance insights."
+            "Complete 3 practice sessions to unlock advanced performance insights."
         );
 
-    const handleConsultMission = useCallback(() => {
+    const handleStartPractice = useCallback(() => {
         if (!weakestSubject) return;
 
         const params = new URLSearchParams({
@@ -478,8 +513,8 @@ export default function Dashboard() {
         );
 
         toast({
-            title: 'Italostudy Mission Initialization',
-            description: `Initializing targeted remediation for ${weakestSubject.subject}.`,
+            title: 'Italostudy Practice Setup',
+            description: `Preparing targeted practice for ${weakestSubject.subject}.`,
         });
     }, [weakestSubject, toast]);
 
@@ -640,7 +675,6 @@ export default function Dashboard() {
                             </div>
                         )}
 
-
                         {/* Highlights Row: Subject Mastery & Top Champions */}
                         <div className="grid md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
                             {/* Subject Mastery Card */}
@@ -696,11 +730,62 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Secondary Highlights: Evaluations */}
+                        <div className="mt-8">
+
+                            {/* Compact Evaluations (Only for IELTS) */}
+                            {activeExam.id === 'ielts-academic' && recentEvaluations.length > 0 ? (
+                                <div className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl flex flex-col h-full">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200/50">
+                                                <Sparkles className="w-5 h-5 text-white" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">Evaluations</h3>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">Writing Feedback</p>
+                                            </div>
+                                        </div>
+                                        <Link to="/writing/history" className="px-4 py-1.5 rounded-full border border-slate-100 dark:border-white/10 text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 transition-colors">
+                                            View All
+                                        </Link>
+                                    </div>
+
+                                    <div className="space-y-4 flex-1">
+                                        {recentEvaluations.map((evalItem: any) => (
+                                            <div
+                                                key={evalItem.id}
+                                                className="group p-4 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-indigo-200 transition-all cursor-pointer flex items-center gap-4"
+                                                onClick={() => navigate(`/writing/results/${evalItem.id}`)}
+                                            >
+                                                <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0 group-hover:rotate-6 transition-transform">
+                                                    ✍️
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-[11px] font-black text-slate-900 dark:text-white truncate uppercase mb-0.5">Writing Task</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={`h-1.5 w-1.5 rounded-full ${evalItem.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{evalItem.status}</p>
+                                                    </div>
+                                                </div>
+                                                {evalItem.status === 'completed' && evalItem.writing_feedback?.[0] && (
+                                                    <div className="text-right">
+                                                        <p className="text-xl font-black text-indigo-600 leading-none">{evalItem.writing_feedback[0].overall_score}</p>
+                                                        <p className="text-[7px] font-black text-slate-300 uppercase mt-1">Band</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : null}
+                        </div>
                     </div>
 
-                    {/* Sidebar */}
+                    {/* Sidebar Area */}
                     <div className="lg:col-span-4 space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
-                        {/* Apply University - Standalone Premium Button */}
+                        {/* Apply University */}
                         <button
                             onClick={() => navigate('/apply-university')}
                             className="w-full group relative flex items-center justify-between p-4 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-white transition-all shadow-xl shadow-amber-200/20 active:scale-95 hover:scale-[1.02] overflow-hidden border-2 border-amber-300/30"
@@ -711,7 +796,7 @@ export default function Dashboard() {
                                     <Award className="w-5 h-5 text-white shadow-sm" />
                                 </div>
                                 <div className="text-left">
-                                    <span className="block text-[9px] font-black uppercase tracking-widest text-amber-100 group-hover:text-white transition-colors">Admission Protocol</span>
+                                    <span className="block text-[9px] font-black uppercase tracking-widest text-amber-100 group-hover:text-white transition-colors">Admission System</span>
                                     <span className="text-sm font-black tracking-tighter">Apply University</span>
                                 </div>
                             </div>
@@ -739,7 +824,7 @@ export default function Dashboard() {
                                     {[
                                         { label: 'Resource Library', path: '/resources', icon: FileText, color: 'text-pink-600', bg: 'bg-pink-50 dark:bg-pink-900/30', border: 'border-pink-100/50' },
                                         { label: '3D Labs', path: '/labs', icon: FlaskConical, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/30', border: 'border-indigo-100/50' },
-                                        { label: 'Mission History', path: '/history', icon: Clock, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30', border: 'border-emerald-100/50' },
+                                        { label: 'Practice History', path: '/history', icon: Clock, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30', border: 'border-emerald-100/50' },
                                         { label: 'Performance', path: '/analytics', icon: BarChart3, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-900/30', border: 'border-rose-100/50' },
                                     ].map((item) => (
                                         <button
@@ -760,76 +845,68 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Compact Evaluations Integration (Only for IELTS) */}
-                        {activeExam.id === 'ielts-academic' && recentEvaluations.length > 0 && (
-                            <div className="bg-slate-50/80 dark:bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl">
-                                <div className="flex items-center justify-between mb-10">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200/50">
-                                            <Sparkles className="w-5 h-5 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">Evaluations</h3>
-                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">Writing Feedback</p>
-                                        </div>
-                                    </div>
-                                    <Link to="/writing/history" className="px-5 py-2 rounded-full border border-slate-100 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 transition-colors">
-                                        View All
-                                    </Link>
-                                </div>
+                        {/* Community & Feedback Hub (Restored to Sidebar) */}
+                        <div className="flex flex-col gap-4">
+                            {/* WhatsApp card made "longer" (taller) */}
+                            <div
+                                onClick={() => window.open('https://chat.whatsapp.com/HMrIISJM6LUEIxgTxSMQp7', '_blank')}
+                                className="group relative p-5 rounded-[2rem] bg-[#075E54] text-white cursor-pointer shadow-xl shadow-emerald-900/10 transition-all hover:-translate-y-1 active:scale-[0.98] border border-white/10 overflow-hidden min-h-[140px] flex flex-col justify-between"
+                            >
+                                {/* Background Decorative Elements */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-emerald-400/20 transition-colors" />
+                                <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 blur-2xl rounded-full -ml-8 -mb-8" />
 
-                                <div className="space-y-4">
-                                    {recentEvaluations.map((evalItem: any) => (
-                                        <div
-                                            key={evalItem.id}
-                                            className="group p-4 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-indigo-200 transition-all cursor-pointer flex items-center gap-4"
-                                            onClick={() => navigate(`/ writing / results / ${evalItem.id} `)}
-                                        >
-                                            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0 group-hover:rotate-6 transition-transform">
-                                                ✍️
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-[11px] font-black text-slate-900 dark:text-white truncate uppercase mb-0.5">Writing Task</p>
-                                                <div className="flex items-center gap-2">
-                                                    <div className={`h - 1.5 w - 1.5 rounded - full ${evalItem.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-500'} `} />
-                                                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{evalItem.status}</p>
-                                                </div>
-                                            </div>
-                                            {evalItem.status === 'completed' && evalItem.writing_feedback?.[0] && (
-                                                <div className="text-right">
-                                                    <p className="text-xl font-black text-indigo-600 leading-none">{evalItem.writing_feedback[0].overall_score}</p>
-                                                    <p className="text-[7px] font-black text-slate-300 uppercase mt-1">Band</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Unified WhatsApp & Leaderboard Space */}
-                        <div className="grid grid-cols-1 gap-6">
-                            <div className="bg-[#128C7E] p-8 md:p-10 rounded-[2.5rem] text-white relative overflow-hidden group hover:bg-[#075E54] transition-colors border-b-8 border-slate-900/20 active:border-b-0 active:translate-y-2">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-[60px] translate-x-1/2 -translate-y-1/2" />
                                 <div className="relative z-10">
-                                    <div className="flex items-center gap-4 mb-6 text-left">
-                                        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center border border-white/30">
-                                            <Users className="w-6 h-6 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-black uppercase tracking-tighter leading-none">Community</h3>
-                                            <p className="text-[9px] font-black text-emerald-100 uppercase mt-1.5 opacity-60">Collaborate now</p>
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-white text-[#075E54] flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
+                                                <MessageCircle className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-sm font-black uppercase tracking-tight leading-none mb-1">WhatsApp Squad</h4>
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                                    <p className="text-[9px] font-bold text-emerald-100/60 uppercase tracking-widest leading-none">Global Hub</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <Button
-                                        onClick={() => window.open('https://chat.whatsapp.com/HMrIISJM6LUEIxgTxSMQp7', '_blank')}
-                                        className="w-full h-14 bg-white text-[#075E54] hover:bg-slate-50 font-black uppercase tracking-widest rounded-2xl border-none text-xs"
-                                    >
-                                        Join WhatsApp
-                                    </Button>
+
+                                    <p className="text-[10px] font-bold text-emerald-100/80 leading-snug">
+                                        Prep tips & live updates from <span className="text-white font-black">2000+ Students</span>. 🎒✨
+                                    </p>
+                                </div>
+
+                                <div className="relative z-10 flex items-center justify-between mt-4">
+                                    <div className="flex -space-x-2">
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="w-7 h-7 rounded-full border-2 border-[#075E54] bg-slate-800 overflow-hidden shadow-md">
+                                                <img src={`https://i.pravatar.cc/100?img=${i + 20}`} alt="User" className="w-full h-full object-cover opacity-90" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-white/50 group-hover:text-white transition-colors text-[9px] font-black uppercase tracking-widest">
+                                        <span>Join Now</span>
+                                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                    </div>
                                 </div>
                             </div>
 
+                            {/* Feedback Form */}
+                            <FeedbackDialog trigger={
+                                <div
+                                    className="group flex items-center gap-4 p-5 rounded-[2rem] bg-indigo-600 text-white cursor-pointer shadow-xl shadow-indigo-900/10 transition-all hover:-translate-y-1 active:scale-[0.98] border border-white/5 overflow-hidden"
+                                >
+                                    <div className="w-10 h-10 rounded-xl bg-white text-indigo-600 flex items-center justify-center shadow-lg group-active:scale-110 transition-transform">
+                                        <ClipboardList className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                        <h4 className="text-[11px] font-black uppercase tracking-tight">Feedback Hub</h4>
+                                        <p className="text-[8px] font-bold text-indigo-100/60 uppercase tracking-widest">Share suggestions 🌟</p>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
+                                </div>
+                            } />
                         </div>
                     </div>
                 </div>

@@ -168,7 +168,7 @@ export default function Practice() {
                                     <BookOpen className="w-8 h-8" />
                                 </div>
                                 <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight text-center">Select Test</h2>
-                                <p className="text-slate-400 font-bold text-[11px] sm:text-sm mt-3 uppercase tracking-widest opacity-60 mb-6">Available {selectedSubject} Missions</p>
+                                <p className="text-slate-400 font-bold text-[11px] sm:text-sm mt-3 uppercase tracking-widest opacity-60 mb-6">Available {selectedSubject} Tests</p>
 
                                 <Button
                                     variant="outline"
@@ -238,7 +238,7 @@ export default function Practice() {
                                 <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100/50 mb-6 text-orange-600">
                                     <Zap className="w-8 h-8 fill-orange-600 animate-pulse" />
                                 </div>
-                                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Mission Length</h2>
+                                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Practice Length</h2>
                                 <p className="text-slate-400 font-bold text-[11px] sm:text-sm mt-3 uppercase tracking-widest">Targeting {selectedSubject}</p>
                             </div>
 
@@ -286,7 +286,7 @@ export default function Practice() {
                 isOpen={isUpgradeModalOpen}
                 onClose={() => setIsUpgradeModalOpen(false)}
                 title="Daily Practice Limit Reached"
-                description="You've used your 15 daily questions for the Explorer Plan. Upgrade to PRO for unlimited practice and simulated exams."
+                description="You've used your 15 daily questions for the Explorer Plan. Upgrade to PRO for unlimited practice and mock exams."
                 feature="Unlimited Practice"
             />
         </Layout>

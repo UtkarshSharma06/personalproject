@@ -123,7 +123,7 @@ export default function MobilePractice() {
                             <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-primary/20">
                                 <Zap className="w-8 h-8 text-primary fill-primary animate-pulse" />
                             </div>
-                            <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Mission length</h2>
+                            <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Practice length</h2>
                             <p className="text-muted-foreground text-sm font-bold uppercase tracking-widest opacity-60">Targeting {selectedSubject}</p>
                         </div>
 
@@ -173,14 +173,14 @@ export default function MobilePractice() {
                             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 border border-primary/20 text-primary">
                                 <BookOpen className="w-6 h-6" />
                             </div>
-                            <h2 className="text-xl font-black text-foreground uppercase tracking-tight">Select Mission</h2>
+                            <h2 className="text-xl font-black text-foreground uppercase tracking-tight">Select Test</h2>
                             <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest opacity-60">Available {selectedSubject} Tasks</p>
                         </div>
 
                         {isLoadingTests ? (
                             <div className="flex flex-col items-center justify-center py-20 gap-4">
                                 <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                                <span className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Scanning Archive...</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Loading...</span>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -209,7 +209,7 @@ export default function MobilePractice() {
                                                         ) : isInProgress ? (
                                                             <span className="text-[8px] font-black text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full uppercase tracking-widest">In Progress</span>
                                                         ) : (
-                                                            <span className="text-[8px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-widest">New Mission</span>
+                                                            <span className="text-[8px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-widest">Available</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -220,7 +220,7 @@ export default function MobilePractice() {
                                 })}
                                 {availableTests.length === 0 && (
                                     <div className="text-center py-20 bg-secondary/20 rounded-[3rem] border border-dashed border-border">
-                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">No matching artifacts found</p>
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">No matching questions found</p>
                                     </div>
                                 )}
                             </div>
@@ -232,8 +232,8 @@ export default function MobilePractice() {
             <UpgradeModal
                 isOpen={isUpgradeModalOpen}
                 onClose={() => setIsUpgradeModalOpen(false)}
-                title="Mission Limit Reached"
-                description="You've exhausted your daily practice artifacts. Upgrade to PRO for unlimited intelligence gathering."
+                title="Limit Reached"
+                description="You've reached your daily practice limit. Upgrade to PRO for unlimited practice sessions."
                 feature="Unlimited Practice"
             />
         </div>

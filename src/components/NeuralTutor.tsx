@@ -66,9 +66,7 @@ export default function NeuralTutor() {
 
             setMessages([{
                 role: 'assistant',
-                setMessages([{
-                    role: 'assistant',
-                    content: data.response || "Hello! How can I help you understand this?",
+                content: data.response || "Hello! How can I help you understand this?",
                 type: 'logic'
             }]);
         } catch (err) {
@@ -189,7 +187,7 @@ export default function NeuralTutor() {
                             >
                                 <div className="flex items-center gap-2">
                                     <Info className="w-3 h-3" />
-                                    <span>Current Mission Context</span>
+                                    <span>Current Session Context</span>
                                 </div>
                                 {isContextExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                             </button>

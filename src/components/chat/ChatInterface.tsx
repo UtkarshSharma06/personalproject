@@ -586,6 +586,8 @@ export default function ChatInterface({ communityId, onBack }: ChatInterfaceProp
                             onDelete={() => handleDeleteMessage(msg.id)}
                             onPin={() => handlePinMessage(msg.id)}
                             isAdmin={isAdmin || isCreator}
+                            reactions={reactions[msg.id] || []}
+                            onView={() => incrementView(msg.id)}
                         />
                     ))
                 )}

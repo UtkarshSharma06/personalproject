@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout';
 import BlogHeader from '@/components/blog/BlogHeader';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import {
@@ -102,6 +103,12 @@ export default function BlogPost() {
 
     return (
         <Layout showHeader={false}>
+            <SEO
+                title={`${post.title} | ItaloStudy Blog`}
+                description={post.excerpt}
+                image={post.featured_image ? getProxiedUrl(post.featured_image) : undefined}
+                type="article"
+            />
             <div className="min-h-screen bg-[#FAFAFA] pb-32">
                 <BlogHeader />
 

@@ -4,20 +4,52 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Star, Send, MessageSquare, Lightbulb, HelpCircle, X } from 'lucide-react';
+import {
+    Star, Send, MessageSquare, Lightbulb,
+    HelpCircle, X, ShieldCheck, Layout,
+    Video, BookOpen, Bug, ArrowLeft,
+    ArrowRight, CheckCircle2, Monitor,
+    AlertCircle
+} from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
-export function FeedbackDialog() {
+interface FeedbackDialogProps {
+    trigger?: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+}
+
+export function FeedbackDialog({ trigger, open, onOpenChange }: FeedbackDialogProps) {
     const { user } = useAuth();
     const { toast } = useToast();
-    const [isOpen, setIsOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
+    const [step, setStep] = useState(1);
+    const totalSteps = 4;
+
+    const isOpen = open !== undefined ? open : internalOpen;
+    const setIsOpen = (val: boolean) => {
+        if (onOpenChange) onOpenChange(val);
+        else setInternalOpen(val);
+        if (!val) setTimeout(() => setStep(1), 300); // Reset stay on close
+    };
+
+    // --- State Management ---
     const [rating, setRating] = useState(0);
-    const [hoveredRating, setHoveredRating] = useState(0);
-    const [review, setReview] = useState('');
-    const [majorQuestions, setMajorQuestions] = useState('');
-    const [suggestions, setSuggestions] = useState('');
     const [category, setCategory] = useState('general');
+    const [review, setReview] = useState('');
+
+    const [questionQuality, setQuestionQuality] = useState(0);
+    const [mocktestQuality, setMocktestQuality] = useState(0);
+    const [videoLectures, setVideoLectures] = useState(0);
+
+    const [uiUxRating, setUiUxRating] = useState(0);
+    const [securityRating, setSecurityRating] = useState(0);
+    const [bugsExperienced, setBugsExperienced] = useState(false);
+    const [bugDetails, setBugDetails] = useState('');
+
+    const [npsScore, setNpsScore] = useState<number | null>(null);
+    const [suggestions, setSuggestions] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const wordCount = review.trim().split(/\s+/).filter(Boolean).length;
@@ -29,16 +61,6 @@ export function FeedbackDialog() {
             return;
         }
 
-        if (rating === 0) {
-            toast({ title: 'Rating Required', description: 'Please select a rating', variant: 'destructive' });
-            return;
-        }
-
-        if (wordCount > maxWords) {
-            toast({ title: 'Review Too Long', description: `Please limit your review to ${maxWords} words`, variant: 'destructive' });
-            return;
-        }
-
         setIsSubmitting(true);
 
         try {
@@ -47,204 +69,284 @@ export function FeedbackDialog() {
                 .insert([{
                     user_id: user.id,
                     rating,
+                    category,
                     review: review.trim() || null,
-                    major_questions: majorQuestions.trim() || null,
-                    suggestions: suggestions.trim() || null,
-                    category
+                    question_quality_rating: questionQuality || null,
+                    mocktest_quality_rating: mocktestQuality || null,
+                    video_lectures_rating: videoLectures || null,
+                    ui_ux_rating: uiUxRating || null,
+                    security_rating: securityRating || null,
+                    bugs_experienced: bugsExperienced,
+                    bug_details: bugDetails.trim() || null,
+                    nps_score: npsScore,
+                    suggestions: suggestions.trim() || null
                 }]);
 
             if (error) throw error;
 
+            // Send Thank You Email
+            try {
+                await supabase.functions.invoke('send-feedback-email', {
+                    body: {
+                        email: user.email,
+                        userName: user.user_metadata?.display_name || user.email?.split('@')[0],
+                        rating: rating
+                    }
+                });
+            } catch (emailErr) {
+                console.error("Failed to send feedback email:", emailErr);
+                // Don't toast error here, as feedback was saved successfully
+            }
+
             toast({
                 title: 'Feedback Submitted!',
-                description: 'Thank you for helping us improve.',
+                description: 'Thank you for your detailed feedback!',
             });
 
-            // Reset form
-            setRating(0);
-            setReview('');
-            setMajorQuestions('');
-            setSuggestions('');
-            setCategory('general');
             setIsOpen(false);
         } catch (error: any) {
-            toast({
-                title: 'Submission Failed',
-                description: error.message,
-                variant: 'destructive'
-            });
+            toast({ title: 'Submission Failed', description: error.message, variant: 'destructive' });
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    const StarRating = ({ value, onChange, label, icon: Icon }: any) => (
+        <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-1">
+                {Icon && <Icon className="w-4 h-4 text-indigo-600" />}
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{label}</span>
+            </div>
+            <div className="flex gap-1.5">
+                {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                        key={s}
+                        type="button"
+                        onClick={() => onChange(s)}
+                        className={cn(
+                            "w-10 h-10 rounded-xl border-2 transition-all flex items-center justify-center group",
+                            value >= s
+                                ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/20"
+                                : "border-slate-100 dark:border-slate-800 text-slate-300 hover:border-indigo-200"
+                        )}
+                    >
+                        <Star className={cn("w-5 h-5", value >= s ? "fill-white" : "group-hover:text-indigo-400")} />
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+
     const categories = [
-        { value: 'general', label: 'General Feedback', icon: MessageSquare },
+        { value: 'general', label: 'General', icon: MessageSquare },
         { value: 'feature', label: 'Feature Request', icon: Lightbulb },
-        { value: 'bug', label: 'Bug Report', icon: HelpCircle },
-        { value: 'content', label: 'Content Quality', icon: Star },
+        { value: 'bug', label: 'Bug Report', icon: AlertCircle },
+        { value: 'content', label: 'Course Content', icon: BookOpen },
     ];
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button
-                    variant="outline"
-                    className="h-10 px-4 rounded-xl border-2 border-slate-200 dark:border-border hover:border-indigo-600 hover:bg-indigo-50 font-bold text-sm transition-all group"
-                >
-                    <MessageSquare className="w-4 h-4 mr-2 group-hover:text-indigo-600 transition-colors" />
-                    Give Feedback
-                </Button>
+                {trigger || (
+                    <Button variant="outline" className="h-10 px-4 rounded-xl border-2 font-bold text-sm transition-all group">
+                        <MessageSquare className="w-4 h-4 mr-2 group-hover:text-indigo-600 transition-colors" />
+                        Detailed Feedback
+                    </Button>
+                )}
             </DialogTrigger>
 
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-0 border-none shadow-2xl">
-                <DialogHeader className="p-8 pb-6 border-b border-slate-100 dark:border-border bg-gradient-to-br from-indigo-50 to-purple-50">
-                    <DialogTitle className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg">
-                            <Star className="w-6 h-6 text-white" />
+            <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] p-0 border-none shadow-2xl bg-white dark:bg-slate-950">
+                {/* Custom Header with Progress */}
+                <div className="p-8 pb-6 border-b border-slate-100 dark:border-slate-900 bg-gradient-to-br from-indigo-50/50 via-white to-purple-50/50 dark:from-indigo-950/20 dark:via-slate-950 dark:to-purple-950/20 relative">
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-100 dark:bg-slate-900">
+                        <div
+                            className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-500 rounded-r-full"
+                            style={{ width: `${(step / totalSteps) * 100}%` }}
+                        />
+                    </div>
+
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest">
+                            Step {step} of {totalSteps}
                         </div>
-                        Share Your Feedback
+                        {step > 1 && (
+                            <button onClick={() => setStep(s => s - 1)} className="text-slate-400 hover:text-indigo-600 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-colors">
+                                <ArrowLeft className="w-3 h-3" /> Back
+                            </button>
+                        )}
+                    </div>
+
+                    <DialogTitle className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                        {step === 1 && "Start Your Review"}
+                        {step === 2 && "Quality Deep Dive"}
+                        {step === 3 && "Technical & Layout"}
+                        {step === 4 && "Final Recommendation"}
                     </DialogTitle>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-2">
-                        Help us improve your learning experience
-                    </p>
-                </DialogHeader>
+                </div>
 
-                <div className="p-8 space-y-6">
-                    {/* Rating Section */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest">
-                            Overall Rating *
-                        </label>
-                        <div className="flex gap-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    type="button"
-                                    onClick={() => setRating(star)}
-                                    onMouseEnter={() => setHoveredRating(star)}
-                                    onMouseLeave={() => setHoveredRating(0)}
-                                    className="transition-all hover:scale-110 active:scale-95"
-                                >
-                                    <Star
-                                        className={cn(
-                                            "w-10 h-10 transition-all",
-                                            (hoveredRating >= star || rating >= star)
-                                                ? "fill-yellow-400 text-yellow-400"
-                                                : "text-slate-300"
-                                        )}
+                <div className="p-8 space-y-8 min-h-[400px]">
+                    {step === 1 && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {/* Category Select */}
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">Primary Interest</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {categories.map((c) => (
+                                        <button
+                                            key={c.value}
+                                            onClick={() => setCategory(c.value)}
+                                            className={cn(
+                                                "flex items-center gap-3 p-4 rounded-2xl border-2 transition-all font-bold text-[11px] text-left",
+                                                category === c.value
+                                                    ? "border-indigo-600 bg-indigo-50/50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400 shadow-sm"
+                                                    : "border-slate-100 dark:border-slate-900 hover:border-slate-200 text-slate-600 dark:text-slate-400"
+                                            )}
+                                        >
+                                            <c.icon className="w-4 h-4" />
+                                            {c.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <StarRating value={rating} onChange={setRating} label="Overall Platform Experience" />
+
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex justify-between items-center">
+                                    <span>Detailed Review</span>
+                                    <span className={cn(wordCount > maxWords ? "text-red-500" : "opacity-40")}>{wordCount}/{maxWords}</span>
+                                </label>
+                                <Textarea
+                                    value={review}
+                                    onChange={(e) => setReview(e.target.value)}
+                                    placeholder="Tell us what you like or specify major issues..."
+                                    className="min-h-[120px] rounded-2xl border-2 focus:ring-0 focus:border-indigo-600 font-medium text-sm leading-relaxed"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                            <StarRating value={questionQuality} onChange={setQuestionQuality} label="Question & Accuracy Quality" icon={BookOpen} />
+                            <StarRating value={mocktestQuality} onChange={setMocktestQuality} label="Mock Test Experience" icon={ArrowRight} />
+                            <StarRating value={videoLectures} onChange={setVideoLectures} label="Video Lecture Content" icon={Video} />
+
+                            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+                                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 leading-relaxed italic">
+                                    "We use your content ratings to prioritize updates for specific subjects and tests."
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 3 && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                            <StarRating value={uiUxRating} onChange={setUiUxRating} label="Interface & UI/UX Design" icon={Monitor} />
+                            <StarRating value={securityRating} onChange={setSecurityRating} label="Account Security & Trust" icon={ShieldCheck} />
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-900 bg-slate-50/50 dark:bg-slate-900/30">
+                                    <div className="flex items-center gap-3">
+                                        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-colors shadow-sm", bugsExperienced ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-600")}>
+                                            <Bug className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-[11px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Experienced any bugs?</h4>
+                                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{bugsExperienced ? "Yes, I found issues" : "No, smooth sailing"}</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setBugsExperienced(!bugsExperienced)}
+                                        className={cn("px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all", bugsExperienced ? "bg-rose-600 text-white shadow-lg shadow-rose-600/20" : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400")}
+                                    >
+                                        {bugsExperienced ? "Reported" : "Report"}
+                                    </button>
+                                </div>
+
+                                {bugsExperienced && (
+                                    <Textarea
+                                        value={bugDetails}
+                                        onChange={(e) => setBugDetails(e.target.value)}
+                                        placeholder="Please describe the bug and which page it occurred on..."
+                                        className="rounded-2xl border-2 border-rose-100 dark:border-rose-900/20 focus:border-rose-600 font-medium text-sm animate-in zoom-in-95 duration-200"
                                     />
-                                </button>
-                            ))}
-                            {rating > 0 && (
-                                <span className="ml-3 text-sm font-bold text-slate-600 dark:text-slate-400 self-center">
-                                    {rating} / 5 {rating === 5 ? '🎉' : rating >= 4 ? '😊' : rating >= 3 ? '🙂' : '😐'}
-                                </span>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Category Selection */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest">
-                            Feedback Type
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                            {categories.map(({ value, label, icon: Icon }) => (
-                                <button
-                                    key={value}
-                                    type="button"
-                                    onClick={() => setCategory(value)}
-                                    className={cn(
-                                        "flex items-center gap-3 p-4 rounded-xl border-2 transition-all font-bold text-sm",
-                                        category === value
-                                            ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                                            : "border-slate-200 dark:border-border hover:border-slate-300 text-slate-600 dark:text-slate-400"
-                                    )}
-                                >
-                                    <Icon className="w-5 h-5" />
-                                    {label}
-                                </button>
-                            ))}
+                    {step === 4 && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                            <div className="space-y-4 text-center">
+                                <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Likelihood to Recommend</label>
+                                <div className="flex justify-between items-center gap-1">
+                                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                                        <button
+                                            key={n}
+                                            onClick={() => setNpsScore(n)}
+                                            className={cn(
+                                                "w-9 h-11 rounded-lg border-2 font-black text-[13px] transition-all flex items-center justify-center",
+                                                npsScore === n
+                                                    ? "bg-indigo-600 border-indigo-600 text-white scale-110 shadow-lg shadow-indigo-600/20"
+                                                    : "border-slate-100 dark:border-slate-800 text-slate-400 hover:border-indigo-200"
+                                            )}
+                                        >
+                                            {n}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="flex justify-between px-1 text-[8px] font-black uppercase tracking-widest text-slate-400">
+                                    <span>Not Likely</span>
+                                    <span>Extremely Likely</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+                                    Suggestions for Recommendation
+                                </label>
+                                <Textarea
+                                    value={suggestions}
+                                    onChange={(e) => setSuggestions(e.target.value)}
+                                    placeholder="What one thing would make Italostudy perfect for you?"
+                                    className="min-h-[100px] rounded-2xl border-2 focus:border-indigo-600 font-medium text-sm"
+                                />
+                            </div>
+
+                            <div className="p-6 rounded-3xl bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 flex items-center gap-5">
+                                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/20">
+                                    <CheckCircle2 className="w-6 h-6" />
+                                </div>
+                                <p className="text-[11px] font-bold leading-relaxed opacity-90">
+                                    Almost done! Your detailed report helps our engineers target the most important areas.
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
+                </div>
 
-                    {/* Review */}
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                            <label className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest">
-                                Your Review
-                            </label>
-                            <span className={cn(
-                                "text-xs font-bold",
-                                wordCount > maxWords ? "text-red-600" : "text-slate-400"
-                            )}>
-                                {wordCount} / {maxWords} words
-                            </span>
-                        </div>
-                        <Textarea
-                            value={review}
-                            onChange={(e) => setReview(e.target.value)}
-                            placeholder="Share your experience with the platform..."
-                            className="min-h-[120px] rounded-xl border-2 border-slate-200 dark:border-border focus:border-indigo-600 resize-none font-medium"
-                        />
-                    </div>
-
-                    {/* Major Questions */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest flex items-center gap-2">
-                            <HelpCircle className="w-4 h-4 text-indigo-600" />
-                            Major Questions or Concerns
-                        </label>
-                        <Textarea
-                            value={majorQuestions}
-                            onChange={(e) => setMajorQuestions(e.target.value)}
-                            placeholder="Any questions about features, content, or functionality?"
-                            className="min-h-[80px] rounded-xl border-2 border-slate-200 dark:border-border focus:border-indigo-600 resize-none font-medium"
-                        />
-                    </div>
-
-                    {/* Suggestions */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest flex items-center gap-2">
-                            <Lightbulb className="w-4 h-4 text-indigo-600" />
-                            Suggestions for Improvement
-                        </label>
-                        <Textarea
-                            value={suggestions}
-                            onChange={(e) => setSuggestions(e.target.value)}
-                            placeholder="What features or improvements would you like to see?"
-                            className="min-h-[80px] rounded-xl border-2 border-slate-200 dark:border-border focus:border-indigo-600 resize-none font-medium"
-                        />
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="flex gap-3 pt-4">
+                {/* Footer Controls */}
+                <div className="p-8 pt-0 flex gap-3">
+                    {step < totalSteps ? (
                         <Button
-                            onClick={() => setIsOpen(false)}
-                            variant="outline"
-                            className="flex-1 h-12 rounded-xl border-2 border-slate-200 dark:border-border hover:border-slate-900 font-black text-sm uppercase tracking-widest"
+                            onClick={() => setStep(s => s + 1)}
+                            disabled={step === 1 && (rating === 0 || wordCount > maxWords)}
+                            className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-600/20 active:scale-[0.98] transition-all"
                         >
-                            Cancel
+                            Next Step <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
+                    ) : (
                         <Button
                             onClick={handleSubmit}
-                            disabled={isSubmitting || rating === 0 || wordCount > maxWords}
-                            className="flex-1 h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-sm uppercase tracking-widest shadow-lg disabled:opacity-50"
+                            disabled={isSubmitting || npsScore === null}
+                            className="w-full h-14 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-600/20 active:scale-[0.98] transition-all"
                         >
-                            {isSubmitting ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                                    Submitting...
-                                </>
-                            ) : (
-                                <>
-                                    <Send className="w-4 h-4 mr-2" />
-                                    Submit Feedback
-                                </>
-                            )}
+                            {isSubmitting ? "Submitting Report..." : "Submit Detailed Report"}
+                            {!isSubmitting && <Send className="w-4 h-4 ml-2" />}
                         </Button>
-                    </div>
+                    )}
                 </div>
             </DialogContent>
         </Dialog>

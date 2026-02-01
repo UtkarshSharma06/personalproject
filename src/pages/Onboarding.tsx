@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Check, X, ArrowRight, Brain, Globe, GraduationCap, Target, Zap, Sparkles } from 'lucide-react';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const exams = [
     {
@@ -47,7 +48,7 @@ const plans = [
     {
         id: 'explorer',
         name: 'Explorer Plan',
-        price: '€0',
+        price: 0,
         description: 'Build your study habit with essential daily practice.',
         icon: Brain,
         color: 'from-slate-400 to-slate-600',
@@ -57,7 +58,7 @@ const plans = [
     {
         id: 'pro',
         name: 'Exam Prep Plan',
-        price: '€0',
+        price: 5,
         description: 'Everything you need to crack the exam with confidence.',
         icon: Zap,
         color: 'from-indigo-500 to-violet-600',
@@ -67,7 +68,7 @@ const plans = [
     {
         id: 'elite',
         name: 'Global Admission Plan',
-        price: '€0',
+        price: 10,
         description: 'Complete support from preparation to university admission.',
         icon: Sparkles,
         color: 'from-amber-500 to-orange-600',
@@ -81,6 +82,7 @@ export default function Onboarding() {
     const { setActiveExam } = useExam();
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { formatPrice } = useCurrency();
     const [step, setStep] = useState(1); // 1: Exam, 2: Plan
     const [selectedExam, setSelectedExam] = useState<string | null>(profile?.selected_exam || null);
     const [selectedPlan, setSelectedPlan] = useState<string | null>(profile?.selected_plan || null);
@@ -143,7 +145,7 @@ export default function Onboarding() {
             await setActiveExam(selectedExam);
 
             toast({
-                title: "Protocol Initialized",
+                title: "Setup Complete",
                 description: `Successfully configured for ${selectedPlan.toUpperCase()} access.`,
             });
 
@@ -270,7 +272,14 @@ export default function Onboarding() {
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-black text-slate-900 dark:text-white leading-none mb-1 uppercase tracking-tight">{plan.name}</h3>
-                                                <p className="text-3xl font-black text-indigo-600 leading-none">{plan.price}</p>
+                                                {plan.price > 0 ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-black text-slate-400 line-through tracking-tighter">{formatPrice(plan.price)}</span>
+                                                        <span className="text-2xl font-black text-indigo-600 leading-none">FREE</span>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-2xl font-black text-indigo-600 leading-none">FREE</p>
+                                                )}
                                             </div>
                                         </div>
 
@@ -312,7 +321,7 @@ export default function Onboarding() {
                                     onClick={handleConfirm}
                                     className="h-16 px-12 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm uppercase tracking-[0.2em] transition-all w-full md:w-auto"
                                 >
-                                    {isSubmitting ? 'Configuring Mission...' : 'Begin Preparation'}
+                                    {isSubmitting ? 'Preparing Your Study...' : 'Begin Preparation'}
                                 </Button>
                                 <button
                                     onClick={() => setStep(1)}

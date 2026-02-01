@@ -19,8 +19,8 @@ export default function AnnouncementBar() {
                 // Not native
             }
 
-            // 2. Check dismissal
-            const isDismissed = localStorage.getItem('announcement-dismissed-v2');
+            // 2. Check dismissal (session-based, resets on reload)
+            const isDismissed = sessionStorage.getItem('announcement-dismissed-v2');
             if (isDismissed === 'true') {
                 setIsVisible(false);
             }
@@ -33,7 +33,7 @@ export default function AnnouncementBar() {
         e.preventDefault();
         e.stopPropagation();
         setIsVisible(false);
-        localStorage.setItem('announcement-dismissed-v2', 'true');
+        sessionStorage.setItem('announcement-dismissed-v2', 'true');
     };
 
     if (!isVisible) return null;
