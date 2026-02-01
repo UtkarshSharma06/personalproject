@@ -208,24 +208,106 @@ export default function Blog() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-                            {filteredPosts.map((post, idx) => (
-                                <motion.div
-                                    key={post.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1 * idx }}
-                                >
-                                    <BlogCard
-                                        id={post.id}
-                                        title={post.title}
-                                        slug={post.slug}
-                                        excerpt={post.excerpt}
-                                        published_at={post.published_at}
-                                        created_at={post.created_at}
-                                    />
-                                </motion.div>
-                            ))}
+                        <div className="relative">
+                            {/* Animated Connecting Lines Background */}
+                            <svg
+                                className="absolute inset-0 w-full h-full pointer-events-none opacity-20 -z-10"
+                                style={{ minHeight: '100%' }}
+                            >
+                                <defs>
+                                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style={{ stopColor: '#fde047', stopOpacity: 1 }}>
+                                            <animate attributeName="stop-color"
+                                                values="#fde047;#facc15;#eab308;#fde047"
+                                                dur="4s"
+                                                repeatCount="indefinite" />
+                                        </stop>
+                                        <stop offset="100%" style={{ stopColor: '#facc15', stopOpacity: 1 }}>
+                                            <animate attributeName="stop-color"
+                                                values="#facc15;#eab308;#fde047;#facc15"
+                                                dur="4s"
+                                                repeatCount="indefinite" />
+                                        </stop>
+                                    </linearGradient>
+                                </defs>
+
+                                {/* Horizontal connecting lines */}
+                                {filteredPosts.length > 1 && Array.from({ length: Math.ceil(filteredPosts.length / 3) }).map((_, rowIdx) => (
+                                    <g key={`row-${rowIdx}`}>
+                                        {/* Line connecting cards in the same row */}
+                                        {[0, 1].map(colIdx => {
+                                            const cardIndex = rowIdx * 3 + colIdx;
+                                            if (cardIndex >= filteredPosts.length - 1) return null;
+
+                                            const x1 = `${(colIdx + 1) * 33.33 - 5}%`;
+                                            const x2 = `${(colIdx + 1) * 33.33 + 5}%`;
+                                            const y = `${rowIdx * 320 + 140}px`;
+
+                                            return (
+                                                <line
+                                                    key={`h-${rowIdx}-${colIdx}`}
+                                                    x1={x1}
+                                                    y1={y}
+                                                    x2={x2}
+                                                    y2={y}
+                                                    stroke="url(#lineGradient)"
+                                                    strokeWidth="2"
+                                                    strokeDasharray="5,5"
+                                                >
+                                                    <animate
+                                                        attributeName="stroke-dashoffset"
+                                                        from="0"
+                                                        to="10"
+                                                        dur="1s"
+                                                        repeatCount="indefinite"
+                                                    />
+                                                </line>
+                                            );
+                                        })}
+
+                                        {/* Vertical connecting line to next row */}
+                                        {rowIdx < Math.ceil(filteredPosts.length / 3) - 1 && (
+                                            <line
+                                                x1="50%"
+                                                y1={`${rowIdx * 320 + 280}px`}
+                                                x2="50%"
+                                                y2={`${(rowIdx + 1) * 320}px`}
+                                                stroke="url(#lineGradient)"
+                                                strokeWidth="2"
+                                                strokeDasharray="5,5"
+                                            >
+                                                <animate
+                                                    attributeName="stroke-dashoffset"
+                                                    from="0"
+                                                    to="10"
+                                                    dur="1s"
+                                                    repeatCount="indefinite"
+                                                />
+                                            </line>
+                                        )}
+                                    </g>
+                                ))}
+                            </svg>
+
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10">
+                                {filteredPosts.map((post, idx) => (
+                                    <motion.div
+                                        key={post.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.1 * idx }}
+                                    >
+                                        <BlogCard
+                                            id={post.id}
+                                            title={post.title}
+                                            slug={post.slug}
+                                            excerpt={post.excerpt}
+                                            published_at={post.published_at}
+                                            created_at={post.created_at}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>
