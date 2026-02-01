@@ -516,7 +516,13 @@ export default function NotFound() {
   opacity: 0.5;
   font-family: Montserrat, sans-serif;
 }
-.text_4041, .text_4042, .text_4043 {
+.text_4041 {
+  transform: scaleY(24.5) scaleX(9);
+}
+.text_4042 {
+  transform: scaleY(24.5) scaleX(9);
+}
+.text_4043 {
   transform: scaleY(24.5) scaleX(9);
 }
 

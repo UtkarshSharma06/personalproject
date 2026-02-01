@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout';
 import BlogHeader from '@/components/blog/BlogHeader';
+import BlogCard from '@/components/blog/BlogCard';
 import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -215,49 +216,14 @@ export default function Blog() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.1 * idx }}
                                 >
-                                    <Link
-                                        to={`/blog/${post.slug}`}
-                                        className="group flex flex-col bg-white border-2 border-slate-100 rounded-[3rem] p-6 hover:border-indigo-100 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 hover:-translate-y-2 h-full"
-                                    >
-                                        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] mb-6 shadow-sm group-hover:shadow-md transition-all">
-                                            {post.featured_image ? (
-                                                <img
-                                                    src={getProxiedUrl(post.featured_image)}
-                                                    alt={post.title}
-                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-indigo-50 text-6xl">
-                                                    📖
-                                                </div>
-                                            )}
-                                            <div className="absolute top-4 left-4">
-                                                <span className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-600 shadow-sm border border-slate-100">
-                                                    {(post as any).blog_categories?.name || (post as any).category_name || "Study Tip"}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
-                                            <Calendar className="w-3.5 h-3.5" />
-                                            {format(new Date(post.published_at || post.created_at), 'MMM dd, yyyy')}
-                                        </div>
-
-                                        <h2 className="text-2xl font-black text-slate-900 leading-tight mb-4 group-hover:text-indigo-600 transition-colors">
-                                            {post.title}
-                                        </h2>
-
-                                        <p className="text-slate-500 leading-relaxed font-bold text-sm mb-6 line-clamp-2">
-                                            {post.excerpt}
-                                        </p>
-
-                                        <div className="mt-auto flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-widest">
-                                            Learn more
-                                            <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                                            </div>
-                                        </div>
-                                    </Link>
+                                    <BlogCard
+                                        id={post.id}
+                                        title={post.title}
+                                        slug={post.slug}
+                                        excerpt={post.excerpt}
+                                        published_at={post.published_at}
+                                        created_at={post.created_at}
+                                    />
                                 </motion.div>
                             ))}
                         </div>
