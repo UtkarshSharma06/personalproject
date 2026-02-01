@@ -2,26 +2,27 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 
 interface BlogCardProps {
-    id: string;
-    title: string;
-    slug: string;
-    excerpt: string;
-    published_at: string;
-    created_at: string;
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  published_at: string;
+  created_at: string;
 }
 
 export default function BlogCard({ id, title, slug, excerpt, published_at, created_at }: BlogCardProps) {
-    const date = new Date(published_at || created_at);
-    const year = format(date, 'yyyy');
-    const dateStr = format(date, 'MMM dd');
+  const date = new Date(published_at || created_at);
+  const year = format(date, 'yyyy');
+  const dateStr = format(date, 'MMM dd');
 
-    return (
-        <div className="card">
-            <style>{`
+  return (
+    <div className="card">
+      <style>{`
 .card {
   box-sizing: border-box;
   display: flex;
   max-width: 320px;
+  height: 280px;
   background-color: rgba(255, 255, 255, 1);
   transition: all .15s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -112,27 +113,27 @@ export default function BlogCard({ id, title, slug, excerpt, published_at, creat
 }
       `}</style>
 
-            <div className="date-time-container">
-                <time className="date-time" dateTime={format(date, 'yyyy-MM-dd')}>
-                    <span>{year}</span>
-                    <span className="separator"></span>
-                    <span>{dateStr}</span>
-                </time>
-            </div>
+      <div className="date-time-container">
+        <time className="date-time" dateTime={format(date, 'yyyy-MM-dd')}>
+          <span>{year}</span>
+          <span className="separator"></span>
+          <span>{dateStr}</span>
+        </time>
+      </div>
 
-            <div className="content">
-                <div className="infos">
-                    <Link to={`/blog/${slug}`}>
-                        <span className="title">{title}</span>
-                    </Link>
+      <div className="content">
+        <div className="infos">
+          <Link to={`/blog/${slug}`}>
+            <span className="title">{title}</span>
+          </Link>
 
-                    <p className="description">{excerpt}</p>
-                </div>
-
-                <Link className="action" to={`/blog/${slug}`}>
-                    Read Blog
-                </Link>
-            </div>
+          <p className="description">{excerpt}</p>
         </div>
-    );
+
+        <Link className="action" to={`/blog/${slug}`}>
+          Read Blog
+        </Link>
+      </div>
+    </div>
+  );
 }
