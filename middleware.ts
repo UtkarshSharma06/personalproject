@@ -56,20 +56,24 @@ export default async function middleware(request: Request) {
     'study-in-italy/universities-2026': { title: 'Top English-Taught Universities in Italy 2026', description: 'Discover the best public and private universities in Italy for international students.' },
     'study-in-italy/without-ielts': { title: 'Study in Italy Without IELTS', description: 'How to get admission in Italy without taking the IELTS or TOEFL exams.' },
     'study-in-italy/tuition-fees-2026': { title: 'Tuition Fees & Scholarships in Italy 2026', description: 'A complete breakdown of university fees and DSU scholarships in Italy.' },
-    'study-in-italy/how-to-apply': { title: 'How to Apply to Italian Universities', description: 'Step-by-step application guide, pre-enrollment, and visa process for Italy.' }
+    'study-in-italy/how-to-apply': { title: 'How to Apply to Italian Universities', description: 'Step-by-step application guide, pre-enrollment, and visa process for Italy.' },
+    
+    '': { title: 'ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified', description: 'Accelerate your medical and academic journey with ItaloStudy. Free CEnT-S, IMAT, SAT, and IELTS preparation with unlimited free mocks and direct university admission support.' },
+    'it': { title: 'ItaloStudy | Preparazione Gratuita per CEnT-S, IMAT, SAT e IELTS', description: 'Inizia il tuo percorso accademico in Italia con ItaloStudy. Preparazione gratuita con simulazioni illimitate.' },
+    'tr': { title: 'ItaloStudy | CEnT-S, IMAT, SAT ve IELTS İçin Ücretsiz Hazırlık', description: 'ItaloStudy ile İtalya\'daki üniversite giriş sınavlarına ücretsiz hazırlanın ve deneme sınavlarını çözün.' }
   };
 
   try {
     let title = 'ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified';
     let description = 'Accelerate your medical and academic journey with ItaloStudy. Free CEnT-S, IMAT, SAT, and IELTS preparation with unlimited free mocks and direct university admission support.';
-    let image = 'https://italostudy.com/logo.webp';
+    let image = 'https://italostudy.com/square.png';
     let ogType = 'website';
     let shouldRenderSeo = false;
 
-    if (staticSeoMap[pathKey]) {
+    if (staticSeoMap[pathKey] !== undefined) {
       title = staticSeoMap[pathKey].title;
       description = staticSeoMap[pathKey].description;
-      image = 'https://italostudy.com/square1.webp';
+      image = 'https://italostudy.com/square.png';
       shouldRenderSeo = true;
     } else if (type === 'blog' && slug) {
       const response = await fetch(
