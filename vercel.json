@@ -1,0 +1,143 @@
+{
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "redirects": [
+        {
+            "source": "/:path(.*)\\.html",
+            "destination": "/:path",
+            "permanent": true
+        },
+        {
+            "source": "/imat-ultimate-guide",
+            "destination": "/imat-exam-ultimate-guide-2026",
+            "permanent": true
+        },
+        {
+            "source": "/imat-cutoff-scores",
+            "destination": "/imat-cutoff-trends-2026",
+            "permanent": true
+        },
+        {
+            "source": "/top-universities-italy",
+            "destination": "/study-in-italy/universities-2026",
+            "permanent": true
+        },
+        {
+            "source": "/study-in-italy-without-ielts",
+            "destination": "/study-in-italy/without-ielts",
+            "permanent": true
+        },
+        {
+            "source": "/community",
+            "destination": "/",
+            "permanent": true
+        },
+        {
+            "source": "/download-app",
+            "destination": "/",
+            "permanent": false
+        },
+        {
+            "source": "/get-admission",
+            "destination": "/study-in-italy-guide-2026",
+            "permanent": true
+        },
+        {
+            "source": "/syllabus",
+            "destination": "/exams",
+            "permanent": true
+        },
+        {
+            "source": "/syllabus/:path*",
+            "destination": "/exams",
+            "permanent": true
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/sitemap-qa.xml",
+            "destination": "/api/sitemap-qa"
+        },
+        {
+            "source": "/resources",
+            "destination": "/api/resources-ssr"
+        },
+        {
+            "source": "/resources/:slug",
+            "destination": "/api/resource-dynamic?slug=:slug"
+        },
+        {
+            "source": "/cent-s-mock",
+            "destination": "/api/cent-s-mock-ssr"
+        },
+        {
+            "source": "/imat-mock",
+            "destination": "/api/imat-mock-ssr"
+        },
+        {
+            "source": "/cent-s-exam-preparation-book-pdf-free-download",
+            "destination": "/api/cent-s-resources-ssr"
+        },
+        {
+            "source": "/blog/:slug",
+            "destination": "/api/blog-post-dynamic?slug=:slug"
+        },
+        {
+            "source": "/(syllabus/.*|imat.*|study-in-italy.*|tolc.*|til-i.*|pricing|about|institutional|exams|cent-s.*)",
+            "destination": "/api/static-seo-router"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Content-Security-Policy",
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://*.supabase.co https://*.googlesyndication.com https://*.googletagservices.com https://*.google.com https://*.vercel.app https://static.cloudflareinsights.com https://*.adtrafficquality.google https://www.gstatic.com https://unpkg.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://storage.googleapis.com https://elfsightcdn.com https://*.elfsight.com; connect-src 'self' blob: https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.vercel-analytics.com https://*.sentry.io https://*.paddle.com https://*.cashfree.com https://*.adtrafficquality.google https://ipapi.co https://api.ipify.org https://api.db-ip.com https://tessdata.projectnaptha.com https://unpkg.com https://cdn.jsdelivr.net https://api.cloudinary.com https://storage.googleapis.com https://tfhub.dev https://*.tfhub.dev https://ik.imagekit.io https://*.elfsight.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://elfsightcdn.com https://*.elfsight.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.cloudinary.com https://*.googleusercontent.com https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.pravatar.cc https://ik.imagekit.io https://placehold.co https://elfsightcdn.com https://*.elfsight.com https://*.pinimg.com https://images.unsplash.com https://www.transparenttextures.com https://grainy-gradients.vercel.app; frame-src 'self' https://*.supabase.co https://*.paddle.com https://*.youtube.com https://*.sketchfab.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.adtrafficquality.google https://*.google.com https://www.gstatic.com https://*.elfsight.com; frame-ancestors 'none'; upgrade-insecure-requests;"
+                },
+                {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                },
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "Referrer-Policy",
+                    "value": "strict-origin-when-cross-origin"
+                },
+                {
+                    "key": "Permissions-Policy",
+                    "value": "camera=(self), microphone=(self), geolocation=(), compute-pressure=(self)"
+                },
+                {
+                    "key": "Strict-Transport-Security",
+                    "value": "max-age=31536000; includeSubDomains; preload"
+                }
+            ]
+        },
+        {
+            "source": "/assets/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        },
+        {
+            "source": "/(.*)\\.html",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, s-maxage=3600, stale-while-revalidate=86400"
+                }
+            ]
+        }
+    ]
+}

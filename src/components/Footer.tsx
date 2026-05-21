@@ -1,0 +1,152 @@
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Instagram, MessageCircle } from 'lucide-react';
+import { imatLinks, centsLinks, studyItalyLinks } from '@/lib/nav-links';
+import { useTranslation } from 'react-i18next';
+
+export default function Footer() {
+    const { t } = useTranslation();
+
+    const footerColumns = [
+        {
+            title: 'Company',
+            links: [
+                { label: 'About Us', path: '/about' },
+                { label: 'Blog & News', path: '/blog' },
+                { label: 'Marketplace', path: 'https://store.italostudy.com' },
+                { label: 'Pricing Plans', path: '/pricing' },
+                { label: 'Contact Us', path: '/contact' },
+                { label: 'Status', path: '/status' }
+            ]
+        },
+        {
+            title: 'CENT-S 2026',
+            links: centsLinks.slice(0, 6)
+        },
+        {
+            title: 'IMAT 2026',
+            links: imatLinks.slice(0, 6)
+        },
+        {
+            title: 'Study in Italy',
+            links: studyItalyLinks.slice(0, 6)
+        }
+    ];
+
+    return (
+        <footer className="py-12 bg-slate-50 border-t border-slate-200 relative z-10 overflow-hidden text-left">
+            <div className="container mx-auto px-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 mb-12">
+                    {/* Brand Column */}
+                    <div className="col-span-2 md:col-span-3 lg:col-span-1 flex flex-col items-start gap-5">
+                        <img
+                            src="/logo.webp"
+                            alt="Italostudy Logo"
+                            className="h-8 w-auto object-contain"
+                            width="140"
+                            height="35"
+                            loading="lazy"
+                        />
+                        <p className="text-[11px] font-medium text-slate-500 max-w-xs leading-relaxed">
+                            Empowering students for Italian entrance exams with expert-led preparation and strategic guidance for success.
+                        </p>
+                        <div className="flex gap-3">
+                            <motion.a
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                href="https://www.instagram.com/italostudycom"
+                                className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all border border-slate-200 shadow-sm"
+                            >
+                                <Instagram className="w-4 h-4" />
+                            </motion.a>
+                            <motion.a
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A"
+                                className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 hover:text-green-600 transition-all border border-slate-200 shadow-sm"
+                            >
+                                <MessageCircle className="w-4 h-4" />
+                            </motion.a>
+                        </div>
+                    </div>
+
+                    {/* Navigation Columns */}
+                    {footerColumns.map((column) => (
+                        <div key={column.title} className="flex flex-col gap-4">
+                            <h4 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">
+                                {column.title}
+                            </h4>
+                            <ul className="flex flex-col gap-2.5">
+                                {column.links.map((link, idx) => (
+                                    <li key={idx}>
+                                        {link.path ? (
+                                            (() => {
+                                                const staticPaths = [
+                                                    '/resources', '/cent-s-exam-preparation-book-pdf', '/status', '/contact', '/roadmap', '/updates', 
+                                                    '/method', '/imat', '/cent-s', '/exams', '/blog', 
+                                                    '/cent-s-mock', '/imat-mock', '/it', '/tr'
+                                                ];
+                                                const isStatic = staticPaths.includes(link.path.split('?')[0]);
+                                                const isExternal = link.path.startsWith('http');
+
+                                                return (isExternal || isStatic) ? (
+                                                    <a
+                                                        href={link.path}
+                                                        target={isExternal ? "_blank" : undefined}
+                                                        rel={isExternal ? "noopener noreferrer" : undefined}
+                                                        className="text-[11px] font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+                                                    >
+                                                        {link.label}
+                                                    </a>
+                                                ) : (
+                                                    <Link
+                                                        to={link.path}
+                                                        className="text-[11px] font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+                                                    >
+                                                        {link.label}
+                                                    </Link>
+                                                );
+                                            })()
+                                        ) : (
+                                            <button
+                                                onClick={link.action}
+                                                className="text-[11px] font-medium text-slate-600 hover:text-indigo-600 transition-colors text-left"
+                                            >
+                                                {link.label}
+                                            </button>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="pt-8 border-t border-slate-200 flex flex-col lg:flex-row justify-between items-center gap-8">
+                    <div className="flex flex-col items-center lg:items-start gap-1">
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                            © {new Date().getFullYear()} ITALOSTUDY EDUCATION TECHNOLOGIES. ALL RIGHTS RESERVED.
+                        </p>
+                        <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-2">
+                            <Link to="/privacy" className="text-[9px] font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Privacy</Link>
+                            <Link to="/terms" className="text-[9px] font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Terms</Link>
+                            <Link to="/refund" className="text-[9px] font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Refunds</Link>
+                        </div>
+                    </div>
+
+                    {/* Payment Methods */}
+                    <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
+                        {['visa', 'mastercard', 'amex', 'paypal', 'applepay', 'googlepay', 'ideal', 'pix', 'upi', 'cashapp'].map(logo => (
+                            <img 
+                                key={logo}
+                                src={`/payments/${logo}.webp`} 
+                                alt={logo} 
+                                className="h-4 md:h-5 w-auto object-contain transition-transform hover:scale-110 opacity-90"
+                            />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </footer>
+    );
+}

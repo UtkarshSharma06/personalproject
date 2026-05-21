@@ -1,0 +1,66 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+Disallow: /mobile/
+Disallow: /auth
+Disallow: /auth/
+Disallow: /settings
+Disallow: /billing
+Disallow: /onboarding
+Disallow: /community
+Disallow: /reset-password
+Disallow: /subjects
+Disallow: /practice
+Disallow: /mock-exams
+Disallow: /*?country=*
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Sitemap Index
+Sitemap: https://italostudy.com/sitemap.xml
+Sitemap: https://italostudy.com/sitemap-blog.xml
+Sitemap: https://italostudy.com/sitemap-qa.xml
+Sitemap: https://italostudy.com/sitemap-authority.xml
+Sitemap: https://italostudy.com/sitemap-core.xml

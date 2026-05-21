@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ItaloStudy">
+
+  <!-- iOS PWA Splash Screens (Branded) -->
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: dark)" href="/splash/splash-dark.png">
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: light)" href="/splash/splash-light.png">
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: dark)" href="/splash/splash-dark.png">
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: dark)" href="/splash/splash-dark.png">
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: dark)" href="/splash/splash-dark.png">
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: dark)" href="/splash/splash-dark.png">
+
+  <!-- Performance: DNS Prefetch & Preconnect -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://jyjhpqtqbwtxxgijxetq.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://ik.imagekit.io" crossorigin>
+  <link rel="dns-prefetch" href="https://ik.imagekit.io">
+  <link rel="dns-prefetch" href="https://ipapi.co">
+  <!-- Prefetch store & app subdomains for fast navigation -->
+  <link rel="dns-prefetch" href="https://store.italostudy.com">
+  <link rel="dns-prefetch" href="https://app.italostudy.com">
+
+  <!-- Preload Critical Assets -->
+  <link rel="preload" href="/logo.webp" as="image" type="image/webp" fetchpriority="high">
+  <link rel="preload" href="/images/hero/banner-img.webp" as="image" type="image/webp" fetchpriority="high">
+  <link rel="preload" href="/images/hero/about-img-bg.webp" as="image" type="image/webp">
+
+  <!-- Outfit — Primary Brand Font (Consolidated) -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+
+  <!-- Google Search Console Verification -->
+  <meta name="google-site-verification" content="uQqeVzzdOhR0Nb7s2EjgPEWhCBkUH-WYsDE5os5XgjI" />
+
+  <!-- Google AdSense — deferred to prioritize LCP/FID -->
+  <script>
+    (function() {
+      let adLoaded = false;
+      function loadAds() {
+        if (adLoaded) return;
+        adLoaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7472926437419938';
+        s.crossOrigin = 'anonymous';
+        document.head.appendChild(s);
+        // Clean up listeners
+        ['scroll', 'mousemove', 'touchstart', 'click'].forEach(function(e) {
+          window.removeEventListener(e, loadAds);
+        });
+      }
+      // Load on first user interaction
+      ['scroll', 'mousemove', 'touchstart', 'click'].forEach(function(e) {
+        window.addEventListener(e, loadAds, { once: true, passive: true });
+      });
+      // Fallback: load after 8 seconds if no interaction
+      setTimeout(loadAds, 8000);
+    })();
+  </script>
+  <meta name="google-adsense-account" content="ca-pub-7472926437419938">
+
+  <!-- Website Title and Branding -->
+  <title>ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified</title>
+  <meta name="description" content="Accelerate your medical and academic journey with ItaloStudy. Free CEnT-S, IMAT, SAT, and IELTS preparation with unlimited free mocks and direct university admission support." />
+  <meta name="author" content="ItaloStudy" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://italostudy.com/" />
+
+  <!-- hreflang — multilingual SEO -->
+  <link rel="alternate" hreflang="en" href="https://italostudy.com/" />
+  <link rel="alternate" hreflang="it" href="https://italostudy.com/it" />
+  <link rel="alternate" hreflang="tr" href="https://italostudy.com/tr" />
+  <link rel="alternate" hreflang="x-default" href="https://italostudy.com/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://italostudy.com/" />
+  <meta property="og:title" content="ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified" />
+  <meta property="og:description" content="Accelerate your medical and academic journey with ItaloStudy. Free CEnT-S, IMAT, SAT, and IELTS preparation with unlimited free mocks and direct university admission support." />
+  <meta property="og:image" content="https://italostudy.com/logo.webp" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://italostudy.com/" />
+  <meta property="twitter:title" content="ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified" />
+  <meta property="twitter:description" content="Accelerate your medical and academic journey with ItaloStudy. Free CEnT-S, IMAT, SAT, and IELTS preparation with unlimited free mocks and direct university admission support." />
+  <meta name="twitter:image" content="https://italostudy.com/logo.webp" />
+
+  <!-- Favicons and Brand Identity -->
+  <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png?v=2" />
+  <link rel="apple-touch-icon" href="/favicon.png?v=2" />
+  <meta name="theme-color" content="#6366f1" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: #fff;
+      color: #050e38;
+    }
+
+    #root {
+      min-height: 100vh
+    }
+
+    /* ─── Inline skeleton — eliminates white flash before React mounts ─── */
+    .sk-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(255,255,255,0.95);
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 100;
+      gap: 16px;
+    }
+    .sk-logo {
+      width: 120px; height: 32px;
+      background: #e2e8f0;
+      border-radius: 8px;
+    }
+    .sk-nav-spacer { flex: 1; }
+    .sk-pill {
+      width: 80px; height: 28px;
+      background: #e2e8f0;
+      border-radius: 20px;
+    }
+    .sk-btn {
+      width: 90px; height: 36px;
+      background: #6366f1;
+      border-radius: 10px;
+      opacity: 0.3;
+    }
+    .sk-hero {
+      padding: 120px 24px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+    .sk-hero-badge {
+      width: 180px; height: 24px;
+      background: #e0e7ff;
+      border-radius: 20px;
+    }
+    .sk-hero-h1 {
+      width: min(640px, 90vw); height: 52px;
+      background: #e2e8f0;
+      border-radius: 12px;
+    }
+    .sk-hero-sub {
+      width: min(480px, 85vw); height: 20px;
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .sk-hero-cta {
+      width: 180px; height: 48px;
+      background: #6366f1;
+      border-radius: 24px;
+      opacity: 0.3;
+      margin-top: 8px;
+    }
+    @keyframes sk-shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .sk-logo, .sk-pill, .sk-hero-badge, .sk-hero-h1, .sk-hero-sub {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 400px 100%;
+      animation: sk-shimmer 1.4s ease-in-out infinite;
+    }
+    /* Hide skeleton once React mounts */
+    #sk-shell { display: block; }
+    #root:not(:empty) + * { display: none !important; }
+  </style>
+
+  <!-- SEO Schema for Brand Recognition -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ItaloStudy",
+      "alternateName": ["italostudy", "italo study"],
+      "url": "https://italostudy.com",
+      "logo": "https://italostudy.com/logo.webp",
+      "description": "Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified. The ultimate platform for university entrance exam preparation.",
+      "sameAs": [
+        "https://www.instagram.com/italostudycom",
+        "https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A"
+      ]
+    }
+  </script>
+</head>
+
+<body>
+
+  <div id="root"></div>
+
+  <!-- Inline skeleton shell — visible instantly, hidden when React mounts -->
+  <div id="sk-shell" aria-hidden="true">
+    <div class="sk-nav">
+      <div class="sk-logo"></div>
+      <div class="sk-nav-spacer"></div>
+      <div class="sk-pill" style="display:none" class="hidden sm:block"></div>
+      <div class="sk-btn"></div>
+    </div>
+    <div class="sk-hero">
+      <div class="sk-hero-badge"></div>
+      <div class="sk-hero-h1"></div>
+      <div class="sk-hero-sub"></div>
+      <div class="sk-hero-sub" style="width: min(360px, 75vw)"></div>
+      <div class="sk-hero-cta"></div>
+    </div>
+  </div>
+
+  <script>
+    // Hide skeleton immediately when React fills #root
+    var root = document.getElementById('root');
+    var shell = document.getElementById('sk-shell');
+    if (root && shell) {
+      var obs = new MutationObserver(function() {
+        if (root.children.length > 0) {
+          shell.style.display = 'none';
+          obs.disconnect();
+        }
+      });
+      obs.observe(root, { childList: true });
+    }
+  </script>
+
+  <script type="module" src="/src/main.tsx"></script>
+
+</body>
+
+</html>
