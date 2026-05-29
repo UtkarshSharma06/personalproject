@@ -68,6 +68,7 @@ export default async function middleware(request: Request) {
     let description = 'Accelerate your medical and academic journey with ItaloStudy. Free CEnT-S, IMAT, SAT, and IELTS preparation with unlimited free mocks and direct university admission support.';
     let image = 'https://italostudy.com/square.png';
     let ogType = 'website';
+    let canonicalUrl = url.origin + url.pathname; // always clean URL without query params
     let shouldRenderSeo = false;
 
     if (staticSeoMap[pathKey] !== undefined) {
@@ -108,33 +109,50 @@ export default async function middleware(request: Request) {
       return new Response(null, { headers: { 'x-middleware-next': '1' } });
     }
 
-    const html = `
-<!DOCTYPE html>
+    // Escape values for safe HTML injection
+    const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeDescription = description.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeImage = image.replace(/"/g, '&quot;');
+    const safeCanonical = canonicalUrl.replace(/"/g, '&quot;');
+
+    const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-534CETZ7YR"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-534CETZ7YR');
+  </script>
+
   <meta charset="UTF-8">
-  <title>${title}</title>
-  <meta name="description" content="${description}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${safeTitle}</title>
+  <meta name="description" content="${safeDescription}">
+  <link rel="canonical" href="${safeCanonical}">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="${ogType}">
-  <meta property="og:url" content="${url.href}">
-  <meta property="og:title" content="${title}">
-  <meta property="og:description" content="${description}">
-  <meta property="og:image" content="${image}">
+  <meta property="og:url" content="${safeCanonical}">
+  <meta property="og:title" content="${safeTitle}">
+  <meta property="og:description" content="${safeDescription}">
+  <meta property="og:image" content="${safeImage}">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="${url.href}">
-  <meta property="twitter:title" content="${title}">
-  <meta property="twitter:description" content="${description}">
-  <meta property="twitter:image" content="${image}">
+  <meta property="twitter:url" content="${safeCanonical}">
+  <meta property="twitter:title" content="${safeTitle}">
+  <meta property="twitter:description" content="${safeDescription}">
+  <meta property="twitter:image" content="${safeImage}">
 
-  <meta http-equiv="refresh" content="0;url=${url.href}">
+  <meta name="robots" content="index, follow">
 </head>
 <body>
-  <p>Redirecting...</p>
-  <script>window.location.href = "${url.href}";</script>
+  <h1>${safeTitle}</h1>
+  <p>${safeDescription}</p>
+  <p><a href="${safeCanonical}">Visit ItaloStudy</a></p>
 </body>
 </html>
     `;

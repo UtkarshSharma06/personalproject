@@ -2,6 +2,93 @@ import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
 
+/**
+ * Returns a list of related authority page links based on blog slug keywords.
+ * These are injected as a hidden nav block in SSR HTML for Google to crawl.
+ * Completely invisible to users — aria-hidden + opacity:0 + height:0.
+ */
+function getRelatedLinks(slug) {
+  const s = (slug || '').toLowerCase();
+  const links = [];
+
+  // CEnT-S cluster
+  if (s.includes('cent-s') || s.includes('cents') || s.includes('cent_s')) {
+    links.push({ href: '/cent-s-exam-ultimate-guide', label: 'CEnT-S Exam Ultimate Guide 2026' });
+    links.push({ href: '/cent-s-syllabus-2026', label: 'CEnT-S Syllabus 2026' });
+    links.push({ href: '/cent-s-mock-test-free-2026', label: 'Free CEnT-S Mock Test 2026' });
+    links.push({ href: '/cent-s-cutoff-2026', label: 'CEnT-S Cutoff Scores 2026' });
+    if (s.includes('syllabus') || s.includes('subject')) {
+      links.push({ href: '/cent-s-exam-pattern-2026', label: 'CEnT-S Exam Pattern 2026' });
+    }
+    if (s.includes('mock') || s.includes('practice') || s.includes('test')) {
+      links.push({ href: '/cent-s-previous-year-papers-pdf', label: 'CEnT-S Previous Year Papers PDF' });
+    }
+    if (s.includes('registr') || s.includes('date') || s.includes('deadline')) {
+      links.push({ href: '/cent-s-registration-process-2026', label: 'CEnT-S Registration Process 2026' });
+      links.push({ href: '/cent-s-important-dates-2026', label: 'CEnT-S Important Dates 2026' });
+    }
+    if (s.includes('book') || s.includes('resource') || s.includes('material')) {
+      links.push({ href: '/best-books-for-cent-s-2026', label: 'Best Books for CEnT-S 2026' });
+    }
+    if (s.includes('strategy') || s.includes('prep') || s.includes('guide') || s.includes('how')) {
+      links.push({ href: '/cent-s-preparation-strategy-2026', label: 'CEnT-S Preparation Strategy 2026' });
+    }
+  }
+
+  // IMAT cluster
+  if (s.includes('imat')) {
+    links.push({ href: '/imat-exam-ultimate-guide-2026', label: 'IMAT Exam Ultimate Guide 2026' });
+    links.push({ href: '/imat-syllabus-2026', label: 'IMAT Syllabus 2026' });
+    links.push({ href: '/imat-mock-test-free-2026', label: 'Free IMAT Mock Test 2026' });
+    links.push({ href: '/imat-cutoff-trends-2026', label: 'IMAT Cutoff Scores 2026' });
+    if (s.includes('registr') || s.includes('date') || s.includes('deadline')) {
+      links.push({ href: '/imat-registration-2026', label: 'IMAT Registration Guide 2026' });
+      links.push({ href: '/imat-exam-dates-2026', label: 'IMAT Exam Dates 2026' });
+    }
+    if (s.includes('strategy') || s.includes('prep') || s.includes('guide') || s.includes('how')) {
+      links.push({ href: '/imat-preparation-strategy-2026', label: 'IMAT Preparation Strategy 2026' });
+    }
+    if (s.includes('book') || s.includes('resource') || s.includes('material')) {
+      links.push({ href: '/imat-best-books-2026', label: 'Best Books for IMAT 2026' });
+    }
+    if (s.includes('neet') || s.includes('vs') || s.includes('compar')) {
+      links.push({ href: '/imat-vs-cents-2026', label: 'IMAT vs CEnT-S Comparison' });
+    }
+  }
+
+  // Study in Italy cluster
+  if (s.includes('italy') || s.includes('italian') || s.includes('universit') || s.includes('abroad') || s.includes('europe')) {
+    links.push({ href: '/study-in-italy-guide-2026', label: 'Study in Italy 2026 Guide' });
+    links.push({ href: '/study-in-italy/universities-2026', label: 'Top Universities in Italy 2026' });
+    if (s.includes('ielts') || s.includes('toefl') || s.includes('language') || s.includes('english')) {
+      links.push({ href: '/study-in-italy/without-ielts', label: 'Study in Italy Without IELTS' });
+    }
+    if (s.includes('fee') || s.includes('cost') || s.includes('scholarship') || s.includes('dsu') || s.includes('budget')) {
+      links.push({ href: '/study-in-italy/tuition-fees-2026', label: 'Tuition Fees & Scholarships in Italy 2026' });
+    }
+    if (s.includes('apply') || s.includes('admission') || s.includes('visa') || s.includes('enroll')) {
+      links.push({ href: '/study-in-italy/how-to-apply', label: 'How to Apply to Italian Universities' });
+    }
+  }
+
+  // Always add these as baseline links
+  if (!s.includes('imat') && !s.includes('cent-s')) {
+    links.push({ href: '/imat-exam-ultimate-guide-2026', label: 'IMAT Exam Ultimate Guide 2026' });
+    links.push({ href: '/cent-s-exam-ultimate-guide', label: 'CEnT-S Exam Ultimate Guide 2026' });
+  }
+  links.push({ href: '/resources', label: 'Free Study Resources - ItaloStudy' });
+  links.push({ href: '/blog', label: 'ItaloStudy Blog' });
+
+  // Deduplicate by href and cap at 8 links
+  const seen = new Set();
+  return links.filter(l => {
+    if (seen.has(l.href)) return false;
+    seen.add(l.href);
+    return true;
+  }).slice(0, 8);
+}
+
+
 export default async function handler(req, res) {
   // 1. Get slug from URL
   const { slug } = req.query;
@@ -121,6 +208,14 @@ export default async function handler(req, res) {
       ? '<img src="' + featuredImage + '" alt="' + title.replace(/"/g, '&quot;') + '" />'
       : '';
 
+    // Build related internal links for this blog post
+    const relatedLinks = getRelatedLinks(slug);
+    const relatedLinksHtml = relatedLinks.length > 0
+      ? '<nav aria-label="related-pages">\n      <ul>\n' +
+        relatedLinks.map(l => '        <li><a href="https://italostudy.com' + l.href + '">' + l.label + '</a></li>').join('\n') +
+        '\n      </ul>\n    </nav>'
+      : '';
+
     const ssrContent =
       '<div id="root">\n' +
       '  <div id="ssr-blog-content" style="opacity:0;height:0;overflow:hidden;position:absolute;pointer-events:none;" aria-hidden="true">\n' +
@@ -128,8 +223,10 @@ export default async function handler(req, res) {
       '    <p>By ItaloStudy Team &bull; ' + publishDate + ' &bull; ' + readTime + ' min read &bull; ' + categoryName + '</p>\n' +
       '    ' + featuredImgTag + '\n' +
       '    <article>' + processedContent + '</article>\n' +
+      '    ' + relatedLinksHtml + '\n' +
       '  </div>\n' +
       '</div>';
+
 
     html = html.replace('<div id="root"></div>', ssrContent);
 

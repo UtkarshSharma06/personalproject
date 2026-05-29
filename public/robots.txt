@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+
+# App routes — not indexable public content
 Disallow: /dashboard
 Disallow: /admin
 Disallow: /api/
@@ -14,10 +16,27 @@ Disallow: /reset-password
 Disallow: /subjects
 Disallow: /practice
 Disallow: /mock-exams
+Disallow: /learning
+Disallow: /answers
+Disallow: /answers/
+Disallow: /it/
+Disallow: /tr/
+
+# Block all query-parameter variants — canonical clean URLs are indexed instead
 Disallow: /*?country=*
+Disallow: /*?*
 
 User-agent: Googlebot
 Allow: /
+Disallow: /api/
+Disallow: /mobile/
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /learning
+Disallow: /answers
+Disallow: /it/
+Disallow: /tr/
+Disallow: /*?*
 
 User-agent: Bingbot
 Allow: /
@@ -60,7 +79,3 @@ Allow: /
 
 # Sitemap Index
 Sitemap: https://italostudy.com/sitemap.xml
-Sitemap: https://italostudy.com/sitemap-blog.xml
-Sitemap: https://italostudy.com/sitemap-qa.xml
-Sitemap: https://italostudy.com/sitemap-authority.xml
-Sitemap: https://italostudy.com/sitemap-core.xml

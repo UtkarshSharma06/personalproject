@@ -51,12 +51,41 @@
             "source": "/syllabus/:path*",
             "destination": "/exams",
             "permanent": true
+        },
+        {
+            "source": "/blog/cent-s-exam-2026-guide",
+            "destination": "/blog/cent-s-exam-2026-complete-guide",
+            "permanent": true
+        },
+        {
+            "source": "/blog/best-cent-s-preparation-whatsapp-group-2026",
+            "destination": "/blog/cent-s-whatsapp-group-2026",
+            "permanent": true
+        },
+        {
+            "source": "/blog/imat-2026-complete-preparation-guide",
+            "destination": "/blog/imat-preparation-guide-2026",
+            "permanent": true
+        },
+        {
+            "source": "/answers",
+            "destination": "/",
+            "permanent": false
+        },
+        {
+            "source": "/answers/:path*",
+            "destination": "/",
+            "permanent": false
         }
     ],
     "rewrites": [
         {
             "source": "/sitemap-qa.xml",
             "destination": "/api/sitemap-qa"
+        },
+        {
+            "source": "/api/indexnow",
+            "destination": "/api/indexnow"
         },
         {
             "source": "/resources",
@@ -83,7 +112,7 @@
             "destination": "/api/blog-post-dynamic?slug=:slug"
         },
         {
-            "source": "/(syllabus/.*|imat.*|study-in-italy.*|tolc.*|til-i.*|pricing|about|institutional|exams|cent-s.*)",
+            "source": "/(syllabus/.*|imat.*|study-in-italy.*|tolc.*|til-i.*|pricing|about|institutional|exams|cent-s.*|best-books-for-cent-s.*|blog$|contact$|privacy$|terms$|refund$|method$|status$|roadmap$|updates$|cent-s-exam-preparation-book-pdf.*)",
             "destination": "/api/static-seo-router"
         },
         {
@@ -97,7 +126,7 @@
             "headers": [
                 {
                     "key": "Content-Security-Policy",
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://*.supabase.co https://*.googlesyndication.com https://*.googletagservices.com https://*.googletagmanager.com https://*.google.com https://*.vercel.app https://static.cloudflareinsights.com https://*.adtrafficquality.google https://www.gstatic.com https://unpkg.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://storage.googleapis.com https://elfsightcdn.com https://*.elfsight.com; connect-src 'self' blob: https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.vercel-analytics.com https://*.sentry.io https://*.paddle.com https://*.cashfree.com https://*.adtrafficquality.google https://ipapi.co https://api.ipify.org https://api.db-ip.com https://tessdata.projectnaptha.com https://unpkg.com https://cdn.jsdelivr.net https://api.cloudinary.com https://storage.googleapis.com https://tfhub.dev https://*.tfhub.dev https://ik.imagekit.io https://*.elfsight.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://elfsightcdn.com https://*.elfsight.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.cloudinary.com https://*.googleusercontent.com https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.pravatar.cc https://ik.imagekit.io https://placehold.co https://elfsightcdn.com https://*.elfsight.com https://*.pinimg.com https://images.unsplash.com https://www.transparenttextures.com https://grainy-gradients.vercel.app; frame-src 'self' https://*.supabase.co https://*.paddle.com https://*.youtube.com https://*.sketchfab.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.adtrafficquality.google https://*.google.com https://www.gstatic.com https://*.elfsight.com; frame-ancestors 'none'; upgrade-insecure-requests;"
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://*.supabase.co https://*.googlesyndication.com https://*.googletagservices.com https://*.googletagmanager.com https://*.google.com https://*.vercel.app https://static.cloudflareinsights.com https://*.adtrafficquality.google https://www.gstatic.com https://unpkg.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://storage.googleapis.com https://elfsightcdn.com https://*.elfsight.com; connect-src 'self' blob: https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.vercel-analytics.com https://*.sentry.io https://*.paddle.com https://*.cashfree.com https://*.adtrafficquality.google https://ipapi.co https://api.ipify.org https://api.db-ip.com https://tessdata.projectnaptha.com https://unpkg.com https://cdn.jsdelivr.net https://api.cloudinary.com https://storage.googleapis.com https://tfhub.dev https://*.tfhub.dev https://ik.imagekit.io https://upload.imagekit.io https://*.elfsight.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://elfsightcdn.com https://*.elfsight.com https://p.typekit.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.cloudinary.com https://*.googleusercontent.com https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.pravatar.cc https://ik.imagekit.io https://placehold.co https://elfsightcdn.com https://*.elfsight.com https://*.pinimg.com https://images.unsplash.com https://www.transparenttextures.com https://grainy-gradients.vercel.app; frame-src 'self' https://*.supabase.co https://*.paddle.com https://*.youtube.com https://*.sketchfab.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.adtrafficquality.google https://*.google.com https://www.gstatic.com https://*.elfsight.com; frame-ancestors 'none'; upgrade-insecure-requests;"
                 },
                 {
                     "key": "X-Frame-Options",
