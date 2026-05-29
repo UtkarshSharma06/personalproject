@@ -80,6 +80,10 @@
     ],
     "rewrites": [
         {
+            "source": "/sitemap-resources.xml",
+            "destination": "/api/sitemap-resources"
+        },
+        {
             "source": "/api/indexnow",
             "destination": "/api/indexnow"
         },
