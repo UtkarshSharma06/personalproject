@@ -80,10 +80,6 @@
     ],
     "rewrites": [
         {
-            "source": "/sitemap-qa.xml",
-            "destination": "/api/sitemap-qa"
-        },
-        {
             "source": "/api/indexnow",
             "destination": "/api/indexnow"
         },
