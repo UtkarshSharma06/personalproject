@@ -81,7 +81,11 @@
     "rewrites": [
         {
             "source": "/sitemap-resources.xml",
-            "destination": "/api/sitemap-resources"
+            "destination": "/api/sitemap-dynamic?type=resources"
+        },
+        {
+            "source": "/sitemap-blog.xml",
+            "destination": "/api/sitemap-dynamic?type=blog"
         },
         {
             "source": "/api/indexnow",
