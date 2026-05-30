@@ -116,6 +116,10 @@
             "destination": "/api/blog-post-dynamic?slug=:slug"
         },
         {
+            "source": "/",
+            "destination": "/api/static-seo-router"
+        },
+        {
             "source": "/(syllabus/.*|imat.*|study-in-italy.*|tolc.*|til-i.*|pricing|about|institutional|exams|cent-s.*|best-books-for-cent-s.*|blog$|contact$|privacy$|terms$|refund$|method$|status$|roadmap$|updates$|cent-s-exam-preparation-book-pdf.*)",
             "destination": "/api/static-seo-router"
         },

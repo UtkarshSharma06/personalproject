@@ -1009,8 +1009,11 @@ export default async function handler(req, res) {
       html = html.replace(/<link rel="canonical" href=".*?"\s*\/>/, `<link rel="canonical" href="${escapeHtml(cleanUrl)}" />`);
     }
 
+    const isRoot = reqUrl.pathname === '/' || reqUrl.pathname === '';
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', isRoot
+      ? 'no-store, no-cache, must-revalidate, max-age=0'
+      : 's-maxage=86400, stale-while-revalidate=86400');
     return res.status(200).send(html);
   } catch (err) {
     console.error('Static SEO SSR error:', err);
