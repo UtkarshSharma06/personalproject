@@ -57,7 +57,7 @@ export default function About() {
 
                 {/* 2. Our Vision Section */}
                 <div className="w-full bg-white relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('https://www.pw.live/_next/static/media/vision-bg.f009a243.svg')] bg-no-repeat bg-bottom bg-cover opacity-50 hidden sm:block pointer-events-none"></div>
+                    <div className="absolute inset-0 bg-[url('/vision-bg.svg')] bg-no-repeat bg-bottom bg-cover opacity-50 hidden sm:block pointer-events-none"></div>
                     
                     <div className="max-w-6xl mx-auto px-6 py-12 md:py-20 flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
                         <div className="lg:w-1/2 w-full text-left mt-8 lg:mt-0">
