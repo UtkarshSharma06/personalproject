@@ -65,12 +65,13 @@ export default function PWHeroSlider() {
                         <div key={banner.id} className="flex-[0_0_100%] min-w-0 relative">
                             <a href={banner.link} className="block w-full">
                                 {/* Desktop/Mobile Image */}
-                                <div className="w-full relative bg-slate-100 aspect-[3000/1333] md:aspect-[2880/544]">
-                                    <picture>
+                                <div className="w-full bg-slate-100 flex items-center justify-center">
+                                    <picture className="w-full">
                                         <source media="(max-width: 767px)" srcSet={banner.imageMobile} />
                                         <img 
                                             src={banner.imageDesktop} 
-                                            className="absolute inset-0 w-full h-full object-cover object-center"
+                                            className="w-full h-auto object-contain block"
+                                            fetchpriority={banner.id === 1 ? "high" : "auto"}
                                             alt={banner.title} 
                                         />
                                     </picture>
