@@ -51,8 +51,8 @@ export default function About() {
                 <div className="w-full bg-white relative overflow-hidden">
                     <div className="absolute inset-0 bg-[url('https://www.pw.live/_next/static/media/vision-bg.f009a243.svg')] bg-no-repeat bg-bottom bg-cover opacity-50 hidden sm:block pointer-events-none"></div>
                     
-                    <div className="max-w-6xl mx-auto px-6 py-12 md:py-20 flex flex-col xl:flex-row items-center justify-between gap-12 relative z-10">
-                        <div className="xl:w-1/2 w-full text-left">
+                    <div className="max-w-6xl mx-auto px-6 py-12 md:py-20 flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
+                        <div className="lg:w-1/2 w-full text-left mt-8 lg:mt-0">
                             <h2 className="text-[32px] md:text-[42px] font-bold text-slate-900 mb-8">
                                 {t('about.pw_vision_title', 'Our Vision')}
                             </h2>
