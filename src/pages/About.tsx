@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SEO from '@/components/SEO';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle2 } from 'lucide-react';
 import PWNavbar from '@/components/home/PWNavbar';
 import Footer from '@/components/Footer';
 
+const LinkedInIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#0A66C2">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    </svg>
+);
+
 export default function About() {
     const { t } = useTranslation();
+    const [isBioExpanded, setIsBioExpanded] = useState(false);
+    const [isArpitBioExpanded, setIsArpitBioExpanded] = useState(false);
 
     return (
         <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden">
@@ -94,49 +102,89 @@ export default function About() {
                             {t('about.pw_founders_title', 'Our Founders')}
                         </h2>
 
-                        <div className="flex flex-col lg:flex-row gap-8 items-start">
-                            {/* Founder Card (Left Side) */}
-                            <div className="flex flex-col bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden w-full lg:w-[400px] shrink-0 mx-auto lg:mx-0">
-                                <div className="w-full px-4 md:px-8 pt-10 pb-6 flex flex-col items-center text-center">
-                                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-indigo-50 mb-6 shadow-sm shrink-0">
-                                        <img 
-                                            src="/founder pic.webp" 
-                                            alt="Utkarsh Sharma" 
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => {
-                                                (e.target as HTMLImageElement).src = '/founder pic.jpg';
-                                            }}
-                                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                            {/* --------------------- Founder Card 1 - Utkarsh --------------------- */}
+                            <div className="w-full h-[460px]">
+                                {/* Click to expand */}
+                                <div className="flex flex-col bg-white rounded-md shadow-md w-full h-full overflow-hidden border border-slate-100 relative">
+                                    <div className={`flex-1 w-full px-6 pt-6 pb-4 ${isBioExpanded ? 'overflow-y-auto' : 'overflow-hidden flex flex-col justify-center'}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                        {!isBioExpanded ? (
+                                            <div className="flex flex-col items-center text-center animate-in fade-in duration-500 pb-[60px]">
+                                                <div className="w-[100px] h-[100px] md:w-[140px] md:h-[140px] rounded-full overflow-hidden mb-4 shrink-0 border-4 border-indigo-50 shadow-sm">
+                                                    <img src="/founder pic.webp" alt="Utkarsh Sharma" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/founder pic.jpg'; }} />
+                                                </div>
+                                                <h3 className="text-[20px] md:text-[24px] font-bold text-slate-900 mb-1 flex items-center justify-center gap-2">
+                                                    {t('about.pw_founder1_name', 'Utkarsh Sharma')}
+                                                    <a href="https://www.linkedin.com/in/utkarshzsharma/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                        <LinkedInIcon />
+                                                    </a>
+                                                </h3>
+                                                <span className="text-[14px] md:text-[16px] font-medium text-slate-700 mb-4 block">{t('about.pw_founder1_role', 'Founder and CEO')}</span>
+                                                <h4 className="text-[15px] md:text-[18px] font-semibold text-slate-800 italic leading-relaxed">
+                                                    "{t('about.pw_founder1_quote', 'My aim is to bridge the gap between international talent and European academic institutions, elevating the standard of global mobility.')}"
+                                                </h4>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col text-left animate-in fade-in duration-500 pb-[60px]">
+                                                <h3 className="text-[20px] md:text-[24px] font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                    {t('about.pw_founder1_name', 'Utkarsh Sharma')}
+                                                    <a href="https://www.linkedin.com/in/utkarshzsharma/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                        <LinkedInIcon />
+                                                    </a>
+                                                </h3>
+                                                <div className="text-[14px] md:text-[15px] leading-[24px] font-medium text-slate-700 space-y-4">
+                                                    <p>Utkarsh Sharma, the Founder and CEO of ItaloStudy, established the platform with a clear vision: to bridge the gap between international talent and European academic institutions. Driven by a deep appreciation for Italy's educational heritage and modern technology, he created a pathway that makes world-class preparation accessible globally.</p>
+                                                    <p>Under his leadership, ItaloStudy has grown into a distinguished platform for Italian university admissions, offering rigorous curricula for the IMAT, CEnT-S, and TOLC examinations.</p>
+                                                    <p>Utkarsh remains dedicated to academic mentorship, continuously innovating to uphold a standard of excellence and ensure that international study remains an attainable goal for dedicated students.</p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                    <h3 className="text-[24px] font-bold text-slate-900 mb-2">
-                                        {t('about.pw_founder1_name', 'Utkarsh Sharma')}
-                                    </h3>
-                                    <span className="text-[16px] font-medium text-slate-600 mb-4 block">
-                                        {t('about.pw_founder1_role', 'Founder and CEO')}
-                                    </span>
-                                    <h4 className="text-[18px] font-semibold text-slate-800 italic leading-relaxed mb-2">
-                                        "{t('about.pw_founder1_quote', 'My aim is to bridge the gap between international talent and European academic institutions, elevating the standard of global mobility.')}"
-                                    </h4>
+                                    <div onClick={() => setIsBioExpanded(!isBioExpanded)} className="absolute bottom-0 left-0 w-full py-4 border-t border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition-colors flex justify-center items-center">
+                                        <span className="text-[#5a4bda] font-bold text-[14px] md:text-[15px] uppercase tracking-wider">{isBioExpanded ? "Read Less" : "Read More"}</span>
+                                    </div>
                                 </div>
-                                
                             </div>
 
-                            {/* Founder Bio (Right Side / Below on Mobile) */}
-                            <div className="w-full lg:flex-1">
-                                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 lg:p-8 h-full">
-                                    <h3 className="text-[24px] font-bold text-slate-900 mb-6 hidden lg:block">
-                                        {t('about.pw_founder1_name', 'Utkarsh Sharma')}
-                                    </h3>
-                                    <div className="text-[15px] lg:text-[16px] leading-relaxed text-slate-700 font-medium space-y-4">
-                                        <p>
-                                            Utkarsh Sharma, the Founder and CEO of ItaloStudy, established the platform with a clear vision: to bridge the gap between international talent and European academic institutions. Driven by a deep appreciation for Italy's educational heritage and modern technology, he created a pathway that makes world-class preparation accessible globally.
-                                        </p>
-                                        <p>
-                                            Under his leadership, ItaloStudy has grown into a distinguished platform for Italian university admissions, offering rigorous curricula for the IMAT, CEnT-S, and TOLC examinations. 
-                                        </p>
-                                        <p>
-                                            Utkarsh remains dedicated to academic mentorship, continuously innovating to uphold a standard of excellence and ensure that international study remains an attainable goal for dedicated students.
-                                        </p>
+                            {/* --------------------- Founder Card 2 - Arpit --------------------- */}
+                            <div className="w-full h-[460px]">
+                                {/* Click to expand */}
+                                <div className="flex flex-col bg-white rounded-md shadow-md w-full h-full overflow-hidden border border-slate-100 relative">
+                                    <div className={`flex-1 w-full px-6 pt-6 pb-4 ${isArpitBioExpanded ? 'overflow-y-auto' : 'overflow-hidden flex flex-col justify-center'}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                        {!isArpitBioExpanded ? (
+                                            <div className="flex flex-col items-center text-center animate-in fade-in duration-500 pb-[60px]">
+                                                <div className="w-[100px] h-[100px] md:w-[140px] md:h-[140px] rounded-full overflow-hidden mb-4 shrink-0 border-4 border-indigo-50 shadow-sm">
+                                                    <img src="/arpit.webp" alt="Arpit Gulpadiya" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/arpit.jpg'; }} />
+                                                </div>
+                                                <h3 className="text-[20px] md:text-[24px] font-bold text-slate-900 mb-1 flex items-center justify-center gap-2">
+                                                    Arpit Gulpadiya
+                                                    <a href="https://www.linkedin.com/in/arpit-gulpadiya/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                        <LinkedInIcon />
+                                                    </a>
+                                                </h3>
+                                                <span className="text-[14px] md:text-[16px] font-medium text-slate-700 mb-4 block">Co-Founder</span>
+                                                <h4 className="text-[15px] md:text-[18px] font-semibold text-slate-800 italic leading-relaxed">
+                                                    "My aim is to build a flawless technological ecosystem that empowers students to achieve global academic excellence."
+                                                </h4>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col text-left animate-in fade-in duration-500 pb-[60px]">
+                                                <h3 className="text-[20px] md:text-[24px] font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                    Arpit Gulpadiya
+                                                    <a href="https://www.linkedin.com/in/arpit-gulpadiya/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                        <LinkedInIcon />
+                                                    </a>
+                                                </h3>
+                                                <div className="text-[14px] md:text-[15px] leading-[24px] font-medium text-slate-700 space-y-4">
+                                                    <p>Arpit brings a powerful intersection of technical architecture, finance, and cross-border academic experience to the platform. Having studied at emlyon business school in Europe, alongside a gold-medal Economics background from Manipal University, he deeply understands the transformative impact of European education.</p>
+                                                    <p>At ItaloStudy, Arpit drove the technological vision, building the cross-platform ecosystem spanning web, mobile, and digital commerce. He architected the platform's advanced product telemetry, user-acquisition pipelines using Supabase, and automated global multi-currency billing systems.</p>
+                                                    <p>Demonstrating his technical prowess, he also co-developed a browser-based AI proctoring system utilizing TensorFlow.js and Google MediaPipe vision APIs to track real-time gaze and face presence, ensuring absolute academic integrity for all simulated mock exams.</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div onClick={() => setIsArpitBioExpanded(!isArpitBioExpanded)} className="absolute bottom-0 left-0 w-full py-4 border-t border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition-colors flex justify-center items-center">
+                                        <span className="text-[#5a4bda] font-bold text-[14px] md:text-[15px] uppercase tracking-wider">{isArpitBioExpanded ? "Read Less" : "Read More"}</span>
                                     </div>
                                 </div>
                             </div>
