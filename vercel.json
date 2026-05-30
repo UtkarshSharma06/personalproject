@@ -120,7 +120,7 @@
             "destination": "/api/static-seo-router"
         },
         {
-            "source": "/((?!.*\\.(js|css|woff2|woff|ttf|otf|eot|png|jpg|jpeg|gif|webp|svg|ico|json|txt|xml|pdf|map|wav|mp3|mp4|webm|avif)$).*)",
+            "source": "/(.*)",
             "destination": "/"
         }
     ],
@@ -155,6 +155,15 @@
             ]
         },
         {
+            "source": "/",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-store, no-cache, must-revalidate, max-age=0"
+                }
+            ]
+        },
+        {
             "source": "/(.*)",
             "headers": [
                 {
@@ -168,7 +177,7 @@
             "headers": [
                 {
                     "key": "Cache-Control",
-                    "value": "public, max-age=0, must-revalidate"
+                    "value": "no-store, no-cache, must-revalidate, max-age=0"
                 }
             ]
         },
