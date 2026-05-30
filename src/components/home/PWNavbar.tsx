@@ -173,7 +173,7 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                     </div>
 
                     {/* Desktop Nav Links */}
-                    <nav className="hidden lg:flex items-center gap-4 xl:gap-8">
+                    <nav className="hidden lg:flex items-center gap-5 xl:gap-6">
                         {/* Mocks Dropdown */}
                         <div className="relative" ref={mocksDropdownRef}>
                             <button
@@ -231,12 +231,10 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                     {user ? (
                         <button
                             onClick={() => window.location.href = 'https://app.italostudy.com/'}
-                            className="flex items-center gap-2 hover:bg-slate-50 transition-colors px-3 py-1.5 rounded-full border border-slate-200"
+                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-semibold rounded-lg px-7 h-10 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[15px] whitespace-nowrap"
                         >
-                            <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
-                                IS
-                            </div>
-                            <ChevronDown className="w-4 h-4 text-slate-500" />
+                            <LayoutDashboard className="w-4 h-4 mr-2" />
+                            {t('nav.dashboard', 'Dashboard')}
                         </button>
                     ) : (
                         <button
