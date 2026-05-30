@@ -35,12 +35,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const { data: resources, error } = await supabase
         .from('exam_resources')
-        .select('slug, updated_at, created_at')
+        .select('slug, created_at')
         .eq('is_active', true);
 
       if (!error && resources && resources.length > 0) {
         resources.forEach((resource) => {
-          const lastMod = resource.updated_at || resource.created_at || new Date().toISOString();
+          const lastMod = resource.created_at || new Date().toISOString();
           xml += `\n  <url>\n    <loc>https://italostudy.com/resources/${resource.slug}</loc>\n    <lastmod>${new Date(lastMod).toISOString().split('T')[0]}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>`;
         });
       }
