@@ -4,10 +4,10 @@ const UniversityMarquee = () => {
     const { t } = useTranslation();
 
     return (
-        <section className="py-12 md:py-8 bg-white overflow-hidden relative z-20">
-            <div className="container mx-auto px-6 max-w-7xl">
-                <div className="flex flex-col items-center gap-8">
-                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] text-center mb-4">
+        <section className="py-12 md:py-8 bg-white overflow-hidden relative z-20 border-b border-[#eaeaea]">
+            <div className="container mx-auto px-6 max-w-[1200px]">
+                <div className="flex flex-col items-center gap-6">
+                    <span className="text-[16px] md:text-[18px] font-bold text-[#333333] text-center mb-2">
                         {t('landing.university_marquee.badge', 'Students who studied from our platform are studying in')}
                     </span>
                     
@@ -26,11 +26,11 @@ const UniversityMarquee = () => {
                                         { name: "Uni of Pavia", src: "/Pavia.webp" },
                                         { name: "Uni of Padua", src: "/Padua.webp" }
                                     ].map((uni, j) => (
-                                        <div key={`${i}-${j}`} className="flex-shrink-0 transition-all duration-500 cursor-default transform-gpu hover:scale-110">
+                                        <div key={`${i}-${j}`} className="flex-shrink-0 transition-all duration-300 cursor-default">
                                             <img 
                                                 src={uni.src} 
                                                 alt={uni.name} 
-                                                className="h-16 md:h-24 w-auto object-contain pointer-events-none select-none" 
+                                                className="h-12 md:h-16 w-auto object-contain pointer-events-none select-none filter grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300" 
                                                 loading="lazy"
                                                 draggable={false}
                                                 onContextMenu={(e) => e.preventDefault()}

@@ -34,7 +34,7 @@ export default function Footer() {
     ];
 
     return (
-        <footer className="py-12 bg-slate-50 border-t border-slate-200 relative z-10 overflow-hidden text-left">
+        <footer className="py-12 bg-[#fcfcfc] border-t border-[#eaeaea] relative z-10 overflow-hidden text-left">
             <div className="container mx-auto px-6">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 mb-12">
                     {/* Brand Column */}
@@ -47,7 +47,7 @@ export default function Footer() {
                             height="35"
                             loading="lazy"
                         />
-                        <p className="text-[11px] font-medium text-slate-500 max-w-xs leading-relaxed">
+                        <p className="text-[13px] text-[#555555] max-w-xs leading-relaxed">
                             Empowering students for Italian entrance exams with expert-led preparation and strategic guidance for success.
                         </p>
                         <div className="flex gap-3">
@@ -55,17 +55,17 @@ export default function Footer() {
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 href="https://www.instagram.com/italostudycom"
-                                className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all border border-slate-200 shadow-sm"
+                                className="w-10 h-10 rounded-[4px] bg-white flex items-center justify-center text-[#555555] hover:text-[#5a4bda] transition-all border border-[#eaeaea] shadow-sm hover:border-[#5a4bda]/30"
                             >
-                                <Instagram className="w-4 h-4" />
+                                <Instagram className="w-5 h-5" />
                             </motion.a>
                             <motion.a
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A"
-                                className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 hover:text-green-600 transition-all border border-slate-200 shadow-sm"
+                                className="w-10 h-10 rounded-[4px] bg-white flex items-center justify-center text-[#555555] hover:text-[#25D366] transition-all border border-[#eaeaea] shadow-sm hover:border-[#25D366]/30"
                             >
-                                <MessageCircle className="w-4 h-4" />
+                                <MessageCircle className="w-5 h-5" />
                             </motion.a>
                         </div>
                     </div>
@@ -73,7 +73,7 @@ export default function Footer() {
                     {/* Navigation Columns */}
                     {footerColumns.map((column) => (
                         <div key={column.title} className="flex flex-col gap-4">
-                            <h4 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">
+                            <h4 className="text-[14px] font-bold text-[#333333] mb-2">
                                 {column.title}
                             </h4>
                             <ul className="flex flex-col gap-2.5">
@@ -94,14 +94,14 @@ export default function Footer() {
                                                         href={link.path}
                                                         target={isExternal ? "_blank" : undefined}
                                                         rel={isExternal ? "noopener noreferrer" : undefined}
-                                                        className="text-[11px] font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+                                                        className="text-[13px] text-[#555555] hover:text-[#5a4bda] transition-colors"
                                                     >
                                                         {link.label}
                                                     </a>
                                                 ) : (
                                                     <Link
                                                         to={link.path}
-                                                        className="text-[11px] font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+                                                        className="text-[13px] text-[#555555] hover:text-[#5a4bda] transition-colors"
                                                     >
                                                         {link.label}
                                                     </Link>
@@ -110,7 +110,7 @@ export default function Footer() {
                                         ) : (
                                             <button
                                                 onClick={link.action}
-                                                className="text-[11px] font-medium text-slate-600 hover:text-indigo-600 transition-colors text-left"
+                                                className="text-[13px] text-[#555555] hover:text-[#5a4bda] transition-colors text-left"
                                             >
                                                 {link.label}
                                             </button>
@@ -122,15 +122,15 @@ export default function Footer() {
                     ))}
                 </div>
 
-                <div className="pt-8 border-t border-slate-200 flex flex-col lg:flex-row justify-between items-center gap-8">
+                <div className="pt-8 border-t border-[#eaeaea] flex flex-col lg:flex-row justify-between items-center gap-8">
                     <div className="flex flex-col items-center lg:items-start gap-1">
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                        <p className="text-[13px] text-[#888888]">
                             © {new Date().getFullYear()} ITALOSTUDY EDUCATION TECHNOLOGIES. ALL RIGHTS RESERVED.
                         </p>
-                        <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-2">
-                            <Link to="/privacy" className="text-[9px] font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Privacy</Link>
-                            <Link to="/terms" className="text-[9px] font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Terms</Link>
-                            <Link to="/refund" className="text-[9px] font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Refunds</Link>
+                        <div className="flex flex-wrap justify-center lg:justify-start gap-6 mt-2">
+                            <Link to="/privacy" className="text-[13px] text-[#888888] hover:text-[#5a4bda] transition-colors">Privacy</Link>
+                            <Link to="/terms" className="text-[13px] text-[#888888] hover:text-[#5a4bda] transition-colors">Terms</Link>
+                            <Link to="/refund" className="text-[13px] text-[#888888] hover:text-[#5a4bda] transition-colors">Refunds</Link>
                         </div>
                     </div>
 

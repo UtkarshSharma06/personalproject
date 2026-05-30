@@ -2,7 +2,7 @@ import { ReactNode, Suspense, lazy } from 'react';
 import { useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
-import PublicNavbar from './PublicNavbar';
+import PWNavbar from './home/PWNavbar';
 import Footer from './Footer';
 import { useVisitorTracking } from '@/hooks/useVisitorTracking';
 import { useAuth } from '@/lib/auth';
@@ -35,7 +35,7 @@ export default function Layout({
                 <AnnouncementBar />
             </Suspense>
 
-            {showHeader && <PublicNavbar subNavigation={subNavigation} />}
+            {showHeader && <PWNavbar subNavigation={subNavigation} />}
             
             <main className={cn(
                 "flex-1 relative",

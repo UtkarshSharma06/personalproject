@@ -137,37 +137,25 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
     };
 
     return (
-        <section className="py-10 relative transform-gpu bg-white">
-            {/* Soft Grid Background Pattern */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-                background: `
-                    linear-gradient(90deg, hsl(220 14% 100% / 0.05) 1px, transparent 1px) 0 0 / 10vmin 10vmin,
-                    linear-gradient(hsl(220 14% 100% / 0.05) 1px, transparent 1px) 0 0 / 10vmin 10vmin
-                `,
-                mask: 'linear-gradient(-15deg, transparent 30%, white)',
-                WebkitMask: 'linear-gradient(-15deg, transparent 30%, white)',
-            }} />
-
-            <div className="container mx-auto px-6 relative z-10">
+        <section className="pt-16 pb-24 relative bg-[#fcfcfc] border-b border-[#eaeaea]">
+            <div className="container mx-auto px-6 max-w-[1200px] relative z-10">
 
                 {/* Section Header */}
                 <div className="flex flex-col items-center text-center mb-12">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 15 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "0px 0px -100px 0px" }} // Trigger earlier
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        className="mb-6"
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="mb-4"
                     >
-                        <EditableText fieldKey="global_challenge_badge" fallback={t('landing.global_challenge.badge')} className="px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-widest mb-4 inline-block" />
-                        <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight mb-6">
+                        <h2 className="text-[32px] md:text-[40px] font-bold text-[#333333] leading-tight mb-4">
                             <EditableText
                                 fieldKey="global_challenge_title"
                                 fallback={t('landing.global_challenge.title') + ' ' + t('landing.global_challenge.title_highlight')}
-                                className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-500"
                             />
                         </h2>
-                        <p className="text-lg text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-[16px] text-[#555555] max-w-2xl mx-auto leading-relaxed">
                             <EditableText fieldKey="global_challenge_description" fallback={t('landing.global_challenge.description')} multiline />
                         </p>
                     </motion.div>
@@ -176,15 +164,15 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
                 <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-stretch">
 
                     {/* LEFT COLUMN: ACTIVE USERS REVEAL */}
-                    <div className="relative group perspective-1000">
-                        <div className="bg-white border border-white/5 rounded-[2.5rem] p-6 h-full flex flex-col justify-center items-center overflow-hidden relative shadow-sm backdrop-blur-md">
+                    <div className="relative group">
+                        <div className="bg-white border border-[#eaeaea] rounded-2xl p-6 h-full flex flex-col justify-center items-center overflow-hidden relative shadow-sm">
                             <ActiveUsersReveal />
                         </div>
                     </div>
 
                     {/* RIGHT COLUMN: LIVE QUIZ CHALLENGE */}
                     <div className="relative">
-                        <div className="bg-white backdrop-blur-lg rounded-[2.5rem] shadow-xl border border-white/5 p-8 md:p-10 h-full flex flex-col relative z-10">
+                        <div className="bg-[#f8f9fe] border border-[#eaeaea] rounded-2xl p-8 md:p-10 h-full flex flex-col relative z-10 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-shadow duration-300">
                             <AnimatePresence mode="wait">
                                 {!showResults ? (
                                     <motion.div
@@ -196,25 +184,25 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
                                         className="h-full flex flex-col"
                                     >
                                         {/* Quiz Header */}
-                                        <div className="flex justify-between items-start mb-8 border-b border-indigo-50 pb-6">
+                                        <div className="flex justify-between items-start mb-6 border-b border-[#eaeaea] pb-4">
                                             <div className="flex flex-col gap-1">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                                                    <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">
+                                                    <div className="w-2 h-2 rounded-full bg-[#e84b3c] animate-pulse" />
+                                                    <span className="text-[12px] font-bold text-[#e84b3c]">
                                                         <EditableText fieldKey="quiz_live_badge" fallback={t('landing.global_challenge.quiz.live_badge')} />
                                                     </span>
                                                 </div>
-                                                <div className="text-sm font-bold text-slate-400">
+                                                <div className="text-[14px] text-[#555555]">
                                                     {t('landing.global_challenge.quiz.question_count', { current: currentQ + 1, total: QUESTIONS.length })}
                                                 </div>
                                             </div>
 
-                                            <div className="bg-indigo-500/10 px-4 py-2 rounded-2xl flex flex-col items-end border border-indigo-400/20">
-                                                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+                                            <div className="bg-[#f4f7ff] px-4 py-2 rounded-[8px] flex flex-col items-end border border-[#5a4bda]/20">
+                                                <span className="text-[10px] font-semibold text-[#5a4bda] uppercase tracking-wider">
                                                     <EditableText fieldKey="quiz_subject_label" fallback={t('landing.global_challenge.quiz.subject_label')} />
                                                 </span>
-                                                <span className="text-indigo-300 font-bold text-sm flex items-center gap-1">
-                                                    {React.createElement(QUESTIONS[currentQ].icon, { className: "w-4 h-4" })}
+                                                <span className="text-[#333333] font-bold text-[14px] flex items-center gap-1 mt-1">
+                                                    {React.createElement(QUESTIONS[currentQ].icon, { className: "w-4 h-4 text-[#5a4bda]" })}
                                                     {QUESTIONS[currentQ].subject}
                                                 </span>
                                             </div>
@@ -222,25 +210,25 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
 
                                         {/* Question Area */}
                                         <div className="flex-1 mb-8">
-                                            <h4 className="text-xl md:text-2xl font-bold text-slate-900 leading-snug mb-8">
+                                            <h4 className="text-[20px] md:text-[24px] font-bold text-[#333333] leading-snug mb-6">
                                                 {QUESTIONS[currentQ].question}
                                             </h4>
 
                                             <div className="space-y-3">
                                                 {QUESTIONS[currentQ].options.map((opt, i) => {
-                                                    let stateClass = "border-slate-100 bg-slate-50/50 hover:bg-indigo-50 hover:border-indigo-200 text-slate-700 shadow-sm";
+                                                    let stateClass = "border-[#eaeaea] bg-white hover:border-[#5a4bda]/30 text-[#555555]";
 
                                                     if (selectedOption === i) {
-                                                        stateClass = "border-indigo-500 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-500 shadow-md";
+                                                        stateClass = "border-[#5a4bda] bg-[#f4f7ff] text-[#5a4bda]";
                                                     }
 
                                                     if (hasSubmitted) {
                                                         if (i === QUESTIONS[currentQ].correct) {
-                                                            stateClass = "border-emerald-500 bg-emerald-50 text-emerald-700 font-bold shadow-md";
+                                                            stateClass = "border-[#2e7d32] bg-[#edf7ed] text-[#2e7d32] font-semibold";
                                                         } else if (selectedOption === i) {
-                                                            stateClass = "border-rose-500 bg-rose-50 text-rose-700";
+                                                            stateClass = "border-[#d32f2f] bg-[#fdeded] text-[#d32f2f]";
                                                         } else {
-                                                            stateClass = "opacity-40 border-slate-100 cursor-not-allowed";
+                                                            stateClass = "opacity-50 border-[#eaeaea] cursor-not-allowed text-[#888888]";
                                                         }
                                                     }
 
@@ -250,13 +238,13 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
                                                             onClick={() => handleSelect(i)}
                                                             disabled={hasSubmitted}
                                                             className={cn(
-                                                                "w-full text-left p-4 rounded-2xl border-2 transition-colors duration-150 font-semibold text-sm flex items-center gap-4 active:scale-[0.99] transform-gpu",
+                                                                "w-full text-left p-4 rounded-xl border transition-colors duration-150 font-medium text-[15px] flex items-center gap-4",
                                                                 stateClass
                                                             )}
                                                         >
                                                             <div className={cn(
-                                                                "w-8 h-8 rounded-xl border-2 flex items-center justify-center text-xs font-black transition-colors",
-                                                                selectedOption === i ? "border-indigo-500 bg-indigo-500 text-white" : "border-slate-200 text-slate-400"
+                                                                "w-8 h-8 rounded-full border flex items-center justify-center text-[14px] font-bold transition-colors",
+                                                                selectedOption === i ? "border-[#5a4bda] bg-[#5a4bda] text-white" : "border-[#eaeaea] text-[#888888]"
                                                             )}>
                                                                 {String.fromCharCode(65 + i)}
                                                             </div>
@@ -282,17 +270,17 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
                                                 <Button
                                                     onClick={handleCheck}
                                                     disabled={selectedOption === null}
-                                                    className="w-full h-14 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-800 hover:shadow-lg active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed group transform-gpu"
+                                                    className="w-full h-12 bg-[#5a4bda] text-white rounded-[4px] font-semibold text-[16px] hover:bg-[#483ab8] transition-all disabled:opacity-50 disabled:cursor-not-allowed group shadow-none"
                                                 >
-                                                    <EditableText fieldKey="quiz_check_answer_btn" fallback={t('landing.global_challenge.quiz.check_answer')} /> <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                    <EditableText fieldKey="quiz_check_answer_btn" fallback={t('landing.global_challenge.quiz.check_answer')} /> <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                                 </Button>
                                             ) : (
-                                                <div className="flex flex-col gap-4 animate-in slide-in-from-bottom-2 duration-300 fade-in">
+                                                <div className="flex flex-col gap-3 animate-in slide-in-from-bottom-2 duration-300 fade-in">
                                                     <div className={cn(
-                                                        "p-4 rounded-2xl text-xs font-bold uppercase tracking-wide text-center flex items-center justify-center gap-2",
+                                                        "p-3 rounded-[4px] text-[14px] font-semibold flex items-center justify-center gap-2",
                                                         selectedOption === QUESTIONS[currentQ].correct
-                                                            ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                                                            : "bg-rose-100 text-rose-800 border border-rose-200"
+                                                            ? "bg-[#edf7ed] text-[#2e7d32] border border-[#c8e6c9]"
+                                                            : "bg-[#fdeded] text-[#d32f2f] border border-[#ffcdd2]"
                                                     )}>
                                                         {selectedOption === QUESTIONS[currentQ].correct
                                                             ? <><Award className="w-4 h-4" /> <EditableText fieldKey="quiz_outstanding_label" fallback={t('landing.global_challenge.quiz.outstanding')} /></>
@@ -300,12 +288,12 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
                                                     </div>
                                                     <Button
                                                         onClick={handleNext}
-                                                        className="w-full h-14 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:shadow-lg active:scale-[0.98] transition-all group transform-gpu"
+                                                        className="w-full h-12 bg-[#333333] text-white rounded-[4px] font-semibold text-[16px] hover:bg-black transition-all group shadow-none"
                                                     >
                                                         {currentQ < QUESTIONS.length - 1
                                                             ? <EditableText fieldKey="quiz_next_challenge_btn" fallback={t('landing.global_challenge.quiz.next_challenge')} />
                                                             : <EditableText fieldKey="quiz_see_results_btn" fallback={t('landing.global_challenge.quiz.see_results')} />
-                                                        } <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                        } <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                                     </Button>
                                                 </div>
                                             )}
@@ -319,20 +307,18 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
                                         className="h-full flex flex-col items-center justify-center text-center py-8"
                                     >
                                         <div className="relative mb-8">
-                                            {/* Reduced blur radius for performance */}
-                                            <div className="absolute inset-0 bg-indigo-500 blur-xl opacity-20 rounded-full" />
-                                            <div className="relative w-28 h-28 rounded-[2rem] bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-xl shadow-indigo-500/30 rotate-3">
-                                                <Award className="w-12 h-12 text-white drop-shadow-md" />
+                                            <div className="relative w-24 h-24 rounded-full bg-[#f8f9fe] border border-[#eaeaea] flex items-center justify-center shadow-sm">
+                                                <Award className="w-12 h-12 text-[#5a4bda]" />
                                             </div>
-                                            <div className="absolute -bottom-2 -right-2 bg-white p-2 rounded-xl shadow-lg rotate-12">
-                                                <span className="text-2xl">🏆</span>
+                                            <div className="absolute -bottom-2 -right-2 bg-white p-2 rounded-full border border-[#eaeaea] shadow-sm">
+                                                <span className="text-xl">🏆</span>
                                             </div>
                                         </div>
 
-                                        <h3 className="text-3xl md:text-4xl font-black text-slate-900 mb-3 tracking-tight">
+                                        <h3 className="text-[28px] font-bold text-[#333333] mb-2 leading-tight">
                                             <EditableText fieldKey="quiz_complete_title" fallback={t('landing.global_challenge.quiz.complete_title')} />
                                         </h3>
-                                        <p className="text-slate-500 font-bold mb-10 max-w-xs mx-auto">
+                                        <p className="text-[#555555] text-[15px] mb-8 max-w-xs mx-auto">
                                             {t('landing.global_challenge.quiz.score_summary', { score, total: QUESTIONS.length })}
                                         </p>
 
@@ -340,19 +326,19 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
                                             <Button
                                                 onClick={resetQuiz}
                                                 variant="outline"
-                                                className="flex-1 h-14 rounded-2xl border-2 border-white/5 font-bold hover:border-slate-200 hover:bg-slate-50 text-slate-600"
+                                                className="flex-1 h-12 rounded-[4px] border border-[#eaeaea] font-semibold text-[15px] hover:bg-[#fcfcfc] text-[#555555] shadow-none"
                                             >
                                                 <EditableText fieldKey="quiz_try_again_btn" fallback={t('landing.global_challenge.quiz.try_again')} />
                                             </Button>
                                             <Button
                                                 onClick={onPracticeMore}
-                                                className="flex-1 h-14 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100"
+                                                className="flex-1 h-12 bg-[#5a4bda] text-white rounded-[4px] font-semibold text-[15px] hover:bg-[#483ab8] shadow-none"
                                             >
                                                 <EditableText fieldKey="quiz_practice_more_btn" fallback={t('landing.global_challenge.quiz.practice_more')} />
                                             </Button>
                                         </div>
 
-                                        <div className="mt-8 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2">
+                                        <div className="mt-8 bg-[#f4f7ff] text-[#5a4bda] px-4 py-2 rounded-full text-[13px] font-semibold flex items-center gap-2">
                                             <EditableText fieldKey="quiz_top_percent_label" fallback={t('landing.global_challenge.quiz.top_percent')} />
                                         </div>
                                     </motion.div>
@@ -366,9 +352,9 @@ const GlobalChallenge = ({ onPracticeMore }: GlobalChallengeProps) => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.5, duration: 0.5 }}
-                            className="absolute -bottom-16 left-0 right-0 text-center"
+                            className="absolute -bottom-14 left-0 right-0 text-center"
                         >
-                            <span className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] bg-white/40 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 shadow-sm transition-colors cursor-default">
+                            <span className="inline-flex items-center gap-2 text-[12px] font-semibold text-[#888888] bg-white px-6 py-3 rounded-full border border-[#eaeaea] shadow-sm transition-colors cursor-default">
                                 👆 <EditableText fieldKey="quiz_simulation_hint" fallback={t('landing.global_challenge.quiz.simulation_hint')} />
                             </span>
                         </motion.div>

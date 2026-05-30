@@ -201,8 +201,8 @@ export default function TrustpilotSection() {
     if (isLoading) return null;
 
     return (
-        <section className="py-12 bg-white overflow-hidden">
-            <div className="container mx-auto px-4 max-w-7xl">
+        <section className="py-12 bg-[#fcfcfc] overflow-hidden border-b border-[#eaeaea]">
+            <div className="container mx-auto px-4 max-w-[1200px]">
                 {/* Header - Compact */}
                 <div className="flex items-center justify-center gap-8 mb-4 opacity-60 hover:opacity-100 transition-opacity">
                     <div className="flex items-center gap-2">
@@ -230,12 +230,12 @@ export default function TrustpilotSection() {
                                 <div
                                     key={`${review.id}-${idx}`}
                                     onClick={() => openReview(review)}
-                                    className="w-[280px] md:w-[320px] flex-shrink-0 bg-slate-50/50 rounded-2xl p-5 border border-slate-100 flex flex-col gap-3 hover:bg-white hover:shadow-lg transition-all cursor-pointer group relative transform-gpu"
+                                    className="w-[280px] md:w-[340px] flex-shrink-0 bg-white rounded-[8px] p-6 border border-[#eaeaea] flex flex-col gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all cursor-pointer group relative"
                                 >
                                     <div className="flex items-center gap-3">
                                         <Avatar name={review.user_name} src={review.user_avatar} />
                                         <div className="min-w-0 flex-1">
-                                            <p className="font-black text-slate-900 text-xs leading-none truncate">{review.user_name}</p>
+                                            <p className="font-bold text-[#333333] text-[14px] leading-none truncate">{review.user_name}</p>
                                             <div className="mt-1">
                                                 <StarRating rating={review.rating} />
                                             </div>
@@ -244,12 +244,12 @@ export default function TrustpilotSection() {
                                             <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M12 2L14.09 8.26L21 9.27L16 14.14L17.18 21L12 17.77L6.82 21L8 14.14L3 9.27L9.91 8.26L12 2Z" fill="#00B67A" /></svg>
                                         </div>
                                     </div>
-                                    <p className="text-slate-600 text-[11px] font-bold leading-relaxed line-clamp-3 italic">
+                                    <p className="text-[#555555] text-[14px] leading-relaxed line-clamp-3">
                                         "{review.content}"
                                     </p>
-                                    <div className="mt-auto pt-2 flex justify-between items-center">
-                                        <span className="text-[9px] text-slate-300 font-bold uppercase tracking-widest">{review.date_string}</span>
-                                        <span className="text-[9px] text-indigo-500 font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Read Full Review →</span>
+                                    <div className="mt-auto pt-4 flex justify-between items-center border-t border-[#f1f1f1]">
+                                        <span className="text-[12px] text-[#888888]">{review.date_string}</span>
+                                        <span className="text-[12px] text-[#5a4bda] font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Read Full →</span>
                                     </div>
                                 </div>
                             ))}
@@ -285,7 +285,7 @@ export default function TrustpilotSection() {
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            className="relative w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden"
+                            className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl border border-[#eaeaea] overflow-hidden"
                         >
                             <button 
                                 onClick={() => setSelectedReview(null)}

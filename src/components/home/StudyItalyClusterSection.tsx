@@ -67,15 +67,11 @@ const StudyItalyClusterSection = () => {
     ];
 
     return (
-        <section className="pt-0 pb-12 bg-white relative overflow-hidden">
-            <div className="container mx-auto px-6 max-w-7xl">
+        <section className="py-12 bg-[#fcfcfc] relative overflow-hidden border-b border-[#eaeaea]">
+            <div className="container mx-auto px-6 max-w-[1200px]">
                 
                 {/* ── THE MASTER STRATEGY CARD ── */}
-                <div className="relative bg-white rounded-[4.5rem] border border-white/5 shadow-[0_80px_120px_-40px_rgba(0,0,0,0.06)] p-10 md:p-24 overflow-hidden group/main">
-                    
-                    {/* Subtle Internal Decor */}
-                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-500/5 blur-[120px] rounded-full -mr-32 -mt-32 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/5 blur-[100px] rounded-full -ml-32 -mb-32 pointer-events-none" />
+                <div className="relative bg-white rounded-[8px] border border-[#eaeaea] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-shadow duration-300 p-8 md:p-16 overflow-hidden group/main">
 
                     {/* Header Section */}
                     <div className="max-w-4xl mb-12 md:mb-16 relative z-10">
@@ -96,7 +92,7 @@ const StudyItalyClusterSection = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
-                            className="text-4xl md:text-6xl font-black text-black mb-10 uppercase tracking-tighter leading-[0.9]"
+                            className="text-[32px] md:text-[40px] font-bold text-[#333333] mb-6 leading-tight"
                         >
                             <span className="text-black">
                                 <EditableText
@@ -111,7 +107,7 @@ const StudyItalyClusterSection = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.2 }}
-                            className="text-xl md:text-2xl !text-black/70 font-bold leading-tight max-w-2xl"
+                            className="text-[16px] text-[#555555] leading-relaxed max-w-2xl"
                         >
                             <EditableText
                                 fieldKey="italy_cluster_desc"
@@ -132,19 +128,19 @@ const StudyItalyClusterSection = () => {
                                 className="h-full"
                             >
                                 <Link to={pillar.path} className="block h-full group/card">
-                                    <div className="h-full bg-slate-50/50 rounded-[2.5rem] p-8 border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500 flex flex-col">
-                                        <div className={`w-16 h-16 rounded-2xl ${pillar.bg} flex items-center justify-center mb-8 group-hover/card:scale-110 transition-transform duration-500`}>
-                                            <pillar.icon className={`${pillar.color} w-7 h-7`} />
+                                    <div className="h-full bg-[#f8f9fe] rounded-[8px] p-6 border border-[#eaeaea] hover:border-[#5a4bda]/30 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 flex flex-col">
+                                        <div className={`w-14 h-14 rounded-full ${pillar.bg} flex items-center justify-center mb-6 group-hover/card:scale-110 transition-transform duration-300`}>
+                                            <pillar.icon className={`${pillar.color} w-6 h-6`} />
                                         </div>
 
-                                        <h3 className="text-lg font-black text-black mb-4 tracking-tight group-hover/card:text-indigo-600 transition-colors">
+                                        <h3 className="text-[18px] font-bold text-[#333333] mb-3 group-hover/card:text-[#5a4bda] transition-colors">
                                             <EditableText
                                                 fieldKey={pillar.titleKey}
                                                 fallback={t(pillar.titleKey, pillar.defaultTitle)}
                                             />
                                         </h3>
 
-                                        <p className="text-[13px] !text-black/70 font-bold leading-relaxed mb-8">
+                                        <p className="text-[14px] text-[#555555] leading-relaxed mb-6">
                                             <EditableText
                                                 fieldKey={pillar.descKey}
                                                 fallback={t(pillar.descKey, pillar.defaultDesc)}
@@ -152,9 +148,9 @@ const StudyItalyClusterSection = () => {
                                             />
                                         </p>
 
-                                        <div className="mt-auto pt-4 flex items-center gap-2 text-indigo-600 font-black text-[10px] uppercase tracking-widest opacity-0 group-hover/card:opacity-100 group-hover/card:translate-x-1 transition-all">
+                                        <div className="mt-auto pt-4 flex items-center gap-2 text-[#5a4bda] font-semibold text-[13px] opacity-0 group-hover/card:opacity-100 group-hover/card:translate-x-1 transition-all">
                                             <span>Access Strategy</span>
-                                            <ArrowRight size={12} />
+                                            <ArrowRight size={14} />
                                         </div>
                                     </div>
                                 </Link>
@@ -166,21 +162,21 @@ const StudyItalyClusterSection = () => {
                     <div className="mt-16 pt-12 border-t border-white/5 relative z-10 flex flex-wrap justify-center gap-6">
                         <Link 
                             to="/study-in-italy/without-ielts" 
-                            className="flex items-center gap-2 px-6 py-3 bg-slate-50 rounded-2xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 hover:border-indigo-100 border border-transparent transition-all"
+                            className="flex items-center gap-2 px-6 py-3 bg-[#f8f9fe] rounded-[8px] text-[14px] font-semibold text-[#555555] hover:text-[#5a4bda] hover:bg-[#f4f7ff] hover:border-[#5a4bda]/30 border border-[#eaeaea] transition-all"
                         >
                             <ShieldCheck className="w-4 h-4" />
                             Study Without IELTS
                         </Link>
                         <Link 
                             to="/study-in-italy/how-to-apply" 
-                            className="flex items-center gap-2 px-6 py-3 bg-slate-50 rounded-2xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 hover:border-indigo-100 border border-transparent transition-all"
+                            className="flex items-center gap-2 px-6 py-3 bg-[#f8f9fe] rounded-[8px] text-[14px] font-semibold text-[#555555] hover:text-[#5a4bda] hover:bg-[#f4f7ff] hover:border-[#5a4bda]/30 border border-[#eaeaea] transition-all"
                         >
                             <ExternalLink className="w-4 h-4" />
                             How to Apply (Steps)
                         </Link>
                         <Link 
                             to="/study-in-italy/universities-2026" 
-                            className="flex items-center gap-2 px-6 py-3 bg-slate-50 rounded-2xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 hover:border-indigo-100 border border-transparent transition-all"
+                            className="flex items-center gap-2 px-6 py-3 bg-[#f8f9fe] rounded-[8px] text-[14px] font-semibold text-[#555555] hover:text-[#5a4bda] hover:bg-[#f4f7ff] hover:border-[#5a4bda]/30 border border-[#eaeaea] transition-all"
                         >
                             <MapPin className="w-4 h-4" />
                             90+ Public Universities List

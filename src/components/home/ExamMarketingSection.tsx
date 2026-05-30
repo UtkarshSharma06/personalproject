@@ -51,16 +51,17 @@ const ExamMarketingSection = ({ className }: ExamMarketingSectionProps) => {
     ];
 
     return (
-        <section className={`pt-2 pb-0 relative overflow-hidden bg-white ${className}`}>
-            <div className="container mx-auto px-6 max-w-7xl">
+        <section className={`py-12 relative overflow-hidden bg-white border-b border-[#eaeaea] ${className}`}>
+            <div className="container mx-auto px-6 max-w-[1200px]">
                 {/* Header - Compact & Premium */}
                 <div className="text-center mb-10 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-100 rounded-full mb-4">
+                    <div className="hidden">
+                        {/* Hidden badge to keep editable text structure if needed */}
                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
                             {t('landing.exam_marketing_hub.badge')}
                         </span>
                     </div>
-                    <h2 className="text-4xl md:text-6xl font-black text-black mb-6 uppercase tracking-tighter leading-[0.9]">
+                    <h2 className="text-[32px] md:text-[40px] font-bold text-[#333333] mb-4 leading-tight">
                         <EditableText
                             fieldKey="exam_marketing_hub_title"
                             fallback={t('landing.exam_marketing_hub.title')}
@@ -79,41 +80,40 @@ const ExamMarketingSection = ({ className }: ExamMarketingSectionProps) => {
                             className="group relative"
                         >
                             <div className={cn(
-                                "h-full rounded-[2.5rem] p-8 md:p-12 transition-all duration-500",
-                                "bg-gradient-to-br border border-white/5 shadow-sm",
-                                "hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-1 hover:border-indigo-100",
-                                exam.bgGradient
+                                "h-full rounded-[8px] p-8 md:p-10 transition-all duration-300",
+                                "bg-white border border-[#eaeaea]",
+                                "hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
                             )}>
                                 <div className="flex flex-col h-full">
-                                    <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center justify-between mb-6">
                                         <div className={cn(
-                                            "w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3",
-                                            exam.accent === 'indigo' ? "bg-indigo-600 text-white" : "bg-slate-900 text-white"
+                                            "w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-300",
+                                            "bg-[#f8f9fe] text-[#5a4bda] border border-[#eaeaea]"
                                         )}>
                                             <exam.badgeIcon className="w-6 h-6" />
                                         </div>
-                                        <div className="px-3 py-1 bg-white/50 backdrop-blur-md border border-white/50 rounded-full">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        <div className="px-4 py-1.5 bg-[#f4f7ff] border border-[#5a4bda]/20 rounded-full">
+                                            <span className="text-[12px] font-bold text-[#5a4bda]">
                                                 {exam.badge}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <h3 className="text-3xl md:text-4xl font-black text-black mb-4 tracking-tighter leading-tight">
+                                    <h3 className="text-[24px] md:text-[28px] font-bold text-[#333333] mb-3 leading-tight">
                                         <EditableText fieldKey={`${exam.key}_marketing_title`} fallback={exam.title} />
                                     </h3>
 
-                                    <p className="text-slate-500 font-bold text-sm md:text-base leading-relaxed mb-8 flex-1">
+                                    <p className="text-[#555555] text-[15px] leading-relaxed mb-6 flex-1">
                                         <EditableText fieldKey={`${exam.key}_marketing_description`} fallback={exam.description} multiline />
                                     </p>
 
                                     <div className="space-y-3 mb-10">
                                         {exam.features.map((feature, i) => (
                                             <div key={i} className="flex items-center gap-3">
-                                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                                                    <CheckCircle className="w-3 text-emerald-500" />
+                                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                                                    <CheckCircle className="w-4 h-4" />
                                                 </div>
-                                                <span className="text-[13px] md:text-sm text-slate-600 font-bold">
+                                                <span className="text-[14px] text-[#555555]">
                                                     {feature}
                                                 </span>
                                             </div>
@@ -121,14 +121,9 @@ const ExamMarketingSection = ({ className }: ExamMarketingSectionProps) => {
                                     </div>
 
                                     <Link to={exam.path}>
-                                        <Button className={cn(
-                                            "w-full h-14 md:h-16 rounded-2xl font-black text-sm md:text-base transition-all group/btn",
-                                            exam.accent === 'indigo' 
-                                                ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-100" 
-                                                : "bg-slate-900 hover:bg-black text-white shadow-xl shadow-slate-100"
-                                        )}>
+                                        <Button className="w-full h-12 bg-[#5a4bda] text-white font-semibold text-[16px] rounded-[4px] hover:bg-[#483ab8] transition-all group/btn shadow-none">
                                             <EditableText fieldKey={`${exam.key}_marketing_cta`} fallback={exam.cta} />
-                                            <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                                            <ArrowRight className="ml-2 w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                                         </Button>
                                     </Link>
                                 </div>

@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import SEO from '@/components/SEO';
-import PublicNavbar from '@/components/PublicNavbar';
+import PWNavbar from '@/components/home/PWNavbar';
 
 const Footer = lazy(() => import('@/components/Footer'));
 
@@ -33,7 +33,7 @@ const Syllabus = () => {
                 description="Your gateway to top universities in Italy. Official information and preparation resources for IMAT and CEnT-S."
             />
 
-            <PublicNavbar />
+            <PWNavbar />
 
             <div className="pt-16"> {/* Offset for fixed navbar */}
                 {/* Header Section */}

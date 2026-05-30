@@ -4,10 +4,10 @@ import { Card } from '@/components/ui/card';
 import { Grid, ChevronRight, Star, BookOpen, TrendingUp, Globe } from 'lucide-react';
 
 interface KnowledgeHubSidebarProps {
-    examType: 'imat' | 'cents' | 'study-italy';
+    examType: 'imat' | 'cents' | 'study-italy' | 'tolc';
 }
 
-import { imatLinks, centsLinks, studyItalyLinks } from '@/lib/nav-links';
+import { imatLinks, centsLinks, studyItalyLinks, tolcLinks } from '@/lib/nav-links';
 
 
 const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) => {
@@ -42,6 +42,10 @@ const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) =
         links = studyItalyLinks;
         title = "Study Italy Hub";
         authorityDesc = "This content is verified by education consultants specializing in Italian university admissions for international students.";
+    } else if (examType === 'tolc') {
+        links = tolcLinks;
+        title = "TOLC Knowledge Hub";
+        authorityDesc = "This guide is maintained by university admissions experts specializing in the CISIA TOLC testing system.";
     }
 
     const isStaticPath = (path: string) => {
@@ -98,7 +102,7 @@ const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) =
                         Free full-length 2026 mock exam. Find your weak spots before test day.
                     </p>
                     {renderLink(
-                        examType === 'cents' ? '/cent-s-mock' : '/imat-mock',
+                        examType === 'cents' ? '/cent-s-mock' : examType === 'tolc' ? '/tolc-mock-test-free-2026' : '/imat-mock',
                         <>
                             <span>Take Free Mock Test</span>
                             <ChevronRight size={14} />
@@ -115,7 +119,7 @@ const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) =
                     Vetted study materials for the 2026 cycle.
                 </p>
                 {renderLink(
-                    examType === 'cents' ? '/best-books-for-cent-s-2026' : '/imat-best-books-2026',
+                    examType === 'cents' ? '/best-books-for-cent-s-2026' : examType === 'tolc' ? '/tolc-best-books-2026' : '/imat-best-books-2026',
                     <>
                         <span className="border-b-2 border-indigo-600 pb-0.5">View Recommended Books</span>
                     </>,

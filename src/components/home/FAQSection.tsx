@@ -9,10 +9,10 @@ import FAQSchema from '@/components/seo/FAQSchema';
 const FAQItem = ({ questionKey, answerKey, fallbackQuestion, fallbackAnswer, isOpen, onClick }: any) => {
     return (
         <div 
-            className={`group rounded-[2rem] border transition-all duration-300 ${
+            className={`group rounded-2xl border transition-all duration-300 ${
                 isOpen 
-                ? 'bg-white border-indigo-100 shadow-[0_20px_50px_-12px_rgba(79,70,229,0.08)]' 
-                : 'bg-slate-50/50 border-slate-100 hover:border-slate-200 hover:bg-white'
+                ? 'bg-white border-[#eaeaea] shadow-[0_8px_30px_rgb(0,0,0,0.06)]' 
+                : 'bg-[#fcfcfc] border-[#eaeaea] hover:bg-white hover:shadow-sm'
             }`}
         >
             <button
@@ -20,19 +20,19 @@ const FAQItem = ({ questionKey, answerKey, fallbackQuestion, fallbackAnswer, isO
                 className="w-full text-left p-6 md:p-8 flex items-center justify-between gap-4 focus:outline-none"
             >
                 <div className="flex items-center gap-4 md:gap-6">
-                    <div className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-colors duration-300 ${
-                        isOpen ? 'bg-indigo-600 text-white' : 'bg-white text-slate-400 group-hover:text-indigo-600 border border-slate-100 shadow-sm'
+                    <div className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                        isOpen ? 'bg-[#5a4bda] text-white' : 'bg-white text-[#888888] group-hover:text-[#5a4bda] border border-[#eaeaea] shadow-sm'
                     }`}>
                         <HelpCircle size={20} className="md:w-6 md:h-6" />
                     </div>
-                    <h3 className={`text-base md:text-lg lg:text-xl font-black tracking-tight leading-tight transition-colors duration-300 ${
-                        isOpen ? 'text-slate-900' : 'text-slate-600 group-hover:text-slate-900'
+                    <h3 className={`text-[16px] md:text-[18px] font-bold leading-tight transition-colors duration-300 ${
+                        isOpen ? 'text-[#333333]' : 'text-[#555555] group-hover:text-[#333333]'
                     }`}>
                         <EditableText fieldKey={questionKey} fallback={fallbackQuestion} />
                     </h3>
                 </div>
                 <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    isOpen ? 'bg-indigo-50 text-indigo-600 rotate-180' : 'bg-slate-200/50 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600'
+                    isOpen ? 'bg-[#f4f7ff] text-[#5a4bda] rotate-180' : 'bg-[#fcfcfc] text-[#888888] group-hover:bg-[#f4f7ff] group-hover:text-[#5a4bda]'
                 }`}>
                     {isOpen ? <Minus size={18} /> : <Plus size={18} />}
                 </div>
@@ -48,8 +48,8 @@ const FAQItem = ({ questionKey, answerKey, fallbackQuestion, fallbackAnswer, isO
                         className="overflow-hidden"
                     >
                         <div className="px-6 md:px-8 pb-8 md:pb-10 ml-0 md:ml-[4.5rem]">
-                            <div className="h-px w-full bg-slate-100 mb-6" />
-                            <div className="text-slate-500 font-bold leading-relaxed text-sm md:text-base lg:text-lg max-w-3xl">
+                            <div className="h-px w-full bg-[#eaeaea] mb-6" />
+                            <div className="text-[#555555] font-medium leading-relaxed text-[15px] max-w-3xl">
                                 <EditableText fieldKey={answerKey} fallback={fallbackAnswer} />
                             </div>
                         </div>
@@ -71,44 +71,29 @@ const FAQSection = () => {
     }));
 
     return (
-        <section className="py-24 md:py-32 bg-white relative overflow-hidden">
+        <section className="pt-16 pb-24 bg-[#fcfcfc] relative overflow-hidden border-b border-[#eaeaea]">
             {/* SEO FAQ Schema */}
             <FAQSchema items={faqSchemaItems} />
             
-            {/* Background Decor */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-50/30 blur-[120px] rounded-full -mt-48 pointer-events-none" />
-            
             <div className="container mx-auto px-6 relative z-10">
                 <div className="max-w-4xl mx-auto">
-                    <div className="text-center mb-16 md:mb-24">
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full mb-6 border border-indigo-100"
-                        >
-                            <MessageCircleQuestion className="w-4 h-4 text-indigo-600" />
-                            <span className="text-[10px] md:text-xs font-black text-indigo-600 uppercase tracking-[0.2em]">
-                                Support Hub
-                            </span>
-                        </motion.div>
-                        
+                    <div className="text-center mb-12 md:mb-16">
                         <motion.h2 
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 15 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.1 }}
-                            className="text-4xl md:text-6xl font-black text-slate-900 mb-8 uppercase tracking-tighter leading-[0.9]"
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            className="text-[28px] md:text-[34px] font-bold text-[#333333] mb-4 leading-tight"
                         >
                             <EditableText fieldKey="faq_hub_title" fallback={t('landing.faq.title')} />
                         </motion.h2>
                         
                         <motion.p 
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 15 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.2 }}
-                            className="text-lg md:text-xl text-slate-500 font-bold max-w-2xl mx-auto"
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+                            className="text-[15px] md:text-[16px] text-[#555555] max-w-2xl mx-auto"
                         >
                             <EditableText fieldKey="faq_hub_description" fallback={t('landing.faq.description')} />
                         </motion.p>
@@ -118,10 +103,10 @@ const FAQSection = () => {
                         {Array.from({ length: 10 }).map((_, index) => (
                             <motion.div
                                 key={index}
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 15 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.05 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ duration: 0.4, ease: "easeOut" }}
                             >
                                 <FAQItem
                                     questionKey={`faq_2026_q${index + 1}`}
@@ -140,15 +125,15 @@ const FAQSection = () => {
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.6 }}
-                        className="mt-20 text-center p-12 rounded-[3rem] bg-slate-50 border border-slate-100"
+                        transition={{ delay: 0.4 }}
+                        className="mt-16 text-center p-8 md:p-12 rounded-[8px] bg-[#f8f9fe] border border-[#eaeaea]"
                     >
-                        <h4 className="text-xl md:text-2xl font-black text-slate-900 mb-4">Still have questions?</h4>
-                        <p className="text-slate-500 font-bold mb-8">Our admission experts are here to help you 24/7.</p>
+                        <h4 className="text-[24px] font-bold text-[#333333] mb-4">Still have questions?</h4>
+                        <p className="text-[#555555] font-medium mb-8">Our admission experts are here to help you 24/7.</p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <a 
                                 href="/contact" 
-                                className="px-8 py-4 bg-white border border-slate-200 text-slate-900 font-black rounded-2xl hover:bg-slate-50 transition-colors shadow-sm"
+                                className="flex items-center justify-center px-8 h-12 bg-white border border-[#eaeaea] text-[#333333] font-semibold rounded-[4px] hover:bg-[#fcfcfc] transition-colors shadow-sm"
                             >
                                 Contact Support
                             </a>
@@ -156,7 +141,7 @@ const FAQSection = () => {
                                 href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A" 
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-8 py-4 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-200 flex items-center gap-2"
+                                className="flex items-center justify-center px-8 h-12 bg-[#25D366] text-white font-semibold rounded-[4px] hover:bg-[#1ebd5a] transition-colors shadow-sm gap-2"
                             >
                                 Chat on WhatsApp
                             </a>

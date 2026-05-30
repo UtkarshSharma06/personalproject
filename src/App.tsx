@@ -82,6 +82,19 @@ const ImatPatternGuide = lazy(() => import('@/pages/exams/imat-authority/ImatPat
 const ImatPreviousPapers = lazy(() => import('@/pages/exams/imat-authority/ImatPreviousPapers'));
 
 const TolcUltimateGuide = lazy(() => import('@/pages/exams/tolc-authority/TolcUltimateGuide'));
+const TolcDetailedSyllabus = lazy(() => import('@/pages/exams/tolc-authority/TolcDetailedSyllabus'));
+const TolcBooks = lazy(() => import('@/pages/exams/tolc-authority/TolcBooks'));
+const TolcDates = lazy(() => import('@/pages/exams/tolc-authority/TolcDates'));
+const TolcPatternGuide = lazy(() => import('@/pages/exams/tolc-authority/TolcPatternGuide'));
+const TolcEligibility = lazy(() => import('@/pages/exams/tolc-authority/TolcEligibility'));
+const TolcRegistration = lazy(() => import('@/pages/exams/tolc-authority/TolcRegistration'));
+const TolcMockTest = lazy(() => import('@/pages/exams/tolc-authority/TolcMockTest'));
+const TolcPreviousPapers = lazy(() => import('@/pages/exams/tolc-authority/TolcPreviousPapers'));
+const TolcPassingScore = lazy(() => import('@/pages/exams/tolc-authority/TolcPassingScore'));
+const TolcCutoffTrends = lazy(() => import('@/pages/exams/tolc-authority/TolcCutoffTrends'));
+const TolcDifficultyAnalysis = lazy(() => import('@/pages/exams/tolc-authority/TolcDifficultyAnalysis'));
+const TolcPrepStrategy = lazy(() => import('@/pages/exams/tolc-authority/TolcPrepStrategy'));
+const TolcVsImat = lazy(() => import('@/pages/exams/tolc-authority/TolcVsImat'));
 const TiliUltimateGuide = lazy(() => import('@/pages/exams/tili-authority/TiliUltimateGuide'));
 const StudyItalyGuide = lazy(() => import('@/pages/study-in-italy/StudyItalyGuide'));
 const StudyItalyUniversities = lazy(() => import('@/pages/study-in-italy/StudyItalyUniversities'));
@@ -153,6 +166,19 @@ const PublicRouter = () => (
     <Route path="/imat-difficulty-analysis-2026" element={<ImatDifficultyAnalysis />} />
     <Route path="/imat-vs-cents-2026" element={<ImatVsCents />} />
     <Route path="/tolc-exam-ultimate-guide-2026" element={<TolcUltimateGuide />} />
+    <Route path="/tolc-syllabus-2026" element={<TolcDetailedSyllabus />} />
+    <Route path="/tolc-best-books-2026" element={<TolcBooks />} />
+    <Route path="/tolc-exam-dates-2026" element={<TolcDates />} />
+    <Route path="/tolc-exam-pattern-2026" element={<TolcPatternGuide />} />
+    <Route path="/tolc-eligibility-criteria-2026" element={<TolcEligibility />} />
+    <Route path="/tolc-registration-2026" element={<TolcRegistration />} />
+    <Route path="/tolc-mock-test-free-2026" element={<TolcMockTest />} />
+    <Route path="/tolc-previous-year-papers-pdf" element={<TolcPreviousPapers />} />
+    <Route path="/tolc-passing-score-explained-2026" element={<TolcPassingScore />} />
+    <Route path="/tolc-cutoff-trends-2026" element={<TolcCutoffTrends />} />
+    <Route path="/tolc-difficulty-analysis-2026" element={<TolcDifficultyAnalysis />} />
+    <Route path="/tolc-preparation-strategy-2026" element={<TolcPrepStrategy />} />
+    <Route path="/tolc-vs-imat-2026" element={<TolcVsImat />} />
     <Route path="/til-i-exam-guide-2026" element={<TiliUltimateGuide />} />
     <Route path="/study-in-italy-guide-2026" element={<StudyItalyGuide />} />
     <Route path="/study-in-italy/universities-2026" element={<StudyItalyUniversities />} />

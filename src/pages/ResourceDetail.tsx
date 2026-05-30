@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout';
-import BlogHeader from '@/components/blog/BlogHeader';
+import PWNavbar from '@/components/home/PWNavbar';
 import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -97,8 +97,10 @@ export default function ResourceDetail() {
     if (isLoading) {
         return (
             <Layout showHeader={false}>
-                <BlogHeader />
-                <ResourceDetailSkeleton />
+                <PWNavbar />
+                <div className="pt-[80px]">
+                    <ResourceDetailSkeleton />
+                </div>
             </Layout>
         );
     }
@@ -112,8 +114,8 @@ export default function ResourceDetail() {
                 description={resource.description || `Download ${resource.title} and other free study materials for ${resource.exam_type.toUpperCase()} on ItaloStudy.`}
                 type="article"
             />
-            <div className="min-h-screen bg-[#FAFAFA] pb-32">
-                <BlogHeader />
+            <div className="min-h-screen bg-[#FAFAFA] pb-32 pt-[80px]">
+                <PWNavbar />
 
                 {/* Back Link */}
                 <div className="container mx-auto px-4 py-8 lg:py-12">

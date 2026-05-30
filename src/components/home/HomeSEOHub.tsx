@@ -32,47 +32,29 @@ const HomeSEOHub = () => {
     };
 
     return (
-        <section className="pt-0 pb-12 bg-white relative overflow-hidden" id="authority-hub">
-            <div className="container mx-auto px-6 max-w-7xl">
+        <section className="pt-16 pb-24 bg-[#fcfcfc] relative overflow-hidden border-b border-[#eaeaea]" id="authority-hub">
+            <div className="container mx-auto px-6 max-w-[1200px]">
                 
                 {/* Standardized Section Header */}
-                <div className="flex flex-col items-center text-center justify-center gap-4 mb-12 md:mb-16">
-                    <div className="max-w-4xl">
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-100 rounded-full mb-8"
-                        >
-                            <Book className="w-3.5 h-3.5 text-black" />
-                            <span className="text-[10px] font-black text-black uppercase tracking-[0.2em]">
-                                <EditableText fieldKey="seo_hub_badge" fallback={t('landing.seo_hub.badge', 'Institutional Library')} />
-                            </span>
-                        </motion.div>
-                        
-                        <motion.h2
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.1 }}
-                            className="text-4xl md:text-6xl font-black text-black uppercase tracking-tighter leading-[0.9]"
-                        >
+                <div className="flex flex-col items-center text-center justify-center gap-2 mb-12">
+                    <motion.div
+                        initial={{ opacity: 0, y: 15 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="max-w-4xl"
+                    >
+                        <h2 className="text-[28px] md:text-[34px] font-bold text-[#333333] leading-tight">
                             <EditableText
                                 fieldKey="seo_hub_title"
                                 fallback={t('landing.seo_hub.title', 'The Authority Hub: Ultimate Guides 2026')}
                             />
-                        </motion.h2>
+                        </h2>
 
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.2 }}
-                            className="mt-8 text-xl text-slate-500 font-bold max-w-2xl mx-auto leading-tight [&_*]:!text-black/70"
-                        >
+                        <p className="mt-4 text-[15px] md:text-[16px] text-[#555555] max-w-2xl mx-auto leading-relaxed">
                             <EditableText fieldKey="seo_hub_description" fallback={t('landing.seo_hub.description')} />
-                        </motion.p>
-                    </div>
+                        </p>
+                    </motion.div>
                 </div>
 
                 {/* Knowledge Vault Clusters */}
@@ -80,37 +62,38 @@ const HomeSEOHub = () => {
                     
                     {/* CEnT-S Cluster */}
                     <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="space-y-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="space-y-6"
                     >
-                        <div className="flex items-center gap-6 p-8 bg-slate-50/50 rounded-[3rem] border border-slate-100 relative overflow-hidden group">
-                            <div className="w-1.5 h-12 bg-indigo-600 rounded-full" />
+                        <div className="flex items-center gap-6 p-6 bg-white rounded-2xl border border-[#eaeaea] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-shadow">
+                            <div className="w-1.5 h-10 bg-[#5a4bda] rounded-full" />
                             <div>
-                                <h3 className="text-2xl font-black text-black uppercase tracking-tight [&_*]:!text-black">
+                                <h3 className="text-[20px] font-bold text-[#333333]">
                                     <EditableText fieldKey="cents_hub_title" fallback="CEnT-S 2026 Master Hub" />
                                 </h3>
-                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Syllabus & Strategy Vault</p>
+                                <p className="text-[13px] text-[#555555] mt-1">Syllabus & Strategy Vault</p>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {centsLinks.map((link, idx) => (
                                 <Link
                                     key={link.key}
                                     to={link.path}
-                                    className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 hover:border-indigo-100 hover:shadow-2xl hover:shadow-slate-200/50 transition-all group relative overflow-hidden"
+                                    className="flex items-center justify-between p-4 bg-white rounded-2xl border border-[#eaeaea] hover:border-[#eaeaea] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all group relative overflow-hidden"
                                 >
-                                    <div className="flex items-center gap-4 relative z-10">
-                                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-colors">
+                                    <div className="flex items-center gap-3 relative z-10">
+                                        <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-[#333333] border border-[#eaeaea] group-hover:bg-[#5a4bda] group-hover:text-white transition-colors">
                                             {getLinkIcon(link.key)}
                                         </div>
-                                        <span className="text-[10px] font-black text-black uppercase tracking-[0.1em] group-hover:text-indigo-600 transition-colors [&_*]:!text-black group-hover:[&_*]:!text-indigo-600">
+                                        <span className="text-[14px] font-semibold text-[#333333]">
                                             <EditableText fieldKey={`hub_cents_${link.key}`} fallback={link.label} />
                                         </span>
                                     </div>
-                                    <ArrowRight className="w-3.5 h-3.5 text-slate-200 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                                    <ArrowRight className="w-4 h-4 text-[#cccccc] group-hover:text-[#5a4bda] group-hover:translate-x-1 transition-all" />
                                 </Link>
                             ))}
                         </div>
@@ -118,37 +101,38 @@ const HomeSEOHub = () => {
 
                     {/* IMAT Cluster */}
                     <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="space-y-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+                        className="space-y-6"
                     >
-                        <div className="flex items-center gap-6 p-8 bg-slate-50/50 rounded-[3rem] border border-slate-100 relative overflow-hidden group">
-                            <div className="w-1.5 h-12 bg-rose-600 rounded-full" />
+                        <div className="flex items-center gap-6 p-6 bg-white rounded-2xl border border-[#eaeaea] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-shadow">
+                            <div className="w-1.5 h-10 bg-[#5a4bda] rounded-full" />
                             <div>
-                                <h3 className="text-2xl font-black text-black uppercase tracking-tight [&_*]:!text-black">
+                                <h3 className="text-[20px] font-bold text-[#333333]">
                                     <EditableText fieldKey="imat_hub_title" fallback="IMAT 2026 Authority Pillar" />
                                 </h3>
-                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Official Test Blueprints</p>
+                                <p className="text-[13px] text-[#555555] mt-1">Official Test Blueprints</p>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {imatLinks.map((link, idx) => (
                                 <Link
                                     key={link.key}
                                     to={link.path}
-                                    className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 hover:border-rose-100 hover:shadow-2xl hover:shadow-slate-200/50 transition-all group relative overflow-hidden"
+                                    className="flex items-center justify-between p-4 bg-white rounded-2xl border border-[#eaeaea] hover:border-[#eaeaea] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all group relative overflow-hidden"
                                 >
-                                    <div className="flex items-center gap-4 relative z-10">
-                                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-rose-600 group-hover:bg-rose-50 transition-colors">
+                                    <div className="flex items-center gap-3 relative z-10">
+                                        <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-[#333333] border border-[#eaeaea] group-hover:bg-[#5a4bda] group-hover:text-white transition-colors">
                                             {getLinkIcon(link.key)}
                                         </div>
-                                        <span className="text-[10px] font-black text-black uppercase tracking-[0.1em] group-hover:text-rose-600 transition-colors [&_*]:!text-black group-hover:[&_*]:!text-rose-600">
+                                        <span className="text-[14px] font-semibold text-[#333333]">
                                             <EditableText fieldKey={`hub_imat_${link.key}`} fallback={link.label} />
                                         </span>
                                     </div>
-                                    <ArrowRight className="w-3.5 h-3.5 text-slate-200 group-hover:text-rose-600 group-hover:translate-x-1 transition-all" />
+                                    <ArrowRight className="w-4 h-4 text-[#cccccc] group-hover:text-[#5a4bda] group-hover:translate-x-1 transition-all" />
                                 </Link>
                             ))}
                         </div>

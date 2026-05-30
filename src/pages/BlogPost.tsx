@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout';
-import BlogHeader from '@/components/blog/BlogHeader';
+import PWNavbar from '@/components/home/PWNavbar';
 import SEO from '@/components/SEO';
 import { SECONDARY_KEYWORDS } from '@/lib/seo-keywords';
 import { Button } from '@/components/ui/button';
@@ -471,8 +471,8 @@ export default function BlogPostPage() {
     if (isLoading) {
         return (
             <Layout showHeader={false}>
-                <BlogHeader />
-                <div className="min-h-screen bg-white container mx-auto px-4 py-20">
+                <PWNavbar />
+                <div className="min-h-screen bg-white container mx-auto px-4 pt-[100px] pb-20">
                     <div className="max-w-3xl mx-auto animate-pulse">
                         <div className="h-4 bg-slate-50 rounded w-24 mb-8" />
                         <div className="h-12 bg-slate-100 rounded-[2rem] w-full mb-4" />
@@ -703,8 +703,8 @@ export default function BlogPostPage() {
                 url={postUrl}
                 canonicalUrl={postUrl}
             />
-            <div className={`w-full bg-[#FAFAFA] ${isCustomHtml ? 'pb-0' : 'pb-32'}`}>
-                <BlogHeader />
+            <div className={`w-full bg-[#FAFAFA] pt-[80px] ${isCustomHtml ? 'pb-0' : 'pb-32'}`}>
+                <PWNavbar />
 
                 {/* Sticky & Side Widget CTAs */}
                 {renderOverlayCtas()}

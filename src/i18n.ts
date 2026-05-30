@@ -641,6 +641,61 @@ const resources = {
                     q10: "Is there a free trial?",
                     a10: "Yes, you can start practicing for FREE with our basic modules."
                 },
+                trusted: {
+                    title_europe: "Europe's",
+                    title_trusted: "Trusted &",
+                    title_affordable: "Affordable",
+                    title_platform: "Educational Platform",
+                    subtitle_p1: "Over 5,000+ students from around the world have trusted ItaloStudy to prepare for the CEnT-S, IMAT, and other competitive exams.",
+                    subtitle_p2: "Join the largest community of international students and start your journey to an Italian university.",
+                    get_started: "Get Started Now",
+                    what_is: "What is ItaloStudy?",
+                    chat_bubble: "Can you help me prepare for the IMAT?",
+                    stat1_title: "Video Lectures",
+                    stat1_desc: "Interactive classes",
+                    stat2_title: "100+",
+                    stat2_desc: "simulated mocks",
+                    stat3_title: "Questions Practiced",
+                    stat3_desc: "Over 50k+ questions solved.",
+                    stat4_title: "24 x 7 support",
+                    stat4_desc: "Available anytime"
+                },
+                exams: {
+                    title: "Exam Categories",
+                    subtitle: "ItaloStudy is preparing students for top Italian university exams. Scroll down to find the one you are preparing for",
+                    explore: "Explore Category",
+                    imat: {
+                        title: "IMAT",
+                        badges: ["Medicine", "Surgery", "Dentistry"]
+                    },
+                    cents: {
+                        title: "CEnT-S",
+                        badges: ["Engineering", "Science", "Architecture"]
+                    },
+                    tolc: {
+                        title: "TOLC",
+                        badges: ["Economics", "Humanities", "Pharmacy"]
+                    }
+                },
+                pw_resources: {
+                    explore: "Explore",
+                    prep_books: {
+                        title: "Preparation Books",
+                        desc: "Our academic experts have authored comprehensive study materials that distil complex concepts into easily digestible content."
+                    },
+                    past_papers: {
+                        title: "Past Papers & Solutions",
+                        desc: "Achieve academic excellence with ItaloStudy's official past papers, providing you with detailed, step-by-step solutions."
+                    },
+                    revision_notes: {
+                        title: "Revision Notes",
+                        desc: "Utilise ItaloStudy's detailed revision notes designed to simplify complex theories into clear, accessible language."
+                    }
+                },
+                hero: {
+                    banner1: { title: "ItaloStudy App" },
+                    banner2: { title: "ItaloStudy Store" }
+                }
 
             }
         }
@@ -1278,6 +1333,61 @@ const resources = {
                     q10: "C'è una prova gratuita?",
                     a10: "Sì, puoi iniziare a fare pratica GRATUITAMENTE con i nostri moduli base."
                 },
+                trusted: {
+                    title_europe: "La Piattaforma Educativa",
+                    title_trusted: "Affidabile &",
+                    title_affordable: "Accessibile",
+                    title_platform: "d'Europa",
+                    subtitle_p1: "Oltre 5.000 studenti da tutto il mondo si sono affidati a ItaloStudy per prepararsi al CEnT-S, all'IMAT e ad altri esami competitivi.",
+                    subtitle_p2: "Unisciti alla più grande comunità di studenti internazionali e inizia il tuo viaggio verso un'università italiana.",
+                    get_started: "Inizia Ora",
+                    what_is: "Cos'è ItaloStudy?",
+                    chat_bubble: "Puoi aiutarmi a prepararmi per l'IMAT?",
+                    stat1_title: "Lezioni Video",
+                    stat1_desc: "Classi interattive",
+                    stat2_title: "100+",
+                    stat2_desc: "simulazioni",
+                    stat3_title: "Domande Praticate",
+                    stat3_desc: "Oltre 50.000 domande risolte.",
+                    stat4_title: "Supporto 24 x 7",
+                    stat4_desc: "Sempre disponibile"
+                },
+                exams: {
+                    title: "Categorie di Esami",
+                    subtitle: "ItaloStudy prepara gli studenti per i migliori esami universitari italiani. Scorri verso il basso per trovare quello per cui ti stai preparando.",
+                    explore: "Esplora Categoria",
+                    imat: {
+                        title: "IMAT",
+                        badges: ["Medicina", "Chirurgia", "Odontoiatria"]
+                    },
+                    cents: {
+                        title: "CEnT-S",
+                        badges: ["Ingegneria", "Scienza", "Architettura"]
+                    },
+                    tolc: {
+                        title: "TOLC",
+                        badges: ["Economia", "Studi Umanistici", "Farmacia"]
+                    }
+                },
+                pw_resources: {
+                    explore: "Esplora",
+                    prep_books: {
+                        title: "Libri di Preparazione",
+                        desc: "I nostri esperti accademici hanno redatto materiali di studio completi che distillano concetti complessi in contenuti facilmente digeribili."
+                    },
+                    past_papers: {
+                        title: "Esami Passati & Soluzioni",
+                        desc: "Raggiungi l'eccellenza accademica con i documenti passati ufficiali di ItaloStudy, fornendoti soluzioni dettagliate passo dopo passo."
+                    },
+                    revision_notes: {
+                        title: "Note di Revisione",
+                        desc: "Utilizza le note di revisione dettagliate di ItaloStudy progettate per semplificare teorie complesse in un linguaggio chiaro e accessibile."
+                    }
+                },
+                hero: {
+                    banner1: { title: "App ItaloStudy" },
+                    banner2: { title: "Negozio ItaloStudy" }
+                }
 
             }
         }
@@ -1944,6 +2054,61 @@ const resources = {
                     q10: "Ücretsiz deneme var mı?",
                     a10: "Evet, temel modüllerimizle ÜCRETSİZ olarak pratiğe başlayabilirsiniz."
                 },
+                trusted: {
+                    title_europe: "Avrupa'nın",
+                    title_trusted: "Güvenilir &",
+                    title_affordable: "Uygun Fiyatlı",
+                    title_platform: "Eğitim Platformu",
+                    subtitle_p1: "Dünyanın dört bir yanından 5.000'den fazla öğrenci CEnT-S, IMAT ve diğer rekabetçi sınavlara hazırlanmak için ItaloStudy'ye güvendi.",
+                    subtitle_p2: "En büyük uluslararası öğrenci topluluğuna katılın ve bir İtalyan üniversitesine doğru yolculuğunuza başlayın.",
+                    get_started: "Hemen Başlayın",
+                    what_is: "ItaloStudy Nedir?",
+                    chat_bubble: "IMAT'a hazırlanmama yardım edebilir misiniz?",
+                    stat1_title: "Video Dersler",
+                    stat1_desc: "Etkileşimli dersler",
+                    stat2_title: "100+",
+                    stat2_desc: "deneme sınavı",
+                    stat3_title: "Pratik Edilen Sorular",
+                    stat3_desc: "50.000'den fazla soru çözüldü.",
+                    stat4_title: "7/24 Destek",
+                    stat4_desc: "Her zaman yanınızda"
+                },
+                exams: {
+                    title: "Sınav Kategorileri",
+                    subtitle: "ItaloStudy, öğrencileri en iyi İtalyan üniversite sınavlarına hazırlıyor. Hazırlandığınız sınavı bulmak için aşağı kaydırın",
+                    explore: "Kategoriyi Keşfet",
+                    imat: {
+                        title: "IMAT",
+                        badges: ["Tıp", "Cerrahi", "Diş Hekimliği"]
+                    },
+                    cents: {
+                        title: "CEnT-S",
+                        badges: ["Mühendislik", "Bilim", "Mimarlık"]
+                    },
+                    tolc: {
+                        title: "TOLC",
+                        badges: ["Ekonomi", "Beşeri Bilimler", "Eczacılık"]
+                    }
+                },
+                pw_resources: {
+                    explore: "Keşfet",
+                    prep_books: {
+                        title: "Hazırlık Kitapları",
+                        desc: "Akademik uzmanlarımız, karmaşık kavramları kolayca sindirilebilir içeriğe dönüştüren kapsamlı çalışma materyalleri hazırladılar."
+                    },
+                    past_papers: {
+                        title: "Geçmiş Sınavlar ve Çözümler",
+                        desc: "Ayrıntılı, adım adım çözümler sunan ItaloStudy'nin resmi geçmiş sınav kağıtlarıyla akademik mükemmelliğe ulaşın."
+                    },
+                    revision_notes: {
+                        title: "Revizyon Notları",
+                        desc: "Karmaşık teorileri açık, erişilebilir bir dile basitleştirmek için tasarlanmış ItaloStudy'nin ayrıntılı revizyon notlarını kullanın."
+                    }
+                },
+                hero: {
+                    banner1: { title: "ItaloStudy Uygulaması" },
+                    banner2: { title: "ItaloStudy Mağazası" }
+                }
 
             }
         }

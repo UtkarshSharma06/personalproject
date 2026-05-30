@@ -1,171 +1,188 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, User, MapPin, Mail, Target, Award, Rocket, Building2, ShieldCheck, Globe2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import SEO from '@/components/SEO';
 import { useTranslation } from 'react-i18next';
-
-const InfoSection = ({ icon: Icon, title, children }: { icon: any, title: string, children: React.ReactNode }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all mb-6"
-    >
-        <div className="flex items-center gap-4 mb-5">
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                <Icon size={24} />
-            </div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">{title}</h2>
-        </div>
-        <div className="text-slate-600 leading-relaxed space-y-4 text-base">
-            {children}
-        </div>
-    </motion.div>
-);
+import { CheckCircle2 } from 'lucide-react';
+import PWNavbar from '@/components/home/PWNavbar';
+import Footer from '@/components/Footer';
 
 export default function About() {
     const { t } = useTranslation();
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+        <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden">
             <SEO
-                title={`${t('about.title')} | ItaloStudy`}
-                description="Learn about ItaloStudy, our mission to simplify global entrance exams, and our founder Utkarsh Kumar Sharma."
-                schema={{
-                    "@context": "https://schema.org",
-                    "@type": "Organization",
-                    "name": "ItaloStudy",
-                    "url": "https://italostudy.com",
-                    "logo": "https://italostudy.com/logo.webp",
-                    "description": "Empowering students through data-driven academic excellence and simplified university admissions for Italian Universities.",
-                    "founder": {
-                        "@type": "Person",
-                        "name": "Utkarsh Kumar Sharma"
-                    },
-                    "sameAs": [
-                        "https://www.instagram.com/italostudy",
-                        "https://www.youtube.com/@italostudy"
-                    ]
-                }}
+                title="About Us - ItaloStudy"
+                description="ItaloStudy is a student's lifelong learning partner that is democratizing education for Italian university admissions."
             />
 
-            {/* Header */}
-            <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-                <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-                    <Link to="/" className="inline-flex items-center gap-2 group text-slate-500 hover:text-indigo-600 transition-colors">
-                        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                        <span className="text-xs font-bold uppercase tracking-wider">{t('common.back')}</span>
-                    </Link>
-                    <Link to="/" className="flex items-center">
-                        <img src="/logo.webp" alt="ItaloStudy" className="h-8 w-auto grayscale contrast-125" />
-                    </Link>
-                </div>
-            </header>
+            <PWNavbar />
 
-            <main className="max-w-4xl mx-auto px-6 py-16 md:py-24">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-16 md:mb-24"
-                >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full text-indigo-600 text-xs font-bold uppercase tracking-widest mb-6">
-                        <Building2 size={14} />
-                        Corporate Profile
+            <main className="pt-[72px]">
+                {/* 1. Hero Section (PW Style) */}
+                <div className="relative w-full min-h-[500px] md:h-[500px] flex flex-col justify-center items-center text-center px-4 py-20 bg-cover bg-center bg-no-repeat"
+                    style={{
+                        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.76), rgba(0, 0, 0, 0.84)), url(/cityview.webp)`
+                    }}>
+                    
+                    <div className="mx-auto px-4 py-[4px] rounded-full bg-white mb-6 w-fit text-center">
+                        <span className="text-[12px] font-bold text-[#09090B] tracking-wider uppercase">
+                            {t('about.pw_hero_title', 'ABOUT ITALOSTUDY')}
+                        </span>
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
-                        {t('about.title')}
+
+                    <h1 className="text-[28px] md:text-[42px] font-medium text-white leading-tight mt-4">
+                        {t('about.pw_hero_slogan_p1', 'Ace the Test, Be Your Best.')}
                     </h1>
-                    <p className="text-lg md:text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-                        Empowering students through data-driven academic excellence and simplified university admissions.
-                    </p>
-                </motion.div>
-
-                <div className="grid gap-6">
-                    <InfoSection icon={Target} title={t('about.mission_title')}>
-                        <p>{t('about.mission_desc1')}</p>
-                        <p>{t('about.mission_desc2')}</p>
-                    </InfoSection>
-
-                    <InfoSection icon={Rocket} title={t('about.do_title')}>
-                        <p>{t('about.do_desc')}</p>
-                        <div className="grid sm:grid-cols-2 gap-4 mt-2">
-                            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                                <h3 className="font-bold text-slate-900 mb-1">{t('about.do_item1')}</h3>
-                                <p className="text-sm text-slate-500">{t('about.do_item1_desc')}</p>
-                            </div>
-                            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                                <h3 className="font-bold text-slate-900 mb-1">{t('about.do_item2')}</h3>
-                                <p className="text-sm text-slate-500">{t('about.do_item2_desc')}</p>
-                            </div>
-                            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                                <h3 className="font-bold text-slate-900 mb-1">{t('about.do_item3')}</h3>
-                                <p className="text-sm text-slate-500">{t('about.do_item3_desc')}</p>
-                            </div>
-                            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                                <h3 className="font-bold text-slate-900 mb-1">{t('about.do_item4')}</h3>
-                                <p className="text-sm text-slate-500">{t('about.do_item4_desc')}</p>
-                            </div>
+                    <div className="mt-2 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                        <div className="text-[32px] md:text-[48px] font-medium text-[#B2A9FF]">
+                            {t('about.pw_hero_slogan_p2_highlight', 'Unlock')}
                         </div>
-                    </InfoSection>
-
-                    <InfoSection icon={User} title={t('about.leadership_title')}>
-                        <div className="flex flex-col md:flex-row gap-6 items-start">
-                            <div className="flex-1">
-                                <p className="mb-4">
-                                    <strong>ItaloStudy</strong> {t('about.leadership_desc1')}
-                                </p>
-                                <p className="text-slate-600">
-                                    {t('about.leadership_desc2')}
-                                </p>
-                            </div>
+                        <div className="text-[28px] md:text-[48px] font-medium text-white text-center">
+                            {t('about.pw_hero_slogan_p2', 'your Italian degrees')}
                         </div>
-                    </InfoSection>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <InfoSection icon={MapPin} title={t('about.office_title')}>
-                            <address className="not-italic text-slate-600">
-                                {t('about.office_address').split(', ').map((line, i) => (
-                                    <span key={i} className="block">{line}</span>
-                                ))}
-                            </address>
-                        </InfoSection>
-
-                        <InfoSection icon={Mail} title={t('about.contact_title')}>
-                            <p>{t('about.contact_desc')}</p>
-                            <a
-                                href="mailto:contact@italostudy.com"
-                                className="inline-flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-700 transition-colors mt-2"
-                            >
-                                contact@italostudy.com
-                                <ArrowLeft size={16} className="rotate-180" />
-                            </a>
-                        </InfoSection>
                     </div>
 
-                    <InfoSection icon={ShieldCheck} title={t('about.commitment_title')}>
-                        <p>{t('about.commitment_desc')}</p>
-                        <div className="flex flex-wrap gap-4 mt-4">
-                            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1.5 rounded-lg">
-                                <Globe2 size={14} /> Global Excellence
-                            </div>
-                            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1.5 rounded-lg">
-                                <ShieldCheck size={14} /> Data Privacy
-                            </div>
-                        </div>
-                    </InfoSection>
+                    <p className="text-[15px] md:text-[18px] font-medium text-white/90 mt-6 lg:mx-32 max-w-4xl leading-relaxed">
+                        {t('about.pw_hero_desc', "ItaloStudy serves as the premier academic bridge for international students aspiring to enter the European Higher Education Area. With a dedicated focus on Italian excellence, we provide world-class, accessible preparation to help ambitious students secure their place at Italy's most prestigious universities.")}
+                    </p>
                 </div>
 
-                <footer className="mt-20 text-center border-t border-slate-200 pt-12">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
-                        © {new Date().getFullYear()} ItaloStudy. {t('footer.rights')}
-                    </p>
-                </footer>
+                {/* 2. Our Vision Section */}
+                <div className="w-full bg-white relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[url('https://www.pw.live/_next/static/media/vision-bg.f009a243.svg')] bg-no-repeat bg-bottom bg-cover opacity-50 hidden sm:block pointer-events-none"></div>
+                    
+                    <div className="max-w-6xl mx-auto px-6 py-12 md:py-20 flex flex-col xl:flex-row items-center justify-between gap-12 relative z-10">
+                        <div className="xl:w-1/2 w-full text-left">
+                            <h2 className="text-[32px] md:text-[42px] font-bold text-slate-900 mb-8">
+                                {t('about.pw_vision_title', 'Our Vision')}
+                            </h2>
+                            <div className="space-y-6">
+                                <div className="flex items-start gap-3">
+                                    <CheckCircle2 className="w-7 h-7 text-indigo-600 shrink-0 mt-0.5" />
+                                    <p className="text-[18px] text-[#3d3d3d] leading-relaxed">
+                                        {t('about.pw_vision_point1', 'To make European academic excellence universally accessible to ambitious students worldwide.')}
+                                    </p>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <CheckCircle2 className="w-7 h-7 text-indigo-600 shrink-0 mt-0.5" />
+                                    <p className="text-[18px] text-[#3d3d3d] leading-relaxed">
+                                        {t('about.pw_vision_point2', 'To provide unparalleled, high-quality preparation that removes barriers to international student mobility.')}
+                                    </p>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <CheckCircle2 className="w-7 h-7 text-indigo-600 shrink-0 mt-0.5" />
+                                    <p className="text-[18px] text-[#3d3d3d] leading-relaxed">
+                                        {t('about.pw_vision_point3', 'To guide every student in realizing their aspiration of studying in Italy, supporting their journey toward academic and professional distinction.')}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="xl:w-1/2 w-full flex justify-center xl:justify-end">
+                            <img 
+                                src="/scene.webp" 
+                                alt="Our Vision" 
+                                className="w-full max-w-[500px] h-auto object-contain rounded-2xl shadow-xl"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3. Our Founders Section */}
+                <div className="w-full bg-[#f8f9fa] py-16 md:py-24 border-t border-slate-200">
+                    <div className="max-w-6xl mx-auto px-6">
+                        <h2 className="text-[32px] md:text-[42px] font-bold text-slate-900 mb-12 text-center md:text-left">
+                            {t('about.pw_founders_title', 'Our Founders')}
+                        </h2>
+
+                        <div className="flex flex-col lg:flex-row gap-8 items-start">
+                            {/* Founder Card (Left Side) */}
+                            <div className="flex flex-col bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden w-full lg:w-[400px] shrink-0 mx-auto lg:mx-0">
+                                <div className="w-full px-4 md:px-8 pt-10 pb-6 flex flex-col items-center text-center">
+                                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-indigo-50 mb-6 shadow-sm shrink-0">
+                                        <img 
+                                            src="/founder pic.webp" 
+                                            alt="Utkarsh Sharma" 
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = '/founder pic.jpg';
+                                            }}
+                                        />
+                                    </div>
+                                    <h3 className="text-[24px] font-bold text-slate-900 mb-2">
+                                        {t('about.pw_founder1_name', 'Utkarsh Sharma')}
+                                    </h3>
+                                    <span className="text-[16px] font-medium text-slate-600 mb-4 block">
+                                        {t('about.pw_founder1_role', 'Founder and CEO')}
+                                    </span>
+                                    <h4 className="text-[18px] font-semibold text-slate-800 italic leading-relaxed mb-2">
+                                        "{t('about.pw_founder1_quote', 'My aim is to bridge the gap between international talent and European academic institutions, elevating the standard of global mobility.')}"
+                                    </h4>
+                                </div>
+                                
+                            </div>
+
+                            {/* Founder Bio (Right Side / Below on Mobile) */}
+                            <div className="w-full lg:flex-1">
+                                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 lg:p-8 h-full">
+                                    <h3 className="text-[24px] font-bold text-slate-900 mb-6 hidden lg:block">
+                                        {t('about.pw_founder1_name', 'Utkarsh Sharma')}
+                                    </h3>
+                                    <div className="text-[15px] lg:text-[16px] leading-relaxed text-slate-700 font-medium space-y-4">
+                                        <p>
+                                            Utkarsh Sharma, the Founder and CEO of ItaloStudy, established the platform with a clear vision: to bridge the gap between international talent and European academic institutions. Driven by a deep appreciation for Italy's educational heritage and modern technology, he created a pathway that makes world-class preparation accessible globally.
+                                        </p>
+                                        <p>
+                                            Under his leadership, ItaloStudy has grown into a distinguished platform for Italian university admissions, offering rigorous curricula for the IMAT, CEnT-S, and TOLC examinations. 
+                                        </p>
+                                        <p>
+                                            Utkarsh remains dedicated to academic mentorship, continuously innovating to uphold a standard of excellence and ensure that international study remains an attainable goal for dedicated students.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 4. Our Presence Section (PW Style) */}
+                <div className="w-full bg-[#fdfaf2] py-16 md:py-24">
+                    <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+                        <div className="w-full md:w-5/12 text-left">
+                            <h2 className="text-[32px] md:text-[42px] font-bold text-slate-900 mb-4">
+                                Our Presence
+                            </h2>
+                            <p className="text-[16px] md:text-[18px] text-[#3d3d3d] leading-relaxed mb-8">
+                                Our community extends globally, creating a widespread academic network that connects ambitious students from across the world to Italy's elite institutions.
+                            </p>
+                            
+                            <div className="flex flex-col gap-5">
+                                <div className="bg-[#fef2cd] rounded-full px-6 py-4 flex items-center">
+                                    <span className="text-[20px] font-bold text-slate-900">85+</span>
+                                    <span className="text-[18px] text-slate-800 ml-2">Countries</span>
+                                </div>
+                                <div className="bg-[#fef2cd] rounded-full px-6 py-4 flex items-center">
+                                    <span className="text-[20px] font-bold text-slate-900">5,000+</span>
+                                    <span className="text-[18px] text-slate-800 ml-2">Students</span>
+                                </div>
+                                <div className="bg-[#fef2cd] rounded-full px-6 py-4 flex items-center">
+                                    <span className="text-[20px] font-bold text-slate-900">3+</span>
+                                    <span className="text-[18px] text-slate-800 ml-2">Exam Categories</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="w-full md:w-7/12 flex justify-center">
+                            <img 
+                                src="/worldmap2.webp" 
+                                alt="Our Global Presence" 
+                                className="w-full max-w-[600px] h-auto object-contain"
+                            />
+                        </div>
+                    </div>
+                </div>
             </main>
 
-            {/* Subtle background element */}
-            <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-40"></div>
+            <Footer />
         </div>
     );
 }
