@@ -15,6 +15,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     if (type === 'blog') {
+      // Always include the root blog index so the sitemap is never empty
+      xml += `\n  <url>\n    <loc>https://italostudy.com/blog</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>`;
+
       const { data: posts, error } = await supabase
         .from('blog_posts')
         .select('slug, updated_at, created_at')
@@ -27,6 +30,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
     } else if (type === 'resources') {
+      // Always include the root resources index so the sitemap is never empty
+      xml += `\n  <url>\n    <loc>https://italostudy.com/resources</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>`;
+
       const { data: resources, error } = await supabase
         .from('exam_resources')
         .select('slug, updated_at, created_at')
