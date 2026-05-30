@@ -37,10 +37,10 @@ export default function PWTrustedSection() {
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className="w-full container mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
             >
-                <div className="relative pt-0 pb-4 md:pt-2 md:pb-7 lg:pt-4 lg:pb-12 flex flex-col xl:flex-row items-center text-center xl:text-left gap-10">
+                <div className="relative pt-0 pb-4 md:pt-2 md:pb-7 lg:pt-4 lg:pb-12 flex flex-col lg:flex-row items-center text-center lg:text-left gap-10">
                     
                     {/* Left Content */}
-                    <div className="flex flex-col items-center xl:items-start mt-6 xl:mt-0 xl:w-[65%]">
+                    <div className="flex flex-col items-center lg:items-start mt-6 lg:mt-0 lg:w-[65%]">
                         <h2 className="text-[32px] md:text-[40px] font-bold text-[#1b2124] md:leading-[50px] mb-4">
                             {t('about.trusted.title_europe', "Europe's")} <span className="text-[#5a4bda]">{t('about.trusted.title_trusted', "Trusted &")}</span><br />
                             <span className="text-[#5a4bda]">{t('about.trusted.title_affordable', "Affordable")}</span><br />
