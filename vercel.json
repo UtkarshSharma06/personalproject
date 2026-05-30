@@ -120,7 +120,7 @@
             "destination": "/api/static-seo-router"
         },
         {
-            "source": "/(.*)",
+            "source": "/((?!.*\\.(js|css|woff2|woff|ttf|otf|eot|png|jpg|jpeg|gif|webp|svg|ico|json|txt|xml|pdf|map|wav|mp3|mp4|webm|avif)$).*)",
             "destination": "/"
         }
     ],
