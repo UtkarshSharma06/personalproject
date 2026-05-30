@@ -69,8 +69,8 @@ export default function PWTrustedSection() {
                 </div>
 
                 {/* Stats / Features Row */}
-                <div className="-mt-8 relative z-30 shadow-[0_2px_10px_rgba(0,0,0,0.05)] rounded bg-white py-2 px-1 sm:px-2 border border-[#f5f5f5]">
-                    <div className="grid grid-cols-2 justify-items-center content-center sm:grid-cols-4 gap-1 sm:gap-0 divide-x divide-slate-100">
+                <div className="-mt-8 relative z-30 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl bg-white py-4 px-2 sm:px-4 border border-slate-100 max-w-3xl mx-auto">
+                    <div className="grid grid-cols-2 justify-items-center content-center sm:grid-cols-4 gap-0 divide-x divide-y sm:divide-y-0 divide-slate-200">
                         {/* Stat 1 */}
                         <div className="flex justify-center items-center w-full flex-col text-center flex-wrap gap-1 bg-white py-1">
                             <div className="text-[#ff4b4b] flex items-center justify-center mb-0.5">
