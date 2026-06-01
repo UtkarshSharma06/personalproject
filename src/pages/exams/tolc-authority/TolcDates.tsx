@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -23,6 +23,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -81,7 +82,12 @@ export default function TolcDates() {
                     title="TOLC Exam Dates 2026: Booking Calendar & Deadlines"
                     description="Complete guide to TOLC 2026 exam dates, booking deadlines, TOLC@HOME vs TOLC@UNI differences, and CISIA attempt limits."
                     keywords="TOLC exam dates, TOLC 2026 calendar, TOLC booking deadline, TOLC@HOME dates, CISIA attempt limit, book TOLC test"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC Exam Dates 2026', item: '/tolc-exam-dates-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -22,6 +22,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -78,7 +79,12 @@ export default function TolcCutoffTrends() {
                     title="TOLC Exam Cutoff Trends 2026: Politecnico & TOLC-MED Data"
                     description="Analyze historical TOLC cutoff scores for top Italian universities, including Politecnico di Milano (TOLC-I) and national Medicine (TOLC-MED) equalized score thresholds."
                     keywords="TOLC cutoff score, TOLC-I politecnico di milano cutoff, TOLC-MED minimum score, what is a good TOLC score, TOLC ranking graduatoria, TOLC Non-EU cutoff"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC Cutoff Trends', item: '/tolc-cutoff-trends-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

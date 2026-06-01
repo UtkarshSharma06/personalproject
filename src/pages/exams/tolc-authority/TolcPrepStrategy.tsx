@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -22,6 +22,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -78,7 +79,12 @@ export default function TolcPrepStrategy() {
                     title="TOLC Exam Preparation Strategy 2026: 90-Day Study Plan"
                     description="A step-by-step 90-day study plan to crush the TOLC exam. Learn how to manage the strict CBT timers, avoid negative marking, and study for TOLC-I and TOLC-MED."
                     keywords="TOLC preparation, how to pass TOLC, TOLC study plan, TOLC-I study strategy, TOLC-MED preparation 90 days, CISIA CBT training"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC Prep Strategy', item: '/tolc-preparation-strategy-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

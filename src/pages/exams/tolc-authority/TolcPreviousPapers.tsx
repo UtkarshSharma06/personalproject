@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -24,6 +24,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -79,7 +80,12 @@ export default function TolcPreviousPapers() {
                     title="TOLC Past Papers & Practice Questions (PDF Download) 2026"
                     description="Why official TOLC past papers don't exist, CISIA's secrecy policy, and the best alternative resources for mock questions, PDFs, and realistic CBT practice."
                     keywords="TOLC past papers PDF, TOLC-I previous year papers, TOLC-MED practice questions, CISIA mock questions, download TOLC exam, TOLC sample papers"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC Previous Papers', item: '/tolc-previous-year-papers-pdf' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

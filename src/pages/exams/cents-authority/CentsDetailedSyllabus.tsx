@@ -26,6 +26,7 @@ import CmsPageWrapper from '@/components/cms/CmsPageWrapper';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import PageNavigation from '@/components/exams/PageNavigation';
 import { centsLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 
 const sections = [
     { id: 'overview', label: 'Overview' },
@@ -90,6 +91,11 @@ export default function CentsDetailedSyllabus() {
                     title="CENT-S Detailed Syllabus 2026: Section-by-Section Breakdown"
                     description="Complete CENT-S 2026 syllabus guide. Detailed breakdown of Math, Logical Reasoning, Sciences, and Reading Comprehension requirements for Italian STEM degrees."
                     keywords="cent-s syllabus 2026, cent-s math topics, cent-s science requirements, cisia syllabus, study italy engineering syllabus"
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
+                        { name: 'CEnT-S Syllabus 2026', item: '/cent-s-syllabus-2026' }
+                    ])]}
                 />
 
                 <FAQSchema items={faqs} />

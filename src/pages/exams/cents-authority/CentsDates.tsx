@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -24,6 +24,7 @@ import CmsPageWrapper from '@/components/cms/CmsPageWrapper';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import PageNavigation from '@/components/exams/PageNavigation';
 import { centsLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 
 const sections = [
     { id: 'overview', label: 'Overview' },
@@ -88,7 +89,12 @@ export default function CentsDates() {
                     title="CENT-S Exam Dates 2026: Official Calendar & Deadlines"
                     description="When is the CENT-S 2026? Official calendar for Spring and Summer macro-periods, registration windows, and university application deadlines for Italian STEM degrees."
                     keywords="cent-s dates 2026, cent-s calendar, cent-s registration deadline, cisia exam dates, study italy stem deadlines"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
+                        { name: 'CEnT-S Exam Dates 2026', item: '/cent-s-important-dates-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

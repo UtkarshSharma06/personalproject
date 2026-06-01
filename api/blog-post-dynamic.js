@@ -178,8 +178,9 @@ export default async function handler(req, res) {
     }
 
     // 6. Inject SEO meta tags — replace the generic index.html values with post-specific ones
-    // NOTE: Do NOT inject FAQ schema here. The React client (BlogPost.tsx) already handles
-    // FAQ schema correctly via react-helmet. Injecting it here would cause duplicates.
+    // FAQ schema IS also injected into the SSR HTML (see step below) for Bing bot and other
+    // non-JS crawlers. Googlebot (which runs JS) will get it from react-helmet in BlogPost.tsx.
+    // react-helmet replaces the SSR tag on hydration so there is no actual duplicate.
     const seoTitle = post.seo_title || title + ' | ItaloStudy Blog';
     const seoDesc = (post.meta_description || excerpt).replace(/"/g, '&quot;');
     const safeTitle = seoTitle.replace(/"/g, '&quot;');

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ import { usePageContent } from '@/hooks/usePageContent';
 import CmsPageWrapper from '@/components/cms/CmsPageWrapper';
 import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import PageNavigation from '@/components/exams/PageNavigation';
 import faqData from '@/data/italy-faqs-2026.json';
@@ -83,7 +84,12 @@ export default function StudyItalyGuide() {
                         title="Study in Italy for International Students: 2026 Ultimate Guide"
                         description="The definitive guide for international students planning to study in Italy. Learn about admission, scholarships, visa processes, and university requirements."
                         keywords="study in italy for international students, study in Italy 2026, Italian university admission, scholarships in Italy, Italy student visa"
-                    />
+                schemas={[getBreadcrumbSchema([
+                    { name: 'Home', item: '/' },
+                    { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
+                    { name: 'Study in Italy Guide 2026', item: '/study-in-italy-guide-2026' }
+                ])]}
+                />
 
                     <FAQSchema items={faqs} />
 

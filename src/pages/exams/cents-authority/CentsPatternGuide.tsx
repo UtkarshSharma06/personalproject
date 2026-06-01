@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import FAQSchema from '@/components/seo/FAQSchema';
 import CTASection from '@/components/exams/CTASection';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import { Button } from '@/components/ui/button';
 import { usePageContent } from '@/hooks/usePageContent';
 import CmsPageWrapper from '@/components/cms/CmsPageWrapper';
@@ -81,6 +82,11 @@ export default function CentsPatternGuide() {
                     title="CENT-S Exam Pattern 2026 – Scoring, Timing & Section Details"
                     description="Master the CENT-S (CISIA English Test – Science) 2026 exam pattern. Detailed analysis of 55 questions, 110-minute timing, and +1/-0.25 scoring system."
                     keywords="CENT-S exam pattern 2026, CISIA English Test Science, CENT-S marks distribution, CENT-S negative marking, CENT-S timing"
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
+                        { name: 'CEnT-S Exam Pattern 2026', item: '/cent-s-exam-pattern-2026' }
+                    ])]}
                 />
 
                 <FAQSchema items={faqs} />

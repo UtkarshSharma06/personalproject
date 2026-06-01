@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,7 @@ import { usePageContent } from '@/hooks/usePageContent';
 import CmsPageWrapper from '@/components/cms/CmsPageWrapper';
 import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import PageNavigation from '@/components/exams/PageNavigation';
 
@@ -94,7 +95,12 @@ export default function StudyItalyApply() {
                     title="How to Apply & Italy Study Visa Requirements 2026"
                     description="A complete step-by-step guide on how international students can apply to Italian universities in 2026, from document preparation to Italy study visa requirements."
                     keywords="italy study visa requirements 2026, how to apply to Italian university, Italian university application process 2026, Italy student visa"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
+                        { name: 'How to Apply in Italy', item: '/study-in-italy/how-to-apply' }
+                    ])]}
+                    />
                 <FAQSchema items={faqs} />
 
                 <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">

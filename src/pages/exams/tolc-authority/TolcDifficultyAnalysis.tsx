@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -23,6 +23,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -78,7 +79,12 @@ export default function TolcDifficultyAnalysis() {
                     title="TOLC Exam Difficulty Level 2026: Is it Harder than IMAT?"
                     description="A deep dive into the difficulty level of the TOLC exam (TOLC-I, TOLC-MED). Analysis of time pressure, logic trick questions, and the -0.25 negative marking penalty."
                     keywords="TOLC difficulty, is TOLC hard, TOLC vs IMAT difficulty, TOLC-I math difficulty, TOLC negative marking, how hard is TOLC"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC Difficulty Analysis', item: '/tolc-difficulty-analysis-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

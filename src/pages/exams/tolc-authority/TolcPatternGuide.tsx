@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -26,6 +26,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -86,7 +87,12 @@ export default function TolcPatternGuide() {
                     title="TOLC Exam Pattern & Scoring System 2026 Explained"
                     description="A detailed breakdown of the TOLC exam pattern, section timings, negative marking rules, and the CISIA equalized scoring algorithm for TOLC-MED, TOLC-I, and TOLC-F."
                     keywords="TOLC exam pattern, TOLC scoring system, TOLC negative marking, TOLC-MED equalized score, CISIA test structure, TOLC time limit"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC Exam Pattern 2026', item: '/tolc-exam-pattern-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

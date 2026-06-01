@@ -604,12 +604,14 @@ export default function BlogPostPage() {
             }))
     } : undefined;
 
-    // NOTE: faqSchemaObj is intentionally excluded here.
-    // The SSR function (api/blog-post-dynamic.js) already injects the FAQ schema
-    // server-side in the raw HTML response for Google to read. Including it here
-    // too via react-helmet causes a 'Duplicate field FAQPage' error in Google
-    // Search Console because Google executes JS AND reads the raw HTML.
-    const allSchemas = [articleSchema, breadcrumbSchema];
+    // FAQ schema is injected BOTH here (via react-helmet for JS crawlers like Googlebot)
+    // AND in the SSR function (for non-JS crawlers like Bing bot). react-helmet deduplicates
+    // on hydration so there is NO duplicate — the client-side version simply replaces the
+    // server-injected one. Without it here, Google Search Console FAQ enhancements don't show
+    // because Googlebot reads the final JS-rendered DOM, not the raw HTML.
+    const allSchemas = faqSchemaObj
+        ? [articleSchema, breadcrumbSchema, faqSchemaObj]
+        : [articleSchema, breadcrumbSchema];
 
     const renderInlineCtas = (position: 'top' | 'mid' | 'bottom') => {
         return ctas

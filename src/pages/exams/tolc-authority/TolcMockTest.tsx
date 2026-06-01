@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -23,6 +23,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -81,7 +82,12 @@ export default function TolcMockTest() {
                     title="Free TOLC Mock Test 2026: CBT Simulator (TOLC-I, E, MED, F)"
                     description="Take a free, full-length TOLC mock test online. Experience the exact CISIA CBT interface, strict section timers, and negative marking. Get instant AI analytics."
                     keywords="TOLC mock test free, TOLC-I simulator, TOLC-MED practice test, online TOLC CBT, CISIA mock exam, TOLC English test"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC Mock Test 2026', item: '/tolc-mock-test-free-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

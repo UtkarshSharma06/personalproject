@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ChevronRight, Home } from 'lucide-react';
 
 interface BreadcrumbItem {
@@ -31,9 +32,11 @@ export default function Breadcrumbs({ items, className = "" }: BreadcrumbsProps)
 
   return (
     <nav aria-label="Breadcrumb" className={`flex items-center space-x-2 text-xs md:text-sm font-medium ${className}`}>
-      <script type="application/ld+json">
-        {JSON.stringify(breadcrumbSchema)}
-      </script>
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+      </Helmet>
       
       <Link 
         to="/" 

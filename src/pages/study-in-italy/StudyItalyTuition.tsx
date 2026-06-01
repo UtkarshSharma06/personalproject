@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,7 @@ import { usePageContent } from '@/hooks/usePageContent';
 import CmsPageWrapper from '@/components/cms/CmsPageWrapper';
 import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import PageNavigation from '@/components/exams/PageNavigation';
 
@@ -91,7 +92,12 @@ export default function StudyItalyTuition() {
                     title="Study in Italy Cost & Tuition Fees 2026: Public vs Private"
                     description="Detailed breakdown of the cost to study in Italy for international students. Compare public and private university tuition fees and living expenses for 2026."
                     keywords="study in italy cost, Italy university tuition fees 2026, cost of studying in Italy, cheap universities in Italy, DSU Italy"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
+                        { name: 'Italy Tuition Fees 2026', item: '/study-in-italy/tuition-fees-2026' }
+                    ])]}
+                    />
                 <FAQSchema items={faqs} />
 
                 <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">

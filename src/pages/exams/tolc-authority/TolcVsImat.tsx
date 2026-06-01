@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -23,6 +23,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -79,7 +80,12 @@ export default function TolcVsImat() {
                     title="TOLC vs IMAT 2026: Which Exam Should You Take?"
                     description="A detailed comparison between the CISIA TOLC (TOLC-MED, TOLC-I) and the IMAT. Understand differences in syllabus, English vs Italian degrees, and scoring."
                     keywords="TOLC vs IMAT, TOLC-MED vs IMAT, difference between TOLC and IMAT, study medicine in Italy exam, IMAT alternative"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC vs IMAT 2026', item: '/tolc-vs-imat-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

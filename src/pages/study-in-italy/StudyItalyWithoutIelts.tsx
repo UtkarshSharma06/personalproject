@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,7 @@ import { usePageContent } from '@/hooks/usePageContent';
 import CmsPageWrapper from '@/components/cms/CmsPageWrapper';
 import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import PageNavigation from '@/components/exams/PageNavigation';
 
@@ -93,7 +94,12 @@ export default function StudyItalyWithoutIelts() {
                     title="Study in Italy Without IELTS 2026 – Requirements & Visa Guide"
                     description="Can you study in Italy without IELTS? Yes! Discover how to get admission and a study visa in Italy using MOI certificates, Duolingo, or native speaker exemptions in 2026."
                     keywords="study in italy without ielts 2026, italy study visa without ielts, study in italy without ielts, can i study in italy without ielts, study in italy for international students without ielts, italian universities without ielts, study in italy requirements 2026"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
+                        { name: 'Study in Italy Without IELTS', item: '/study-in-italy/without-ielts' }
+                    ])]}
+                    />
                 <FAQSchema items={faqs} />
 
                 <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">

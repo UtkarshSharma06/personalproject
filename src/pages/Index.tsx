@@ -217,6 +217,9 @@ export default function Index() {
             </Suspense>
 
 
+            {/* H1 — required for SEO; visually hidden since hero uses banner images */}
+            <h1 className="sr-only">ItaloStudy — Free Prep for CEnT-S, IMAT, SAT &amp; IELTS</h1>
+
             <PWNavbar />
 
             {/* Wrapped in lavender background to guarantee seamless blending between slider and trusted section */}

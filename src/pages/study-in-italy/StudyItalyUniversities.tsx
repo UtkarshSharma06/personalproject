@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,7 @@ import { usePageContent } from '@/hooks/usePageContent';
 import CmsPageWrapper from '@/components/cms/CmsPageWrapper';
 import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import PageNavigation from '@/components/exams/PageNavigation';
 
@@ -96,7 +97,12 @@ export default function StudyItalyUniversities() {
                     title="Study in Italy in English: Top Universities for International Students"
                     description="Discover the top Italian universities offering programs in English. Explore rankings, English-taught programs, and admission insights for international students."
                     keywords="study in italy in english, best universities in Italy for international students, English universities in Italy, public universities Italy rankings"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
+                        { name: 'Universities in Italy 2026', item: '/study-in-italy/universities-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

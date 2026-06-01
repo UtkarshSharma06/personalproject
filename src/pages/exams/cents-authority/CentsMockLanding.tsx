@@ -28,6 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import SEOHead from '@/components/seo/SEOHead';
 import { centsLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import { Link } from 'react-router-dom';
 
 export default function CentsMockLanding() {
@@ -132,100 +133,28 @@ export default function CentsMockLanding() {
 
     return (
         <Layout variant="public">
-            <SEOHead 
+            <SEOHead
                 title="CEnT-S Mock Test 2026 – Free Official Simulation & Ranking"
                 description="Take the free CEnT-S mock test 2026. Realistic 110-minute simulation with 55 questions, +1/-0.25 scoring, and national ranking. Practice for CISIA English Test Science."
                 keywords="cent-s mock test, cent s mock test, cents mock test, cents mock exam, cent-s practice test, cent s practice test, cent-s test simulation, cent-s simulator, cent-s preparation, italostudy"
+                faqs={[
+                    { question: 'What exactly is the CENT-S exam?', answer: 'CENT-S (CISIA English Test Science) is the primary entrance examination used by top-tier Italian universities for admission to English-taught STEM Bachelor\'s degrees. It evaluates a student\'s proficiency in core scientific disciplines including Mathematics, Physics, Chemistry, and Biology, alongside Logic and Verbal Comprehension.' },
+                    { question: 'What is the structure and question count of the CENT-S?', answer: 'The exam is composed of 55 multiple-choice questions. These are strategically divided into sections: Mathematics (20 questions), Logic (10 questions), Physics (10 questions), Chemistry (10 questions), and Biology (5 questions), with an integrated Verbal Comprehension component.' },
+                    { question: 'How long is the CENT-S exam and how is time managed?', answer: 'The total duration is 110 minutes. Crucially, the exam is section-timed, meaning you have a specific time quota for each subject. Once a section\'s time expires, you cannot return to it. Our simulations perfectly replicate this section-clock logic.' },
+                    { question: 'What is the scoring and penalty system for CENT-S?', answer: 'Scoring follows the official CISIA standard: +1 point for every correct answer, 0 points for questions left blank, and a negative penalty of -0.25 points for every incorrect answer. This makes strategic guessing a vital skill for success.' },
+                    { question: 'Are calculators or periodic tables allowed during the test?', answer: 'No, the official CENT-S is a no-resource exam. You are not permitted to use calculators, periodic tables, or external notes. Our mock platform highlights this by disabling such tools and providing a digital scratchpad instead.' },
+                    { question: 'Which universities in Italy require the CENT-S exam?', answer: 'Major institutions like the University of Milan, University of Rome Tor Vergata, University of Padua, and many others use the CENT-S for their English-language Engineering and Science programs. Always check the specific Bando of your target university.' },
+                    { question: 'How realistic are the Italostudy CENT-S mock tests?', answer: 'Our simulations are built using years of exam data to mirror the exact question-style, difficulty parameters, and digital interface of the actual CISIA platform. Students often report that our mocks are the closest experience to the real test day.' },
+                    { question: 'How can I access my CENT-S mock results and analysis?', answer: 'Immediately upon submission, you receive a comprehensive Performance Report. This includes your raw score, scaled score, section-wise accuracy, and a predicted national ranking based on our community data.' },
+                    { question: 'What is the best way to prepare for the CENT-S Science sections?', answer: 'Consistent practice with full-length simulations is key. We recommend taking at least 5-10 mock tests to adapt to the 110-minute pressure and identifying your weakest sections (e.g., Physics or Logic) for targeted review.' },
+                    { question: 'Is the CENT-S exam held online or in-person?', answer: 'The CENT-S is primarily delivered as a TOLC@HOME online proctored exam or TOLC@UNI at university computer labs. Our platform is optimized to prepare you for either format by mimicking the computer-based testing environment.' }
+                ]}
+                schemas={[getBreadcrumbSchema([
+                    { name: 'Home', item: '/' },
+                    { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
+                    { name: 'CEnT-S Mock Test 2026', item: '/cent-s-mock-landing' }
+                ])]}
             />
-
-            <script type="application/ld+json">
-                {JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "FAQPage",
-                    "mainEntity": [
-                        {
-                            "@type": "Question",
-                            "name": "What exactly is the CENT-S exam?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "CENT-S (CISIA English Test Science) is the primary entrance examination used by top-tier Italian universities for admission to English-taught STEM Bachelor's degrees. It evaluates a student's proficiency in core scientific disciplines including Mathematics, Physics, Chemistry, and Biology, alongside Logic and Verbal Comprehension."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "What is the structure and question count of the CENT-S?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "The exam is composed of 55 multiple-choice questions. These are strategically divided into sections: Mathematics (20 questions), Logic (10 questions), Physics (10 questions), Chemistry (10 questions), and Biology (5 questions), with an integrated Verbal Comprehension component."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "How long is the CENT-S exam and how is time managed?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "The total duration is 110 minutes. Crucially, the exam is section-timed, meaning you have a specific time quota for each subject. Once a section's time expires, you cannot return to it. Our simulations perfectly replicate this section-clock logic."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "What is the scoring and penalty system for CENT-S?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "Scoring follows the official CISIA standard: +1 point for every correct answer, 0 points for questions left blank, and a negative penalty of -0.25 points for every incorrect answer. This makes strategic guessing a vital skill for success."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "Are calculators or periodic tables allowed during the test?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "No, the official CENT-S is a 'no-resource' exam. You are not permitted to use calculators, periodic tables, or external notes. Our mock platform highlights this by disabling such tools and providing a digital scratchpad instead."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "Which universities in Italy require the CENT-S exam?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "Major institutions like the University of Milan, University of Rome Tor Vergata, University of Padua, and many others use the CENT-S for their English-language Engineering and Science programs. Always check the specific call for applications (Bando) of your target university."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "How realistic are the Italostudy CENT-S mock tests?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "Our simulations are built using years of exam data to mirror the exact question-style, difficulty parameters, and digital interface of the actual CISIA platform. Students often report that our mocks are the closest experience to the real test day."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "How can I access my CENT-S mock results and analysis?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "Immediately upon submission, you receive a comprehensive Performance Report. This includes your raw score, scaled score, section-wise accuracy, and a predicted national ranking based on our community data."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "What is the best way to prepare for the CENT-S Science sections?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "Consistent practice with full-length simulations is key. We recommend taking at least 5-10 mock tests to adapt to the 110-minute pressure and identifying your weakest sections (e.g., Physics or Logic) for targeted review."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "is the CENT-S exam held online or in-person?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "The CENT-S is primarily delivered as a 'TOLC@HOME' online proctored exam or 'TOLC@UNI' at university computer labs. Our platform is optimized to prepare you for either format by mimicking the computer-based testing environment."
-                            }
-                        }
-                    ]
-                })}
-            </script>
 
             
             <div className="bg-white min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900">

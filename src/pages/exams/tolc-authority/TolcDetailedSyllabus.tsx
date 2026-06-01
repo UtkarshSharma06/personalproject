@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -31,6 +31,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -91,7 +92,12 @@ export default function TolcDetailedSyllabus() {
                     title="TOLC Detailed Syllabus 2026: Complete Section-by-Section Guide"
                     description="The most comprehensive and detailed TOLC 2026 syllabus guide. Complete breakdown of TOLC-I, TOLC-E, TOLC-F, TOLC-MED, and TOLC-SU requirements for Italian university admissions."
                     keywords="TOLC syllabus 2026, TOLC-I syllabus, TOLC-E topics, TOLC-MED biology, TOLC-F chemistry, TOLC logical reasoning, CISIA test topics"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'TOLC Syllabus 2026', item: '/tolc-syllabus-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

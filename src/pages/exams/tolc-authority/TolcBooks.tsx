@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -25,6 +25,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { tolcLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -84,7 +85,12 @@ export default function TolcBooks() {
                     title="Best Books for TOLC 2026: Official Preparation Guide"
                     description="The ultimate guide to the best preparation books for TOLC-I, TOLC-E, TOLC-F, and TOLC-MED. Comprehensive reviews of Alpha Test, EdiTEST, and Hoepli manuals."
                     keywords="TOLC preparation books, best books for TOLC, Alpha Test TOLC, EdiTEST TOLC-MED, Hoepli TOLC-I, study materials for TOLC"
-                />
+                    schemas={[getBreadcrumbSchema([
+                        { name: 'Home', item: '/' },
+                        { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
+                        { name: 'Best TOLC Books', item: '/tolc-best-books-2026' }
+                    ])]}
+                    />
 
                 <FAQSchema items={faqs} />
 

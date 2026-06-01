@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,7 @@ import FAQSchema from '@/components/seo/FAQSchema';
 import { useLiveEdit } from '@/contexts/LiveEditContext';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { imatLinks } from '@/lib/nav-links';
+import { getBreadcrumbSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
