@@ -19,13 +19,4 @@ createRoot(document.getElementById("root")!).render(
     </HelmetProvider>
 );
 
-// Remove the inline pre-JS skeleton after React's first paint.
-// Double-rAF ensures the skeleton is removed AFTER React has committed
-// its first frame to the screen — seamless handoff, no white flash.
-const removePreSkeleton = () => {
-    const sk = document.getElementById('app-sk');
-    if (!sk) return;
-    sk.classList.add('sk-out');
-    setTimeout(() => sk.remove(), 200);
-};
-requestAnimationFrame(() => requestAnimationFrame(removePreSkeleton));
+

@@ -446,6 +446,10 @@ export default function BlogPostPage() {
 
     useEffect(() => {
         fetchPost();
+
+        // Clean up the server-injected FAQ schema to prevent duplicates with react-helmet
+        const ssrFaq = document.getElementById('ssr-faq-schema');
+        if (ssrFaq) ssrFaq.remove();
     }, [slug]);
 
     const fetchPost = async () => {

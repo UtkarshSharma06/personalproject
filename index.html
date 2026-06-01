@@ -196,7 +196,6 @@
     }
     /* Hide skeleton once React mounts */
     #sk-shell { display: block; }
-    #root:not(:empty) + * { display: none !important; }
   </style>
 
   <!-- SEO Schema for Brand Recognition -->
@@ -238,20 +237,7 @@
     </div>
   </div>
 
-  <script>
-    // Hide skeleton immediately when React fills #root
-    var root = document.getElementById('root');
-    var shell = document.getElementById('sk-shell');
-    if (root && shell) {
-      var obs = new MutationObserver(function() {
-        if (root.children.length > 0) {
-          shell.style.display = 'none';
-          obs.disconnect();
-        }
-      });
-      obs.observe(root, { childList: true });
-    }
-  </script>
+
 
   <!-- Google Analytics — deferred so it never blocks render -->
   <script>

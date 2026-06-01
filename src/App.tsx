@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { SpeedInsights as VercelSpeedInsights } from "@vercel/speed-insights/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth";
 import { lazy, Suspense, useEffect } from "react";
 import { LiveEditProvider } from "@/contexts/LiveEditContext";
@@ -229,12 +229,25 @@ const AppProviders = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+const RouterListener = () => {
+  const location = useLocation();
+  useEffect(() => {
+    // Hide the HTML skeleton exactly when the lazy-loaded route has finished suspending and mounted.
+    const sk = document.getElementById('sk-shell');
+    if (sk) {
+      sk.style.display = 'none';
+    }
+  }, [location.pathname]);
+  return null;
+};
+
 const AuthBridge = () => {
   return (
     <BrowserRouter>
       <ToasterProvider />
       <Suspense fallback={<PageLoader />}>
         <PublicRouter />
+        <RouterListener />
       </Suspense>
       <VercelAnalytics />
       <VercelSpeedInsights />

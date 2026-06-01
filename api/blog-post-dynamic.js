@@ -174,13 +174,10 @@ export default async function handler(req, res) {
             acceptedAnswer: { '@type': 'Answer', text: faq.answer }
           }))
       };
-      faqSchemaTag = '<script type="application/ld+json">' + JSON.stringify(faqSchema) + '</script>';
+      faqSchemaTag = '<script id="ssr-faq-schema" type="application/ld+json">' + JSON.stringify(faqSchema) + '</script>';
     }
 
     // 6. Inject SEO meta tags — replace the generic index.html values with post-specific ones
-    // FAQ schema IS also injected into the SSR HTML (see step below) for Bing bot and other
-    // non-JS crawlers. Googlebot (which runs JS) will get it from react-helmet in BlogPost.tsx.
-    // react-helmet replaces the SSR tag on hydration so there is no actual duplicate.
     const seoTitle = post.seo_title || title + ' | ItaloStudy Blog';
     const seoDesc = (post.meta_description || excerpt).replace(/"/g, '&quot;');
     const safeTitle = seoTitle.replace(/"/g, '&quot;');
