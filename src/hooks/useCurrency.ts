@@ -20,11 +20,7 @@ const COUNTRY_TO_CURRENCY: Record<string, string> = {
 
 export const SUPPORTED_CURRENCIES = [
     { code: 'EUR', symbol: '€', name: 'Euro' },
-    { code: 'USD', symbol: '$', name: 'US Dollar' },
-    { code: 'GBP', symbol: '£', name: 'British Pound' },
-    { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-    { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' },
-    { code: 'TRY', symbol: '₺', name: 'Turkish Lira' }
+    { code: 'INR', symbol: '₹', name: 'Indian Rupee' }
 ];
 
 export function useCurrency() {
@@ -85,24 +81,13 @@ export function useCurrency() {
 
                 if (data && (data.status === 'success' || data.success !== false || data.status !== 'fail')) {
                     const countryCode = data.countryCode || data.country_code || data.country;
-                    const apiCurrencyCode = data.currency || data.currency_code;
-
-                    let currencyInfo: CurrencyInfo;
-
-                    if (apiCurrencyCode && apiCurrencyCode.length === 3) {
-                        currencyInfo = {
-                            code: apiCurrencyCode,
-                            symbol: data.currency_symbol || data.symbol || '',
-                            country: countryCode || 'XX'
-                        };
-                    } else {
-                        const code = COUNTRY_TO_CURRENCY[countryCode] || 'EUR';
-                        currencyInfo = {
-                            code,
-                            symbol: '',
-                            country: countryCode || 'XX'
-                        };
-                    }
+                    
+                    const isIndia = countryCode === 'IN';
+                    const currencyInfo: CurrencyInfo = {
+                        code: isIndia ? 'INR' : 'EUR',
+                        symbol: isIndia ? '₹' : '€',
+                        country: countryCode || 'XX'
+                    };
 
                     // Cache the result
                     localStorage.setItem('userCurrency', JSON.stringify({
@@ -116,16 +101,13 @@ export function useCurrency() {
                     // Final Guess: Navigator Language
                     const language = navigator.language;
                     const region = language.split('-')[1];
-                    if (region && COUNTRY_TO_CURRENCY[region]) {
-                        const guessedInfo = {
-                            code: COUNTRY_TO_CURRENCY[region],
-                            symbol: '',
-                            country: region
-                        };
-                        setCurrency(guessedInfo);
-                    } else {
-                        setCurrency(DEFAULT_CURRENCY);
-                    }
+                    const isIndia = region === 'IN';
+                    const guessedInfo = {
+                        code: isIndia ? 'INR' : 'EUR',
+                        symbol: isIndia ? '₹' : '€',
+                        country: region || 'XX'
+                    };
+                    setCurrency(guessedInfo);
                 }
             } catch (error) {
                 console.error('Currency detection totally failed:', error);

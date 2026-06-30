@@ -17,7 +17,7 @@ import {
     Users,
     Home
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { useNavigate } from 'react-router-dom';
 import CTASection from '@/components/exams/CTASection';
 import { usePageContent } from '@/hooks/usePageContent';

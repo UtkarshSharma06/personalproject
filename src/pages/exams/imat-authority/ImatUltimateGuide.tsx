@@ -94,9 +94,9 @@ export default function ImatUltimateGuide() {
             >
                 <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
                     <SEOHead
-                        title="ItaloStudy: The Ultimate IMAT 2026 Guide & Medical School Portal"
-                        description="Welcome to Italostudy. Your definitive guide to the 2026 IMAT exam. Learn about Italian medical school admission, Non-EU quotas, financial aid, and application prep."
-                        keywords="italostudy, italo study, italostudy.com, IMAT guide 2026, study medicine in Italy, IMAT requirements, Italy medical school English"
+                        title="IMAT 2026 – Complete Guide: Registration, Syllabus, Dates & Cutoff | ItalStudy"
+                        description="The complete IMAT 2026 guide. Exam dates, Universitaly registration process, official syllabus breakdown, cutoff scores for all Italian universities, and preparation strategy for EU & Non-EU students."
+                        keywords="imat 2026, imat exam 2026, imat exam, what is imat, imat 2026 registration, imat 2026 exam date, imat preparation, imat eligibility, imat non eu seats, study medicine italy english, imat guide 2026, italostudy imat"
                         faqs={faqs}
                         schemas={[
                             getCourseSchema('imat'),

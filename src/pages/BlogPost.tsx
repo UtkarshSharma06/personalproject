@@ -29,7 +29,9 @@ import {
     X,
     Send,
     Youtube,
-    DownloadCloud
+    DownloadCloud,
+    ShoppingBag,
+    ChevronRight
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -423,12 +425,88 @@ function splitContentAtMidpoint(html: string): [string, string] {
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
+const StoreAdsMobile = ({ adProducts }: { adProducts: any[] }) => {
+    if (!adProducts || adProducts.length === 0) return null;
+    return (
+        <div className="mt-12 lg:hidden w-full px-4">
+            <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-indigo-500" /> Featured Products
+            </h3>
+            <div className="flex overflow-x-auto gap-4 pb-6 snap-x no-scrollbar">
+                {adProducts.map(p => (
+                    <a 
+                        key={p.id}
+                        href={`https://store.italostudy.com/${p.slug}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="min-w-[200px] w-[200px] snap-center bg-white border-2 border-slate-100 rounded-3xl p-4 shadow-sm hover:border-indigo-500 hover:shadow-xl transition-all block group"
+                    >
+                        <div className="aspect-square rounded-2xl bg-slate-50 mb-4 overflow-hidden relative">
+                            {p.images?.[0] && <img src={p.images[0]} alt={p.title} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500" />}
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-sm line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">{p.title}</h4>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-base font-black text-indigo-600">€{p.discount_price || p.price}</span>
+                            {p.discount_price && <span className="text-sm font-bold text-slate-400 line-through">€{p.price}</span>}
+                        </div>
+                    </a>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const StoreAdsDesktop = ({ adProducts }: { adProducts: any[] }) => {
+    if (!adProducts || adProducts.length === 0) return null;
+    return (
+        <aside className="hidden lg:block w-[260px] shrink-0 sticky top-[120px] max-h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden no-scrollbar space-y-6">
+            <div className="bg-indigo-50/50 rounded-3xl p-6 border-2 border-indigo-100/50">
+                <h3 className="text-sm font-black text-indigo-900 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-indigo-500" /> Featured
+                </h3>
+                <div className="space-y-4">
+                    {adProducts.map(p => (
+                        <a 
+                            key={p.id}
+                            href={`https://store.italostudy.com/${p.slug}`}
+                            target="_blank" rel="noopener noreferrer"
+                            className="block bg-white rounded-2xl p-3 border-2 border-transparent hover:border-indigo-500 shadow-sm hover:shadow-lg transition-all group"
+                        >
+                            <div className="aspect-[4/3] rounded-xl bg-slate-50 mb-3 overflow-hidden">
+                                {p.images?.[0] && <img src={p.images[0]} alt={p.title} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500" />}
+                            </div>
+                            <h4 className="font-bold text-slate-900 text-sm line-clamp-2 mb-1 group-hover:text-indigo-600">{p.title}</h4>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-base font-black text-indigo-600">€{p.discount_price || p.price}</span>
+                                {p.discount_price && <span className="text-xs font-bold text-slate-400 line-through">€{p.price}</span>}
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            </div>
+        </aside>
+    );
+};
+
 export default function BlogPostPage() {
     const { slug } = useParams();
     const navigate = useNavigate();
     const { toast } = useToast();
     const [post, setPost] = useState<BlogPost | null>(null);
+    const [adProducts, setAdProducts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [scrollProgress, setScrollProgress] = useState(0);
+
+    // Track scroll for progress bar
+    useEffect(() => {
+        const handleScroll = () => {
+            const totalScroll = document.documentElement.scrollTop;
+            const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scroll = windowHeight > 0 ? (totalScroll / windowHeight) : 0;
+            setScrollProgress(scroll);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const contentRef = (node: HTMLDivElement | null) => {
         if (node && post) {
@@ -467,6 +545,14 @@ export default function BlogPostPage() {
 
         setPost(data as any);
         setIsLoading(false);
+
+        if (data.cta_config && typeof data.cta_config === 'object' && 'ad_product_ids' in data.cta_config && Array.isArray(data.cta_config.ad_product_ids) && data.cta_config.ad_product_ids.length > 0) {
+            const { data: products } = await supabase
+                .from('store_products')
+                .select('id, title, price, discount_price, images, slug')
+                .in('id', data.cta_config.ad_product_ids as string[]);
+            if (products) setAdProducts(products);
+        }
 
         // Increment view count safely
         await (supabase as any).rpc('increment_blog_view', { post_id: data.id });
@@ -613,9 +699,23 @@ export default function BlogPostPage() {
     // on hydration so there is NO duplicate — the client-side version simply replaces the
     // server-injected one. Without it here, Google Search Console FAQ enhancements don't show
     // because Googlebot reads the final JS-rendered DOM, not the raw HTML.
+    const productSchemas = adProducts.map(p => ({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": p.title,
+        "image": p.images?.[0] || 'https://italostudy.com/logo.webp',
+        "offers": {
+            "@type": "Offer",
+            "url": `https://store.italostudy.com/${p.slug}`,
+            "priceCurrency": "EUR",
+            "price": p.discount_price || p.price,
+            "availability": "https://schema.org/InStock"
+        }
+    }));
+
     const allSchemas = faqSchemaObj
-        ? [articleSchema, breadcrumbSchema, faqSchemaObj]
-        : [articleSchema, breadcrumbSchema];
+        ? [articleSchema, breadcrumbSchema, faqSchemaObj, ...productSchemas]
+        : [articleSchema, breadcrumbSchema, ...productSchemas];
 
     const renderInlineCtas = (position: 'top' | 'mid' | 'bottom') => {
         return ctas
@@ -709,13 +809,17 @@ export default function BlogPostPage() {
                 url={postUrl}
                 canonicalUrl={postUrl}
             />
-            <div className={`w-full bg-[#FAFAFA] pt-[80px] ${isCustomHtml ? 'pb-0' : 'pb-32'}`}>
+            <div className={`w-full bg-[#f4f3ff] pt-[80px] ${isCustomHtml ? 'pb-0' : 'pb-32'}`}>
+
                 <PWNavbar />
 
                 {/* Sticky & Side Widget CTAs */}
                 {renderOverlayCtas()}
 
-                {isCustomHtml ? (
+                <div className="container mx-auto px-4 max-w-[1400px]">
+                    <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
+                        <div className="flex-1 w-full max-w-4xl min-w-0">
+                            {isCustomHtml ? (
                     <div className="w-full relative" id="custom-html-wrapper">
                         <div 
                             ref={contentRef}
@@ -726,183 +830,193 @@ export default function BlogPostPage() {
                 ) : (
                 <>
                     {/* Back Button */}
-                    <div className="container mx-auto px-4 py-8 lg:py-12">
+                    <div className="container mx-auto px-4 py-8 max-w-4xl">
                         <Link
                             to="/blog"
-                            className="group inline-flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-widest hover:text-slate-900 transition-colors"
+                            className="group inline-flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-widest hover:text-indigo-800 transition-colors bg-white/50 px-4 py-2 rounded-full border border-indigo-100"
                         >
-                            <motion.div
-                                whileHover={{ scale: 1.1, x: -5 }}
-                                className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all"
-                            >
-                                <ChevronLeft className="w-4 h-4" />
-                            </motion.div>
+                            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                             Back to Blog
                         </Link>
                     </div>
 
                     <article className="container mx-auto px-4">
                         <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="max-w-3xl mx-auto bg-white border-2 border-slate-100 rounded-[3rem] p-8 lg:p-16 shadow-xl shadow-slate-200/20"
-                    >
-                        {/* Article Meta */}
-                        <div className="flex items-center gap-3 mb-8">
-                            <span className="bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-yellow-200">
-                                ✨ Pro Tip
-                            </span>
-                            <div className="h-4 w-[1px] bg-slate-100 mx-2" />
-                            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                <Calendar className="w-3.5 h-3.5" />
-                                {format(new Date(publishedDate), 'MMMM dd, yyyy')}
-                            </div>
-                        </div>
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="max-w-4xl mx-auto bg-white border-[6px] border-white rounded-[3rem] p-6 md:p-12 lg:p-16 shadow-2xl shadow-indigo-900/5 relative overflow-hidden"
+                        >
+                            {/* Decorative Blobs */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2" />
+                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-pink-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2" />
 
-                        <h1 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight mb-8">
-                            {post.title}
-                        </h1>
-
-                        <div className="flex flex-wrap items-center gap-6 pb-12 mb-12 border-b-2 border-dashed border-slate-50">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 font-bold border-2 border-indigo-100">
-                                    <User className="w-5 h-5" />
+                            <div className="relative z-10">
+                                {/* Article Meta */}
+                                <div className="flex flex-wrap items-center gap-3 mb-8">
+                                    <span className="bg-yellow-400 text-slate-900 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-sm">
+                                        ✨ Pro Tip
+                                    </span>
+                                    <span className="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border border-indigo-100">
+                                        Editorial
+                                    </span>
                                 </div>
-                                <span className="text-sm font-black text-slate-900 uppercase tracking-widest">ITALOSTUDY TEAM</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm font-bold text-slate-400">
-                                <Clock className="w-4 h-4" />
-                                {readTime} min read
-                            </div>
-                        </div>
 
-                        {/* Top CTA */}
-                        {renderInlineCtas('top')}
+                                {/* Layout heading removed to prefer the heading inside the content */}
 
-                        {/* Featured Image */}
-                        {post.featured_image && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.2 }}
-                                className="aspect-[16/10] rounded-[2.5rem] overflow-hidden mb-16 shadow-lg border-4 border-slate-50"
-                            >
-                                <img
-                                    src={getProxiedUrl(post.featured_image)}
-                                    alt={post.title}
-                                    className="w-full h-full object-cover"
-                                />
-                            </motion.div>
-                        )}
-
-                        {/* Content — first half */}
-                        <div
-                            ref={contentRef}
-                            className="prose prose-slate max-w-none [&_.katex]:text-lg [&_.katex]:font-serif prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-600 prose-a:text-indigo-600 prose-img:rounded-[2.5rem] prose-img:shadow-xl"
-                            style={{ fontSize: '16px', lineHeight: '1.6', color: '#000' }}
-                            dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(
-                                    hasMidCta ? contentFirst : rawContent,
-                                    { ADD_ATTR: ['style', 'class', 'target'], ADD_TAGS: ['iframe'] }
-                                )
-                            }}
-                        />
-
-                        {/* Mid-article CTA */}
-                        {renderInlineCtas('mid')}
-
-                        {/* Content — second half */}
-                        {hasMidCta && contentSecond && (
-                            <div
-                                className="prose prose-slate max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-600 prose-a:text-indigo-600 prose-img:rounded-[2.5rem] prose-img:shadow-xl"
-                                style={{ fontSize: '16px', lineHeight: '1.6', color: '#000' }}
-                                dangerouslySetInnerHTML={{
-                                    __html: DOMPurify.sanitize(contentSecond, { ADD_ATTR: ['style', 'class', 'target'], ADD_TAGS: ['iframe'] })
-                                }}
-                            />
-                        )}
-
-                        {/* Bottom CTA */}
-                        {renderInlineCtas('bottom')}
-
-                        {/* FAQ Section */}
-                        {post.faq_schema && post.faq_schema.length > 0 && (
-                            <div className="mt-20 space-y-6">
-                                <div className="text-center mb-12">
-                                    <h2 className="text-4xl font-black text-slate-900 mb-3">Frequently Asked Questions</h2>
-                                    <p className="text-slate-600 font-bold">Everything you need to know about this topic</p>
+                                <div className="flex flex-wrap items-center gap-6 pb-10 mb-10 border-b-2 border-dashed border-slate-100">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-[1.25rem] bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+                                            <User className="w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Written By</div>
+                                            <div className="text-sm font-black text-slate-900">ITALOSTUDY TEAM</div>
+                                        </div>
+                                    </div>
+                                    <div className="w-2 h-2 rounded-full bg-slate-200 hidden sm:block" />
+                                    <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
+                                        <Calendar className="w-5 h-5 text-indigo-400" />
+                                        {format(new Date(publishedDate), 'MMMM dd, yyyy')}
+                                    </div>
+                                    <div className="w-2 h-2 rounded-full bg-slate-200 hidden sm:block" />
+                                    <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
+                                        <Clock className="w-5 h-5 text-indigo-400" />
+                                        {readTime} min read
+                                    </div>
                                 </div>
-                                <div className="space-y-4">
-                                    {post.faq_schema.map((faq, index) => (
-                                        <details
-                                            key={faq.id || index}
-                                            className="group bg-white border-2 border-slate-100 rounded-[2rem] overflow-hidden hover:border-indigo-200 transition-all"
-                                        >
-                                            <summary className="cursor-pointer p-6 font-black text-lg text-slate-900 flex items-center justify-between list-none">
-                                                <span className="flex-1 pr-4">{faq.question}</span>
-                                                <svg
-                                                    className="w-6 h-6 text-indigo-600 transition-transform group-open:rotate-180"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                >
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </summary>
-                                            <div className="px-6 pb-6 text-slate-600 font-medium leading-relaxed border-t border-slate-100 pt-4">
-                                                {faq.answer}
-                                            </div>
-                                        </details>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
 
-                        {/* Share Box */}
-                        <div className="mt-20 p-12 rounded-[3.5rem] bg-[#EEF2FF] border-2 border-indigo-100 flex flex-col items-center text-center">
-                            <div className="mb-10">
-                                <h4 className="text-3xl font-black text-indigo-950 mb-3 flex items-center justify-center gap-3">
-                                    Did you find this helpful? 🎒
-                                </h4>
-                                <p className="text-indigo-600 font-bold text-lg">Share the magic with your study buddies!</p>
-                            </div>
-                            <div className="flex flex-wrap items-center justify-center gap-4">
-                                {[
-                                    { name: 'WhatsApp', icon: MessageCircle, color: 'text-[#25D366]', url: `https://api.whatsapp.com/send?text=Check out this amazing study tip on Italostudy! ${window.location.href}` },
-                                    { name: 'Instagram', icon: Instagram, color: 'text-[#E4405F]', action: 'copy' },
-                                    { name: 'Facebook', icon: Facebook, color: 'text-[#1877F2]', url: `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}` },
-                                    { name: 'Twitter', icon: Twitter, color: 'text-[#1DA1F2]', url: `https://twitter.com/intent/tweet?url=${window.location.href}&text=Check out this awesome study tip on Italostudy!` },
-                                    { name: 'Reddit', icon: MessageSquare, color: 'text-[#FF4500]', url: `https://www.reddit.com/submit?url=${window.location.href}&title=${post.title}` },
-                                    { name: 'Quora', icon: HelpCircle, color: 'text-[#B92B27]', url: `https://www.quora.com/share?url=${window.location.href}` },
-                                    { name: 'Copy Link', icon: LinkIcon, color: 'text-slate-900', action: 'copy' },
-                                ].map((platform) => (
-                                    <motion.button
-                                        key={platform.name}
-                                        whileHover={{ scale: 1.15, y: -8 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        onClick={() => {
-                                            if (platform.action === 'copy') {
-                                                navigator.clipboard.writeText(window.location.href);
-                                                toast({
-                                                    title: "Link Copied! ✨",
-                                                    description: platform.name === 'Instagram' ? "Paste it in your bio or DM it to friends!" : "Share it anywhere!",
-                                                });
-                                            } else if (platform.url) {
-                                                window.open(platform.url, '_blank');
-                                            }
-                                        }}
-                                        className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg shadow-indigo-100/50 hover:shadow-2xl transition-all duration-300 group"
-                                        title={`Share on ${platform.name}`}
+                                {/* Top CTA */}
+                                {renderInlineCtas('top')}
+
+                                {/* Featured Image */}
+                                {post.featured_image && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: 0.2 }}
+                                        className="w-full flex justify-center mb-16"
                                     >
-                                        <platform.icon className={`w-7 h-7 ${platform.color} transition-transform group-hover:scale-110`} />
-                                    </motion.button>
-                                ))}
+                                        <img
+                                            src={getProxiedUrl(post.featured_image)}
+                                            alt={post.title}
+                                            className="w-full max-w-3xl h-auto max-h-[450px] object-contain rounded-[2rem] shadow-xl"
+                                        />
+                                    </motion.div>
+                                )}
+
+                                {/* Content — first half */}
+                                <div
+                                    ref={contentRef}
+                                    className="prose prose-lg prose-indigo max-w-none font-['Outfit'] prose-headings:font-black prose-headings:tracking-tight prose-headings:text-slate-900 prose-p:text-slate-900 prose-p:leading-relaxed prose-li:text-slate-900 prose-a:font-bold prose-a:text-indigo-600 prose-img:rounded-[2rem] prose-img:shadow-xl prose-img:border-4 prose-img:border-slate-50 w-full"
+                                    dangerouslySetInnerHTML={{
+                                        __html: DOMPurify.sanitize(
+                                            hasMidCta ? contentFirst : rawContent,
+                                            { ADD_ATTR: ['style', 'class', 'target'], ADD_TAGS: ['iframe'] }
+                                        )
+                                    }}
+                                />
+
+                                {/* Mid-article CTA */}
+                                {renderInlineCtas('mid')}
+
+                                {/* Content — second half */}
+                                {hasMidCta && contentSecond && (
+                                    <div
+                                        className="prose prose-lg prose-indigo max-w-none font-['Outfit'] prose-headings:font-black prose-headings:tracking-tight prose-headings:text-slate-900 prose-p:text-slate-900 prose-p:leading-relaxed prose-li:text-slate-900 prose-a:font-bold prose-a:text-indigo-600 prose-img:rounded-[2rem] prose-img:shadow-xl prose-img:border-4 prose-img:border-slate-50 w-full mt-8"
+                                        dangerouslySetInnerHTML={{
+                                            __html: DOMPurify.sanitize(contentSecond, { ADD_ATTR: ['style', 'class', 'target'], ADD_TAGS: ['iframe'] })
+                                        }}
+                                    />
+                                )}
+
+                                {/* Bottom CTA */}
+                                {renderInlineCtas('bottom')}
+                                
+                                {/* Share Box (Bubbly EdTech Style) */}
+                                <div className="mt-16 p-8 md:p-12 rounded-[2.5rem] bg-indigo-50 border-2 border-indigo-100 flex flex-col items-center text-center relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/40 rounded-full blur-2xl -mr-16 -mt-16" />
+                                    <div className="mb-8 relative z-10">
+                                        <h4 className="text-2xl md:text-3xl font-black text-indigo-950 mb-2">
+                                            Found this helpful? 🎒
+                                        </h4>
+                                        <p className="text-indigo-600 font-bold">Share the magic with your study buddies!</p>
+                                    </div>
+                                    <div className="flex flex-wrap items-center justify-center gap-3 relative z-10">
+                                        {[
+                                            { name: 'WhatsApp', icon: MessageCircle, color: 'text-[#25D366]', bg: 'bg-[#25D366]/10', hover: 'hover:bg-[#25D366]', url: `https://api.whatsapp.com/send?text=Check out this amazing study tip on Italostudy! ${window.location.href}` },
+                                            { name: 'Instagram', icon: Instagram, color: 'text-[#E4405F]', bg: 'bg-[#E4405F]/10', hover: 'hover:bg-[#E4405F]', action: 'copy' },
+                                            { name: 'Facebook', icon: Facebook, color: 'text-[#1877F2]', bg: 'bg-[#1877F2]/10', hover: 'hover:bg-[#1877F2]', url: `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}` },
+                                            { name: 'Twitter', icon: Twitter, color: 'text-[#1DA1F2]', bg: 'bg-[#1DA1F2]/10', hover: 'hover:bg-[#1DA1F2]', url: `https://twitter.com/intent/tweet?url=${window.location.href}&text=Check out this awesome study tip on Italostudy!` },
+                                            { name: 'Copy Link', icon: LinkIcon, color: 'text-slate-900', bg: 'bg-white', hover: 'hover:bg-slate-900', action: 'copy' },
+                                        ].map((platform) => (
+                                            <motion.button
+                                                key={platform.name}
+                                                whileHover={{ scale: 1.1, y: -4 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() => {
+                                                    if (platform.action === 'copy') {
+                                                        navigator.clipboard.writeText(window.location.href);
+                                                        toast({
+                                                            title: "Link Copied! ✨",
+                                                            description: platform.name === 'Instagram' ? "Paste it in your bio or DM it to friends!" : "Share it anywhere!",
+                                                        });
+                                                    } else if (platform.url) {
+                                                        window.open(platform.url, '_blank');
+                                                    }
+                                                }}
+                                                className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors group ${platform.bg} ${platform.hover}`}
+                                                title={`Share on ${platform.name}`}
+                                            >
+                                                <platform.icon className={`w-6 h-6 ${platform.color} group-hover:text-white transition-colors`} />
+                                            </motion.button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* FAQ Section */}
+                                {post.faq_schema && post.faq_schema.length > 0 && (
+                                    <div className="mt-20">
+                                        <div className="text-center mb-10">
+                                            <h2 className="text-3xl font-black text-slate-900 mb-2">Frequently Asked Questions</h2>
+                                            <p className="text-slate-500 font-bold">Got questions? We've got answers.</p>
+                                        </div>
+                                        <div className="space-y-4">
+                                            {post.faq_schema.map((faq, index) => (
+                                                <details
+                                                    key={faq.id || index}
+                                                    className="group bg-white border-2 border-slate-100 rounded-[2rem] overflow-hidden hover:border-indigo-200 transition-colors shadow-sm"
+                                                >
+                                                    <summary className="cursor-pointer p-6 font-black text-lg text-slate-900 flex items-center justify-between list-none">
+                                                        <span className="flex-1 pr-4">{faq.question}</span>
+                                                        <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0 group-open:bg-indigo-600 transition-colors">
+                                                            <svg
+                                                                className="w-5 h-5 text-indigo-600 group-open:text-white transition-transform group-open:rotate-180"
+                                                                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                            >
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                                            </svg>
+                                                        </div>
+                                                    </summary>
+                                                    <div className="px-6 pb-6 text-slate-600 font-medium leading-relaxed pt-2">
+                                                        {faq.answer}
+                                                    </div>
+                                                </details>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    </motion.div>
-                </article>
+                        </motion.div>
+                    </article>
                 </>
                 )}
-
-                {/* Default sticky CTA (yellow note) - shown only when no custom CTA is configured */}
+                            <StoreAdsMobile adProducts={adProducts} />
+                        </div>
+                        <StoreAdsDesktop adProducts={adProducts} />
+                    </div>
+                </div>
+                
+                    {/* Default sticky CTA (yellow note) - shown only when no custom CTA is configured */}
                 {!ctas.length && (
                     <div className="container mx-auto px-4 mt-20">
                         <motion.div

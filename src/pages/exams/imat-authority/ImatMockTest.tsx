@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -91,9 +91,9 @@ export default function ImatMockTest() {
                 }
             >
                 <SEOHead
-                    title="IMAT Mock Test 2026 – Free Full-Length Exam Simulation"
-                    description="Take the free IMAT mock test 2026. Realistic 100-minute simulation with 60 questions, instant global ranking, and detailed answer explanations for medical applicants."
-                    keywords="imat mock test, imat mock exam, imat mock test free, imat practice test, imat simulation 2026, imat free mock, imat prep, medical entrance italy, italostudy"
+                    title="Free IMAT Mock Test 2026 – 60 Questions, 100 Minutes, Instant Global Rank"
+                    description="Take the free IMAT mock test 2026 online. Full 60-question simulation with real -0.4 penalty marking, strict 100-minute timer, and instant global percentile ranking. The best free IMAT practice test and simulator available."
+                    keywords="imat mock test, imat mock test free, free imat mock test, imat mock exam, imat simulation 2026, imat test simulation, imat simulator, imat free mock test, imat practice test, imat mock 2026, imat test online, free imat simulation test, imat mock paper"
                 />
 
                 <FAQSchema items={faqs} />

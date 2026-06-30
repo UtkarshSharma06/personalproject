@@ -629,7 +629,7 @@
         var selectedSeries = null;
 
         window.handleStartSimulation = function(id, past) {
-            if (!isLogged) { window.location.href = '/auth'; return; }
+            if (!isLogged) { window.open('https://app.italostudy.com', '_blank'); return; }
             window.location.href = past ? '/mock-guidelines?session_id='+id+'&exam_type='+examType : '/waiting-room/'+id;
         };
 

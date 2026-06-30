@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Target, Info, BookOpen, Clock, Activity, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { useTranslation } from 'react-i18next';
 import EditableText from '@/components/cms/EditableText';
 

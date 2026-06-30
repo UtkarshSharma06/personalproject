@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout';
 import { useToast } from '@/hooks/use-toast';
@@ -21,7 +22,6 @@ import {
 import { motion } from 'framer-motion';
 import { getProxiedUrl } from '@/lib/url';
 import Footer from '@/components/Footer';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { BlogSkeleton } from '@/components/SkeletonLoader';
 
 interface BlogPost {
@@ -51,7 +51,6 @@ export default function Blog() {
     const POSTS_PER_PAGE = 15;
     const { toast } = useToast();
     const navigate = useNavigate();
-    const { trackEvent } = useAnalytics();
 
     const filteredPosts = posts.filter(post => {
         const query = searchQuery.toLowerCase();
@@ -80,12 +79,9 @@ export default function Blog() {
     // Track Zero Result Searches
     useEffect(() => {
         if (searchQuery && searchQuery.length >= 3 && !isLoading && filteredPosts.length === 0) {
-            const timer = setTimeout(() => {
-                trackEvent('zero_result_search', { query: searchQuery, category: selectedCategory, location: 'Blog' });
-            }, 1500);
-            return () => clearTimeout(timer);
+            // Tracking removed
         }
-    }, [searchQuery, filteredPosts.length, selectedCategory, isLoading, trackEvent]);
+    }, [searchQuery, filteredPosts.length, selectedCategory, isLoading]);
 
     // Reset to page 1 when search or category changes
     useEffect(() => {

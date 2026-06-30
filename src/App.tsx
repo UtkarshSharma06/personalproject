@@ -13,7 +13,8 @@ import { HelmetProvider } from "react-helmet-async";
 
 import { PricingProvider, usePricing } from "@/context/PricingContext";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
-import CookieConsent from "@/components/CookieConsent";
+import AutoTranslator from "@/components/seo/AutoTranslator";
+
 
 // Lazy Load Public Pages
 // External Redirect Component
@@ -43,6 +44,8 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Refund = lazy(() => import("./pages/Refund"));
 const About = lazy(() => import("./pages/About"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const Courses = lazy(() => import("./pages/Courses"));
+const CourseExplore = lazy(() => import("./pages/CourseExplore"));
 const Institutional = lazy(() => import("./pages/Institutional"));
 const Syllabus = lazy(() => import("./pages/Syllabus"));
 const SyllabusDetail = lazy(() => import("./pages/SyllabusDetail"));
@@ -80,6 +83,11 @@ const ImatMockTest = lazy(() => import('@/pages/exams/imat-authority/ImatMockTes
 const ImatPassingScore = lazy(() => import('@/pages/exams/imat-authority/ImatPassingScore'));
 const ImatPatternGuide = lazy(() => import('@/pages/exams/imat-authority/ImatPatternGuide'));
 const ImatPreviousPapers = lazy(() => import('@/pages/exams/imat-authority/ImatPreviousPapers'));
+const ImatVsNeet = lazy(() => import('@/pages/exams/imat-authority/ImatVsNeet'));
+const ImatScoreCalculator = lazy(() => import('@/pages/exams/imat-authority/ImatScoreCalculator'));
+const ImatBiologySyllabus = lazy(() => import('@/pages/exams/imat-authority/ImatBiologySyllabus'));
+const ImatLogicalReasoning = lazy(() => import('@/pages/exams/imat-authority/ImatLogicalReasoning'));
+const ImatForIndianStudents = lazy(() => import('@/pages/exams/imat-authority/ImatForIndianStudents'));
 
 const TolcUltimateGuide = lazy(() => import('@/pages/exams/tolc-authority/TolcUltimateGuide'));
 const TolcDetailedSyllabus = lazy(() => import('@/pages/exams/tolc-authority/TolcDetailedSyllabus'));
@@ -123,9 +131,15 @@ const PublicRouter = () => (
     <Route path="/" element={<Index />} />
     <Route path="/it" element={<IndexItaly />} />
     <Route path="/tr" element={<IndexTurkey />} />
+
+    <Route path="/tr/*" element={<IndexTurkey />} />
+
+    <Route path="/it/*" element={<IndexItaly />} />
     <Route path="/auth" element={<ExternalRedirect to="https://app.italostudy.com/auth" />} />
     <Route path="/reset-password" element={<ExternalRedirect to="https://app.italostudy.com/reset-password" />} />
     <Route path="/pricing" element={<Pricing />} />
+    <Route path="/courses" element={<Courses />} />
+    <Route path="/courses/:slug" element={<CourseExplore />} />
     <Route path="/institutional" element={<Institutional />} />
     <Route path="/about" element={<About />} />
     <Route path="/privacy" element={<Privacy />} />
@@ -165,6 +179,11 @@ const PublicRouter = () => (
     <Route path="/imat-passing-score-explained-2026" element={<ImatPassingScore />} />
     <Route path="/imat-difficulty-analysis-2026" element={<ImatDifficultyAnalysis />} />
     <Route path="/imat-vs-cents-2026" element={<ImatVsCents />} />
+    <Route path="/imat-vs-neet-2026" element={<ImatVsNeet />} />
+    <Route path="/imat-score-calculator" element={<ImatScoreCalculator />} />
+    <Route path="/imat-biology-syllabus-2026" element={<ImatBiologySyllabus />} />
+    <Route path="/imat-logical-reasoning-guide-2026" element={<ImatLogicalReasoning />} />
+    <Route path="/imat-exam-for-indian-students" element={<ImatForIndianStudents />} />
     <Route path="/tolc-exam-ultimate-guide-2026" element={<TolcUltimateGuide />} />
     <Route path="/tolc-syllabus-2026" element={<TolcDetailedSyllabus />} />
     <Route path="/tolc-best-books-2026" element={<TolcBooks />} />
@@ -244,6 +263,7 @@ const RouterListener = () => {
 const AuthBridge = () => {
   return (
     <BrowserRouter>
+      <AutoTranslator />
       <ToasterProvider />
       <Suspense fallback={<PageLoader />}>
         <PublicRouter />
@@ -251,7 +271,7 @@ const AuthBridge = () => {
       </Suspense>
       <VercelAnalytics />
       <VercelSpeedInsights />
-      <CookieConsent />
+
     </BrowserRouter>
   );
 };

@@ -920,6 +920,27 @@ const PAGE_SEO = {
       'All preparation resources and mock tests available free on ItaloStudy',
     ],
   },
+  'courses': {
+    title: 'Prep Courses for IMAT & CEnT-S | Expert-Led Video Lessons | ItaloStudy',
+    description: 'Browse expert-led online prep courses for IMAT, CEnT-S, TOLC, and TIL-I. Lifetime access, structured video lectures, and practice to get you exam-ready.',
+    canonical: 'https://italostudy.com/courses',
+    h1: 'Italian University Entrance Exam Prep Courses',
+    intro: 'ItaloStudy offers structured, expert-led online courses for every major Italian university entrance exam. Each course includes comprehensive video lessons, topic-by-topic breakdowns, and practice resources to help you score higher.',
+    relatedLinks: [
+      { href: '/imat-exam-ultimate-guide-2026', label: 'IMAT Exam Guide 2026' },
+      { href: '/cent-s-exam-ultimate-guide', label: 'CEnT-S Exam Guide 2026' },
+      { href: '/pricing', label: 'ItaloStudy Pricing Plans' },
+      { href: '/imat-mock-test-free-2026', label: 'Free IMAT Mock Test' },
+      { href: '/study-in-italy-guide-2026', label: 'Study in Italy 2026 Guide' },
+    ],
+    keyPoints: [
+      'Expert instructors with proven exam track records',
+      'Structured video lectures aligned to the official exam syllabus',
+      'Lifetime course access — study at your own pace',
+      'Available for IMAT, CEnT-S, TOLC, and TIL-I exams',
+      'Pair with ItaloStudy practice questions for maximum results',
+    ],
+  },
   'method': {
     title: 'ItaloStudy Method | How We Help You Score Higher | ItaloStudy',
     description: 'Learn about the ItaloStudy preparation method: adaptive learning, mock tests, analytics, and expert content for IMAT and CEnT-S.',
@@ -943,6 +964,7 @@ const PAGE_SEO = {
   },
 };
 
+
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -958,7 +980,53 @@ export default async function handler(req, res) {
     const reqUrl = new URL(req.url, 'https://italostudy.com');
     // Strip leading slash and any query params
     const rawPath = reqUrl.pathname.replace(/^\//, '').replace(/\/$/, '');
-    const pageMeta = PAGE_SEO[rawPath];
+    let pageMeta = PAGE_SEO[rawPath];
+
+    // --- DYNAMIC COURSE SEO INTERCEPTION ---
+    // Handles /courses/:slug (individual course pages from Supabase)
+    if (!pageMeta && rawPath.startsWith('courses/')) {
+      const slug = rawPath.split('/')[1];
+      if (slug) {
+        try {
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+          const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://jyjhpqtqbwtxxgijxetq.supabase.co';
+          const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5amhwcXRxYnd0eHhnaWp4ZXRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MTgyNjUsImV4cCI6MjA4MzE5NDI2NX0.5HaHhfgPQbIRKmHZE61ggrtj-lKi5JlBU9tsOfQ_d3c';
+          
+          const queryParam = isUuid ? `id=eq.${slug}` : `slug=eq.${slug}`;
+          const fetchUrl = `${supabaseUrl}/rest/v1/courses?${queryParam}&select=title,description,banner_url&limit=1`;
+          
+          const response = await fetch(fetchUrl, {
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+              const course = data[0];
+              pageMeta = {
+                title: `${course.title} - Online Prep Course | ItaloStudy`,
+                description: course.description || `Enroll in ${course.title} to prepare for your Italian medical entrance exam. Get lifetime access to expert-led lessons and practice.`,
+                canonical: `https://italostudy.com/courses/${slug}`,
+                h1: course.title,
+                intro: course.description || 'Master your exam with this expert-led course.',
+                keyPoints: [
+                  'Lifetime access to course materials',
+                  'Taught by expert educators',
+                  'Comprehensive video lectures and practice'
+                ],
+                ogImage: course.banner_url || null
+              };
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching course for SSR:', err);
+        }
+      }
+    }
+    // ---------------------------------------
 
     const templatePath = path.join(process.cwd(), 'dist', 'index.html');
     let html = fs.readFileSync(templatePath, 'utf8');
@@ -979,6 +1047,11 @@ export default async function handler(req, res) {
       html = html.replace(/<meta property="og:url" content=".*?"\s*\/>/, `<meta property="og:url" content="${safeCanonical}" />`);
       html = html.replace(/<meta property="twitter:title" content=".*?"\s*\/>/, `<meta property="twitter:title" content="${safeTitle}" />`);
       html = html.replace(/<meta property="twitter:description" content=".*?"\s*\/>/, `<meta property="twitter:description" content="${safeDesc}" />`);
+
+      if (pageMeta.ogImage) {
+        html = html.replace(/<meta property="og:image" content=".*?"\s*\/>/, `<meta property="og:image" content="${pageMeta.ogImage}" />`);
+        html = html.replace(/<meta name="twitter:image" content=".*?"\s*\/>/, `<meta name="twitter:image" content="${pageMeta.ogImage}" />`);
+      }
 
       // Inject SSR content block — visible to bots, hidden to users via CSS
       // This is the critical fix: Google needs real HTML content to index pages properly

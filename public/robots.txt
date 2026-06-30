@@ -19,8 +19,6 @@ Disallow: /mock-exams
 Disallow: /learning
 Disallow: /answers
 Disallow: /answers/
-Disallow: /it/
-Disallow: /tr/
 
 # Block all query-parameter variants — canonical clean URLs are indexed instead
 Disallow: /*?country=*
@@ -34,8 +32,6 @@ Disallow: /dashboard
 Disallow: /auth
 Disallow: /learning
 Disallow: /answers
-Disallow: /it/
-Disallow: /tr/
 Disallow: /*?*
 
 User-agent: Bingbot

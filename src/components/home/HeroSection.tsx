@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation, Trans } from 'react-i18next';

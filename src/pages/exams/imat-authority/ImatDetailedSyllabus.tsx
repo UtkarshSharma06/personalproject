@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -94,9 +94,9 @@ export default function ImatDetailedSyllabus() {
                 }
             >
                 <SEOHead
-                    title="IMAT Detailed Syllabus 2026: Section-by-Section Guide"
-                    description="The most detailed IMAT 2026 syllabus guide. Complete breakdown of Biology, Chemistry, Physics, Math, and Logical Reasoning requirements for the Italian medical entrance exam."
-                    keywords="IMAT syllabus 2026, IMAT biology topics, IMAT chemistry requirements, IMAT physics math syllabus, IMAT logical reasoning guide"
+                    title="IMAT Syllabus 2026 – Official PDF: Biology, Chemistry, Physics & Math Topics"
+                    description="Download the complete IMAT 2026 official syllabus PDF. Full topic breakdown: Biology (23Q), Chemistry (15Q), Physics & Math (13Q), Logical Reasoning (9Q). Free guide updated for the 2026 academic intake."
+                    keywords="imat syllabus 2026, imat syllabus 2026 pdf, imat syllabus 2026 pdf free download, imat 2026 syllabus, imat 2026 syllabus official, imat syllabus pdf free download, imat biology syllabus 2026, imat chemistry topics, imat topics 2026, imat syllabus official, syllabus imat 2026"
                 />
 
                 <FAQSchema items={faqs} />
@@ -128,6 +128,23 @@ export default function ImatDetailedSyllabus() {
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
                                         {getField('hero_desc', "The IMAT syllabus is derived from the Italian ministerial decree. It benchmarks candidate knowledge against high-level European secondary school standards.")}
                                     </EditableText>
+
+                                    {/* PDF Download Banner */}
+                                    <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1">Official Document</p>
+                                            <h3 className="font-black text-indigo-900 text-base">Download IMAT 2026 Official Syllabus PDF</h3>
+                                            <p className="text-sm text-indigo-600 mt-0.5">Published by MUR (Ministry of University & Research) — Free</p>
+                                        </div>
+                                        <a
+                                            href="https://www.mur.gov.it/it/comunicazioni/test-ammissione-medicina-e-odontoiatria-lingua-inglese"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="shrink-0 bg-indigo-600 text-white font-black px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors text-sm flex items-center gap-2"
+                                        >
+                                            Download PDF ↗
+                                        </a>
+                                    </div>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                                         {[

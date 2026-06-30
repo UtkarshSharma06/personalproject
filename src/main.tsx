@@ -13,6 +13,27 @@ window.addEventListener('vite:preloadError', (event) => {
     window.location.reload();
 });
 
+// Patch DOM methods to prevent React from crashing when Google Translate modifies the DOM
+if (typeof Node === 'function' && Node.prototype) {
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function(child: Node) {
+    if (child.parentNode !== this) {
+      if (console) console.warn('React attempted to remove a child from a different parent (likely due to Google Translate). Suppressing crash.');
+      return child;
+    }
+    return originalRemoveChild.apply(this, [child] as any);
+  };
+
+  const originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function(newNode: Node, referenceNode: Node | null) {
+    if (referenceNode && referenceNode.parentNode !== this) {
+      if (console) console.warn('React attempted to insert before a node from a different parent (likely due to Google Translate). Suppressing crash.');
+      return newNode;
+    }
+    return originalInsertBefore.apply(this, [newNode, referenceNode] as any);
+  };
+}
+
 createRoot(document.getElementById("root")!).render(
     <HelmetProvider>
         <App />

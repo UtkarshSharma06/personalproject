@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import PWNavbar from './home/PWNavbar';
 import Footer from './Footer';
-import { useVisitorTracking } from '@/hooks/useVisitorTracking';
 import { useAuth } from '@/lib/auth';
 
 const AnnouncementBar = lazy(() => import('./AnnouncementBar'));

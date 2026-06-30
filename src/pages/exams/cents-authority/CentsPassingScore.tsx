@@ -16,7 +16,7 @@ import {
     Activity,
     Users
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import FAQSchema from '@/components/seo/FAQSchema';
 import CTASection from '@/components/exams/CTASection';
 import { usePageContent } from '@/hooks/usePageContent';

@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 import SEOHead from '@/components/seo/SEOHead';
 import { centsLinks } from '@/lib/nav-links';
 import { getBreadcrumbSchema } from '@/utils/seo-schemas';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 
 export default function CentsMockLanding() {
     const { user } = useAuth();

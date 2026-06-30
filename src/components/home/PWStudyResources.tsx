@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import EditableText from '@/components/cms/EditableText';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { ArrowRight } from 'lucide-react';
 
 export default function PWStudyResources() {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/auth';
 import { usePricing } from '@/context/PricingContext';
@@ -99,15 +100,16 @@ export default function PublicNavbar({ subNavigation }: { subNavigation?: React.
                 scrolled ? "h-16 px-4 md:px-12" : "h-24 px-4 md:px-12"
             )}>
                 {/* Logo */}
-                <div className="flex-1 flex justify-start">
-                    <Link to="/" className="flex items-center gap-3 group">
+                <div className="flex-1 flex justify-start shrink-0">
+                    <Link to="/" className="flex items-center gap-3 group shrink-0 notranslate" translate="no">
                         <img
                             src="/logo.webp"
                             alt="Italostudy Logo"
                             className={cn(
-                                "h-9 md:h-11 w-auto object-contain transition-all",
+                                "h-9 md:h-11 w-auto object-contain transition-all notranslate",
                                 !isLightTheme && (scrolled ? "brightness-0" : "brightness-0 invert")
                             )}
+                            translate="no"
                             width="180"
                             height="48"
                             loading="eager"
@@ -139,8 +141,8 @@ export default function PublicNavbar({ subNavigation }: { subNavigation?: React.
                                     <Link
                                         to={item.path!}
                                         className={cn(
-                                            "text-[12px] font-bold tracking-tight transition-colors flex items-center gap-1 py-1",
-                                            isLightTheme ? "text-slate-600 hover:text-indigo-600" : "text-white/70 hover:text-white"
+                                            "text-[15px] lg:text-[16px] font-semibold tracking-tight transition-colors flex items-center gap-1 py-1",
+                                            isLightTheme ? "text-slate-900 hover:text-indigo-600" : "text-white/70 hover:text-white"
                                         )}
                                     >
                                         {item.name}
@@ -198,8 +200,8 @@ export default function PublicNavbar({ subNavigation }: { subNavigation?: React.
                                     key={item.name}
                                     href={item.path!}
                                     className={cn(
-                                        "text-[12px] font-bold tracking-tight transition-colors",
-                                        isLightTheme ? "text-slate-600 hover:text-indigo-600" : "text-white/70 hover:text-white"
+                                        "text-[15px] lg:text-[16px] font-semibold tracking-tight transition-colors",
+                                        isLightTheme ? "text-slate-900 hover:text-indigo-600" : "text-white/70 hover:text-white"
                                     )}
                                 >
                                     {item.name}
@@ -209,22 +211,12 @@ export default function PublicNavbar({ subNavigation }: { subNavigation?: React.
                                     key={item.name}
                                     to={item.path!}
                                     className={cn(
-                                        "text-[12px] font-bold tracking-tight transition-colors",
-                                        isLightTheme ? "text-slate-600 hover:text-indigo-600" : "text-white/70 hover:text-white"
+                                        "text-[15px] lg:text-[16px] font-semibold tracking-tight transition-colors",
+                                        isLightTheme ? "text-slate-900 hover:text-indigo-600" : "text-white/70 hover:text-white"
                                     )}
                                 >
                                     <div className="flex items-center gap-1.5">
                                         {item.name}
-                                        {item.path === '/pricing' && (
-                                            <span className={cn(
-                                                "px-1.5 py-0.5 border rounded text-[8px] font-black animate-pulse uppercase",
-                                                isLightTheme 
-                                                    ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
-                                                    : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                            )}>
-                                                {t('landing.header.beta_free', 'BETA FREE')}
-                                            </span>
-                                        )}
                                     </div>
                                 </Link>
                             )

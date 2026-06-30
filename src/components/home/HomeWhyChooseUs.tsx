@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Target, Zap, Users, Shield, Rocket, Heart, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { useTranslation, Trans } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import EditableText from '@/components/cms/EditableText';

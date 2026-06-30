@@ -17,6 +17,11 @@ export const IMAT_CLUSTER: SEOLink[] = [
   { title: "Preparation Strategy", href: "/imat-preparation-strategy-2026", description: "How to score 50+ using the authority framework." },
   { title: "Cutoff Trends", href: "/imat-cutoff-trends-2026", description: "Historical scores for all 15+ public universities." },
   { title: "Previous Year Papers", href: "/imat-previous-year-papers-pdf", description: "Download official PDFs from 2011 to 2025." },
+  { title: "IMAT vs NEET Comparison", href: "/imat-vs-neet-2026", description: "Which is easier for Indian students?" },
+  { title: "IMAT Score Calculator", href: "/imat-score-calculator", description: "Calculate your raw score instantly." },
+  { title: "IMAT Biology Syllabus", href: "/imat-biology-syllabus-2026", description: "23-question section full breakdown." },
+  { title: "Logical Reasoning Guide", href: "/imat-logical-reasoning-guide-2026", description: "Critical thinking strategies for Section 1." },
+  { title: "Guide for Indian Students", href: "/imat-exam-for-indian-students", description: "Eligibility, centers, visa from India." },
 ];
 
 export const CENTS_CLUSTER: SEOLink[] = [

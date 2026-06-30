@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { useAuth } from '@/lib/auth';
 import { motion } from 'framer-motion';
 import {
@@ -45,19 +46,19 @@ export default function BlogHeader() {
                     transition={{ duration: 0.5 }}
                     className="flex items-center gap-4"
                 >
-                    <a href="/" className="flex items-center gap-3 group">
+                    <Link to="/" reloadDocument className="flex items-center gap-3 group">
                         <img
                             src="/logo.webp"
                             alt="Italostudy Logo"
                             className="h-10 w-auto object-contain"
                             loading="eager"
                         />
-                    </a>
+                    </Link>
                 </motion.div>
 
                 {/* Animated Navigation (Desktop) */}
                 <nav className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200/50">
-                    <a href="/">
+                    <Link to="/" reloadDocument>
                         <motion.div
                             whileHover={{ scale: 1.05, backgroundColor: 'white' }}
                             whileTap={{ scale: 0.95 }}
@@ -66,7 +67,7 @@ export default function BlogHeader() {
                             <Home className="w-3 h-3" />
                             Home
                         </motion.div>
-                    </a>
+                    </Link>
 
                     <a href="/blog">
                         <motion.div

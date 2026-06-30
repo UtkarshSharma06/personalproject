@@ -1,6 +1,6 @@
-
 import { lazy, Suspense, useEffect, useState, memo } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/auth';
 // Only import the icons actually used in the EAGER bundle
@@ -124,16 +124,22 @@ export default function Index() {
                 setCountryCode(code);
                 // Auto-redirect if on root and in specific regions
                 if (pathname === '/') {
+                    // Check if user has explicitly chosen a language in this session to prevent infinite loop trap
+                    const langPref = localStorage.getItem('italo_lang_preference');
+                    if (langPref) return;
+
                     if (code === 'TR') {
                         i18n.changeLanguage('tr');
+                        navigate('/tr', { replace: true });
                     } else if (code === 'IT' || code === 'CH' || code === 'SM' || code === 'VA') {
                         i18n.changeLanguage('it');
+                        navigate('/it', { replace: true });
                     }
                 }
             })
             .catch(() => setCountryCode('XX'))
             .finally(() => setCountryLoading(false));
-    }, [searchParams, pathname]);
+    }, [searchParams, pathname, navigate, i18n]);
 
     // Fast-path redirect: check localStorage session cache to avoid waiting for Supabase round-trip
     useEffect(() => {
@@ -181,9 +187,13 @@ export default function Index() {
     // Auth state updates silently when Supabase resolves; public pages don't need auth to render.
 
     const activeCountry = countryOverride || countryCode;
+    
+    // If user has explicitly chosen a language, their choice overrides IP detection entirely
+    const userLangPref = localStorage.getItem('italo_lang_preference');
+    const effectiveCountry = userLangPref ? null : activeCountry;
 
     // Show localized versions based on PATH first, then COUNTRY
-    if (pathname === '/tr' || activeCountry === 'TR') {
+    if (pathname === '/tr' || effectiveCountry === 'TR') {
         return (
             <Suspense fallback={null}>
                 <IndexTurkey />
@@ -191,7 +201,7 @@ export default function Index() {
         );
     }
 
-    if (pathname === '/it' || (activeCountry === 'IT' || activeCountry === 'CH' || activeCountry === 'SM' || activeCountry === 'VA')) {
+    if (pathname === '/it' || (effectiveCountry === 'IT' || effectiveCountry === 'CH' || effectiveCountry === 'SM' || effectiveCountry === 'VA')) {
         return (
             <Suspense fallback={null}>
                 <IndexItaly />

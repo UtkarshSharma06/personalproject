@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { Card } from '@/components/ui/card';
 import { Grid, ChevronRight } from 'lucide-react';
 import EditableText from '@/components/cms/EditableText';

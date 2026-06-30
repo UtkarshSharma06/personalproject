@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -15,9 +15,10 @@ import {
     Zap,
     Download,
     BrainCircuit,
-    Beaker
+    Beaker,
+    Calculator
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import CTASection from '@/components/exams/CTASection';
 import { usePageContent } from '@/hooks/usePageContent';
 import CmsPageWrapper from '@/components/cms/CmsPageWrapper';

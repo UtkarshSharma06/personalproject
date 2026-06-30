@@ -15,7 +15,7 @@ import {
     Zap,
     Target
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import CTASection from '@/components/exams/CTASection';
 import { usePageContent } from '@/hooks/usePageContent';
 import CmsPageWrapper from '@/components/cms/CmsPageWrapper';

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { ArrowRight, Book, FileText, BarChart, Settings, History, HelpCircle, Calendar, GraduationCap, Scale, BookOpen, ClipboardCheck, Zap, Globe, Target, Calculator } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditableText from '@/components/cms/EditableText';

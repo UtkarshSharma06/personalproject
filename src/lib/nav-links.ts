@@ -13,6 +13,11 @@ export const imatLinks = [
     { key: 'difficulty', label: 'Difficulty Analysis', path: '/imat-difficulty-analysis-2026' },
     { key: 'passing', label: 'Passing Score Explained', path: '/imat-passing-score-explained-2026' },
     { key: 'vs', label: 'IMAT vs CENT-S', path: '/imat-vs-cents-2026' },
+    { key: 'vs_neet', label: 'IMAT vs NEET 2026', path: '/imat-vs-neet-2026' },
+    { key: 'calculator', label: 'IMAT Score Calculator', path: '/imat-score-calculator' },
+    { key: 'biology', label: 'Biology Syllabus Guide', path: '/imat-biology-syllabus-2026' },
+    { key: 'logic', label: 'Logical Reasoning Guide', path: '/imat-logical-reasoning-guide-2026' },
+    { key: 'india', label: 'Guide for Indian Students', path: '/imat-exam-for-indian-students' },
     { key: 'dedicated_mock', label: 'Full Exam Simulations', path: '/imat-mock' }
 ];
 

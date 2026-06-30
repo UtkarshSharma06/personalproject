@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { motion } from 'framer-motion';
 import { Instagram, MessageCircle } from 'lucide-react';
 import { imatLinks, centsLinks, studyItalyLinks } from '@/lib/nav-links';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 export default function Footer() {
     const { t } = useTranslation();
@@ -38,15 +39,18 @@ export default function Footer() {
             <div className="container mx-auto px-6">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 mb-12">
                     {/* Brand Column */}
-                    <div className="col-span-2 md:col-span-3 lg:col-span-1 flex flex-col items-start gap-5">
-                        <img
-                            src="/logo.webp"
-                            alt="Italostudy Logo"
-                            className="h-8 w-auto object-contain"
-                            width="140"
-                            height="35"
-                            loading="lazy"
-                        />
+                    <div className="col-span-2 md:col-span-3 lg:col-span-1 flex flex-col items-start gap-5 shrink-0">
+                        <Link to="/" className="notranslate block shrink-0" translate="no">
+                            <img
+                                src="/logo.webp"
+                                alt="Italostudy Logo"
+                                className="h-8 w-auto object-contain notranslate"
+                                translate="no"
+                                width="140"
+                                height="35"
+                                loading="lazy"
+                            />
+                        </Link>
                         <p className="text-[13px] text-[#555555] max-w-xs leading-relaxed">
                             Empowering students for Italian entrance exams with expert-led preparation and strategic guidance for success.
                         </p>

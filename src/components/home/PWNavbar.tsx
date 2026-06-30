@@ -1,11 +1,53 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/auth';
-import {
-    Menu, X, ChevronDown, LayoutDashboard,
-    GraduationCap, BookOpen, Stethoscope, FileText, ChevronRight, ChevronLeft
+import { useLocation } from 'react-router-dom';
+import { 
+    Menu, 
+    X, 
+    ChevronDown, 
+    Globe, 
+    BookOpen, 
+    GraduationCap, 
+    Stethoscope, 
+    ChevronRight,
+    ChevronLeft,
+    LayoutDashboard,
+    FileText
 } from 'lucide-react';
+
+const FlagUK = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" className={className}>
+        <clipPath id="s"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
+        <clipPath id="t"><path d="M30,15 h30 v15 z v-15 h-30 z h-30 v-15 z v15 h30 z"/></clipPath>
+        <g clipPath="url(#s)">
+            <path d="M0,0 v30 h60 v-30 z" fill="#012169"/>
+            <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
+            <path d="M0,0 L60,30 M60,0 L0,30" clipPath="url(#t)" stroke="#C8102E" strokeWidth="4"/>
+            <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10"/>
+            <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" strokeWidth="6"/>
+        </g>
+    </svg>
+);
+
+const FlagIT = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2" className={className}>
+        <rect width="1" height="2" fill="#009246"/>
+        <rect x="1" width="1" height="2" fill="#ffffff"/>
+        <rect x="2" width="1" height="2" fill="#ce2b37"/>
+    </svg>
+);
+
+const FlagTR = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" className={className}>
+        <rect width="1200" height="800" fill="#E30A17"/>
+        <circle cx="425" cy="400" r="200" fill="#fff"/>
+        <circle cx="475" cy="400" r="160" fill="#E30A17"/>
+        <polygon points="583.334,400 735.654,449.52 641.348,319.64 641.348,480.36 735.654,350.48" fill="#fff"/>
+    </svg>
+);
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, useScroll, AnimatePresence } from 'framer-motion';
@@ -14,14 +56,17 @@ import { imatLinks, centsLinks, tolcLinks } from '@/lib/nav-links';
 export default function PWNavbar({ subNavigation }: { subNavigation?: React.ReactNode }) {
     const { t } = useTranslation();
     const { user } = useAuth();
+    const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mobileMenuView, setMobileMenuView] = useState<'main' | 'exams'>('main');
     const [isExamsDropdownOpen, setIsExamsDropdownOpen] = useState(false);
     const [activeExamId, setActiveExamId] = useState('imat');
     const [expandedMobileExam, setExpandedMobileExam] = useState<string | null>(null);
     const [isMocksDropdownOpen, setIsMocksDropdownOpen] = useState(false);
+    const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const mocksDropdownRef = useRef<HTMLDivElement>(null);
+    const langDropdownRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll();
 
     // Close dropdown on click outside
@@ -32,6 +77,9 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
             }
             if (mocksDropdownRef.current && !mocksDropdownRef.current.contains(event.target as Node)) {
                 setIsMocksDropdownOpen(false);
+            }
+            if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
+                setIsLangDropdownOpen(false);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
@@ -64,6 +112,60 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
 
     const activeExam = allExamsData.find(e => e.id === activeExamId) || allExamsData[0];
 
+    const cookieString = document.cookie;
+    const isTrCookie = cookieString.includes('googtrans=/en/tr') || cookieString.includes('googtrans=/auto/tr');
+    const isItCookie = cookieString.includes('googtrans=/en/it') || cookieString.includes('googtrans=/auto/it');
+    const isTr = location.pathname.startsWith('/tr') || isTrCookie;
+    const isIt = location.pathname.startsWith('/it') || isItCookie;
+    const currentLang = isTr ? 'TR' : isIt ? 'IT' : 'EN';
+
+    const handleLanguageChange = (lang: 'EN' | 'IT' | 'TR') => {
+        setIsLangDropdownOpen(false);
+        setIsMobileMenuOpen(false);
+        if (lang === currentLang) return;
+        
+        // Set an explicit flag to prevent IP-based auto-redirects from overriding user choice
+        localStorage.setItem('italo_lang_preference', lang);
+        
+        let basePath = location.pathname;
+        if (basePath.startsWith('/tr')) basePath = basePath.replace(/^\/tr/, '') || '/';
+        if (basePath.startsWith('/it')) basePath = basePath.replace(/^\/it/, '') || '/';
+
+        let newPath = basePath;
+
+        if (lang === 'TR') {
+            document.cookie = 'googtrans=/en/tr; path=/;';
+            // Also explicitly redirect to /tr if we are on the homepage for standard routing
+            if (basePath === '/') newPath = '/tr';
+        } else if (lang === 'IT') {
+            document.cookie = 'googtrans=/en/it; path=/;';
+            if (basePath === '/') newPath = '/it';
+        } else if (lang === 'EN') {
+            const domains = [window.location.hostname, '.' + window.location.hostname, 'localhost', '.localhost', 'italostudy.com', '.italostudy.com'];
+            domains.forEach(d => {
+                document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${d}`;
+                document.cookie = `i18next=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${d}`;
+            });
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'i18next=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            localStorage.removeItem('i18nextLng');
+            localStorage.removeItem('i18nextLng-italostudy');
+            sessionStorage.removeItem('user_country');
+        }
+
+        // If we are on /tr or /it and switch to EN, we should redirect back to /
+        if (lang === 'EN' && (location.pathname === '/tr' || location.pathname === '/it' || location.pathname.startsWith('/tr/') || location.pathname.startsWith('/it/'))) {
+            window.location.href = '/' + location.search;
+            return;
+        }
+
+        if (newPath !== location.pathname) {
+            window.location.href = newPath + location.search;
+        } else {
+            window.location.reload();
+        }
+    };
+
     return (
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
             <div className="absolute inset-0 bg-white/95 backdrop-blur-md border-b border-slate-200/50 -z-10 pointer-events-none" />
@@ -73,16 +175,17 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                 <div className="flex items-center gap-4 lg:gap-8">
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="lg:hidden text-slate-700 hover:text-slate-900 transition-colors"
+                        className="lg:hidden text-slate-900 hover:text-slate-900 transition-colors"
                     >
                         {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
                     </button>
                     
-                    <Link to="/" className="flex items-center">
+                    <Link to="/" className="flex items-center shrink-0 notranslate" translate="no">
                         <img
                             src="/logo.webp"
                             alt="ItaloStudy Logo"
-                            className="h-8 md:h-10 w-auto object-contain"
+                            className="h-8 md:h-10 w-auto object-contain notranslate"
+                            translate="no"
                         />
                     </Link>
 
@@ -90,7 +193,7 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                     <div className="hidden lg:block relative" ref={dropdownRef}>
                         <button
                             onClick={() => setIsExamsDropdownOpen(!isExamsDropdownOpen)}
-                            className="flex items-center gap-2 border border-indigo-200/70 px-5 py-2.5 rounded-lg text-[#5a4bda] font-bold shadow-sm hover:shadow hover:bg-indigo-50/50 transition-all bg-white text-[15px]"
+                            className={`flex items-center gap-2 border border-indigo-200/70 px-5 py-2.5 rounded-lg text-[#5a4bda] font-bold shadow-sm hover:shadow hover:bg-indigo-50/50 transition-all bg-white ${isTr || isIt ? "text-[14px] xl:text-[15px] px-4" : "text-[15px]"}`}
                         >
                             <span>{t('nav.exams', 'Exams')}</span>
                             <ChevronDown className={cn("w-4 h-4 transition-transform", isExamsDropdownOpen && "rotate-180")} />
@@ -161,7 +264,7 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                                                 className="flex items-center gap-2.5 px-3 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-indigo-400 hover:shadow-md transition-all group"
                                             >
                                                 <div className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-indigo-500 transition-colors shrink-0" />
-                                                <span className="text-[13px] font-semibold text-slate-700 group-hover:text-indigo-700 leading-tight">
+                                                <span className="text-[13px] font-semibold text-slate-900 group-hover:text-indigo-700 leading-tight">
                                                     {t(`nav.links.${link.label}`, link.label)}
                                                 </span>
                                             </Link>
@@ -173,14 +276,14 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                     </div>
 
                     {/* Desktop Nav Links */}
-                    <nav className="hidden lg:flex items-center gap-5 xl:gap-6">
+                    <nav className={cn("hidden lg:flex items-center", isTr || isIt ? "gap-1 xl:gap-3" : "gap-3 xl:gap-5")}>
                         {/* Mocks Dropdown */}
                         <div className="relative" ref={mocksDropdownRef}>
                             <button
                                 onClick={() => setIsMocksDropdownOpen(!isMocksDropdownOpen)}
-                                className="flex items-center gap-1 text-[15px] font-semibold text-slate-700 hover:text-[#5a4bda] transition-colors whitespace-nowrap"
+                                className={`flex items-center gap-1 ${isTr || isIt ? "text-[15px] xl:text-[16px]" : "text-[15px] xl:text-[16px]"} font-semibold text-slate-900 hover:text-[#5a4bda] transition-colors whitespace-nowrap`}
                             >
-                                Simulated Mocks
+                                Mocks
                                 <ChevronDown className={cn("w-4 h-4 transition-transform", isMocksDropdownOpen && "rotate-180")} />
                             </button>
                             
@@ -189,14 +292,14 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                                     <Link 
                                         to="/imat-mock" 
                                         onClick={() => setIsMocksDropdownOpen(false)}
-                                        className="px-4 py-2 hover:bg-slate-50 text-[14px] font-medium text-slate-700 hover:text-indigo-600 transition-colors"
+                                        className="px-4 py-2 hover:bg-slate-50 text-[14px] font-medium text-slate-900 hover:text-indigo-600 transition-colors"
                                     >
                                         IMAT Mocks
                                     </Link>
                                     <Link 
                                         to="/cent-s-mock" 
                                         onClick={() => setIsMocksDropdownOpen(false)}
-                                        className="px-4 py-2 hover:bg-slate-50 text-[14px] font-medium text-slate-700 hover:text-indigo-600 transition-colors"
+                                        className="px-4 py-2 hover:bg-slate-50 text-[14px] font-medium text-slate-900 hover:text-indigo-600 transition-colors"
                                     >
                                         CEnT-S Mocks
                                     </Link>
@@ -204,34 +307,67 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                             )}
                         </div>
 
-                        <Link to="/resources" className="text-[15px] font-semibold text-slate-700 hover:text-[#5a4bda] transition-colors whitespace-nowrap">
+                        <Link to="/resources" className={`${isTr || isIt ? "text-[15px] xl:text-[16px]" : "text-[15px] xl:text-[16px]"} font-semibold text-slate-900 hover:text-[#5a4bda] transition-colors flex items-center gap-1.5 whitespace-nowrap`}>
                             {t('nav.resources', 'Resources')}
+                            <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[9px] font-black uppercase tracking-wider">Free</span>
                         </Link>
-                        <Link to="/pricing" className="text-[15px] font-semibold text-slate-700 hover:text-[#5a4bda] transition-colors flex items-center gap-1.5 whitespace-nowrap">
+                        <Link to="/pricing" className={`${isTr || isIt ? "text-[15px] xl:text-[16px]" : "text-[15px] xl:text-[16px]"} font-semibold text-slate-900 hover:text-[#5a4bda] transition-colors flex items-center gap-1.5 whitespace-nowrap`}>
                             {t('nav.pricing', 'Pricing')}
-                            <span className="px-2 py-0.5 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm shadow-emerald-200 whitespace-nowrap">{t('nav.free_beta', 'Free')}</span>
                         </Link>
-                        <Link to="/blog" className="text-[15px] font-semibold text-slate-700 hover:text-[#5a4bda] transition-colors whitespace-nowrap">
+                        <Link to="/courses" className={`${isTr || isIt ? "text-[15px] xl:text-[16px]" : "text-[15px] xl:text-[16px]"} font-semibold text-slate-900 hover:text-[#5a4bda] transition-colors whitespace-nowrap`}>
+                            Courses
+                        </Link>
+                        <Link to="/blog" className={`${isTr || isIt ? "text-[15px] xl:text-[16px]" : "text-[15px] xl:text-[16px]"} font-semibold text-slate-900 hover:text-[#5a4bda] transition-colors whitespace-nowrap`}>
                             {t('nav.blog', 'Blog')}
                         </Link>
-                        <Link to="/about" className="text-[15px] font-semibold text-slate-700 hover:text-[#5a4bda] transition-colors whitespace-nowrap">
-                            About Us
+                        <Link to="/about" className={`${isTr || isIt ? "text-[15px] xl:text-[16px]" : "text-[15px] xl:text-[16px]"} font-semibold text-slate-900 hover:text-[#5a4bda] transition-colors whitespace-nowrap`}>
+                            About
                         </Link>
-                        <a href="https://store.italostudy.com" className="text-[15px] font-semibold text-slate-700 hover:text-[#5a4bda] transition-colors whitespace-nowrap">
+                        <a href="https://store.italostudy.com" className={`${isTr || isIt ? "text-[15px] xl:text-[16px]" : "text-[15px] xl:text-[16px]"} font-semibold text-slate-900 hover:text-[#5a4bda] transition-colors whitespace-nowrap`}>
                             {t('nav.store', 'Store')}
                         </a>
-                        <Link to="/contact" className="text-[15px] font-semibold text-slate-700 hover:text-[#5a4bda] transition-colors whitespace-nowrap">
+                        <Link to="/contact" className={`${isTr || isIt ? "text-[15px] xl:text-[16px]" : "text-[15px] xl:text-[16px]"} font-semibold text-slate-900 hover:text-[#5a4bda] transition-colors whitespace-nowrap`}>
                             {t('nav.contact', 'Contact')}
                         </Link>
                     </nav>
                 </div>
 
-                {/* Login/Dashboard CTA */}
-                <div className="flex items-center">
+                {/* Right Side Actions */}
+                <div className="flex items-center gap-2 lg:gap-4">
+                    {/* Language Switcher Desktop */}
+                    <div className="block relative" ref={langDropdownRef}>
+                        <button
+                            onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                            className="flex items-center gap-2 text-slate-600 hover:text-[#5a4bda] transition-colors py-2 px-2"
+                        >
+                            {currentLang === 'EN' ? <FlagUK className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" /> : 
+                             currentLang === 'IT' ? <FlagIT className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" /> : 
+                             <FlagTR className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" />}
+                            <ChevronDown className={cn("w-4 h-4 lg:w-5 lg:h-5 transition-transform opacity-70", isLangDropdownOpen && "rotate-180")} />
+                        </button>
+                        
+                        {isLangDropdownOpen && (
+                            <div className="absolute top-full right-0 mt-2 w-40 lg:w-44 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-50 py-2 notranslate" translate="no">
+                                <button onClick={() => handleLanguageChange('EN')} className={cn("w-full flex items-center gap-3 px-4 py-2.5 text-[15px] hover:bg-slate-50 transition-colors", currentLang === 'EN' ? "font-bold text-indigo-600 bg-indigo-50/30" : "font-medium text-slate-900")}>
+                                    <FlagUK className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm shrink-0" />
+                                    English
+                                </button>
+                                <button onClick={() => handleLanguageChange('IT')} className={cn("w-full flex items-center gap-3 px-4 py-2.5 text-[15px] hover:bg-slate-50 transition-colors", currentLang === 'IT' ? "font-bold text-indigo-600 bg-indigo-50/30" : "font-medium text-slate-900")}>
+                                    <FlagIT className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm shrink-0" />
+                                    Italiano
+                                </button>
+                                <button onClick={() => handleLanguageChange('TR')} className={cn("w-full flex items-center gap-3 px-4 py-2.5 text-[15px] hover:bg-slate-50 transition-colors", currentLang === 'TR' ? "font-bold text-indigo-600 bg-indigo-50/30" : "font-medium text-slate-900")}>
+                                    <FlagTR className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm shrink-0" />
+                                    Türkçe
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     {user ? (
                         <button
                             onClick={() => window.location.href = 'https://app.italostudy.com/'}
-                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-semibold rounded-lg px-7 h-10 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[15px] whitespace-nowrap"
+                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-bold rounded-lg px-3 lg:px-6 h-9 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[13px] lg:text-[15px] whitespace-nowrap"
                         >
                             <LayoutDashboard className="w-4 h-4 mr-2" />
                             {t('nav.dashboard', 'Dashboard')}
@@ -239,7 +375,7 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                     ) : (
                         <button
                             onClick={() => window.location.href = 'https://app.italostudy.com/auth'}
-                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-semibold rounded-lg px-7 h-10 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[15px] whitespace-nowrap"
+                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-bold rounded-lg px-3 lg:px-4 xl:px-5 h-9 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[13px] lg:text-[14px] whitespace-nowrap"
                         >
                             {t('nav.login_register', 'Login / Register')}
                         </button>
@@ -260,8 +396,8 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                         {/* Mobile Menu Header */}
                         <div className="h-[72px] px-4 flex items-center justify-between border-b border-[#eaeaea] shrink-0">
                             {mobileMenuView === 'main' ? (
-                                <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
-                                    <img src="/logo.webp" alt="ItaloStudy Logo" className="h-8 md:h-10 w-auto object-contain" />
+                                <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 notranslate" translate="no">
+                                    <img src="/logo.webp" alt="ItaloStudy Logo" className="h-8 md:h-10 w-auto object-contain notranslate" translate="no" />
                                 </Link>
                             ) : (
                                 <button onClick={() => setMobileMenuView('main')} className="flex items-center gap-2 text-[#333333] font-bold text-[18px]">
@@ -286,8 +422,9 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                                     {[
                                         { name: 'IMAT Mocks', path: "/imat-mock" },
                                         { name: 'CEnT-S Mocks', path: "/cent-s-mock" },
-                                        { name: t('nav.resources', 'Resources'), path: "/resources" },
+                                        { name: t('nav.resources', 'Resources'), path: "/resources", badge: 'Free' },
                                         { name: t('nav.pricing', 'Pricing'), path: "/pricing" },
+                                        { name: 'Courses', path: "/courses" },
                                         { name: t('nav.blog', 'Blog'), path: "/blog" },
                                         { name: 'About Us', path: "/about" },
                                         { name: t('nav.store', 'Store'), path: "https://store.italostudy.com", isExternal: true },
@@ -301,9 +438,7 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                                             <Link key={item.name} to={item.path} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between p-4 border-b border-[#eaeaea] hover:bg-slate-50 transition-colors">
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-bold text-[#333333] text-[16px]">{item.name}</span>
-                                                    {item.path === "/pricing" && (
-                                                        <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-black uppercase tracking-wider">{t('nav.free_beta', 'Free')}</span>
-                                                    )}
+                                                    {item.badge && <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-black uppercase tracking-wider">{item.badge}</span>}
                                                 </div>
                                             </Link>
                                         )
@@ -338,7 +473,7 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                                                             <Link 
                                                                 to={exam.path} 
                                                                 onClick={() => setIsMobileMenuOpen(false)}
-                                                                className="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg font-semibold mb-3"
+                                                                className="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg font-bold mb-3"
                                                             >
                                                                 {t('nav.view_main_exam_guide', 'View Main {{exam}} Guide \u2192', { exam: exam.name })}
                                                             </Link>
@@ -365,14 +500,24 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                             )}
                         </div>
                         
+                        {/* Mobile Language Switcher */}
+                        <div className="px-4 mt-6 mb-24">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Language</h4>
+                            <div className="grid grid-cols-3 gap-2">
+                                <button onClick={() => handleLanguageChange('EN')} className={cn("py-2 rounded-lg text-sm font-bold transition-colors border", currentLang === 'EN' ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-white border-slate-200 text-slate-600")}>EN</button>
+                                <button onClick={() => handleLanguageChange('IT')} className={cn("py-2 rounded-lg text-sm font-bold transition-colors border", currentLang === 'IT' ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-white border-slate-200 text-slate-600")}>IT</button>
+                                <button onClick={() => handleLanguageChange('TR')} className={cn("py-2 rounded-lg text-sm font-bold transition-colors border", currentLang === 'TR' ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-white border-slate-200 text-slate-600")}>TR</button>
+                            </div>
+                        </div>
+
                         {/* Mobile Menu Footer (Fixed at bottom) */}
                         <div className="p-4 bg-white border-t border-[#eaeaea] absolute bottom-0 left-0 right-0 z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] flex justify-center">
                             {user ? (
-                                <button onClick={() => window.location.href = 'https://app.italostudy.com/'} className="px-10 bg-[#5a4bda] text-white font-semibold rounded-[6px] h-11 flex items-center justify-center text-[15px]">
+                                <button onClick={() => window.location.href = 'https://app.italostudy.com/'} className="px-10 bg-[#5a4bda] text-white font-bold rounded-[6px] h-11 flex items-center justify-center text-[15px]">
                                     {t('nav.dashboard', 'Go to Dashboard')}
                                 </button>
                             ) : (
-                                <button onClick={() => window.location.href = 'https://app.italostudy.com/auth'} className="px-10 bg-[#5a4bda] text-white font-semibold rounded-[6px] h-11 flex items-center justify-center text-[15px]">
+                                <button onClick={() => window.location.href = 'https://app.italostudy.com/auth'} className="px-10 bg-[#5a4bda] text-white font-bold rounded-[6px] h-11 flex items-center justify-center text-[15px]">
                                     {t('nav.login_register', 'Login / Register')}
                                 </button>
                             )}
