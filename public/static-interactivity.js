@@ -154,11 +154,13 @@
                 { pageLanguage: 'en', autoDisplay: false, layout: 0 },
                 'google_translate_element'
             );
-            // After widget init, programmatically apply the language via doGTranslate
+            // After widget init, programmatically apply the language
             var attempts = 0;
             var interval = setInterval(function() {
-                if (window.doGTranslate) {
-                    window.doGTranslate('en|' + targetLang);
+                var select = document.querySelector('.goog-te-combo');
+                if (select) {
+                    select.value = targetLang;
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
                     clearInterval(interval);
                 } else if (++attempts > 30) {
                     clearInterval(interval);

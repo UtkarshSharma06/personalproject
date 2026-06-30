@@ -58,8 +58,17 @@ function triggerTranslation(lang: string, maxAttempts = 30) {
   const attempt = (count: number) => {
     if ((window as any).doGTranslate) {
       (window as any).doGTranslate(`en|${lang}`);
-    } else if (count < maxAttempts) {
-      setTimeout(() => attempt(count + 1), 200);
+    } else {
+      // Inline doGTranslate definition
+      const gtElement = document.getElementById('google_translate_element');
+      const select = gtElement?.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+      if (select) {
+        select.value = lang;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        // We consider it successful if we fired the event
+      } else if (count < maxAttempts) {
+        setTimeout(() => attempt(count + 1), 200);
+      }
     }
   };
   attempt(0);
