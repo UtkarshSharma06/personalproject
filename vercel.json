@@ -120,7 +120,7 @@
             "destination": "/api/static-seo-router"
         },
         {
-            "source": "/(syllabus/.*|imat.*|study-in-italy.*|tolc.*|til-i.*|pricing|about|institutional|exams|cent-s.*|best-books-for-cent-s.*|courses.*|blog$|contact$|privacy$|terms$|refund$|method$|status$|roadmap$|updates$|cent-s-exam-preparation-book-pdf.*)",
+            "source": "/(syllabus/.*|imat.*|study-in-italy.*|tolc.*|til-i.*|pricing|about|institutional|exams|cent-s.*|best-books-for-cent-s.*|courses.*|blog$|contact$|privacy$|terms$|refund$|method$|status$|roadmap$|updates$|cent-s-exam-preparation-book-pdf.*|it.*|tr.*)",
             "destination": "/api/static-seo-router"
         },
         {
