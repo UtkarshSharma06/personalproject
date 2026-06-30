@@ -87,6 +87,9 @@
     /* ─── Init ──────────────────────────────────────────────────── */
     function init() {
         console.log('--- Static Interactivity Re-hydrated ---');
+        checkAutoRedirect();
+        initGoogleTranslate();
+        initLangButtons();
         killGhostModals();
         initCookieBanner();
         initMobileMenu();
@@ -94,82 +97,138 @@
         initNavDropdowns();
         initBlog();
         initMocks();
-        initAnnouncementBar();
     }
 
-    /* ─── Global Announcement Bar ─────────────────────────────── */
-    function initAnnouncementBar() {
-        var SUPABASE_URL = 'https://jyjhpqtqbwtxxgijxetq.supabase.co';
-        var ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5amhwcXRxYnd0eHhnaWp4ZXRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MTgyNjUsImV4cCI6MjA4MzE5NDI2NX0.5HaHhfgPQbIRKmHZE61ggrtj-lKi5JlBU9tsOfQ_d3c';
-        
+    /* ─── Auto Redirect for Logged-in Users ────────────────────── */
+    function checkAutoRedirect() {
+        // Only redirect from root landing pages (Home, Home-IT, Home-TR)
         var path = window.location.pathname;
-        var isImat = path.includes('imat');
-        var isCents = path.includes('cent-s');
-        var isStore = path.includes('store');
-
-        fetch(SUPABASE_URL + '/rest/v1/site_announcements?is_active=eq.true&order=created_at.desc', {
-            headers: {
-                'apikey': ANON_KEY,
-                'Authorization': 'Bearer ' + ANON_KEY
+        var isLandingPage = path === '/' || path === '/index.html' || path === '/it' || path === '/tr' || path === '/it/' || path === '/tr/';
+        
+        if (isLandingPage && document.cookie.indexOf('italostudy_logged_in=true') !== -1) {
+            // Allow bypass via ?no_redirect=true
+            if (window.location.search.indexOf('no_redirect=true') === -1) {
+                console.log('[Auth] Logged in detected, redirecting to dashboard...');
+                window.location.href = 'https://app.italostudy.com';
             }
-        })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            if (!data || data.length === 0) return;
-
-            var active = null;
-            if (isStore) active = data.find(function(a) { return a.page_target === 'store'; });
-            else if (isImat) active = data.find(function(a) { return a.page_target === 'imat'; });
-            else if (isCents) active = data.find(function(a) { return a.page_target === 'cents'; });
-            
-            if (!active) active = data.find(function(a) { return a.page_target === 'global'; });
-            
-            if (active) renderAnnouncement(active);
-        })
-        .catch(function(err) { console.error('Announcement Error:', err); });
-
-        function renderAnnouncement(a) {
-            var bar = document.createElement('div');
-            bar.id = 'dynamic-announcement-bar';
-            bar.style.width = '100%';
-            bar.style.position = 'relative';
-            bar.style.zIndex = '1001';
-            
-            var content = a.content;
-            var btnText = a.button_text || '';
-            var bgColor = a.bg_color || '#4f46e5';
-            var textColor = a.text_color || '#ffffff';
-            var link = a.link_url || '#';
-
-            var html = '';
-            if (a.template_id === 'ticker') {
-                html = '<div style="background:'+bgColor+'; color:'+textColor+'; overflow:hidden; white-space:nowrap; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:0.1em; padding:10px 0;">' +
-                       '<div class="ticker-content" style="display:inline-block; animation: ticker-scroll 20s linear infinite; padding-left: 100%;">' +
-                       content + ' &nbsp; • &nbsp; ' + content + ' &nbsp; • &nbsp; ' + content + ' &nbsp; • &nbsp; ' + content + 
-                       '</div></div>';
-                var style = document.createElement('style');
-                style.innerHTML = '@keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }';
-                document.head.appendChild(style);
-            } else {
-                html = '<div style="background:'+bgColor+'; color:'+textColor+'; padding:12px 20px; display:flex; align-items:center; justify-content:center; gap:15px; text-align:center; font-size:12px; font-weight:700; border-bottom: 1px solid rgba(0,0,0,0.1);">' +
-                       '<span>' + content + '</span>' +
-                       (btnText ? '<a href="'+link+'" style="background:rgba(255,255,255,0.2); color:inherit; padding:5px 15px; border-radius:99px; text-decoration:none; font-size:10px; font-weight:900; text-transform:uppercase; transition: all 0.3s;" onmouseover="this.style.background=\'rgba(255,255,255,0.3)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.2)\'">'+btnText+'</a>' : '') +
-                       '</div>';
-            }
-
-            bar.innerHTML = html;
-            document.body.prepend(bar);
-
-            // Push fixed header down
-            setTimeout(function() {
-                var header = document.querySelector('header.fixed');
-                if (header) {
-                    var h = bar.offsetHeight;
-                    header.style.transition = 'top 0.3s ease';
-                    header.style.top = h + 'px';
-                }
-            }, 100);
         }
+    }
+
+    /* ─── Google Translate Auto-Init (HTML pages) ───────────────── */
+    function initGoogleTranslate() {
+        // Read the googtrans cookie set by the React navbar language switcher
+        var cookieMatch = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+        var targetLang = cookieMatch ? cookieMatch[1] : null;
+
+        // No translation needed
+        if (!targetLang) return;
+
+        // Inject CSS to hide ALL Google Translate UI chrome
+        var style = document.createElement('style');
+        style.id = 'goog-translate-hide-css';
+        style.innerHTML = [
+            '.skiptranslate, iframe.skiptranslate { display: none !important; }',
+            'body { top: 0px !important; }',
+            '#goog-gt-tt { display: none !important; }',
+            '.goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }',
+            '#google_translate_element { display: none !important; }',
+            '.goog-te-banner-frame { display: none !important; }',
+            '.goog-te-menu-frame { display: none !important; }',
+            /* Hide the Google Translate attribution icon/logo */
+            '.goog-logo-link { display: none !important; }',
+            '.goog-te-gadget { display: none !important; }'
+        ].join('\n');
+        document.head.appendChild(style);
+
+        // Create hidden widget container
+        if (!document.getElementById('google_translate_element')) {
+            var div = document.createElement('div');
+            div.id = 'google_translate_element';
+            div.style.display = 'none';
+            document.body.appendChild(div);
+        }
+
+        // Callback invoked by GT script after it loads
+        window.googleTranslateElementInit = function() {
+            new window.google.translate.TranslateElement(
+                { pageLanguage: 'en', autoDisplay: false, layout: 0 },
+                'google_translate_element'
+            );
+            // After widget init, programmatically apply the language via doGTranslate
+            var attempts = 0;
+            var interval = setInterval(function() {
+                if (window.doGTranslate) {
+                    window.doGTranslate('en|' + targetLang);
+                    clearInterval(interval);
+                } else if (++attempts > 30) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        };
+
+        // Inject the GT script once
+        if (!document.getElementById('google-translate-script')) {
+            var script = document.createElement('script');
+            script.id = 'google-translate-script';
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            script.async = true;
+            document.body.appendChild(script);
+        }
+    }
+
+    /* ─── Language Button Intercept (HTML pages) ────────────────── */
+    // The HTML pages have language links like <a href="/tr"> and <a href="/it">.
+    // On static HTML pages we don't want to navigate to the homepage — instead we:
+    //   1. Set the googtrans cookie (same as the React navbar does)
+    //   2. Reload the current page so GT auto-applies the new language
+    function initLangButtons() {
+        var hostname = window.location.hostname;
+        var domains = [hostname, '.' + hostname, 'italostudy.com', '.italostudy.com'];
+
+        function setLangCookie(lang) {
+            if (lang === 'en') {
+                // Clear the cookie on all domains
+                var expired = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                document.cookie = 'googtrans=; ' + expired;
+                domains.forEach(function(d) {
+                    document.cookie = 'googtrans=; ' + expired + ' domain=' + d;
+                });
+                localStorage.setItem('italo_lang_preference', 'EN');
+            } else {
+                document.cookie = 'googtrans=/en/' + lang + '; path=/;';
+                domains.forEach(function(d) {
+                    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=' + d;
+                });
+                localStorage.setItem('italo_lang_preference', lang.toUpperCase());
+            }
+        }
+
+        // Intercept clicks on any <a> whose href is exactly "/" (EN), "/it" (IT), "/tr" (TR)
+        document.addEventListener('click', function(e) {
+            var anchor = e.target.closest('a');
+            if (!anchor) return;
+
+            var href = anchor.getAttribute('href');
+            // Only intercept the dedicated language-switch hrefs
+            if (href === '/') {
+                // Switching to English from a non-root HTML page — stay on current page
+                var currentPath = window.location.pathname;
+                if (currentPath !== '/' && currentPath !== '') {
+                    e.preventDefault();
+                    setLangCookie('en');
+                    window.location.reload();
+                }
+                // If already on root '/', let it navigate normally
+            } else if (href === '/it') {
+                e.preventDefault();
+                setLangCookie('it');
+                window.location.reload();
+            } else if (href === '/tr') {
+                e.preventDefault();
+                setLangCookie('tr');
+                window.location.reload();
+            }
+        }, true); // capture phase so we catch it before other handlers
     }
 
     /* ─── Header Scroll Animation ────────────────────────────── */
@@ -467,9 +526,9 @@
 
     /* ─── Mobile Menu Toggle ───────────────────────────────────── */
     function initMobileMenu() {
-        var openBtn = document.getElementById('mobile-menu-open') || document.getElementById('mobile-menu-toggle');
+        var openBtn = document.getElementById('mobile-menu-open');
         var closeBtn = document.getElementById('mobile-menu-close');
-        var panel = document.getElementById('mobile-menu-panel') || document.getElementById('mobile-menu');
+        var panel = document.getElementById('mobile-menu-panel');
 
         if (!openBtn || !panel) {
             // Fallback for legacy class-based detection
@@ -490,19 +549,15 @@
 
         if (openBtn && panel) {
             openBtn.addEventListener('click', function () {
-                panel.classList.remove('hidden', 'opacity-0', 'invisible', 'pointer-events-none');
-                if (panel.style.display === 'none' || !panel.style.display) {
-                    panel.style.display = 'flex';
-                }
+                panel.classList.remove('hidden');
+                panel.style.display = 'flex';
                 document.body.style.overflow = 'hidden'; // Prevent scroll
             });
 
             if (closeBtn) {
                 closeBtn.addEventListener('click', function () {
-                    panel.classList.add('opacity-0', 'invisible', 'pointer-events-none');
-                    // We keep display flex but hide it visually to allow transitions if needed, 
-                    // or we can set hidden if we want to be sure.
-                    // For now, let's match the inline script logic.
+                    panel.classList.add('hidden');
+                    panel.style.display = 'none';
                     document.body.style.overflow = '';
                 });
             }
@@ -510,27 +565,12 @@
             // Close on link click
             panel.querySelectorAll('a').forEach(function(link) {
                 link.addEventListener('click', function() {
-                    panel.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+                    panel.classList.add('hidden');
+                    panel.style.display = 'none';
                     document.body.style.overflow = '';
                 });
             });
         }
-    }
-
-    /* ─── Supabase Central Initialization ────────────────────────── */
-    var SB_URL = 'https://jyjhpqtqbwtxxgijxetq.supabase.co';
-    var SB_KEY = 'sb_publishable_LZduUlJ96GYtgyo0l-iTzw_P-8Glk_v';
-    var _sbClient = null;
-
-    function getSupabase() {
-        if (_sbClient) return _sbClient;
-        if (typeof window.supabase !== 'undefined') {
-            _sbClient = window.supabase.createClient(SB_URL, SB_KEY);
-            console.log('[Supabase] Client Initialized successfully.');
-            return _sbClient;
-        }
-        console.error('[Supabase] Library not found in window.');
-        return null;
     }
 
     /* ─── Blog Pagination & Filtering (Dynamic) ───────────────────────────── */
@@ -538,13 +578,21 @@
         var grid = document.getElementById('blog-grid');
         if (!grid) return;
 
-        var sb = getSupabase();
-        if (!sb) return;
+        // 1. Supabase Initialization
+        var supabaseUrl = 'https://jyjhpqtqbwtxxgijxetq.supabase.co';
+        var supabaseKey = 'sb_publishable_LZduUlJ96GYtgyo0l-iTzw_P-8Glk_v';
+        
+        if (typeof supabase === 'undefined') {
+            console.error('Supabase library not loaded. Dynamic blog updates disabled.');
+            return;
+        }
 
+        var supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
         var searchInput = document.getElementById('blog-search-input');
         var catBtns = Array.from(document.querySelectorAll('.blog-category-btn'));
         var prevBtn = document.getElementById('blog-prev-btn');
         var nextBtn = document.getElementById('blog-next-btn');
+        var pageBtns = Array.from(document.querySelectorAll('.blog-page-btn'));
         var paginationWrapper = document.getElementById('blog-pagination');
         var scrollAnchor = document.getElementById('blog-search-input') || grid; 
 
@@ -552,230 +600,367 @@
         var currentPage = 1;
         var currentCategory = 'all';
         var currentSearch = '';
-        var allPosts = [];
+        var allPosts = []; // Will store fetched data
 
-        var emojiMap = { 'exams': '📝', 'life-abroad': '🌍', 'study-tips': '💡', 'imat': '🏥', 'tolc': '🎓' };
+        // Helper: Category Emoji Mapping
+        var emojiMap = {
+            'exams': '\ud83d\udcdd',
+            'life-abroad': '\ud83c\udf0d',
+            'study-tips': '\ud83d\udca1',
+            'imat': '\ud83c\udfe5',
+            'tolc': '\ud83c\udf93'
+        };
 
-        grid.innerHTML = '<div class="col-span-full py-20 text-center"><div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-4"></div><p class="text-slate-500 font-bold">Syncing archives...</p></div>';
+        // Initial Loading State
+        grid.innerHTML = '<div class="col-span-full py-20 text-center"><div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-4"></div><p class="text-slate-500 font-bold">Loading blogs...</p></div>';
 
         async function fetchContent() {
             try {
-                var { data, error } = await sb.from('blog_posts').select('*, blog_categories(name, slug)').order('created_at', { ascending: false });
+                // Fetch Categories to update the buttons if needed (optional but good for consistency)
+                var catRes = await supabaseClient.from('blog_categories').select('name, slug');
+                if (catRes.data) {
+                    // Update buttons with emojis if slugs match
+                    catBtns.forEach(function(btn) {
+                        var slug = btn.getAttribute('data-category');
+                        if (slug !== 'all') {
+                            var match = catRes.data.find(c => c.slug === slug);
+                            if (match && btn.innerText.indexOf('\ud83d') === -1) {
+                                btn.innerText = (emojiMap[slug] || '\ud83d\udccc') + ' ' + match.name;
+                            }
+                        }
+                    });
+                }
+
+                // Fetch Posts - latest first
+                var { data, error } = await supabaseClient
+                    .from('blog_posts')
+                    .select('*, blog_categories(name, slug)')
+                    .order('created_at', { ascending: false })
+                    .order('published_at', { ascending: false });
+
                 if (error) throw error;
                 allPosts = data || [];
+                console.log('Blog Sync — Fetched ' + allPosts.length + ' posts:', allPosts);
                 render();
-            } catch (err) { console.error('Blog Fetch Error:', err); }
+            } catch (err) {
+                console.error('Error fetching blog data:', err);
+            }
         }
 
         function render() {
+            // Filter
             var filtered = allPosts.filter(function(post) {
                 var title = (post.title || '').toLowerCase();
                 var cat = (post.blog_categories && post.blog_categories.slug) || 'none';
-                return (currentSearch === '' || title.indexOf(currentSearch) !== -1) && (currentCategory === 'all' || cat === currentCategory);
+                var matchSearch = currentSearch === '' || title.indexOf(currentSearch) !== -1;
+                var matchCat = currentCategory === 'all' || cat === currentCategory;
+                return matchSearch && matchCat;
             });
 
+            console.log('Blog Sync — Rendering ' + filtered.length + ' posts (Page ' + currentPage + ')');
             var totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE) || 1;
             if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
-            var start = (currentPage - 1) * POSTS_PER_PAGE;
 
+            var start = (currentPage - 1) * POSTS_PER_PAGE;
+            var end = start + POSTS_PER_PAGE;
+
+            // Render Grid Content
             if (filtered.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-24 bg-white border-2 border-dashed border-slate-200 rounded-[3rem]"><h3 class="text-2xl font-black text-slate-900 mb-2">No posts found</h3></div>';
+                grid.innerHTML = '<div class="col-span-full text-center py-24 bg-white border-2 border-dashed border-slate-200 rounded-[3rem]"><div class="text-6xl mb-4">\ud83d\udca3</div><h3 class="text-2xl font-black text-slate-900 mb-2">No posts found</h3><p class="text-slate-500 font-bold">Try adjusting your search or filters!</p></div>';
             } else {
-                grid.innerHTML = filtered.slice(start, start + POSTS_PER_PAGE).map(function(post, idx) {
+                var html = `
+                <style>
+                    .card-body { display: flex; width: 100%; background-color: white; }
+                    .date-time-container { writing-mode: vertical-lr; transform: rotate(180deg); padding: 1rem 0.5rem; background-color: #f8fafc; border-right: 1px solid #f1f5f9; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+                    .date-time { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #334155; letter-spacing: 0.1em; }
+                    .separator { width: 1px; height: 24px; background-color: #cbd5e1; }
+                    .content { display: flex; flex: 1; flex-direction: column; justify-content: space-between; }
+                    .infos { padding: 1.5rem; }
+                    .title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; line-height: 1.3; color: #0f172a; text-decoration: none; display: block; margin-bottom: 0.75rem; letter-spacing: -0.02em; }
+                    .description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-size: 0.875rem; line-height: 1.6; color: #64748b; font-weight: 500; }
+                    .action-btn { background-color: #fde047; padding: 1rem; text-align: center; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #0f172a; transition: all 0.2s; }
+                    .action-btn:hover { background-color: #facc15; color: black; }
+                </style>
+                `;
+                html += filtered.slice(start, end).map(function(post, idx) {
                     var date = new Date(post.published_at || post.created_at);
-                    var img = post.featured_image || '';
-                    return '<div class="blog-post-card"><div class="group h-full flex flex-col bg-white rounded-[2rem] overflow-hidden border border-slate-100 hover:shadow-2xl transition-all"><a class="block relative aspect-video overflow-hidden" href="/blog/'+post.slug+'">' + (img ? '<img src="'+img+'" class="w-full h-full object-cover">' : '<div class="w-full h-full bg-slate-100"></div>') + '</a><div class="p-8 flex flex-col flex-1"><a href="/blog/'+post.slug+'" class="text-xl font-black text-slate-900 hover:text-indigo-600 transition-colors uppercase leading-tight mb-4">'+post.title+'</a><p class="text-slate-500 text-sm font-medium line-clamp-3 mb-6">'+(post.excerpt || '')+'</p><a href="/blog/'+post.slug+'" class="mt-auto bg-yellow-400 py-3 text-center text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-yellow-500 transition-colors">Read Article</a></div></div></div>';
+                    var year = date.getFullYear();
+                    var dateStr = date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+                    var image = post.featured_image || '';
+                    var categorySlug = (post.blog_categories && post.blog_categories.slug) || 'none';
+
+                    var imgHtml = image 
+                        ? '<img src="' + image + '" alt="' + post.title + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">'
+                        : '<div class="w-full h-full bg-slate-100 flex items-center justify-center"><span class="text-4xl">\ud83c\udf92</span></div>';
+
+                    return `
+                        <div class="blog-post-card animate-fade-in" style="animation-delay: ${idx * 0.1}s">
+                            <div class="card-wrapper group h-full flex flex-col bg-white rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-slate-100">
+                                <a class="block relative aspect-video overflow-hidden" href="/blog/${post.slug}">
+                                    ${imgHtml}
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </a>
+                                <div class="card-body flex flex-1">
+                                    <div class="date-time-container">
+                                        <time class="date-time" datetime="${date.toISOString().split('T')[0]}">
+                                            <span>${year}</span>
+                                            <span class="separator"></span>
+                                            <span>${dateStr}</span>
+                                        </time>
+                                    </div>
+                                    <div class="content">
+                                        <div class="infos">
+                                            <a href="/blog/${post.slug}">
+                                                <span class="title group-hover:text-indigo-600 transition-colors">${post.title}</span>
+                                            </a>
+                                            <p class="description">${post.excerpt || ''}</p>
+                                        </div>
+                                        <a class="action-btn" href="/blog/${post.slug}">Read Article</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 }).join('');
+                grid.innerHTML = html;
             }
 
-            if (paginationWrapper) paginationWrapper.style.display = totalPages <= 1 ? 'none' : 'flex';
-            if (prevBtn) prevBtn.disabled = currentPage === 1;
-            if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+            // Update Pagination UI
+            if (paginationWrapper) {
+                paginationWrapper.style.display = totalPages <= 1 ? 'none' : 'flex';
+                if (prevBtn) {
+                    prevBtn.disabled = currentPage === 1;
+                    prevBtn.style.opacity = currentPage === 1 ? '0.3' : '1';
+                }
+                if (nextBtn) {
+                    nextBtn.disabled = currentPage === totalPages;
+                    nextBtn.style.opacity = currentPage === totalPages ? '0.3' : '1';
+                }
+                
+                // Clear and rebuild page buttons for dynamic total
+                var pageNumbersContainer = document.getElementById('blog-page-numbers');
+                if (pageNumbersContainer) {
+                    var pagesHtml = '';
+                    for (var i = 1; i <= totalPages; i++) {
+                        var activeClass = i === currentPage 
+                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
+                            : 'bg-white text-slate-400 hover:text-indigo-600 border-2 border-slate-100 hover:border-indigo-100';
+                        pagesHtml += `<button data-page="${i}" class="blog-page-btn w-10 h-10 rounded-xl font-black text-xs transition-all ${activeClass}">${i}</button>`;
+                    }
+                    pageNumbersContainer.innerHTML = pagesHtml;
+                    
+                    // Re-attach listeners to new buttons
+                    pageNumbersContainer.querySelectorAll('.blog-page-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var p = parseInt(this.getAttribute('data-page'), 10);
+                            if (p) { currentPage = p; render(); doScroll(); }
+                        });
+                    });
+                }
+            }
+
+            // Update Category Buttons UI
+            catBtns.forEach(function(btn) {
+                var cat = btn.getAttribute('data-category');
+                if (cat === currentCategory) {
+                    btn.className = 'blog-category-btn px-6 py-3 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all shadow-sm bg-indigo-600 border-indigo-600 text-white';
+                } else {
+                    btn.className = 'blog-category-btn px-6 py-3 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all shadow-sm bg-white border-slate-100 text-slate-600 hover:border-indigo-400 hover:text-indigo-600';
+                }
+            });
         }
 
-        if (searchInput) searchInput.addEventListener('input', function(e) { currentSearch = e.target.value.toLowerCase(); currentPage = 1; render(); });
-        catBtns.forEach(function(btn) { btn.addEventListener('click', function() { currentCategory = this.getAttribute('data-category'); currentPage = 1; render(); }); });
-        if (prevBtn) prevBtn.addEventListener('click', function() { if (currentPage > 1) { currentPage--; render(); window.scrollTo({top: grid.offsetTop - 100, behavior: 'smooth'}); } });
-        if (nextBtn) nextBtn.addEventListener('click', function() { if (currentPage < Math.ceil(allPosts.length / POSTS_PER_PAGE)) { currentPage++; render(); window.scrollTo({top: grid.offsetTop - 100, behavior: 'smooth'}); } });
+        function doScroll() {
+            if (scrollAnchor) {
+                var y = scrollAnchor.getBoundingClientRect().top + window.scrollY - 100;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }
 
+        // Search Listener
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                currentSearch = e.target.value.toLowerCase();
+                currentPage = 1;
+                render();
+            });
+        }
+
+        // Category Listeners
+        catBtns.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var cat = this.getAttribute('data-category');
+                if (cat) {
+                    currentCategory = cat;
+                    currentPage = 1;
+                    render();
+                }
+            });
+        });
+
+        // Prev/Next Listeners
+        if (prevBtn) prevBtn.addEventListener('click', function(e) { 
+            e.preventDefault();
+            if (currentPage > 1) { currentPage--; render(); doScroll(); } 
+        });
+        
+        if (nextBtn) nextBtn.addEventListener('click', function(e) { 
+            e.preventDefault();
+            if (currentPage < Math.ceil(allPosts.length / POSTS_PER_PAGE)) {
+                currentPage++; render(); doScroll(); 
+            }
+        });
+
+        // Initial Fetch
         fetchContent();
     }
 
     /* ─── Mock Tests (CEnT-S & IMAT)  ───────────────────────────── */
     function initMocks() {
-        var path = window.location.pathname.toLowerCase();
-        var isCents = path.indexOf('cent-s-mock') !== -1;
-        var isImat = path.indexOf('imat-mock') !== -1;
+        var path = window.location.pathname;
+        var isCents = path.indexOf('/cent-s-mock') !== -1;
+        var isImat = path.indexOf('/imat-mock') !== -1;
+        
         if (!isCents && !isImat) return;
 
         var container = document.getElementById('mock-list-container');
         if (!container) return;
 
-        var sb = getSupabase();
-        if (!sb) {
-            container.innerHTML = '<div class="text-center py-20 text-red-500 font-bold uppercase tracking-widest text-[10px]">Registry Link Offline</div>';
+        var examType = isCents ? 'cent-s-prep' : 'imat-prep';
+
+        if (typeof window.supabase === 'undefined') {
+            container.innerHTML = '<div class="text-center py-20 text-red-500 font-bold">Error: Supabase client not loaded.</div>';
             return;
         }
 
-        var examType = isCents ? 'cent-s-prep' : 'imat-prep';
-        console.log('[MockSync] Initializing for ' + examType);
+        var sbUrl = 'https://jyjhpqtqbwtxxgijxetq.supabase.co';
+        var sbKey = 'sb_publishable_LZduUlJ96GYtgyo0l-iTzw_P-8Glk_v';
+        var sbClient = window.supabase.createClient(sbUrl, sbKey);
 
-        container.innerHTML = '<div class="flex flex-col items-center justify-center py-32"><div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-6"></div><p class="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Syncing Portal Data...</p></div>';
+        container.innerHTML = '<div class="flex flex-col items-center justify-center py-32 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200"><div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-6"></div><p class="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Loading simulations...</p></div>';
 
+        // Check auth status synchronously based on the auth-check script
         var isLogged = !!window.__IS_LOGGED_IN;
-        var currentFilter = 'all';
-        var sessions = [];
-        var allSeries = [];
-        var selectedSeries = null;
 
-        window.handleStartSimulation = function(id, past) {
-            if (!isLogged) { window.open('https://app.italostudy.com', '_blank'); return; }
-            window.location.href = past ? '/mock-guidelines?session_id='+id+'&exam_type='+examType : '/waiting-room/'+id;
-        };
-
-        window.filterMocks = function(f) { 
-            currentFilter = f; 
-            selectedSeries = null;
-            render(); 
-        };
-
-        window.viewSeriesMocks = function(id) {
-            selectedSeries = allSeries.find(function(s) { return s.id === id; });
-            render();
-            container.scrollIntoView({ behavior: 'smooth' });
-        };
-
-        window.openSeriesSchedule = function(id) {
-            var s = allSeries.find(function(x) { return x.id === id; });
-            if (!s || !s.schedule_info) return;
-
-            var modal = document.createElement('div');
-            modal.id = 'series-schedule-modal';
-            modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300';
-            modal.innerHTML = '<div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all scale-95 opacity-0" id="series-modal-content">' +
-                '<div class="p-8 border-b border-slate-50 flex items-center justify-between">' +
-                    '<div class="flex items-center gap-4">' +
-                        '<div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>' +
-                        '<div><h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">Series Schedule</h2><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">'+s.title+'</p></div>' +
-                    '</div>' +
-                    '<button onclick="closeSeriesSchedule()" class="p-2 hover:bg-slate-50 rounded-xl transition-colors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
-                '</div>' +
-                '<div class="p-10 max-h-[60vh] overflow-y-auto text-slate-600 leading-relaxed text-sm">' + s.schedule_info + '</div>' +
-                '<div class="p-8 bg-slate-50 flex justify-end"><button onclick="closeSeriesSchedule()" class="bg-slate-900 text-white rounded-2xl px-8 py-3 text-[10px] font-black uppercase tracking-widest">Close Schedule</button></div>' +
-            '</div>';
-            
-            document.body.appendChild(modal);
-            setTimeout(function() {
-                var content = document.getElementById('series-modal-content');
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
-
-            window.closeSeriesSchedule = function() {
-                var content = document.getElementById('series-modal-content');
-                content.classList.remove('scale-100', 'opacity-100');
-                content.classList.add('scale-95', 'opacity-0');
-                setTimeout(function() { modal.remove(); }, 300);
-            };
-        };
-
-        async function fetchData() {
-            try {
-                var resSessions = await sb.from('mock_sessions').select('*').eq('is_active', true).eq('exam_type', examType).order('start_time', { ascending: false });
-                var resSeries = await sb.from('mock_series').select('*, mock_series_items(session_id)').eq('is_active', true).eq('exam_type', examType).order('created_at', { ascending: false });
-                
-                sessions = resSessions.data || [];
-                allSeries = resSeries.data || [];
-                
-                var now = new Date();
-                sessions.forEach(function(s) {
-                    var st = new Date(s.start_time), et = new Date(s.end_time);
-                    s.statusFlag = st > now ? 'upcoming' : (et < now ? 'past' : 'live');
-                });
-
-                render();
-            } catch (err) { 
-                console.error('Mock Fetch Error:', err); 
-                container.innerHTML = '<div class="text-center py-20 text-red-500 font-bold uppercase tracking-widest text-[9px]">Connection Failed</div>'; 
+        function handleStartSimulation(sessionId, isPast) {
+            if (!isLogged) {
+                // Not logged in -> go to auth page with redirect back here or directly to waiting room
+                window.location.href = '/auth'; // User wants them to be redirected
+                return;
+            }
+            if (isPast) {
+                window.location.href = '/mock-guidelines?session_id=' + sessionId + '&exam_type=' + examType;
+            } else {
+                window.location.href = '/waiting-room/' + sessionId;
             }
         }
+        window.handleStartSimulation = handleStartSimulation; // Export to global for inline onclick
 
-        function render() {
-            var html = '';
+        // Icons SVG definitions (tailored from Lucide)
+        var clockIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+        var targetIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
+        var medalIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.61 2.14a2 2 0 0 1 .14 2.2L16.79 15"/><path d="M11 12 5.12 2.2"/><path d="m13 12 5.88-9.8"/><path d="M8 7h8"/><circle cx="12" cy="17" r="5"/><polyline points="12 18 12 19 13 20"/></svg>';
+
+        function renderCard(session, isNewest, totalCount, index) {
+            var isUpcoming = session.statusFlag === 'upcoming' || session.statusFlag === 'live';
+            var indexStr = (totalCount - index).toString().padStart(2, '0');
+            var borderClass = isNewest ? "border-indigo-600 ring-4 ring-indigo-50 shadow-2xl" : "border-slate-100 hover:shadow-2xl hover:shadow-slate-200/50";
             
-            if (currentFilter === 'series' && !selectedSeries) {
-                if (allSeries.length === 0) {
-                    container.innerHTML = '<div class="py-32 text-center opacity-30"><h3 class="text-2xl font-black uppercase tracking-tighter">No Series Established</h3></div>';
+            var badgeHtml = isNewest 
+                ? '<div class="px-3 py-1 bg-indigo-600 rounded-full text-[8px] md:text-[9px] font-black text-white uppercase tracking-widest">New</div>'
+                : (isUpcoming 
+                    ? '<div class="px-3 py-1 bg-emerald-100 rounded-full text-[8px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest">Upcoming</div>'
+                    : '<div class="px-3 py-1 bg-slate-100 rounded-full text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Archive</div>');
+
+            var btnText = 'Start Simulation';
+            if (!isLogged) btnText = 'Login to Start';
+            if (session.statusFlag === 'upcoming') btnText = 'Register Now';
+
+            var isPast = session.statusFlag === 'past';
+
+            return `
+            <div class="group bg-white rounded-[2rem] md:rounded-[2.5rem] border-2 p-6 md:p-8 flex flex-col transition-all duration-500 relative overflow-hidden ${borderClass}">
+                <div class="flex items-center justify-between mb-6 md:mb-8">
+                    <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                        Simulator #${indexStr}
+                    </div>
+                    ${badgeHtml}
+                </div>
+                <h3 class="text-xl md:text-2xl font-black text-slate-900 mb-6 leading-[1.2] group-hover:text-indigo-600 transition-colors">
+                    ${session.title}
+                </h3>
+                <div class="space-y-4 mb-8 md:mb-10 flex-grow">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">${clockIcon}</div>
+                        <span class="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest">110 Minutes / Sectioned</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">${targetIcon}</div>
+                        <span class="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest">55 Questions / +1/-0.25 Scoring</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">${medalIcon}</div>
+                        <span class="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest">Ranking & Analysis Enabled</span>
+                    </div>
+                </div>
+                <button onclick="handleStartSimulation('${session.id}', ${isPast})" class="w-full inline-flex items-center justify-center h-12 md:h-14 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-lg active:scale-95 bg-indigo-600 text-white hover:bg-indigo-700">
+                    ${btnText}
+                </button>
+            </div>
+            `;
+        }
+
+        async function fetchMocks() {
+            try {
+                var res = await sbClient.from('mock_sessions')
+                    .select('*')
+                    .eq('is_active', true)
+                    .eq('exam_type', examType)
+                    .order('start_time', { ascending: false });
+                
+                if (res.error) throw res.error;
+                var sessions = res.data || [];
+                var now = new Date();
+                
+                sessions.forEach(function(s) {
+                    var st = new Date(s.start_time);
+                    var et = new Date(s.end_time);
+                    if (st > now) s.statusFlag = 'upcoming';
+                    else if (et < now) s.statusFlag = 'past';
+                    else s.statusFlag = 'live';
+                });
+
+                var upcoming = sessions.filter(function(s) { return s.statusFlag === 'upcoming' || s.statusFlag === 'live'; });
+                var archive = sessions.filter(function(s) { return s.statusFlag === 'past'; });
+
+                if (sessions.length === 0) {
+                    container.innerHTML = '<div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-20 text-center"><p class="text-slate-400 font-bold">The exam archive is currently being updated. Please check back later!</p></div>';
                     return;
                 }
-                html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">';
-                allSeries.forEach(function(s) {
-                    html += '<div class="bg-white p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border-2 border-slate-100 border-b-[6px] shadow-sm hover:border-indigo-200 transition-all cursor-pointer group flex flex-col justify-between" onclick="viewSeriesMocks(\''+s.id+'\')">' +
-                        '<div>' +
-                            '<div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center mb-6 text-indigo-600 group-hover:scale-110 transition-transform"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2h2v20h-2z"/><path d="M12 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6"/><path d="M12 4h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/></svg></div>' +
-                            '<h3 class="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">'+s.title+'</h3>' +
-                            '<p class="text-xs text-slate-500 font-medium line-clamp-2 mb-6">'+(s.description || 'Curated series of practice mocks.')+'</p>' +
-                            '<div class="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-slate-400">' +
-                                '<span class="flex items-center gap-1.5">⚡ '+(s.mock_series_items ? s.mock_series_items.length : 0)+' Mocks</span>' +
-                                '<span class="flex items-center gap-1.5">📅 Updated '+new Date(s.created_at).toLocaleDateString()+'</span>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="pt-8 flex flex-col gap-2">' +
-                            '<button class="w-full bg-indigo-600 text-white h-12 rounded-2xl text-[10px] uppercase font-black tracking-widest shadow-lg shadow-indigo-100">View Mocks</button>' +
-                            (s.schedule_info ? '<button onclick="event.stopPropagation(); window.openSeriesSchedule(\''+s.id+'\')" class="w-full h-10 rounded-xl text-[9px] uppercase font-bold tracking-widest text-slate-400 hover:text-slate-600">Open Schedule</button>' : '') +
-                        '</div>' +
-                    '</div>';
-                });
-                html += '</div>';
-                container.innerHTML = html;
-                return;
-            }
 
-            var filtered = sessions;
-            if (selectedSeries) {
-                var ids = selectedSeries.mock_series_items.map(function(item) { return item.session_id; });
-                filtered = sessions.filter(function(s) { return ids.indexOf(s.id) !== -1; });
+                var html = '';
                 
-                html += '<div class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 md:p-6 bg-slate-50 rounded-[2rem] border border-slate-100 mb-8">' +
-                    '<div class="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">' +
-                        '<button onclick="window.filterMocks(\'series\')" class="w-10 h-10 rounded-full hover:bg-white flex items-center justify-center transition-colors shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>' +
-                        '<div><h2 class="text-lg font-black text-slate-900 uppercase tracking-tight">'+selectedSeries.title+'</h2><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Showing mocks in this series</p></div>' +
-                    '</div>' +
-                    (selectedSeries.schedule_info ? '<button onclick="window.openSeriesSchedule(\''+selectedSeries.id+'\')" class="w-full md:w-auto bg-indigo-600 text-white px-6 h-10 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-md shadow-indigo-100">Series Schedule</button>' : '') +
-                '</div>';
-            } else {
-                if (currentFilter === 'upcoming') filtered = sessions.filter(function(s) { return s.statusFlag !== 'past'; });
-                else if (currentFilter === 'past') filtered = sessions.filter(function(s) { return s.statusFlag === 'past'; });
-            }
+                if (upcoming.length > 0) {
+                    html += '<div class="mb-12"><h3 class="text-xl font-black mb-6 text-slate-900 border-b border-indigo-100 pb-2 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span> Upcoming / Live Simulations</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
+                    upcoming.forEach(function(s, i) { html += renderCard(s, false, sessions.length, i); });
+                    html += '</div></div>';
+                }
 
-            if (filtered.length === 0) {
-                container.innerHTML = html + '<div class="py-32 text-center opacity-30"><h3 class="text-2xl font-black uppercase tracking-tighter">No Simulations Found</h3></div>';
-                return;
-            }
+                if (archive.length > 0) {
+                    html += '<div class="mb-12"><h3 class="text-xl font-black mb-6 text-slate-900 border-b border-slate-200 pb-2">Archive / Past Simulations</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
+                    archive.forEach(function(s, i) { html += renderCard(s, i === 0, archive.length, i); });
+                    html += '</div></div>';
+                }
 
-            var upcoming = filtered.filter(function(s) { return s.statusFlag !== 'past'; });
-            var archive = filtered.filter(function(s) { return s.statusFlag === 'past'; });
-
-            if (upcoming.length > 0) {
-                html += '<div class="mb-24"><h3 class="text-2xl font-black text-[#001533] uppercase tracking-tight mb-10">Mocks Available</h3><div class="grid gap-6">';
-                upcoming.forEach(function(s) {
-                    var d = new Date(s.start_time);
-                    html += '<div class="bg-white rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row items-center justify-between border border-slate-100 group shadow-sm gap-6 md:gap-0"><div class="flex flex-col md:flex-row items-center text-center md:text-left gap-4 md:gap-8"><div class="flex flex-col items-center justify-center bg-slate-50 rounded-2xl w-20 h-20 shrink-0"><span class="text-2xl font-black">'+d.getDate()+'</span><span class="text-[8px] font-bold uppercase text-slate-400">'+d.toLocaleString('default',{month:'short'})+'</span></div><div><h3 class="text-xl font-black text-slate-900 mb-2">'+s.title+'</h3><span class="text-[9px] font-black uppercase inline-block '+(s.statusFlag==='live'?'text-red-600 bg-red-50':'text-emerald-600 bg-emerald-50')+' px-3 py-1 rounded-full">'+(s.statusFlag==='live'?'Live Now':'Registration Open')+'</span></div></div><button onclick="handleStartSimulation(\''+s.id+'\', false)" class="w-full md:w-auto px-8 py-3 bg-[#001533] text-white rounded-xl font-bold uppercase text-[10px] tracking-widest shrink-0">Register Now</button></div>';
-                });
-                html += '</div></div>';
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error fetching mock sessions:', err);
+                container.innerHTML = '<div class="text-center py-20 text-red-500 font-bold">Failed to load mock tests. Code: ' + err.message + '</div>';
             }
-
-            if (archive.length > 0) {
-                html += '<div><h3 class="text-2xl font-black text-[#001533] uppercase tracking-tight mb-10">Historical Archive</h3><div class="grid gap-4 bg-white border border-slate-100 rounded-[2rem] p-4 shadow-sm">';
-                archive.forEach(function(s) {
-                    var d = new Date(s.start_time).toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'});
-                    html += '<div onclick="handleStartSimulation(\''+s.id+'\', true)" class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 md:p-6 gap-3 md:gap-0 hover:bg-slate-50 rounded-2xl cursor-pointer group transition-all"><div class="flex items-center gap-4 w-full md:w-auto"><div class="w-10 h-10 bg-slate-50 flex items-center justify-center rounded-xl text-slate-400 shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="font-bold text-slate-900 line-clamp-1">'+s.title+'</span></div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0 ml-14 md:ml-0">'+d+'</span></div>';
-                });
-                html += '</div></div>';
-            }
-            container.innerHTML = html;
         }
 
-        fetchData();
+        fetchMocks();
     }
 })();

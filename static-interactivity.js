@@ -88,6 +88,8 @@
     function init() {
         console.log('--- Static Interactivity Re-hydrated ---');
         checkAutoRedirect();
+        initGoogleTranslate();
+        initLangButtons();
         killGhostModals();
         initCookieBanner();
         initMobileMenu();
@@ -110,6 +112,123 @@
                 window.location.href = 'https://app.italostudy.com';
             }
         }
+    }
+
+    /* ─── Google Translate Auto-Init (HTML pages) ───────────────── */
+    function initGoogleTranslate() {
+        // Read the googtrans cookie set by the React navbar language switcher
+        var cookieMatch = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+        var targetLang = cookieMatch ? cookieMatch[1] : null;
+
+        // No translation needed
+        if (!targetLang) return;
+
+        // Inject CSS to hide ALL Google Translate UI chrome
+        var style = document.createElement('style');
+        style.id = 'goog-translate-hide-css';
+        style.innerHTML = [
+            '.skiptranslate, iframe.skiptranslate { display: none !important; }',
+            'body { top: 0px !important; }',
+            '#goog-gt-tt { display: none !important; }',
+            '.goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }',
+            '#google_translate_element { display: none !important; }',
+            '.goog-te-banner-frame { display: none !important; }',
+            '.goog-te-menu-frame { display: none !important; }',
+            /* Hide the Google Translate attribution icon/logo */
+            '.goog-logo-link { display: none !important; }',
+            '.goog-te-gadget { display: none !important; }'
+        ].join('\n');
+        document.head.appendChild(style);
+
+        // Create hidden widget container
+        if (!document.getElementById('google_translate_element')) {
+            var div = document.createElement('div');
+            div.id = 'google_translate_element';
+            div.style.display = 'none';
+            document.body.appendChild(div);
+        }
+
+        // Callback invoked by GT script after it loads
+        window.googleTranslateElementInit = function() {
+            new window.google.translate.TranslateElement(
+                { pageLanguage: 'en', autoDisplay: false, layout: 0 },
+                'google_translate_element'
+            );
+            // After widget init, programmatically apply the language via doGTranslate
+            var attempts = 0;
+            var interval = setInterval(function() {
+                if (window.doGTranslate) {
+                    window.doGTranslate('en|' + targetLang);
+                    clearInterval(interval);
+                } else if (++attempts > 30) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        };
+
+        // Inject the GT script once
+        if (!document.getElementById('google-translate-script')) {
+            var script = document.createElement('script');
+            script.id = 'google-translate-script';
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            script.async = true;
+            document.body.appendChild(script);
+        }
+    }
+
+    /* ─── Language Button Intercept (HTML pages) ────────────────── */
+    // The HTML pages have language links like <a href="/tr"> and <a href="/it">.
+    // On static HTML pages we don't want to navigate to the homepage — instead we:
+    //   1. Set the googtrans cookie (same as the React navbar does)
+    //   2. Reload the current page so GT auto-applies the new language
+    function initLangButtons() {
+        var hostname = window.location.hostname;
+        var domains = [hostname, '.' + hostname, 'italostudy.com', '.italostudy.com'];
+
+        function setLangCookie(lang) {
+            if (lang === 'en') {
+                // Clear the cookie on all domains
+                var expired = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                document.cookie = 'googtrans=; ' + expired;
+                domains.forEach(function(d) {
+                    document.cookie = 'googtrans=; ' + expired + ' domain=' + d;
+                });
+                localStorage.setItem('italo_lang_preference', 'EN');
+            } else {
+                document.cookie = 'googtrans=/en/' + lang + '; path=/;';
+                domains.forEach(function(d) {
+                    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=' + d;
+                });
+                localStorage.setItem('italo_lang_preference', lang.toUpperCase());
+            }
+        }
+
+        // Intercept clicks on any <a> whose href is exactly "/" (EN), "/it" (IT), "/tr" (TR)
+        document.addEventListener('click', function(e) {
+            var anchor = e.target.closest('a');
+            if (!anchor) return;
+
+            var href = anchor.getAttribute('href');
+            // Only intercept the dedicated language-switch hrefs
+            if (href === '/') {
+                // Switching to English from a non-root HTML page — stay on current page
+                var currentPath = window.location.pathname;
+                if (currentPath !== '/' && currentPath !== '') {
+                    e.preventDefault();
+                    setLangCookie('en');
+                    window.location.reload();
+                }
+                // If already on root '/', let it navigate normally
+            } else if (href === '/it') {
+                e.preventDefault();
+                setLangCookie('it');
+                window.location.reload();
+            } else if (href === '/tr') {
+                e.preventDefault();
+                setLangCookie('tr');
+                window.location.reload();
+            }
+        }, true); // capture phase so we catch it before other handlers
     }
 
     /* ─── Header Scroll Animation ────────────────────────────── */
