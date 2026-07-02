@@ -830,7 +830,7 @@ export default function BlogPostPage() {
                 ) : (
                 <>
                     {/* Back Button */}
-                    <div className="container mx-auto px-4 py-8 max-w-4xl">
+                    <div className="w-full py-4 sm:py-8">
                         <Link
                             to="/blog"
                             className="group inline-flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-widest hover:text-indigo-800 transition-colors bg-white/50 px-4 py-2 rounded-full border border-indigo-100"
@@ -840,11 +840,11 @@ export default function BlogPostPage() {
                         </Link>
                     </div>
 
-                    <article className="container mx-auto px-4">
+                    <article className="w-full">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="max-w-4xl mx-auto bg-white border-[6px] border-white rounded-[3rem] p-6 md:p-12 lg:p-16 shadow-2xl shadow-indigo-900/5 relative overflow-hidden"
+                            className="w-full bg-white sm:border-[6px] sm:border-white rounded-[2rem] sm:rounded-[3rem] p-5 sm:p-8 md:p-12 lg:p-16 shadow-xl sm:shadow-2xl shadow-indigo-900/5 relative overflow-hidden"
                         >
                             {/* Decorative Blobs */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2" />
@@ -907,7 +907,7 @@ export default function BlogPostPage() {
                                 {/* Content — first half */}
                                 <div
                                     ref={contentRef}
-                                    className="prose prose-lg prose-indigo max-w-none font-['Outfit'] prose-headings:font-black prose-headings:tracking-tight prose-headings:text-slate-900 prose-p:text-slate-900 prose-p:leading-relaxed prose-li:text-slate-900 prose-a:font-bold prose-a:text-indigo-600 prose-img:rounded-[2rem] prose-img:shadow-xl prose-img:border-4 prose-img:border-slate-50 w-full"
+                                    className="prose sm:prose-lg prose-indigo max-w-none font-['Outfit'] prose-headings:font-black prose-headings:tracking-tight prose-headings:text-slate-900 prose-p:text-slate-900 prose-p:leading-[1.75] sm:prose-p:leading-relaxed prose-li:text-slate-900 prose-a:font-bold prose-a:text-indigo-600 prose-img:rounded-2xl sm:prose-img:rounded-[2rem] prose-img:shadow-xl prose-img:border-4 prose-img:border-slate-50 w-full"
                                     dangerouslySetInnerHTML={{
                                         __html: DOMPurify.sanitize(
                                             hasMidCta ? contentFirst : rawContent,
@@ -922,7 +922,7 @@ export default function BlogPostPage() {
                                 {/* Content — second half */}
                                 {hasMidCta && contentSecond && (
                                     <div
-                                        className="prose prose-lg prose-indigo max-w-none font-['Outfit'] prose-headings:font-black prose-headings:tracking-tight prose-headings:text-slate-900 prose-p:text-slate-900 prose-p:leading-relaxed prose-li:text-slate-900 prose-a:font-bold prose-a:text-indigo-600 prose-img:rounded-[2rem] prose-img:shadow-xl prose-img:border-4 prose-img:border-slate-50 w-full mt-8"
+                                        className="prose sm:prose-lg prose-indigo max-w-none font-['Outfit'] prose-headings:font-black prose-headings:tracking-tight prose-headings:text-slate-900 prose-p:text-slate-900 prose-p:leading-[1.75] sm:prose-p:leading-relaxed prose-li:text-slate-900 prose-a:font-bold prose-a:text-indigo-600 prose-img:rounded-2xl sm:prose-img:rounded-[2rem] prose-img:shadow-xl prose-img:border-4 prose-img:border-slate-50 w-full mt-6 sm:mt-8"
                                         dangerouslySetInnerHTML={{
                                             __html: DOMPurify.sanitize(contentSecond, { ADD_ATTR: ['style', 'class', 'target'], ADD_TAGS: ['iframe'] })
                                         }}
