@@ -62,7 +62,7 @@ User-agent: ClaudeBot
 Allow: /
 
 User-agent: CCBot
-Allow: /
+Allow: /                                                                    
 
 User-agent: PerplexityBot
 Allow: /
@@ -71,6 +71,9 @@ User-agent: Bytespider
 Allow: /
 
 User-agent: cohere-ai
+Allow: /
+
+User-agent: Mercury
 Allow: /
 
 # Sitemap Index

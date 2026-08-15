@@ -88,8 +88,6 @@
     function init() {
         console.log('--- Static Interactivity Re-hydrated ---');
         checkAutoRedirect();
-        initGoogleTranslate();
-        initLangButtons();
         killGhostModals();
         initCookieBanner();
         initMobileMenu();
@@ -112,123 +110,6 @@
                 window.location.href = 'https://app.italostudy.com';
             }
         }
-    }
-
-    /* ─── Google Translate Auto-Init (HTML pages) ───────────────── */
-    function initGoogleTranslate() {
-        // Read the googtrans cookie set by the React navbar language switcher
-        var cookieMatch = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
-        var targetLang = cookieMatch ? cookieMatch[1] : null;
-
-        // No translation needed
-        if (!targetLang) return;
-
-        // Inject CSS to hide ALL Google Translate UI chrome
-        var style = document.createElement('style');
-        style.id = 'goog-translate-hide-css';
-        style.innerHTML = [
-            '.skiptranslate, iframe.skiptranslate { display: none !important; }',
-            'body { top: 0px !important; }',
-            '#goog-gt-tt { display: none !important; }',
-            '.goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }',
-            '#google_translate_element { display: none !important; }',
-            '.goog-te-banner-frame { display: none !important; }',
-            '.goog-te-menu-frame { display: none !important; }',
-            /* Hide the Google Translate attribution icon/logo */
-            '.goog-logo-link { display: none !important; }',
-            '.goog-te-gadget { display: none !important; }'
-        ].join('\n');
-        document.head.appendChild(style);
-
-        // Create hidden widget container
-        if (!document.getElementById('google_translate_element')) {
-            var div = document.createElement('div');
-            div.id = 'google_translate_element';
-            div.style.display = 'none';
-            document.body.appendChild(div);
-        }
-
-        // Callback invoked by GT script after it loads
-        window.googleTranslateElementInit = function() {
-            new window.google.translate.TranslateElement(
-                { pageLanguage: 'en', autoDisplay: false, layout: 0 },
-                'google_translate_element'
-            );
-            // After widget init, programmatically apply the language via doGTranslate
-            var attempts = 0;
-            var interval = setInterval(function() {
-                if (window.doGTranslate) {
-                    window.doGTranslate('en|' + targetLang);
-                    clearInterval(interval);
-                } else if (++attempts > 30) {
-                    clearInterval(interval);
-                }
-            }, 200);
-        };
-
-        // Inject the GT script once
-        if (!document.getElementById('google-translate-script')) {
-            var script = document.createElement('script');
-            script.id = 'google-translate-script';
-            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-            script.async = true;
-            document.body.appendChild(script);
-        }
-    }
-
-    /* ─── Language Button Intercept (HTML pages) ────────────────── */
-    // The HTML pages have language links like <a href="/tr"> and <a href="/it">.
-    // On static HTML pages we don't want to navigate to the homepage — instead we:
-    //   1. Set the googtrans cookie (same as the React navbar does)
-    //   2. Reload the current page so GT auto-applies the new language
-    function initLangButtons() {
-        var hostname = window.location.hostname;
-        var domains = [hostname, '.' + hostname, 'italostudy.com', '.italostudy.com'];
-
-        function setLangCookie(lang) {
-            if (lang === 'en') {
-                // Clear the cookie on all domains
-                var expired = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                document.cookie = 'googtrans=; ' + expired;
-                domains.forEach(function(d) {
-                    document.cookie = 'googtrans=; ' + expired + ' domain=' + d;
-                });
-                localStorage.setItem('italo_lang_preference', 'EN');
-            } else {
-                document.cookie = 'googtrans=/en/' + lang + '; path=/;';
-                domains.forEach(function(d) {
-                    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=' + d;
-                });
-                localStorage.setItem('italo_lang_preference', lang.toUpperCase());
-            }
-        }
-
-        // Intercept clicks on any <a> whose href is exactly "/" (EN), "/it" (IT), "/tr" (TR)
-        document.addEventListener('click', function(e) {
-            var anchor = e.target.closest('a');
-            if (!anchor) return;
-
-            var href = anchor.getAttribute('href');
-            // Only intercept the dedicated language-switch hrefs
-            if (href === '/') {
-                // Switching to English from a non-root HTML page — stay on current page
-                var currentPath = window.location.pathname;
-                if (currentPath !== '/' && currentPath !== '') {
-                    e.preventDefault();
-                    setLangCookie('en');
-                    window.location.reload();
-                }
-                // If already on root '/', let it navigate normally
-            } else if (href === '/it') {
-                e.preventDefault();
-                setLangCookie('it');
-                window.location.reload();
-            } else if (href === '/tr') {
-                e.preventDefault();
-                setLangCookie('tr');
-                window.location.reload();
-            }
-        }, true); // capture phase so we catch it before other handlers
     }
 
     /* ─── Header Scroll Animation ────────────────────────────── */
@@ -844,11 +725,16 @@
         // Check auth status synchronously based on the auth-check script
         var isLogged = !!window.__IS_LOGGED_IN;
 
-        function handleStartSimulation(sessionId, statusFlag) {
-            if (statusFlag === 'upcoming') {
-                window.location.href = 'https://app.italostudy.com/waiting-room/' + sessionId;
+        function handleStartSimulation(sessionId, isPast) {
+            if (!isLogged) {
+                // Not logged in -> go to auth page with redirect back here or directly to waiting room
+                window.location.href = '/auth'; // User wants them to be redirected
+                return;
+            }
+            if (isPast) {
+                window.location.href = '/mock-guidelines?session_id=' + sessionId + '&exam_type=' + examType;
             } else {
-                window.open('https://app.italostudy.com', '_blank');
+                window.location.href = '/waiting-room/' + sessionId;
             }
         }
         window.handleStartSimulation = handleStartSimulation; // Export to global for inline onclick
@@ -872,6 +758,8 @@
             var btnText = 'Start Simulation';
             if (!isLogged) btnText = 'Login to Start';
             if (session.statusFlag === 'upcoming') btnText = 'Register Now';
+
+            var isPast = session.statusFlag === 'past';
 
             return `
             <div class="group bg-white rounded-[2rem] md:rounded-[2.5rem] border-2 p-6 md:p-8 flex flex-col transition-all duration-500 relative overflow-hidden ${borderClass}">
@@ -898,105 +786,12 @@
                         <span class="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest">Ranking & Analysis Enabled</span>
                     </div>
                 </div>
-                <button onclick="handleStartSimulation('${session.id}', '${session.statusFlag}')" class="w-full inline-flex items-center justify-center h-12 md:h-14 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-lg active:scale-95 bg-indigo-600 text-white hover:bg-indigo-700">
+                <button onclick="handleStartSimulation('${session.id}', ${isPast})" class="w-full inline-flex items-center justify-center h-12 md:h-14 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-lg active:scale-95 bg-indigo-600 text-white hover:bg-indigo-700">
                     ${btnText}
                 </button>
             </div>
             `;
         }
-
-        var allSessions = [];
-        var allSeries = [];
-        var currentFilter = 'all';
-
-        function renderSeriesCard(series, totalCount, index) {
-            var indexStr = (totalCount - index).toString().padStart(2, '0');
-            var borderClass = index === 0 ? "border-indigo-600 ring-4 ring-indigo-50 shadow-2xl" : "border-slate-100 hover:shadow-2xl hover:shadow-slate-200/50";
-            
-            var badgeHtml = '<div class="px-3 py-1 bg-violet-100 rounded-full text-[8px] md:text-[9px] font-black text-violet-600 uppercase tracking-widest">Series</div>';
-
-            return `
-            <div class="group bg-white rounded-[2rem] md:rounded-[2.5rem] border-2 p-6 md:p-8 flex flex-col transition-all duration-500 relative overflow-hidden ${borderClass}">
-                <div class="flex items-center justify-between mb-6 md:mb-8">
-                    <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                        Collection #${indexStr}
-                    </div>
-                    ${badgeHtml}
-                </div>
-                <h3 class="text-xl md:text-2xl font-black text-slate-900 mb-6 leading-[1.2] group-hover:text-indigo-600 transition-colors">
-                    ${series.title}
-                </h3>
-                <div class="space-y-4 mb-8 md:mb-10 flex-grow text-slate-500 text-sm">
-                    ${series.description ? series.description : 'A curated collection of mock exams to help you prepare effectively.'}
-                </div>
-                <button onclick="window.open('https://app.italostudy.com/mock-exams', '_blank')" class="w-full inline-flex items-center justify-center h-12 md:h-14 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-lg active:scale-95 bg-indigo-600 text-white hover:bg-indigo-700">
-                    View Series
-                </button>
-            </div>
-            `;
-        }
-
-        function renderFilteredMocks() {
-            var filteredUpcoming = [];
-            var filteredArchive = [];
-
-            if (currentFilter === 'all') {
-                filteredUpcoming = allSessions.filter(function(s) { return s.statusFlag === 'upcoming' || s.statusFlag === 'live'; });
-                filteredArchive = allSessions.filter(function(s) { return s.statusFlag === 'past'; });
-            } else if (currentFilter === 'upcoming') {
-                filteredUpcoming = allSessions.filter(function(s) { return s.statusFlag === 'upcoming' || s.statusFlag === 'live'; });
-            } else if (currentFilter === 'past') {
-                filteredArchive = allSessions.filter(function(s) { return s.statusFlag === 'past'; });
-            } else if (currentFilter === 'series') {
-                if (allSeries.length === 0) {
-                    container.innerHTML = '<div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-20 text-center"><p class="text-slate-400 font-bold">No series available currently. Please check back later!</p></div>';
-                    return;
-                }
-                
-                var html = '<div class="mb-12"><h3 class="text-xl font-black mb-6 text-slate-900 border-b border-violet-100 pb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-violet-500"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg> Exam Series</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
-                allSeries.forEach(function(s, i) { html += renderSeriesCard(s, allSeries.length, i); });
-                html += '</div></div>';
-                container.innerHTML = html;
-                return;
-            }
-
-            if (filteredUpcoming.length === 0 && filteredArchive.length === 0) {
-                container.innerHTML = '<div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-20 text-center"><p class="text-slate-400 font-bold">No simulations found for this category.</p></div>';
-                return;
-            }
-
-            var html = '';
-            
-            if (filteredUpcoming.length > 0) {
-                html += '<div class="mb-12"><h3 class="text-xl font-black mb-6 text-slate-900 border-b border-indigo-100 pb-2 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span> Upcoming / Live Simulations</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
-                filteredUpcoming.forEach(function(s) { html += renderCard(s, false, allSessions.length, allSessions.indexOf(s)); });
-                html += '</div></div>';
-            }
-
-            if (filteredArchive.length > 0) {
-                html += '<div class="mb-12"><h3 class="text-xl font-black mb-6 text-slate-900 border-b border-slate-200 pb-2">Archive / Past Simulations</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
-                filteredArchive.forEach(function(s) { html += renderCard(s, allSessions.indexOf(s) === 0 && currentFilter === 'past', allSessions.length, allSessions.indexOf(s)); });
-                html += '</div></div>';
-            }
-
-            container.innerHTML = html;
-        }
-
-        var tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(function(tab) {
-            tab.addEventListener('click', function() {
-                tabs.forEach(function(t) { t.classList.remove('active'); });
-                this.classList.add('active');
-                
-                var id = this.id;
-                if (id === 'tab-all') currentFilter = 'all';
-                else if (id === 'tab-series') currentFilter = 'series';
-                else if (id === 'tab-upcoming') currentFilter = 'upcoming';
-                else if (id === 'tab-past') currentFilter = 'past';
-                
-                renderFilteredMocks();
-            });
-        });
 
         async function fetchMocks() {
             try {
@@ -1006,17 +801,8 @@
                     .eq('exam_type', examType)
                     .order('start_time', { ascending: false });
                 
-                var seriesRes = await sbClient.from('mock_series')
-                    .select('*')
-                    .eq('is_active', true)
-                    .eq('exam_type', examType)
-                    .order('created_at', { ascending: false });
-                
                 if (res.error) throw res.error;
-                if (seriesRes.error) throw seriesRes.error;
-                
                 var sessions = res.data || [];
-                allSeries = seriesRes.data || [];
                 var now = new Date();
                 
                 sessions.forEach(function(s) {
@@ -1027,14 +813,29 @@
                     else s.statusFlag = 'live';
                 });
 
-                allSessions = sessions;
+                var upcoming = sessions.filter(function(s) { return s.statusFlag === 'upcoming' || s.statusFlag === 'live'; });
+                var archive = sessions.filter(function(s) { return s.statusFlag === 'past'; });
 
-                if (allSessions.length === 0) {
+                if (sessions.length === 0) {
                     container.innerHTML = '<div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-20 text-center"><p class="text-slate-400 font-bold">The exam archive is currently being updated. Please check back later!</p></div>';
                     return;
                 }
 
-                renderFilteredMocks();
+                var html = '';
+                
+                if (upcoming.length > 0) {
+                    html += '<div class="mb-12"><h3 class="text-xl font-black mb-6 text-slate-900 border-b border-indigo-100 pb-2 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span> Upcoming / Live Simulations</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
+                    upcoming.forEach(function(s, i) { html += renderCard(s, false, sessions.length, i); });
+                    html += '</div></div>';
+                }
+
+                if (archive.length > 0) {
+                    html += '<div class="mb-12"><h3 class="text-xl font-black mb-6 text-slate-900 border-b border-slate-200 pb-2">Archive / Past Simulations</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
+                    archive.forEach(function(s, i) { html += renderCard(s, i === 0, archive.length, i); });
+                    html += '</div></div>';
+                }
+
+                container.innerHTML = html;
             } catch (err) {
                 console.error('Error fetching mock sessions:', err);
                 container.innerHTML = '<div class="text-center py-20 text-red-500 font-bold">Failed to load mock tests. Code: ' + err.message + '</div>';

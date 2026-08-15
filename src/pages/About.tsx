@@ -15,6 +15,7 @@ export default function About() {
     const { t } = useTranslation();
     const [isBioExpanded, setIsBioExpanded] = useState(false);
     const [isArpitBioExpanded, setIsArpitBioExpanded] = useState(false);
+    const [isSpandanBioExpanded, setIsSpandanBioExpanded] = useState(false);
 
     return (
         <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden">
@@ -102,7 +103,7 @@ export default function About() {
                             {t('about.pw_founders_title', 'Our Founders')}
                         </h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
                             {/* --------------------- Founder Card 1 - Utkarsh --------------------- */}
                             <div className="w-full h-[460px]">
                                 {/* Click to expand */}
@@ -185,6 +186,49 @@ export default function About() {
                                     </div>
                                     <div onClick={() => setIsArpitBioExpanded(!isArpitBioExpanded)} className="absolute bottom-0 left-0 w-full py-4 border-t border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition-colors flex justify-center items-center">
                                         <span className="text-[#5a4bda] font-bold text-[14px] md:text-[15px] uppercase tracking-wider">{isArpitBioExpanded ? "Read Less" : "Read More"}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* --------------------- Founder Card 3 - Spandan --------------------- */}
+                            <div className="w-full h-[460px]">
+                                {/* Click to expand */}
+                                <div className="flex flex-col bg-white rounded-md shadow-md w-full h-full overflow-hidden border border-slate-100 relative">
+                                    <div className={`flex-1 w-full px-6 pt-6 pb-4 ${isSpandanBioExpanded ? 'overflow-y-auto' : 'overflow-hidden flex flex-col justify-center'}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                        {!isSpandanBioExpanded ? (
+                                            <div className="flex flex-col items-center text-center animate-in fade-in duration-500 pb-[60px]">
+                                                <div className="w-[100px] h-[100px] md:w-[140px] md:h-[140px] rounded-full overflow-hidden mb-4 shrink-0 border-4 border-indigo-50 shadow-sm bg-indigo-50 flex items-center justify-center">
+                                                    <img src="/spandan.webp" alt="Spandan" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/founder pic.jpg'; }} />
+                                                </div>
+                                                <h3 className="text-[20px] md:text-[24px] font-bold text-slate-900 mb-1 flex items-center justify-center gap-2">
+                                                    Spandan
+                                                    <a href="https://www.linkedin.com/in/spandan-5b383936b?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                        <LinkedInIcon />
+                                                    </a>
+                                                </h3>
+                                                <span className="text-[14px] md:text-[16px] font-medium text-slate-700 mb-4 block">Founding Member</span>
+                                                <h4 className="text-[15px] md:text-[18px] font-semibold text-slate-800 italic leading-relaxed">
+                                                    "My aim is to make learning more intuitive, engaging, and meaningful, while helping students develop the confidence to think beyond the textbook."
+                                                </h4>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col text-left animate-in fade-in duration-500 pb-[60px]">
+                                                <h3 className="text-[20px] md:text-[24px] font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                    Spandan
+                                                    <a href="https://www.linkedin.com/in/spandan-5b383936b?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                        <LinkedInIcon />
+                                                    </a>
+                                                </h3>
+                                                <div className="text-[14px] md:text-[15px] leading-[24px] font-medium text-slate-700 space-y-4">
+                                                    <p>Spandan is an educator and academic mentor at ItaloStudy, passionate about helping students build strong conceptual foundations in the biosciences and logical reasoning. His teaching philosophy centers around true conceptual understanding rather than simple memorization, emphasizing structural logic and critical thinking.</p>
+                                                    <p>His academic background is backed by notable achievements in student STEM and innovation circuits, including a district science championship, a state-level research run, and a selection for an intensive bootcamp at an IIT.</p>
+                                                    <p>With experience leading student educational initiatives and publishing a forthcoming poetry collection, Spandan brings a highly analytical yet creative perspective to his instruction. He uses an interactive, discussion-driven approach to break down competitive examination frameworks, helping global student cohorts build the problem-solving skills they need to succeed.</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div onClick={() => setIsSpandanBioExpanded(!isSpandanBioExpanded)} className="absolute bottom-0 left-0 w-full py-4 border-t border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition-colors flex justify-center items-center">
+                                        <span className="text-[#5a4bda] font-bold text-[14px] md:text-[15px] uppercase tracking-wider">{isSpandanBioExpanded ? "Read Less" : "Read More"}</span>
                                     </div>
                                 </div>
                             </div>

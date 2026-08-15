@@ -13,17 +13,14 @@ const DEFAULT_CURRENCY: CurrencyInfo = {
 };
 
 const COUNTRY_TO_CURRENCY: Record<string, string> = {
-    IN: 'INR', 
-    PK: 'PKR', 
-    BD: 'BDT'
-    // All other countries will naturally fall back to 'EUR' in the code below
+    IT: 'EUR', DE: 'EUR', FR: 'EUR', ES: 'EUR', AT: 'EUR', NL: 'EUR', BE: 'EUR', PT: 'EUR',
+    US: 'USD', GB: 'GBP', IN: 'INR', NG: 'NGN', EG: 'EGP', PK: 'PKR', BD: 'BDT',
+    TR: 'TRY', BR: 'BRL', CA: 'CAD', AU: 'AUD', SG: 'SGD', AE: 'AED', SA: 'SAR'
 };
 
 export const SUPPORTED_CURRENCIES = [
     { code: 'EUR', symbol: '€', name: 'Euro' },
-    { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-    { code: 'PKR', symbol: '₨', name: 'Pakistani Rupee' },
-    { code: 'BDT', symbol: '৳', name: 'Bangladeshi Taka' }
+    { code: 'INR', symbol: '₹', name: 'Indian Rupee' }
 ];
 
 export function useCurrency() {
@@ -40,7 +37,7 @@ export function useCurrency() {
             country: 'MANUAL'
         };
         setCurrency(newCurrency);
-        localStorage.setItem('userCurrency_v2', JSON.stringify({
+        localStorage.setItem('userCurrency', JSON.stringify({
             data: newCurrency,
             timestamp: Date.now(),
             isManual: true
@@ -51,7 +48,7 @@ export function useCurrency() {
         const detectCurrency = async () => {
             try {
                 // 1. Check localStorage cache first
-                const cached = localStorage.getItem('userCurrency_v2');
+                const cached = localStorage.getItem('userCurrency');
                 if (cached) {
                     try {
                         const parsedCache = JSON.parse(cached);
@@ -66,41 +63,34 @@ export function useCurrency() {
                     }
                 }
 
-                // 2. PRIMARY API: api.country.is (Best for localhost, CORS-friendly)
+                // 2. PRIMARY API: ipapi.co (HTTPS stable)
                 let data: any = null;
                 try {
-                    const response = await fetch('https://api.country.is/');
+                    const response = await fetch('https://ipapi.co/json/');
                     data = await response.json();
                 } catch (e) {
-                    // SECONDARY API: ipapi.co
+                    // 3. SECONDARY API FALLBACK: ipwhois.app (HTTPS)
                     try {
-                        const response = await fetch('https://ipapi.co/json/');
+                        console.log('Primary IP API failed, trying ipwhois...');
+                        const response = await fetch('https://ipwhois.app/json/');
                         data = await response.json();
                     } catch (e2) {
-                        // TERTIARY API: ipwhois.app
-                        try {
-                            const response = await fetch('https://ipwhois.app/json/');
-                            data = await response.json();
-                        } catch (e3) {
-                            console.error('All IP detection APIs failed');
-                        }
+                        console.error('All IP detection APIs failed');
                     }
                 }
 
-                if (data && (data.status === 'success' || data.success !== false || data.status !== 'fail' || data.country)) {
+                if (data && (data.status === 'success' || data.success !== false || data.status !== 'fail')) {
                     const countryCode = data.countryCode || data.country_code || data.country;
                     
-                    const currencyCode = COUNTRY_TO_CURRENCY[countryCode] || 'EUR';
-                    const symbolMap: Record<string, string> = { 'EUR': '€', 'INR': '₹', 'USD': '$', 'GBP': '£', 'PKR': '₨', 'BDT': '৳' };
-                    
+                    const isIndia = countryCode === 'IN';
                     const currencyInfo: CurrencyInfo = {
-                        code: currencyCode,
-                        symbol: symbolMap[currencyCode] || currencyCode,
+                        code: isIndia ? 'INR' : 'EUR',
+                        symbol: isIndia ? '₹' : '€',
                         country: countryCode || 'XX'
                     };
 
                     // Cache the result
-                    localStorage.setItem('userCurrency_v2', JSON.stringify({
+                    localStorage.setItem('userCurrency', JSON.stringify({
                         data: currencyInfo,
                         timestamp: Date.now(),
                         isManual: false
@@ -111,12 +101,10 @@ export function useCurrency() {
                     // Final Guess: Navigator Language
                     const language = navigator.language;
                     const region = language.split('-')[1];
-                    const currencyCode = COUNTRY_TO_CURRENCY[region] || 'EUR';
-                    const symbolMap: Record<string, string> = { 'EUR': '€', 'INR': '₹', 'USD': '$', 'GBP': '£', 'PKR': '₨', 'BDT': '৳' };
-                    
+                    const isIndia = region === 'IN';
                     const guessedInfo = {
-                        code: currencyCode,
-                        symbol: symbolMap[currencyCode] || currencyCode,
+                        code: isIndia ? 'INR' : 'EUR',
+                        symbol: isIndia ? '₹' : '€',
                         country: region || 'XX'
                     };
                     setCurrency(guessedInfo);

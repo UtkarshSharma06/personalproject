@@ -307,14 +307,11 @@ export default function Pricing() {
                                                 })()}
                                             </>
                                         ) : (
-                                            <div className="flex items-baseline justify-center gap-1 mb-6 flex-wrap">
-                                                <span className={cn(
-                                                    "font-black text-slate-900 dark:text-white tracking-tighter",
-                                                    currentPrice(plan).length > 8 ? "text-3xl lg:text-4xl" : "text-5xl"
-                                                )}>
+                                            <div className="flex items-baseline justify-center gap-1 mb-6">
+                                                <span className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter">
                                                     {currentPrice(plan)}
                                                 </span>
-                                                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px] whitespace-nowrap">
+                                                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">
                                                     / {billingCycle === 'monthly' ? 'month' : 'quarter'}
                                                 </span>
                                             </div>
