@@ -37,6 +37,7 @@ import PWTrustedSection from '@/components/home/PWTrustedSection';
 import PWExamCategories from '@/components/home/PWExamCategories';
 import PWNavbar from '@/components/home/PWNavbar';
 import PWStudyResources from '@/components/home/PWStudyResources';
+import PWCourses from '@/components/home/PWCourses';
 
 import faqData from '@/data/italy-faqs-2026.json';
 import seoData from '@/data/seo/seo-it.json';
@@ -123,6 +124,9 @@ export default function IndexItaly() {
 
                 {/* 1.5 PW Exam Categories */}
                 <PWExamCategories />
+
+                {/* 1.6 PW Courses */}
+                <PWCourses />
 
                 {/* University Branding - Global Presence */}
                 <Suspense fallback={null}>

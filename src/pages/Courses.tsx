@@ -67,9 +67,11 @@ function CourseCard({ course, index }: { course: any; index: number }) {
             transition={{ delay: index * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="group bg-white rounded-xl border border-slate-200 border-t-[4px] border-t-[#5A4BDA] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col relative"
         >
-            {/* ONLINE Tag Ribbon - PW Image */}
-            <div className="absolute top-[0px] left-0 z-10 w-[72px]">
-                <img src="https://static.pw.live/images/onlineTag_20241022124328.webp" alt="online" className="w-full object-contain" />
+            {/* ONLINE Tag Ribbon */}
+            <div className="absolute top-0 left-0 z-10">
+                <div className="bg-red-500 text-white text-[10px] font-black uppercase tracking-wider py-1 px-3 shadow-md transform -skew-x-12 ml-2 mt-2 inline-block">
+                    ONLINE
+                </div>
             </div>
 
             {/* Thumbnail */}
@@ -110,8 +112,8 @@ function CourseCard({ course, index }: { course: any; index: number }) {
                             {course.language || 'English'}
                         </span>
                         {/* WhatsApp icon */}
-                        <a href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A" target="_blank" rel="noopener noreferrer" className="w-[26px] h-[26px] flex items-center justify-center -mt-px hover:scale-110 transition-transform">
-                            <img alt="WAIcon" src="https://static.pw.live/5eb393ee95fab7468a79d189/GLOBAL_CMS/cac77a2f-7e6f-464f-ac8b-81059f83e42d.fc62406e" className="w-full h-full object-contain" />
+                        <a href="https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz" target="_blank" rel="noopener noreferrer" className="w-[26px] h-[26px] flex items-center justify-center -mt-px hover:scale-110 transition-transform bg-[#25D366] text-white rounded-full shadow-sm">
+                            <MessageCircle className="w-3.5 h-3.5" />
                         </a>
                     </div>
                 </div>
@@ -254,7 +256,14 @@ export default function CoursesMarketplace() {
                         ...c,
                         exam_model_name: c.exam_model_id ? (examMap[c.exam_model_id] || c.exam_model_id) : 'General'
                     }));
-                    setCourses(mapped);
+                    const sortedMapped = mapped.sort((a: any, b: any) => {
+                        const aLaunched = a.launch_date?.toLowerCase() !== 'coming soon';
+                        const bLaunched = b.launch_date?.toLowerCase() !== 'coming soon';
+                        if (aLaunched && !bLaunched) return -1;
+                        if (!aLaunched && bLaunched) return 1;
+                        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                    });
+                    setCourses(sortedMapped);
                 }
             } catch (err) {
                 console.error(err);

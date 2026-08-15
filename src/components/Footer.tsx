@@ -1,6 +1,6 @@
 import { LocalizedLink as Link } from '@/components/LocalizedLink';
 import { motion } from 'framer-motion';
-import { Instagram, MessageCircle } from 'lucide-react';
+import { Instagram, MessageCircle, Linkedin } from 'lucide-react';
 import { imatLinks, centsLinks, studyItalyLinks } from '@/lib/nav-links';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -66,10 +66,18 @@ export default function Footer() {
                             <motion.a
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
-                                href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A"
+                                href="https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz"
                                 className="w-10 h-10 rounded-[4px] bg-white flex items-center justify-center text-[#555555] hover:text-[#25D366] transition-all border border-[#eaeaea] shadow-sm hover:border-[#25D366]/30"
                             >
                                 <MessageCircle className="w-5 h-5" />
+                            </motion.a>
+                            <motion.a
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                href="https://www.linkedin.com/company/italostudy"
+                                className="w-10 h-10 rounded-[4px] bg-white flex items-center justify-center text-[#555555] hover:text-[#0077b5] transition-all border border-[#eaeaea] shadow-sm hover:border-[#0077b5]/30"
+                            >
+                                <Linkedin className="w-5 h-5" />
                             </motion.a>
                         </div>
                     </div>
@@ -86,7 +94,7 @@ export default function Footer() {
                                         {link.path ? (
                                             (() => {
                                                 const staticPaths = [
-                                                    '/resources', '/cent-s-exam-preparation-book-pdf', '/status', '/contact', '/roadmap', '/updates', 
+                                                    '/resources', '/cent-s-exam-preparation-book-pdf', '/status', '/roadmap', '/updates', 
                                                     '/method', '/imat', '/cent-s', '/exams', '/blog', 
                                                     '/cent-s-mock', '/imat-mock', '/it', '/tr'
                                                 ];

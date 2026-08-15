@@ -78,7 +78,7 @@ export default function PublicNavbar({ subNavigation }: { subNavigation?: React.
         { name: 'Pricing', path: '/pricing' },
         { name: 'Blog', path: '/blog' },
         { name: 'Store', path: 'https://store.italostudy.com', isExternal: true },
-        { name: 'Contact', path: '/contact', isStatic: true },
+        { name: 'Contact', path: '/contact' },
     ];
 
     const isExternalPath = (path: string | null) => {
@@ -229,7 +229,7 @@ export default function PublicNavbar({ subNavigation }: { subNavigation?: React.
                         <a href="https://www.instagram.com/italostudycom" target="_blank" rel="noopener noreferrer" className={cn("transition-colors", isLightTheme ? "text-slate-400 hover:text-pink-600" : "text-white/40 hover:text-pink-500")} aria-label="Follow us on Instagram">
                             <Instagram className="w-5 h-5" />
                         </a>
-                        <a href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A" target="_blank" rel="noopener noreferrer" className={cn("transition-colors", isLightTheme ? "text-slate-400 hover:text-green-600" : "text-white/40 hover:text-green-500")} aria-label="Join our WhatsApp Community">
+                        <a href="https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz" target="_blank" rel="noopener noreferrer" className={cn("transition-colors", isLightTheme ? "text-slate-400 hover:text-green-600" : "text-white/40 hover:text-green-500")} aria-label="Join our WhatsApp Community">
                             <MessageCircle className="w-5 h-5" />
                         </a>
                     </div>

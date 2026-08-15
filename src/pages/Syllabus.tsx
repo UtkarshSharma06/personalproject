@@ -352,7 +352,7 @@ const Syllabus = () => {
                                 </div>
 
                                 <a 
-                                    href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A" 
+                                    href="https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz" 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="block"

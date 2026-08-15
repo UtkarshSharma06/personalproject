@@ -38,6 +38,7 @@ const StaticRedirect = () => {
 const Index = lazy(() => import("./pages/Index"));
 const IndexItaly = lazy(() => import("./pages/IndexItaly"));
 const IndexTurkey = lazy(() => import("./pages/IndexTurkey"));
+const Contact = lazy(() => import("./pages/Contact"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
@@ -225,7 +226,7 @@ const PublicRouter = () => (
     <Route path="/practice" element={<ExternalRedirect to="https://app.italostudy.com/practice" />} />
     <Route path="/mock-exams" element={<ExternalRedirect to="https://app.italostudy.com/mock-exams" />} />
     
-    <Route path="/contact" element={<StaticRedirect />} />
+    <Route path="/contact" element={<Contact />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );

@@ -138,7 +138,7 @@ const FAQSection = () => {
                                 Contact Support
                             </a>
                             <a 
-                                href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A" 
+                                href="https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz" 
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center justify-center px-8 h-12 bg-[#25D366] text-white font-semibold rounded-[4px] hover:bg-[#1ebd5a] transition-colors shadow-sm gap-2"

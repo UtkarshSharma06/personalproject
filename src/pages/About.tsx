@@ -112,7 +112,7 @@ export default function About() {
                                         {!isBioExpanded ? (
                                             <div className="flex flex-col items-center text-center animate-in fade-in duration-500 pb-[60px]">
                                                 <div className="w-[100px] h-[100px] md:w-[140px] md:h-[140px] rounded-full overflow-hidden mb-4 shrink-0 border-4 border-indigo-50 shadow-sm">
-                                                    <img src="/founder pic.webp" alt="Utkarsh Sharma" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/founder pic.jpg'; }} />
+                                                    <img src="/utkarshfounder.webp" alt="Utkarsh Sharma" className="w-full h-full object-cover" />
                                                 </div>
                                                 <h3 className="text-[20px] md:text-[24px] font-bold text-slate-900 mb-1 flex items-center justify-center gap-2">
                                                     {t('about.pw_founder1_name', 'Utkarsh Sharma')}
@@ -198,7 +198,7 @@ export default function About() {
                                         {!isSpandanBioExpanded ? (
                                             <div className="flex flex-col items-center text-center animate-in fade-in duration-500 pb-[60px]">
                                                 <div className="w-[100px] h-[100px] md:w-[140px] md:h-[140px] rounded-full overflow-hidden mb-4 shrink-0 border-4 border-indigo-50 shadow-sm bg-indigo-50 flex items-center justify-center">
-                                                    <img src="/spandan.webp" alt="Spandan" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/founder pic.jpg'; }} />
+                                                    <img src="/spandan.webp" alt="Spandan" className="w-full h-full object-cover" />
                                                 </div>
                                                 <h3 className="text-[20px] md:text-[24px] font-bold text-slate-900 mb-1 flex items-center justify-center gap-2">
                                                     Spandan

@@ -116,7 +116,7 @@ export default function BlogHeader() {
                         <motion.a
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A"
+                            href="https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-green-500 hover:bg-green-50 transition-all border border-slate-100"
@@ -205,7 +205,7 @@ export default function BlogHeader() {
                                             <a href="https://www.instagram.com/italostudycom" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
                                                 <Instagram className="w-4 h-4" />
                                             </a>
-                                            <a href="https://chat.whatsapp.com/CfVh7u9L6vT7ZFpZwwVa4A" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
+                                            <a href="https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
                                                 <MessageCircle className="w-4 h-4" />
                                             </a>
                                         </div>
