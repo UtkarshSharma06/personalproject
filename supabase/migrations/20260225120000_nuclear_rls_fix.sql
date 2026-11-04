@@ -19,7 +19,7 @@ TO authenticated
 USING (
     EXISTS (
         SELECT 1 FROM public.profiles
-        WHERE id = auth.uid() AND (role = 'admin' OR email = 'contact@italostudy.com')
+        WHERE id = auth.uid() AND (role = 'admin' OR email = 'info@italostudy.com' OR email = 'contact@italostudy.com')
     )
 );
 
@@ -40,7 +40,7 @@ TO authenticated
 USING (
     EXISTS (
         SELECT 1 FROM public.profiles
-        WHERE id = auth.uid() AND (role = 'admin' OR email = 'contact@italostudy.com')
+        WHERE id = auth.uid() AND (role = 'admin' OR email = 'info@italostudy.com' OR email = 'contact@italostudy.com')
     )
 );
 

@@ -70,8 +70,8 @@ export default function PublicNavbar({ subNavigation }: { subNavigation?: React.
             path: '/exams',
             isDropdown: true,
             items: [
-                { name: 'IMAT 2026', path: '/imat-exam-ultimate-guide-2026' },
-                { name: 'CEnT-S 2026', path: '/cent-s-exam-ultimate-guide' }
+                { name: 'IMAT 2027', path: '/imat-exam-ultimate-guide-2026' },
+                { name: 'CEnT-S 2027', path: '/cent-s-exam-ultimate-guide' }
             ]
         },
         { name: 'Resources', path: '/resources', isStatic: true },

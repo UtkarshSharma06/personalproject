@@ -96,9 +96,9 @@ export default function CentsPrepStrategy() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Preparation Strategy 2026 – STEM Success Roadmap"
-                    description="The complete CENT-S (CISIA English Test – Science) 2026 preparation strategy. 3-phase study plan covering Math, Reasoning, and Sciences with timing and subject priorities."
-                    keywords="CENT-S preparation 2026, CISIA English Test prep, study plan scientific programs Italy, CENT-S strategy"
+                    title="CENT-S Preparation Strategy 2027 – STEM Success Roadmap"
+                    description="The complete CENT-S (CISIA English Test – Science) 2027 preparation strategy. 3-phase study plan covering Math, Reasoning, and Sciences with timing and subject priorities."
+                    keywords="CENT-S preparation 2027, CISIA English Test prep, study plan scientific programs Italy, CENT-S strategy"
                 />
 
                 <FAQSchema items={faqs} />
@@ -120,11 +120,11 @@ export default function CentsPrepStrategy() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-6">
-                                        {getField('hero_headline', 'CENT-S 2026 Preparation Strategy')}
+                                        {getField('hero_headline', 'CENT-S 2027 Preparation Strategy')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" as="p" className="text-xl text-slate-600 leading-relaxed font-medium mb-10">

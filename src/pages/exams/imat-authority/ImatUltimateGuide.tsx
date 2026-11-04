@@ -50,7 +50,7 @@ const faqs = [
     { question: 'Who can take the IMAT?', answer: 'Anyone with a high school diploma (or equivalent) that is recognized in Italy can take the IMAT. It is open to both EU and Non-EU students.' },
     { question: 'How much does medical school in Italy cost?', answer: 'Public universities in Italy are heavily subsidized. Tuition typically ranges from €156 to €4,000 per year, depending on family income.' },
     { question: 'What is the format of the IMAT?', answer: 'The IMAT is a 100-minute paper-based exam consisting of 60 multiple-choice questions in Biology, Chemistry, Physics, Maths, and General Knowledge/Logic.' },
-    { question: 'When is the IMAT 2026 exam?', answer: 'The IMAT is usually held once a year in September. Official dates for 2026 are typically announced by the Mur (Ministry of University and Research) in late spring.' },
+    { question: 'When is the IMAT 2027 exam?', answer: 'The IMAT is usually held once a year in September. Official dates for 2027 are typically announced by the Mur (Ministry of University and Research) in late spring.' },
     { question: 'How many seats are available for Non-EU students?', answer: 'There are roughly 1,500+ seats across Italy, with specific quotas allocated to Non-EU students residing abroad at each university.' },
     { question: 'Can I study medicine in Italy in English?', answer: 'Yes, there are currently 15+ public universities and several private ones offering full MD programs entirely in English.' },
     { question: 'Do I need to speak Italian to study medicine in English?', answer: 'No, the degree is taught entirely in English. However, learning basic Italian is helpful for clinical rotations in later years.' },
@@ -94,16 +94,16 @@ export default function ImatUltimateGuide() {
             >
                 <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
                     <SEOHead
-                        title="IMAT 2026 – Complete Guide: Registration, Syllabus, Dates & Cutoff | ItalStudy"
-                        description="The complete IMAT 2026 guide. Exam dates, Universitaly registration process, official syllabus breakdown, cutoff scores for all Italian universities, and preparation strategy for EU & Non-EU students."
-                        keywords="imat 2026, imat exam 2026, imat exam, what is imat, imat 2026 registration, imat 2026 exam date, imat preparation, imat eligibility, imat non eu seats, study medicine italy english, imat guide 2026, italostudy imat"
+                        title="IMAT 2027 – Complete Guide: Registration, Syllabus, Dates & Cutoff | ItalStudy"
+                        description="The complete IMAT 2027 guide. Exam dates, Universitaly registration process, official syllabus breakdown, cutoff scores for all Italian universities, and preparation strategy for EU & Non-EU students."
+                        keywords="imat 2027, imat exam 2027, imat exam, what is imat, imat 2027 registration, imat 2027 exam date, imat preparation, imat eligibility, imat non eu seats, study medicine italy english, imat guide 2027, italostudy imat"
                         faqs={faqs}
                         schemas={[
                             getCourseSchema('imat'),
                             getBreadcrumbSchema([
                                 { name: 'Home', item: '/' },
                                 { name: 'Guides', item: '/resources' },
-                                { name: 'IMAT 2026', item: '/imat-exam-ultimate-guide-2026' }
+                                { name: 'IMAT 2027', item: '/imat-exam-ultimate-guide-2026' }
                             ])
                         ]}
                     />
@@ -123,11 +123,11 @@ export default function ImatUltimateGuide() {
                                 <section id="overview" className="scroll-mt-48">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-4xl md:text-7xl font-black text-slate-900 leading-[1.2] md:leading-[1.1] mb-8 mt-4 md:mt-0">
-                                        {getField('hero_headline', 'IMAT Ultimate Guide 2026')}
+                                        {getField('hero_headline', 'IMAT Ultimate Guide 2027')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-xl md:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -157,7 +157,7 @@ export default function ImatUltimateGuide() {
 
                                     <div className="prose prose-lg prose-slate max-w-none text-slate-600 leading-loose">
                                         <EditableText fieldKey="overview_body" multiline as="div" className="mb-6">
-                                            {getField('overview_body', "The IMAT (International Medical Admissions Test) is your gateway to studying medicine and surgery in English at Italy's top public universities. This guide provides a comprehensive overview of the admission process, requirements, and strategies for the 2026 intake.")}
+                                            {getField('overview_body', "The IMAT (International Medical Admissions Test) is your gateway to studying medicine and surgery in English at Italy's top public universities. This guide provides a comprehensive overview of the admission process, requirements, and strategies for the 2027 intake.")}
                                         </EditableText>
                                         <p className="p-4 bg-indigo-50 rounded-xl border border-indigo-100 text-indigo-900 font-medium text-base">
                                             <span className="font-bold">💡 Seeking Engineering or Non-Medical STEM?</span> If you are applying for engineering or computer science degrees, you do not need the IMAT. You must prepare for the <Link to="/cent-s-exam-ultimate-guide" className="text-indigo-600 font-bold hover:underline">CEnT-S Exam</Link> instead.
@@ -207,7 +207,7 @@ export default function ImatUltimateGuide() {
                                     </div>
                                     <div className="prose prose-lg text-slate-600 mb-8 max-w-none">
                                         <EditableText fieldKey="section_eligibility_body" multiline as="div">
-                                            {getField('section_eligibility_body', 'To be eligible for the IMAT 2026, students must have a valid high school diploma that is recognized by the Italian educational system. Requirements vary slightly between EU and Non-EU candidates.')}
+                                            {getField('section_eligibility_body', 'To be eligible for the IMAT 2027, students must have a valid high school diploma that is recognized by the Italian educational system. Requirements vary slightly between EU and Non-EU candidates.')}
                                         </EditableText>
                                     </div>
                                     <div className="grid md:grid-cols-3 gap-6">

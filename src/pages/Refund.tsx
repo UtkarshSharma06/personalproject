@@ -333,7 +333,7 @@ export default function Refund() {
                         <ol className="space-y-4">
                             {[
                                 {
-                                    step: 'Email us at contact@italostudy.com',
+                                    step: 'Email us at info@italostudy.com',
                                     detail: 'Use the subject line: "Refund Request — [Your Account Email]"',
                                 },
                                 {
@@ -371,10 +371,10 @@ export default function Refund() {
                             Reach our billing team directly. We aim to respond within 1–2 business days.
                         </p>
                         <a
-                            href="mailto:contact@italostudy.com?subject=Refund Request"
+                            href="mailto:info@italostudy.com?subject=Refund Request"
                             className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold text-[14px] px-5 py-2.5 rounded-lg hover:bg-slate-100 transition-colors"
                         >
-                            ✉ contact@italostudy.com
+                            ✉ info@italostudy.com
                         </a>
                         <p className="mt-5 text-slate-500 text-[12px]">
                             ItaloStudy is an independent educational technology platform.

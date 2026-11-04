@@ -76,7 +76,7 @@ export default function TolcPrepStrategy() {
                 }
             >
                 <SEOHead
-                    title="TOLC Exam Preparation Strategy 2026: 90-Day Study Plan"
+                    title="TOLC Exam Preparation Strategy 2027: 90-Day Study Plan"
                     description="A step-by-step 90-day study plan to crush the TOLC exam. Learn how to manage the strict CBT timers, avoid negative marking, and study for TOLC-I and TOLC-MED."
                     keywords="TOLC preparation, how to pass TOLC, TOLC study plan, TOLC-I study strategy, TOLC-MED preparation 90 days, CISIA CBT training"
                     schemas={[getBreadcrumbSchema([

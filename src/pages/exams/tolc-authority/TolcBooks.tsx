@@ -83,7 +83,7 @@ export default function TolcBooks() {
                 }
             >
                 <SEOHead
-                    title="Best Books for TOLC 2026: Official Preparation Guide"
+                    title="Best Books for TOLC 2027: Official Preparation Guide"
                     description="The ultimate guide to the best preparation books for TOLC-I, TOLC-E, TOLC-F, and TOLC-MED. Comprehensive reviews of Alpha Test, EdiTEST, and Hoepli manuals."
                     keywords="TOLC preparation books, best books for TOLC, Alpha Test TOLC, EdiTEST TOLC-MED, Hoepli TOLC-I, study materials for TOLC"
                     schemas={[getBreadcrumbSchema([
@@ -111,7 +111,7 @@ export default function TolcBooks() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Book size={12} className="text-indigo-600" />
-                                        Updated for 2026 Admissions
+                                        Updated for 2027 Admissions
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">

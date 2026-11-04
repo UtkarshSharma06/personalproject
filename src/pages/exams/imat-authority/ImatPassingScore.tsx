@@ -92,9 +92,9 @@ export default function ImatPassingScore() {
                 }
             >
                 <SEOHead
-                    title="IMAT Passing Score 2026: Official Thresholds & Cutoff Analysis"
-                    description="What is the passing score for IMAT 2026? Analysis of historical cutoffs, EU vs Non-EU thresholds, and how the 90-point scoring system works. Get the real data."
-                    keywords="IMAT passing score 2026, IMAT cutoffs 2026, IMAT score calculation, IMAT minimum threshold, study medicine italy scores"
+                    title="IMAT Passing Score 2027: Official Thresholds & Cutoff Analysis"
+                    description="What is the passing score for IMAT 2027? Analysis of historical cutoffs, EU vs Non-EU thresholds, and how the 90-point scoring system works. Get the real data."
+                    keywords="IMAT passing score 2027, IMAT cutoffs 2027, IMAT score calculation, IMAT minimum threshold, study medicine italy scores"
                 />
 
                 <FAQSchema items={faqs} />
@@ -116,11 +116,11 @@ export default function ImatPassingScore() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'IMAT 2026 Passing Score Analysis')}
+                                        {getField('hero_headline', 'IMAT 2027 Passing Score Analysis')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">

@@ -31,7 +31,7 @@ import EditableText from '@/components/cms/EditableText';
 import FAQSchema from '@/components/seo/FAQSchema';
 import KnowledgeHubSidebar from '@/components/exams/KnowledgeHubSidebar';
 import { imatLinks } from '@/lib/nav-links';
-import { getBreadcrumbSchema } from '@/utils/seo-schemas';
+import { getBreadcrumbSchema, getEventSchema } from '@/utils/seo-schemas';
 import PageNavigation from '@/components/exams/PageNavigation';
 
 const sections = [
@@ -43,9 +43,9 @@ const sections = [
 ];
 
 const faqs = [
-    { question: 'When is the IMAT 2026 exam date?', answer: 'The official date is usually announced by the Italian Ministry in late spring. Historically, the exam takes place in mid-September.' },
-    { question: 'When does registration for IMAT 2026 open?', answer: 'Registration typically opens in early July and stays open for about 2-3 weeks. You must register through the official Universitaly.it portal.' },
-    { question: 'When are the IMAT 2026 results released?', answer: 'Scanned answer sheets are usually available 10-14 days after the exam. Official results and rankings are published approximately 3-4 weeks later.' },
+    { question: 'When is the IMAT 2027 exam date?', answer: 'The official date is usually announced by the Italian Ministry in late spring. Historically, the exam takes place in mid-September.' },
+    { question: 'When does registration for IMAT 2027 open?', answer: 'Registration typically opens in early July and stays open for about 2-3 weeks. You must register through the official Universitaly.it portal.' },
+    { question: 'When are the IMAT 2027 results released?', answer: 'Scanned answer sheets are usually available 10-14 days after the exam. Official results and rankings are published approximately 3-4 weeks later.' },
     { question: 'Is the exam date the same globally?', answer: 'Yes, the IMAT is held on the same day and at the same time (adjusted for time zones) across all international and Italian test centers.' },
     { question: 'What is the deadline for university preferences?', answer: 'You must finalize your list of university preferences by the close of the registration window in July. You cannot change these later.' },
     { question: 'Can the exam date be changed?', answer: 'No. The IMAT is a single-session annual exam. If you miss the date, you must wait until the following year.' },
@@ -95,9 +95,24 @@ export default function ImatExamDates() {
                 }
             >
                 <SEOHead
-                    title="IMAT Exam Dates 2026: Official Registration & Results Timeline"
-                    description="Official IMAT 2026 calendar. Important dates for registration (July), exam day (September), and ranking publication. Don't miss the ministerial deadlines."
-                    keywords="IMAT exam date 2026, IMAT registration 2026 dates, IMAT results date 2026, IMAT calendar 2026, Universitaly registration window"
+                    title="IMAT 2027 Exam Date & Universitaly Deadline Calendar (Confirmed Dates)"
+                    description="Official IMAT 2027 calendar: Confirmed exam dates (mid-September 2027), Universitaly registration window (July 2027), pre-enrollment deadlines, and results."
+                    keywords="imat exam date 2027, imat exam date 2026, when is the imat exam 2027, when is the imat exam 2026, when is imat 2026, imat 2026 date, imat 2026 exam date, imat registration 2027 dates, imat results date 2027, imat calendar 2027, universitaly registration window, universitaly pre enrollment 2026/2027 deadline, mur imat 2027"
+                    schemas={[
+                        getBreadcrumbSchema([
+                            { name: 'Home', item: '/' },
+                            { name: 'IMAT Guide', item: '/imat' },
+                            { name: 'IMAT Exam Dates 2027', item: '/imat-exam-dates-2026' }
+                        ]),
+                        getEventSchema(
+                            "IMAT 2027 Entrance Examination",
+                            "Official Italian Ministry (MUR) International Medical Admissions Test for English-taught Medicine and Surgery programs in Italy.",
+                            "2027-09-16T12:00:00+02:00",
+                            "2027-09-16T13:40:00+02:00",
+                            "Global Test Centers & Universitaly",
+                            "https://italostudy.com/imat-exam-dates-2026"
+                        )
+                    ]}
                 />
 
                 <FAQSchema items={faqs} />
@@ -119,11 +134,11 @@ export default function ImatExamDates() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'IMAT 2026 Official Timeline')}
+                                        {getField('hero_headline', 'IMAT 2027 Official Timeline')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -132,10 +147,10 @@ export default function ImatExamDates() {
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                                         {[
-                                            { key: 'reg', label: 'Registration', value: 'July 2026', icon: Bell },
-                                            { key: 'test', label: 'Exam Day', value: 'Sept 2026', icon: Calendar },
-                                            { key: 'res', label: 'Results', value: 'Oct 2026', icon: Clock },
-                                            { key: 'rank', label: 'Ranking', value: 'Oct 2026', icon: Activity }
+                                            { key: 'reg', label: 'Registration', value: 'July 2027', icon: Bell },
+                                            { key: 'test', label: 'Exam Day', value: 'Sept 2027', icon: Calendar },
+                                            { key: 'res', label: 'Results', value: 'Oct 2027', icon: Clock },
+                                            { key: 'rank', label: 'Ranking', value: 'Oct 2027', icon: Activity }
                                         ].map((item, i) => (
                                             <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
                                                 <item.icon className="text-indigo-600 mb-3 group-hover:scale-110 transition-transform" size={24} />
@@ -148,6 +163,69 @@ export default function ImatExamDates() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Quick Summary Date Table for Featured Snippet */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                                                <Calendar className="text-indigo-600" size={20} />
+                                                IMAT 2027 Official Schedule & Key Deadlines
+                                            </h3>
+                                            <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                                                Updated for 2027 Session
+                                            </span>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-sm">
+                                                <thead>
+                                                    <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                        <th className="py-3 px-4">Milestone</th>
+                                                        <th className="py-3 px-4">Official / Expected Date</th>
+                                                        <th className="py-3 px-4">Authority / Portal</th>
+                                                        <th className="py-3 px-4">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Universitaly Pre-Enrollment</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-bold">March – July 2027</td>
+                                                        <td className="py-3 px-4">Universitaly.it</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md">Mandatory for Non-EU</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">MUR Decree (Bando Pubblico)</td>
+                                                        <td className="py-3 px-4">Late June / Early July 2027</td>
+                                                        <td className="py-3 px-4">Italian Ministry (MUR)</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">Official Test Date & Seats</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">IMAT Registration Window</td>
+                                                        <td className="py-3 px-4 text-rose-600 font-bold">Early July – Late July 2027</td>
+                                                        <td className="py-3 px-4">Universitaly.it</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">Strict ~21 Day Window</span></td>
+                                                    </tr>
+                                                    <tr className="bg-indigo-50/50">
+                                                        <td className="py-3 px-4 font-black text-slate-900">IMAT 2027 Exam Day</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-black">Mid-September 2027 (12:00 PM CET)</td>
+                                                        <td className="py-3 px-4 font-bold">Global Test Centers</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-black px-2 py-0.5 bg-indigo-600 text-white rounded-md">Single Global Sitting</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Scored Answer Sheets Online</td>
+                                                        <td className="py-3 px-4">Late September 2027 (~10-14 days)</td>
+                                                        <td className="py-3 px-4">Universitaly Candidate Area</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">Anonymous Score Check</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">National Ranking (Graduatoria)</td>
+                                                        <td className="py-3 px-4">October 2027</td>
+                                                        <td className="py-3 px-4">MUR / Universitaly</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">Assignments (Assegnato)</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </section>
 
                                 {/* Timeline */}
@@ -158,7 +236,7 @@ export default function ImatExamDates() {
                                         </div>
                                         <h2 className="text-3xl font-black text-slate-900">Critical Milestones</h2>
                                     </div>
-                                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-8 md:p-12 relative overflow-hidden">
+                                    <div className="bg-slate-900 text-white rounded-[2.5rem] border border-slate-800 shadow-xl p-8 md:p-12 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-8 opacity-5 text-indigo-600">
                                             <Zap size={200} />
                                         </div>
@@ -323,6 +401,69 @@ export default function ImatExamDates() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Quick Summary Date Table for Featured Snippet */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                                                <Calendar className="text-indigo-600" size={20} />
+                                                IMAT 2027 Official Schedule & Key Deadlines
+                                            </h3>
+                                            <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                                                Updated for 2027 Session
+                                            </span>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-sm">
+                                                <thead>
+                                                    <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                        <th className="py-3 px-4">Milestone</th>
+                                                        <th className="py-3 px-4">Official / Expected Date</th>
+                                                        <th className="py-3 px-4">Authority / Portal</th>
+                                                        <th className="py-3 px-4">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Universitaly Pre-Enrollment</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-bold">March – July 2027</td>
+                                                        <td className="py-3 px-4">Universitaly.it</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md">Mandatory for Non-EU</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">MUR Decree (Bando Pubblico)</td>
+                                                        <td className="py-3 px-4">Late June / Early July 2027</td>
+                                                        <td className="py-3 px-4">Italian Ministry (MUR)</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">Official Test Date & Seats</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">IMAT Registration Window</td>
+                                                        <td className="py-3 px-4 text-rose-600 font-bold">Early July – Late July 2027</td>
+                                                        <td className="py-3 px-4">Universitaly.it</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">Strict ~21 Day Window</span></td>
+                                                    </tr>
+                                                    <tr className="bg-indigo-50/50">
+                                                        <td className="py-3 px-4 font-black text-slate-900">IMAT 2027 Exam Day</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-black">Mid-September 2027 (12:00 PM CET)</td>
+                                                        <td className="py-3 px-4 font-bold">Global Test Centers</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-black px-2 py-0.5 bg-indigo-600 text-white rounded-md">Single Global Sitting</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Scored Answer Sheets Online</td>
+                                                        <td className="py-3 px-4">Late September 2027 (~10-14 days)</td>
+                                                        <td className="py-3 px-4">Universitaly Candidate Area</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">Anonymous Score Check</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">National Ranking (Graduatoria)</td>
+                                                        <td className="py-3 px-4">October 2027</td>
+                                                        <td className="py-3 px-4">MUR / Universitaly</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">Assignments (Assegnato)</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </section>
 
                                 {/* Bottom Grid */}
@@ -335,6 +476,69 @@ export default function ImatExamDates() {
                                                 <ChevronRight className="text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
                                             </Link>
                                         ))}
+                                    </div>
+
+                                    {/* Quick Summary Date Table for Featured Snippet */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                                                <Calendar className="text-indigo-600" size={20} />
+                                                IMAT 2027 Official Schedule & Key Deadlines
+                                            </h3>
+                                            <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                                                Updated for 2027 Session
+                                            </span>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-sm">
+                                                <thead>
+                                                    <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                        <th className="py-3 px-4">Milestone</th>
+                                                        <th className="py-3 px-4">Official / Expected Date</th>
+                                                        <th className="py-3 px-4">Authority / Portal</th>
+                                                        <th className="py-3 px-4">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Universitaly Pre-Enrollment</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-bold">March – July 2027</td>
+                                                        <td className="py-3 px-4">Universitaly.it</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md">Mandatory for Non-EU</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">MUR Decree (Bando Pubblico)</td>
+                                                        <td className="py-3 px-4">Late June / Early July 2027</td>
+                                                        <td className="py-3 px-4">Italian Ministry (MUR)</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">Official Test Date & Seats</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">IMAT Registration Window</td>
+                                                        <td className="py-3 px-4 text-rose-600 font-bold">Early July – Late July 2027</td>
+                                                        <td className="py-3 px-4">Universitaly.it</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">Strict ~21 Day Window</span></td>
+                                                    </tr>
+                                                    <tr className="bg-indigo-50/50">
+                                                        <td className="py-3 px-4 font-black text-slate-900">IMAT 2027 Exam Day</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-black">Mid-September 2027 (12:00 PM CET)</td>
+                                                        <td className="py-3 px-4 font-bold">Global Test Centers</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-black px-2 py-0.5 bg-indigo-600 text-white rounded-md">Single Global Sitting</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Scored Answer Sheets Online</td>
+                                                        <td className="py-3 px-4">Late September 2027 (~10-14 days)</td>
+                                                        <td className="py-3 px-4">Universitaly Candidate Area</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">Anonymous Score Check</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">National Ranking (Graduatoria)</td>
+                                                        <td className="py-3 px-4">October 2027</td>
+                                                        <td className="py-3 px-4">MUR / Universitaly</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">Assignments (Assegnato)</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </section>
 

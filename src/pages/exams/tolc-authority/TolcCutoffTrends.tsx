@@ -76,7 +76,7 @@ export default function TolcCutoffTrends() {
                 }
             >
                 <SEOHead
-                    title="TOLC Exam Cutoff Trends 2026: Politecnico & TOLC-MED Data"
+                    title="TOLC Exam Cutoff Trends 2027: Politecnico & TOLC-MED Data"
                     description="Analyze historical TOLC cutoff scores for top Italian universities, including Politecnico di Milano (TOLC-I) and national Medicine (TOLC-MED) equalized score thresholds."
                     keywords="TOLC cutoff score, TOLC-I politecnico di milano cutoff, TOLC-MED minimum score, what is a good TOLC score, TOLC ranking graduatoria, TOLC Non-EU cutoff"
                     schemas={[getBreadcrumbSchema([

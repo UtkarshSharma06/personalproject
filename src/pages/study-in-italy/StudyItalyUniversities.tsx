@@ -100,7 +100,7 @@ export default function StudyItalyUniversities() {
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
-                        { name: 'Universities in Italy 2026', item: '/study-in-italy/universities-2026' }
+                        { name: 'Universities in Italy 2027', item: '/study-in-italy/universities-2026' }
                     ])]}
                     />
 
@@ -123,11 +123,11 @@ export default function StudyItalyUniversities() {
                                 <section id="overview" className="scroll-mt-40">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6 md:mb-8">
-                                        {getField('hero_headline', 'Top Universities in Italy 2026')}
+                                        {getField('hero_headline', 'Top Universities in Italy 2027')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -236,7 +236,7 @@ export default function StudyItalyUniversities() {
                                 <section id="comparison" className="p-8 md:p-12 bg-white rounded-[2.5rem] md:rounded-[3rem] border-2 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23_42,1)]">
                                     <h2 className="text-2xl md:text-4xl font-black text-slate-900 mb-8 flex items-center gap-4">
                                         <TrendingUp className="text-violet-500" size={28} />
-                                        Public vs Private: 2026 Comparison
+                                        Public vs Private: 2027 Comparison
                                     </h2>
                                     <div className="space-y-4 md:space-y-6">
                                         {[

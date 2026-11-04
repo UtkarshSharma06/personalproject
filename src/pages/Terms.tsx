@@ -143,7 +143,7 @@ export default function Terms() {
                         <Ul items={[
                             'Provide accurate, complete, and current registration information',
                             'Maintain the security of your password and accept responsibility for all activity under your account',
-                            'Immediately notify us of any unauthorised access at contact@italostudy.com',
+                            'Immediately notify us of any unauthorised access at info@italostudy.com',
                             'Not share your account credentials with any third party',
                             'Not create more than one account per person without prior written permission',
                         ]} />
@@ -240,7 +240,7 @@ export default function Terms() {
                             'Coupons and promotional codes may not be combinable across the Store and the main platform.',
                         ]} />
                         <p>
-                            For Store-specific queries, contact us at <strong>contact@italostudy.com</strong> with your order number.
+                            For Store-specific queries, contact us at <strong>info@italostudy.com</strong> with your order number.
                         </p>
                     </section>
 
@@ -450,10 +450,10 @@ export default function Terms() {
                             <p className="font-bold text-lg mb-1">ItaloStudy</p>
                             <p className="text-slate-400 text-[14px] mb-4">Independent educational technology platform</p>
                             <a
-                                href="mailto:contact@italostudy.com"
+                                href="mailto:info@italostudy.com"
                                 className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold text-[14px] px-5 py-2.5 rounded-lg hover:bg-slate-100 transition-colors"
                             >
-                                ✉ contact@italostudy.com
+                                ✉ info@italostudy.com
                             </a>
                             <div className="mt-5 pt-5 border-t border-slate-700 flex flex-wrap gap-4 text-[13px] text-slate-400">
                                 <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>

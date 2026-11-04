@@ -134,8 +134,8 @@ export default function CentsMockLanding() {
     return (
         <Layout variant="public">
             <SEOHead
-                title="CEnT-S Mock Test 2026 – Free Official Simulation & Ranking"
-                description="Take the free CEnT-S mock test 2026. Realistic 110-minute simulation with 55 questions, +1/-0.25 scoring, and national ranking. Practice for CISIA English Test Science."
+                title="CEnT-S Mock Test 2027 – Free Official Simulation & Ranking"
+                description="Take the free CEnT-S mock test 2027. Realistic 110-minute simulation with 55 questions, +1/-0.25 scoring, and national ranking. Practice for CISIA English Test Science."
                 keywords="cent-s mock test, cent s mock test, cents mock test, cents mock exam, cent-s practice test, cent s practice test, cent-s test simulation, cent-s simulator, cent-s preparation, italostudy"
                 faqs={[
                     { question: 'What exactly is the CENT-S exam?', answer: 'CENT-S (CISIA English Test Science) is the primary entrance examination used by top-tier Italian universities for admission to English-taught STEM Bachelor\'s degrees. It evaluates a student\'s proficiency in core scientific disciplines including Mathematics, Physics, Chemistry, and Biology, alongside Logic and Verbal Comprehension.' },
@@ -152,7 +152,7 @@ export default function CentsMockLanding() {
                 schemas={[getBreadcrumbSchema([
                     { name: 'Home', item: '/' },
                     { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
-                    { name: 'CEnT-S Mock Test 2026', item: '/cent-s-mock-landing' }
+                    { name: 'CEnT-S Mock Test 2027', item: '/cent-s-mock-landing' }
                 ])]}
             />
 

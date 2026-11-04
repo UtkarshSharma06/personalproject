@@ -215,7 +215,7 @@ export default function Index() {
     return (
         <div className="min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden relative bg-white">
             <SEO
-                title={getField('seo_title', t('landing.seo.title', 'ItaloStudy | Free CEnT-S & IMAT Prep 2026: Unlimited Mocks & Lectures'))}
+                title={getField('seo_title', t('landing.seo.title', 'ItaloStudy | Free CEnT-S & IMAT Prep 2027: Unlimited Mocks & Lectures'))}
                 description={getField('seo_description', t('landing.seo.description', 'Experience the world\'s most advanced study simulator for IMAT, SAT, CEnT-S and IELTS preparation. Europe\'s choice for admissions success.'))}
                 keywords={getField('seo_keywords', t('landing.seo.keywords', 'italostudy, IMAT preparation, CEnT-S exam guide, European admissions, global study prep'))}
                 locale={currentLocale}

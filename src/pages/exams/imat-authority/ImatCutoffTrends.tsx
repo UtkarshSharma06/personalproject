@@ -38,7 +38,7 @@ const sections = [
     { id: 'overview', label: 'Overview' },
     { id: 'trends', label: 'Recent Trends' },
     { id: 'historical', label: 'Historical Data' },
-    { id: 'projection', label: '2026 Projection' },
+    { id: 'projection', label: '2027 Projection' },
     { id: 'faqs', label: 'FAQs' }
 ];
 
@@ -50,7 +50,7 @@ const faqs = [
     { question: 'Which university has the highest IMAT cutoff?', answer: 'The University of Milan (Statale) and Sapienza University of Rome consistently have the highest cutoff scores due to their global reputations.' },
     { question: 'What is the "scrolling" mechanism?', answer: 'Scrolling refers to the process where, as admitted students decline their seats, the next highest-scoring candidates on the ranking list are offered those places.' },
     { question: 'Are cutoffs lower for private universities?', answer: 'Cutoffs for private universities like San Raffaele or Humanitas can be lower or higher depending on the specific applicant pool and tuition fees.' },
-    { question: 'How can I project the 2026 cutoff?', answer: 'Projection involves looking at the 5-year average while accounting for the ~5-10% annual increase in applicant numbers and global competition.' },
+    { question: 'How can I project the 2027 cutoff?', answer: 'Projection involves looking at the 5-year average while accounting for the ~5-10% annual increase in applicant numbers and global competition.' },
     { question: 'Does a high school GPA affect the cutoff?', answer: 'In Italian public universities, only your IMAT score determines your ranking. Your high school grades are usually only a tie-breaker if scores are identical.' },
     { question: 'Should I choose a university based solely on cutoffs?', answer: 'No, you should also consider city living costs, clinical facilities, and faculty research. A "lower cutoff" university often provides an equally excellent medical education.' }
 ];
@@ -89,8 +89,8 @@ export default function ImatCutoffTrends() {
             >
                 <SEOHead
                     title="IMAT Cutoff Trends 2011-2025 – Target Scores & Projection"
-                    description="Comprehensive analysis of IMAT scores and cutoff trends. Understand the 'safe zone' for top Italian universities and project your target for 2026."
-                    keywords="IMAT cutoff 2026, IMAT safe score, IMAT university ranking, Sapienza IMAT cutoff, University of Milan IMAT score"
+                    description="Comprehensive analysis of IMAT scores and cutoff trends. Understand the 'safe zone' for top Italian universities and project your target for 2027."
+                    keywords="IMAT cutoff 2027, IMAT safe score, IMAT university ranking, Sapienza IMAT cutoff, University of Milan IMAT score"
                 />
 
                 <FAQSchema items={faqs} />
@@ -112,7 +112,7 @@ export default function ImatCutoffTrends() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6">
@@ -120,7 +120,7 @@ export default function ImatCutoffTrends() {
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                        {getField('hero_desc', 'A deep dive into 14 years of historical data. We analyze how the Italian medical university landscape has shifted and what it means for your 2026 seat.')}
+                                        {getField('hero_desc', 'A deep dive into 14 years of historical data. We analyze how the Italian medical university landscape has shifted and what it means for your 2027 seat.')}
                                     </EditableText>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
@@ -205,7 +205,7 @@ export default function ImatCutoffTrends() {
                                     </div>
                                 </section>
 
-                                {/* Projection 2026 */}
+                                {/* Projection 2027 */}
                                 <section id="projection" className="scroll-mt-40">
                                     <div className="bg-slate-900 text-white rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-8 opacity-10">
@@ -214,7 +214,7 @@ export default function ImatCutoffTrends() {
                                         <div className="relative z-10">
                                             <h2 className="text-2xl md:text-4xl font-black mb-8 flex items-center gap-4 text-emerald-400">
                                                 <Target size={28} />
-                                                2026 Score Projection
+                                                2027 Score Projection
                                             </h2>
                                             <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-medium mb-12 max-w-3xl">
                                                 Based on the stabilization of current exam logistics, we project that the "First Choice Scroll" for top 5 universities will settle at approximately <span className="text-white font-black underline decoration-emerald-500">58.0 - 64.0 points</span>. Candidates targeting coastal or southern universities should aim for a safety margin of <span className="text-white font-black underline decoration-indigo-400">45.0+ points</span>.

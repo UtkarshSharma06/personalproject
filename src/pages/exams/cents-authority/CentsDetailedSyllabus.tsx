@@ -88,13 +88,13 @@ export default function CentsDetailedSyllabus() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Detailed Syllabus 2026: Section-by-Section Breakdown"
-                    description="Complete CENT-S 2026 syllabus guide. Detailed breakdown of Math, Logical Reasoning, Sciences, and Reading Comprehension requirements for Italian STEM degrees."
-                    keywords="cent-s syllabus 2026, cent-s math topics, cent-s science requirements, cisia syllabus, study italy engineering syllabus"
+                    title="CENT-S Detailed Syllabus 2027: Section-by-Section Breakdown"
+                    description="Complete CENT-S 2027 syllabus guide. Detailed breakdown of Math, Logical Reasoning, Sciences, and Reading Comprehension requirements for Italian STEM degrees."
+                    keywords="cent-s syllabus 2027, cent-s math topics, cent-s science requirements, cisia syllabus, study italy engineering syllabus"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
-                        { name: 'CEnT-S Syllabus 2026', item: '/cent-s-syllabus-2026' }
+                        { name: 'CEnT-S Syllabus 2027', item: '/cent-s-syllabus-2026' }
                     ])]}
                 />
 
@@ -117,11 +117,11 @@ export default function CentsDetailedSyllabus() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'CENT-S 2026 Detailed Syllabus')}
+                                        {getField('hero_headline', 'CENT-S 2027 Detailed Syllabus')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">

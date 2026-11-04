@@ -77,7 +77,7 @@ export default function TolcPreviousPapers() {
                 }
             >
                 <SEOHead
-                    title="TOLC Past Papers & Practice Questions (PDF Download) 2026"
+                    title="TOLC Past Papers & Practice Questions (PDF Download) 2027"
                     description="Why official TOLC past papers don't exist, CISIA's secrecy policy, and the best alternative resources for mock questions, PDFs, and realistic CBT practice."
                     keywords="TOLC past papers PDF, TOLC-I previous year papers, TOLC-MED practice questions, CISIA mock questions, download TOLC exam, TOLC sample papers"
                     schemas={[getBreadcrumbSchema([
@@ -122,7 +122,7 @@ export default function TolcPreviousPapers() {
                                             <div>
                                                 <h3 className="font-bold text-rose-900 text-lg mb-2">Scam Warning</h3>
                                                 <p className="text-rose-800 text-sm leading-relaxed">
-                                                    Do not pay money to websites claiming to sell "Official 2025 TOLC Past Papers". Because the test is digital and randomized, no single past paper exists. These sellers are either selling fake questions or highly fragmented, unreliable memory recalls from students.
+                                                    Do not pay money to websites claiming to sell "Official 2026/2027 TOLC Past Papers". Because the test is digital and randomized, no single past paper exists. These sellers are either selling fake questions or highly fragmented, unreliable memory recalls from students.
                                                 </p>
                                             </div>
                                         </div>

@@ -86,9 +86,9 @@ export default function CentsCutoffTrends() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Cutoff Trends 2026: Passing Scores & Ranking Analysis"
-                    description="What is a good score for CENT-S 2026? Analysis of raw scores, normalization coefficients, and university-specific cutoffs for Italian STEM programs."
-                    keywords="cent-s cutoff 2026, cent-s passing score, cent-s ranking logic, cent-s normalization, study stem italy"
+                    title="CENT-S Cutoff Trends 2027: Passing Scores & Ranking Analysis"
+                    description="What is a good score for CENT-S 2027? Analysis of raw scores, normalization coefficients, and university-specific cutoffs for Italian STEM programs."
+                    keywords="cent-s cutoff 2027, cent-s passing score, cent-s ranking logic, cent-s normalization, study stem italy"
                 />
 
                 <FAQSchema items={faqs} />
@@ -110,7 +110,7 @@ export default function CentsCutoffTrends() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
@@ -126,7 +126,7 @@ export default function CentsCutoffTrends() {
                                             { key: 'q', label: 'Questions', value: '55 MCQ', icon: Target },
                                             { key: 'safe', label: 'Safe Score', value: '42+', icon: Trophy },
                                             { key: 'comp', label: 'Competition', value: 'High', icon: Users },
-                                            { key: 'status', label: 'Status', value: '2026 Ver', icon: CheckCircle2 }
+                                            { key: 'status', label: 'Status', value: '2027 Ver', icon: CheckCircle2 }
                                         ].map((item, i) => (
                                             <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
                                                 <item.icon className="text-indigo-600 mb-3 group-hover:scale-110 transition-transform" size={24} />

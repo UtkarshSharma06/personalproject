@@ -85,7 +85,7 @@ const HomeAuthorityStats = () => {
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-black text-black uppercase tracking-tight">Admissions Results</h3>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Verified 2026 Batch</p>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Verified 2027 Batch</p>
                                         </div>
                                     </div>
 
@@ -107,7 +107,7 @@ const HomeAuthorityStats = () => {
                                             <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Success Rate</div>
                                         </div>
                                         <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                                            <div className="text-3xl font-black text-black mb-1">2026</div>
+                                            <div className="text-3xl font-black text-black mb-1">2027</div>
                                             <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active Cycle</div>
                                         </div>
                                     </div>

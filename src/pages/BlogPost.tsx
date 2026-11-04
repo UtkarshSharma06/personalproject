@@ -425,23 +425,57 @@ function splitContentAtMidpoint(html: string): [string, string] {
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
-const StoreAdsMobile = ({ adProducts }: { adProducts: any[] }) => {
-    if (!adProducts || adProducts.length === 0) return null;
+const StoreAdsMobile = ({ adProducts, adCourses }: { adProducts: any[], adCourses: any[] }) => {
+    if ((!adProducts || adProducts.length === 0) && (!adCourses || adCourses.length === 0)) return null;
     return (
         <div className="mt-12 lg:hidden w-full px-4">
             <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-indigo-500" /> Featured Products
+                <ShoppingBag className="w-5 h-5 text-indigo-500" /> Featured
             </h3>
             <div className="flex overflow-x-auto gap-4 pb-6 snap-x no-scrollbar">
-                {adProducts.map(p => (
+                {adCourses?.map(c => (
+                    <a 
+                        key={c.id}
+                        href={`https://italostudy.com/courses/${c.slug || c.id}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="min-w-[200px] w-[200px] snap-center bg-white border-2 border-slate-100 rounded-3xl p-4 shadow-sm hover:border-indigo-500 hover:shadow-xl transition-all block group relative"
+                    >
+                        <div className="aspect-video rounded-2xl bg-slate-900 mb-4 overflow-hidden relative flex items-center justify-center">
+                            {c.banner_url ? (
+                                <img src={c.banner_url} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            ) : (
+                                <span className="text-white font-bold text-xs p-2 text-center">{c.title}</span>
+                            )}
+                            <div className="absolute top-2 right-2 bg-indigo-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                COURSE
+                            </div>
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-sm line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">{c.title}</h4>
+                        <div className="flex items-baseline gap-2">
+                            {c.price_eur ? (
+                                <>
+                                    <span className="text-base font-black text-indigo-600">€{c.discount_price_eur || c.price_eur}</span>
+                                    {c.discount_price_eur && <span className="text-sm font-bold text-slate-400 line-through">€{c.price_eur}</span>}
+                                </>
+                            ) : (
+                                <span className="text-sm font-black text-indigo-600">View Course</span>
+                            )}
+                        </div>
+                    </a>
+                ))}
+                {adProducts?.map(p => (
                     <a 
                         key={p.id}
                         href={`https://store.italostudy.com/${p.slug}`}
                         target="_blank" rel="noopener noreferrer"
                         className="min-w-[200px] w-[200px] snap-center bg-white border-2 border-slate-100 rounded-3xl p-4 shadow-sm hover:border-indigo-500 hover:shadow-xl transition-all block group"
                     >
-                        <div className="aspect-square rounded-2xl bg-slate-50 mb-4 overflow-hidden relative">
-                            {p.images?.[0] && <img src={p.images[0]} alt={p.title} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500" />}
+                        <div className="aspect-square rounded-2xl bg-slate-50 mb-4 overflow-hidden relative flex items-center justify-center">
+                            {p.images?.[0] ? (
+                                <img src={p.images[0]} alt={p.title} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500" />
+                            ) : (
+                                <span className="text-slate-400 text-xs">No image</span>
+                            )}
                         </div>
                         <h4 className="font-bold text-slate-900 text-sm line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">{p.title}</h4>
                         <div className="flex items-baseline gap-2">
@@ -455,8 +489,8 @@ const StoreAdsMobile = ({ adProducts }: { adProducts: any[] }) => {
     );
 };
 
-const StoreAdsDesktop = ({ adProducts }: { adProducts: any[] }) => {
-    if (!adProducts || adProducts.length === 0) return null;
+const StoreAdsDesktop = ({ adProducts, adCourses }: { adProducts: any[], adCourses: any[] }) => {
+    if ((!adProducts || adProducts.length === 0) && (!adCourses || adCourses.length === 0)) return null;
     return (
         <aside className="hidden lg:block w-[260px] shrink-0 sticky top-[120px] max-h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden no-scrollbar space-y-6">
             <div className="bg-indigo-50/50 rounded-3xl p-6 border-2 border-indigo-100/50">
@@ -464,15 +498,49 @@ const StoreAdsDesktop = ({ adProducts }: { adProducts: any[] }) => {
                     <ShoppingBag className="w-4 h-4 text-indigo-500" /> Featured
                 </h3>
                 <div className="space-y-4">
-                    {adProducts.map(p => (
+                    {adCourses?.map(c => (
+                        <a 
+                            key={c.id}
+                            href={`https://italostudy.com/courses/${c.slug || c.id}`}
+                            target="_blank" rel="noopener noreferrer"
+                            className="block bg-white rounded-2xl p-3 border-2 border-transparent hover:border-indigo-500 shadow-sm hover:shadow-lg transition-all group relative"
+                        >
+                            <div className="absolute top-2 right-2 bg-indigo-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
+                                COURSE
+                            </div>
+                            <div className="aspect-video rounded-xl bg-slate-900 mb-3 overflow-hidden flex items-center justify-center relative">
+                                {c.banner_url ? (
+                                    <img src={c.banner_url} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                ) : (
+                                    <span className="text-white font-bold text-[10px] text-center px-2">{c.title}</span>
+                                )}
+                            </div>
+                            <h4 className="font-bold text-slate-900 text-sm line-clamp-2 mb-1 group-hover:text-indigo-600">{c.title}</h4>
+                            <div className="flex items-baseline gap-2">
+                                {c.price_eur ? (
+                                    <>
+                                        <span className="text-base font-black text-indigo-600">€{c.discount_price_eur || c.price_eur}</span>
+                                        {c.discount_price_eur && <span className="text-xs font-bold text-slate-400 line-through">€{c.price_eur}</span>}
+                                    </>
+                                ) : (
+                                    <span className="text-sm font-black text-indigo-600">View Course</span>
+                                )}
+                            </div>
+                        </a>
+                    ))}
+                    {adProducts?.map(p => (
                         <a 
                             key={p.id}
                             href={`https://store.italostudy.com/${p.slug}`}
                             target="_blank" rel="noopener noreferrer"
                             className="block bg-white rounded-2xl p-3 border-2 border-transparent hover:border-indigo-500 shadow-sm hover:shadow-lg transition-all group"
                         >
-                            <div className="aspect-[4/3] rounded-xl bg-slate-50 mb-3 overflow-hidden">
-                                {p.images?.[0] && <img src={p.images[0]} alt={p.title} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500" />}
+                            <div className="aspect-[4/3] rounded-xl bg-slate-50 mb-3 overflow-hidden flex items-center justify-center">
+                                {p.images?.[0] ? (
+                                    <img src={p.images[0]} alt={p.title} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500" />
+                                ) : (
+                                    <span className="text-slate-400 text-xs">No image</span>
+                                )}
                             </div>
                             <h4 className="font-bold text-slate-900 text-sm line-clamp-2 mb-1 group-hover:text-indigo-600">{p.title}</h4>
                             <div className="flex items-baseline gap-2">
@@ -487,12 +555,91 @@ const StoreAdsDesktop = ({ adProducts }: { adProducts: any[] }) => {
     );
 };
 
+const AutoInjectedCTAs = ({ ctas, rawContent }: { ctas: CTAConfig[], rawContent: string }) => {
+    const [targets, setTargets] = useState<{top: HTMLElement | null, mid: HTMLElement | null, bottom: HTMLElement | null}>({top: null, mid: null, bottom: null});
+    const [mounted, setMounted] = useState(false);
+    
+    const renderInlineCtas = (position: 'top' | 'mid' | 'bottom') => {
+        return ctas
+            .filter(cta => cta.position === position && cta.template !== 'side-widget')
+            .map((cta, i) => <BlogCTA key={cta.id || i} config={cta} />);
+    };
+
+    useEffect(() => {
+        setMounted(true);
+        const wrapper = document.getElementById('custom-html-wrapper');
+        if (!wrapper) return;
+
+        let topTarget = document.getElementById('cta-top') || document.getElementById('auto-cta-top');
+        let midTarget = document.getElementById('cta-mid') || document.getElementById('auto-cta-mid');
+        let bottomTarget = document.getElementById('cta-bottom') || document.getElementById('auto-cta-bottom');
+
+        const headings = Array.from(wrapper.querySelectorAll('h2'));
+        const hasTopCta = ctas.some(c => c.position === 'top' && c.template !== 'sticky-bar' && c.template !== 'side-widget');
+        const hasMidCta = ctas.some(c => c.position === 'mid' && c.template !== 'sticky-bar' && c.template !== 'side-widget');
+        const hasBottomCta = ctas.some(c => c.position === 'bottom' && c.template !== 'sticky-bar' && c.template !== 'side-widget');
+
+        if (!topTarget && headings.length > 0) {
+            topTarget = document.createElement('div');
+            topTarget.id = 'auto-cta-top';
+            if (hasTopCta) topTarget.className = "container mx-auto px-4 my-10 relative z-20";
+            headings[0].parentNode?.insertBefore(topTarget, headings[0]);
+        }
+        
+        if (!midTarget && headings.length >= 2) {
+            midTarget = document.createElement('div');
+            midTarget.id = 'auto-cta-mid';
+            if (hasMidCta) midTarget.className = "container mx-auto px-4 my-12 relative z-20";
+            const midIndex = Math.floor(headings.length / 2);
+            headings[midIndex].parentNode?.insertBefore(midTarget, headings[midIndex]);
+        }
+
+        if (!bottomTarget) {
+            bottomTarget = document.createElement('div');
+            bottomTarget.id = 'auto-cta-bottom';
+            if (hasBottomCta) bottomTarget.className = "container mx-auto px-4 mt-16 relative z-20";
+            wrapper.appendChild(bottomTarget);
+        }
+
+        setTargets({ top: topTarget, mid: midTarget, bottom: bottomTarget });
+
+        return () => {
+            const tTop = document.getElementById('auto-cta-top');
+            if (tTop) tTop.remove();
+            const tMid = document.getElementById('auto-cta-mid');
+            if (tMid) tMid.remove();
+            const tBot = document.getElementById('auto-cta-bottom');
+            if (tBot) tBot.remove();
+        };
+    }, [rawContent, ctas]);
+
+    if (!mounted) return null;
+    
+    return (
+        <>
+            {targets.top && createPortal(renderInlineCtas('top'), targets.top)}
+            {targets.mid && createPortal(renderInlineCtas('mid'), targets.mid)}
+            {targets.bottom && createPortal(renderInlineCtas('bottom'), targets.bottom)}
+            
+            {ctas.map((cta, i) => {
+                if (!cta.id) return null;
+                const targetElement = document.getElementById(`cta-${cta.id}`);
+                if (targetElement) {
+                    return createPortal(<BlogCTA key={cta.id || i} config={cta} />, targetElement);
+                }
+                return null;
+            })}
+        </>
+    );
+};
+
 export default function BlogPostPage() {
     const { slug } = useParams();
     const navigate = useNavigate();
     const { toast } = useToast();
     const [post, setPost] = useState<BlogPost | null>(null);
     const [adProducts, setAdProducts] = useState<any[]>([]);
+    const [adCourses, setAdCourses] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -553,6 +700,16 @@ export default function BlogPostPage() {
                 .in('id', data.cta_config.ad_product_ids as string[]);
             if (products) setAdProducts(products);
         }
+
+        let fetchedCourses: any[] = [];
+        if (data.cta_config && typeof data.cta_config === 'object' && 'ad_course_ids' in data.cta_config && Array.isArray(data.cta_config.ad_course_ids) && data.cta_config.ad_course_ids.length > 0) {
+            const { data: courses } = await supabase
+                .from('courses')
+                .select('id, title, price_eur, discount_price_eur, banner_url, slug')
+                .in('id', data.cta_config.ad_course_ids as string[]);
+            if (courses) fetchedCourses = courses;
+        }
+        setAdCourses(fetchedCourses);
 
         // Increment view count safely
         await (supabase as any).rpc('increment_blog_view', { post_id: data.id });
@@ -729,71 +886,7 @@ export default function BlogPostPage() {
             .map((cta, i) => <BlogCTA key={cta.id || i} config={cta} />);
     };
 
-    const AutoInjectedCTAs = () => {
-        const [targets, setTargets] = useState<{top: HTMLElement | null, mid: HTMLElement | null, bottom: HTMLElement | null}>({top: null, mid: null, bottom: null});
-        const [mounted, setMounted] = useState(false);
-        
-        useEffect(() => {
-            setMounted(true);
-            const wrapper = document.getElementById('custom-html-wrapper');
-            if (!wrapper) return;
 
-            // Try to find user-defined placeholders
-            let topTarget = document.getElementById('cta-top');
-            let midTarget = document.getElementById('cta-mid');
-            let bottomTarget = document.getElementById('cta-bottom');
-
-            const headings = Array.from(wrapper.querySelectorAll('h2'));
-            const hasTopCta = ctas.some(c => c.position === 'top' && c.template !== 'sticky-bar' && c.template !== 'side-widget');
-            const hasMidCta = ctas.some(c => c.position === 'mid' && c.template !== 'sticky-bar' && c.template !== 'side-widget');
-            const hasBottomCta = ctas.some(c => c.position === 'bottom' && c.template !== 'sticky-bar' && c.template !== 'side-widget');
-
-            // Auto-inject Top CTA before the 1st H2 if no placeholder exists
-            if (!topTarget && headings.length > 0) {
-                topTarget = document.createElement('div');
-                if (hasTopCta) topTarget.className = "container mx-auto px-4 my-10 relative z-20";
-                headings[0].parentNode?.insertBefore(topTarget, headings[0]);
-            }
-            
-            // Auto-inject Mid CTA before the middle H2 if no placeholder exists and there are enough headings
-            if (!midTarget && headings.length >= 2) {
-                midTarget = document.createElement('div');
-                if (hasMidCta) midTarget.className = "container mx-auto px-4 my-12 relative z-20";
-                const midIndex = Math.floor(headings.length / 2);
-                headings[midIndex].parentNode?.insertBefore(midTarget, headings[midIndex]);
-            }
-
-            // Auto-inject Bottom CTA at the very end of the content
-            if (!bottomTarget) {
-                bottomTarget = document.createElement('div');
-                if (hasBottomCta) bottomTarget.className = "container mx-auto px-4 mt-16 relative z-20";
-                wrapper.appendChild(bottomTarget);
-            }
-
-            setTargets({ top: topTarget, mid: midTarget, bottom: bottomTarget });
-
-        }, [rawContent]);
-
-        if (!mounted) return null;
-        
-        return (
-            <>
-                {targets.top && createPortal(renderInlineCtas('top'), targets.top)}
-                {targets.mid && createPortal(renderInlineCtas('mid'), targets.mid)}
-                {targets.bottom && createPortal(renderInlineCtas('bottom'), targets.bottom)}
-                
-                {/* Fallback for explicit ID placeholders like <div id="cta-123"> */}
-                {ctas.map((cta, i) => {
-                    if (!cta.id) return null;
-                    const targetElement = document.getElementById(`cta-${cta.id}`);
-                    if (targetElement) {
-                        return createPortal(<BlogCTA key={cta.id || i} config={cta} />, targetElement);
-                    }
-                    return null;
-                })}
-            </>
-        );
-    };
 
     return (
         <Layout showHeader={false}>
@@ -816,16 +909,16 @@ export default function BlogPostPage() {
                 {/* Sticky & Side Widget CTAs */}
                 {renderOverlayCtas()}
 
-                <div className="container mx-auto px-4 max-w-[1400px]">
-                    <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
-                        <div className="flex-1 w-full max-w-4xl min-w-0">
+                <div className={isCustomHtml ? "w-full px-0 sm:px-4" : "container mx-auto px-4 max-w-[1400px]"}>
+                    <div className={`flex flex-col lg:flex-row gap-8 items-start ${isCustomHtml ? '' : 'justify-center'}`}>
+                        <div className={`flex-1 w-full ${isCustomHtml ? 'max-w-full' : 'max-w-4xl'} min-w-0`}>
                             {isCustomHtml ? (
                     <div className="w-full relative" id="custom-html-wrapper">
                         <div 
                             ref={contentRef}
                             dangerouslySetInnerHTML={{ __html: rawContent }} 
                         />
-                        <AutoInjectedCTAs />
+                        <AutoInjectedCTAs ctas={ctas} rawContent={rawContent} />
                     </div>
                 ) : (
                 <>
@@ -1010,9 +1103,9 @@ export default function BlogPostPage() {
                     </article>
                 </>
                 )}
-                            <StoreAdsMobile adProducts={adProducts} />
+                            <StoreAdsMobile adProducts={adProducts} adCourses={adCourses} />
                         </div>
-                        <StoreAdsDesktop adProducts={adProducts} />
+                        <StoreAdsDesktop adProducts={adProducts} adCourses={adCourses} />
                     </div>
                 </div>
                 

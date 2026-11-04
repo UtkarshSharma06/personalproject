@@ -84,13 +84,13 @@ export default function TolcPatternGuide() {
                 }
             >
                 <SEOHead
-                    title="TOLC Exam Pattern & Scoring System 2026 Explained"
+                    title="TOLC Exam Pattern & Scoring System 2027 Explained"
                     description="A detailed breakdown of the TOLC exam pattern, section timings, negative marking rules, and the CISIA equalized scoring algorithm for TOLC-MED, TOLC-I, and TOLC-F."
                     keywords="TOLC exam pattern, TOLC scoring system, TOLC negative marking, TOLC-MED equalized score, CISIA test structure, TOLC time limit"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
-                        { name: 'TOLC Exam Pattern 2026', item: '/tolc-exam-pattern-2026' }
+                        { name: 'TOLC Exam Pattern 2027', item: '/tolc-exam-pattern-2026' }
                     ])]}
                     />
 

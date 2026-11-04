@@ -20,9 +20,9 @@ const ClusterHero: React.FC<ClusterHeroProps> = ({
     getField,
     icon: Icon,
     badgeKey = 'authority_badge',
-    badgeDefault = 'Official Guide 2026',
+    badgeDefault = 'Official Guide 2027',
     headlineKey = 'hero_headline',
-    headlineDefault = 'Study in Italy 2026',
+    headlineDefault = 'Study in Italy 2027',
     descKey = 'hero_desc',
     descDefault = 'The definitive roadmap for international students.'
 }) => {
@@ -76,10 +76,10 @@ const ClusterHero: React.FC<ClusterHeroProps> = ({
                             <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Status</div>
                             <div className="text-xl font-black mb-4 flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                2026 Intake Open
+                                2027 Intake Open
                             </div>
                             <p className="text-slate-400 text-sm font-medium leading-relaxed mb-6">
-                                Official MIUR portal for the 2026/27 academic year is now accepting pre-enrollments.
+                                Official MIUR portal for the 2027-27 academic year is now accepting pre-enrollments.
                             </p>
                             <a href="https://www.universitaly.it" target="_blank" className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-2xl text-xs font-black transition-colors w-full justify-center">
                                 Portal Access

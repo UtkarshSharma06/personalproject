@@ -52,7 +52,7 @@ const HomeInsights = () => {
                                 </div>
                                 <div className="flex items-center gap-2 justify-center text-[12px] font-medium text-[#888888] [&_*]:!text-[#888888]">
                                     <Info className="w-4 h-4" />
-                                    <EditableText fieldKey="insights_source" fallback={t('landing.insights.source', 'Official 2026 Session Data')} />
+                                    <EditableText fieldKey="insights_source" fallback={t('landing.insights.source', 'Official 2027 Session Data')} />
                                 </div>
                             </div>
                         </div>

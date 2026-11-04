@@ -31,14 +31,14 @@ USING (
     EXISTS (
         SELECT 1 FROM public.profiles
         WHERE profiles.id = auth.uid()
-        AND (profiles.role = 'admin' OR profiles.email = 'contact@italostudy.com')
+        AND (profiles.role = 'admin' OR profiles.email = 'info@italostudy.com' OR email = 'contact@italostudy.com')
     )
 )
 WITH CHECK (
     EXISTS (
         SELECT 1 FROM public.profiles
         WHERE profiles.id = auth.uid()
-        AND (profiles.role = 'admin' OR profiles.email = 'contact@italostudy.com')
+        AND (profiles.role = 'admin' OR profiles.email = 'info@italostudy.com' OR email = 'contact@italostudy.com')
     )
 );
 

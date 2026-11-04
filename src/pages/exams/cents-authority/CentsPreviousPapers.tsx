@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Card } from '@/components/ui/card';
@@ -69,10 +69,12 @@ export default function CentsPreviousPapers() {
     }, []);
 
     const papers = [
-        { title: "Official CISIA Sample Set", year: "2026 Edition", type: "Diagnostic", fieldKey: "paper_1" },
-        { title: "TOLC-I Scientific Archive", year: "2024-2025", type: "High Yield", fieldKey: "paper_2" },
-        { title: "Reasoning & Logic Focus", year: "2025 Special", type: "Sectional", fieldKey: "paper_3" },
-        { title: "Mathematics Mastery Pack", year: "2026 Prep", type: "Targeted", fieldKey: "paper_4" }
+        { title: "Official CISIA CENT-S English Sample Paper", year: "2027 Edition", type: "Diagnostic Set", fieldKey: "paper_1" },
+        { title: "CENT-S 600+ Questions Prep Book (PDF)", year: "2027 Edition", type: "Complete Guide", fieldKey: "paper_2" },
+        { title: "TOLC-I & TOLC-E Scientific Question Archive", year: "2023–2026 Archive", type: "High Yield", fieldKey: "paper_3" },
+        { title: "Mathematics & Logic Focus Pack (PDF)", year: "2027 Prep", type: "Sectional Mastery", fieldKey: "paper_4" },
+        { title: "Biology, Chemistry & Physics Practice Pack", year: "2027 Science", type: "Science Drill", fieldKey: "paper_5" },
+        { title: "CENT-S Previous Year Exam Questions PDF", year: "Solved Collection", type: "Past Questions", fieldKey: "paper_6" }
     ];
 
     return (
@@ -88,9 +90,9 @@ export default function CentsPreviousPapers() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Previous Year Papers PDF – Official Samples & Solved Sets"
-                    description="Download CENT-S previous year papers and official CISIA scientific sample sets. Access solved TOLC-I and TOLC-E papers for 2026 exam preparation."
-                    keywords="CENT-S previous papers, CENT-S sample paper pdf, CISIA past papers, TOLC-I previous papers English, CENT-S practice test pdf"
+                    title="CENT-S Exam Sample Papers & Questions PDF (Free Download) – CISIA 2027"
+                    description="Download CENT-S exam sample papers, practice questions PDF, and past papers with official answer keys. Free 600+ questions prep book PDF and online simulations."
+                    keywords="cent-s exam sample paper, cents exam questions pdf, cent-s exam questions pdf, cent-s past papers, cent-s exam preparation book pdf free download, cents exam pdf, cents past papers, cents practice test, cent-s practice test, cent-s exam sample paper pdf, cents exam questions, cisia cent s practice test, cents sample test"
                 />
 
                 <FAQSchema items={faqs} />
@@ -112,7 +114,7 @@ export default function CentsPreviousPapers() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-6">

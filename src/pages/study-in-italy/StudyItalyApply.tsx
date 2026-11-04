@@ -42,7 +42,7 @@ const sections = [
 
 
 const faqs = [
-    { question: 'When should I start applying to Italian universities for 2026?', answer: 'Ideally, begin research in September-October 2025. Most universities open applications for the 2026/27 academic year in February-March 2026. Pre-enrollment on UniversItaly opens around January.' },
+    { question: 'When should I start applying to Italian universities for 2027?', answer: 'Ideally, begin research in September-October 2026. Most universities open applications for the 2027 intake in February-March 2027. Pre-enrollment on UniversItaly opens around January.' },
     { question: 'What documents do I need to apply to an Italian university?', answer: 'The core documents are: Passport, secondary school certificate (translated + legalized), degree transcripts if applying for Master\'s, English proficiency certificate (IELTS/MOI), CV, and two letters of recommendation for postgraduate programs.' },
     { question: 'What is UniversItaly and is it mandatory?', answer: 'UniversItaly (universitaly.it) is the official Italian government pre-enrollment portal. It is mandatory for all non-EU students applying for a student visa to Italy.' },
     { question: 'What is a Declaration of Value (DOV)?', answer: 'A DOV is a document issued by the Italian Embassy in your country confirming that your previous degree is officially recognized by the Italian government. It is required for Master\'s applications.' },
@@ -92,9 +92,9 @@ export default function StudyItalyApply() {
                 }
             >
                 <SEOHead
-                    title="How to Apply & Italy Study Visa Requirements 2026"
-                    description="A complete step-by-step guide on how international students can apply to Italian universities in 2026, from document preparation to Italy study visa requirements."
-                    keywords="italy study visa requirements 2026, how to apply to Italian university, Italian university application process 2026, Italy student visa"
+                    title="How to Apply & Italy Study Visa Requirements 2027"
+                    description="A complete step-by-step guide on how international students can apply to Italian universities in 2027, from document preparation to Italy study visa requirements."
+                    keywords="italy study visa requirements 2027, how to apply to Italian university, Italian university application process 2027, Italy student visa"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
@@ -120,13 +120,13 @@ export default function StudyItalyApply() {
                                 <section id="overview" className="scroll-mt-40">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6">
                                         {getField('hero_headline', 'How to Apply to Italian Universities')}
                                     </EditableText>
                                     <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                        {getField('hero_subheadline', 'The exact application process for international students in 2026 — from choosing your program to landing your student visa. Each step is documented and explained.')}
+                                        {getField('hero_subheadline', 'The exact application process for international students in 2027 — from choosing your program to landing your student visa. Each step is documented and explained.')}
                                     </EditableText>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                                         {[
@@ -152,19 +152,41 @@ export default function StudyItalyApply() {
                                     </div>
                                 </section>
 
+                                    {/* Admission Consulting Callout */}
+                                    <div className="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-3xl p-8 mb-8 shadow-xl relative overflow-hidden border border-indigo-800">
+                                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                                            <div className="max-w-xl">
+                                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-black uppercase tracking-wider mb-3">
+                                                    <Sparkles size={14} /> 1-on-1 Admission & Visa Support
+                                                </div>
+                                                <h3 className="text-2xl font-black mb-2">Need Help with Universitaly Pre-Enrollment or Study Visa?</h3>
+                                                <p className="text-slate-300 text-sm leading-relaxed">
+                                                    Our expert Italian education advisors provide end-to-end guidance: university selection, CIMEA / Declaration of Value document verification, Universitaly submission, and Embassy interview preparation.
+                                                </p>
+                                            </div>
+                                            <a 
+                                                href="https://consult.italostudy.com" 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="shrink-0 bg-white text-slate-900 hover:bg-indigo-50 font-black px-6 py-3.5 rounded-2xl shadow-lg transition-all flex items-center gap-2 group text-sm"
+                                            >
+                                                Book Consultation <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                            </a>
+                                        </div>
+                                    </div>
                                 {/* Timeline */}
                                 <section id="timeline" className="scroll-mt-40">
                                     <div className="flex items-center gap-4 mb-8">
                                         <div className="bg-indigo-100 p-2 md:p-3 rounded-2xl">
                                             <CalendarDays className="text-indigo-600" size={28} />
                                         </div>
-                                        <h2 className="text-2xl md:text-4xl font-black text-slate-900 underline decoration-indigo-400 underline-offset-8">2026 Application Timeline</h2>
+                                        <h2 className="text-2xl md:text-4xl font-black text-slate-900 underline decoration-indigo-400 underline-offset-8">2027 Application Timeline</h2>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {[
-                                            { key: 'research', title: 'Research Phase', weight: 'Sep – Nov 2025', focus: 'Shortlist universities and programs. Research entrance exams (IMAT, TOLC). Prepare a list of required documents.', color: 'bg-blue-50 text-blue-700 border-blue-100' },
-                                            { key: 'apply', title: 'Application Phase', weight: 'Jan – May 2026', focus: 'Submit applications to universities. Prepare and legalize academic documents. UniversItaly pre-enrollment opens in January.', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
-                                            { key: 'visa', title: 'Visa Phase', weight: 'Mar – Aug 2026', focus: 'Book consulate appointment. Submit Type D visa application. Wait 60-90 days. Convert to Permesso di Soggiorno on arrival.', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' }
+                                            { key: 'research', title: 'Research Phase', weight: 'Sep – Nov 2026', focus: 'Shortlist universities and programs. Research entrance exams (IMAT, TOLC). Prepare a list of required documents.', color: 'bg-blue-50 text-blue-700 border-blue-100' },
+                                            { key: 'apply', title: 'Application Phase', weight: 'Jan – May 2027', focus: 'Submit applications to universities. Prepare and legalize academic documents. UniversItaly pre-enrollment opens in January.', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
+                                            { key: 'visa', title: 'Visa Phase', weight: 'Mar – Aug 2027', focus: 'Book consulate appointment. Submit Type D visa application. Wait 60-90 days. Convert to Permesso di Soggiorno on arrival.', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' }
                                         ].map((item, i) => (
                                             <div key={i} className={`p-6 md:p-8 rounded-[2rem] border-2 shadow-[8px_8px_0px_0px_rgba(15,23_42,1)] border-slate-900 ${item.color} flex flex-col justify-between h-full`}>
                                                 <div>

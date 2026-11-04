@@ -13,7 +13,8 @@ export const CORE_KEYWORDS =
     "cent-s exam, cent-s, cent s, cent exam italy, cent-s exam italy, cent s exam italy, " +
     "cents exam, cent-s exam preparation, cent s exam preparation, cents exam preparation, " +
     "cent-s preparation, cent s preparation, cents preparation, cent-s prep, cents prep, cent s prep, " +
-    "cent-s exam dates, cent s exam dates, cents exam dates, cent exam dates, cent exam date 2026, cents available dates, cent test dates, cents exam date 2026, " +
+    "cent-s exam dates, cent s exam dates, cents exam dates, cent exam dates, cent exam date 2027, cent exam date 2026, cents available dates, cent test dates, cents exam date 2027, " +
+    "cent-s 2027, cents 2027, cent-s exam 2027, cents exam 2027, cent-s 2026-27, cent-s syllabus 2027, cents mock test 2027, " +
     "cent-s exam registration, cents exam registration, cent-s exam registration, " +
     "cent-s exam fee, cents exam fee, cents exam fees, cent s test fee, cent exam fees, cent-s exam fees, " +
     "cent-s exam syllabus, cent s exam syllabus, cents exam syllabus, cent test syllabus, cent s syllabus, cent syllabus, cents syllabus, cents topics, cents structure, " +
@@ -33,7 +34,8 @@ export const CORE_KEYWORDS =
     "sapienza cent-s, cent-s italy, cent s italy, cent s university, cent s macro period, " +
 
     // IMAT
-    "imat, imat 2026, imat exam 2026, imat syllabus 2026, imat 2026 syllabus, imat syllabus, imat test syllabus, imat exam syllabus 2026, imat exam syllabus, imat test syllabus 2026, " +
+    "imat, imat 2027, imat exam 2027, imat syllabus 2027, imat 2027 syllabus, imat 2026-27, imat 2027 registration, imat 2027 dates, imat exam date 2027, imat 2026 results, imat 2026 cutoff, imat 2026 score analysis, " +
+    "imat 2026, imat exam 2026, imat syllabus 2026, imat 2026 syllabus, imat syllabus, imat test syllabus, imat exam syllabus 2026, imat exam syllabus, imat test syllabus 2026, " +
     "imat syllabus 2026 pdf free download, imat syllabus pdf free download, imat 2026 syllabus pdf, imat syllabus 2026 pdf, " +
     "imat 2026 biology chemistry physics mathematics, imat 2026 date, imat date 2026, imat exam date 2026, imat dates 2026, imat exam dates 2026, imat 2026 dates, data imat 2026, " +
     "imat registration 2026, imat 2026 registration, imat application 2026, imat 2026 registration date, imat exam 2026 registration date, imat 2026 iscrizione, imat 2026 deadline, universitaly imat 2026, " +
@@ -44,6 +46,7 @@ export const CORE_KEYWORDS =
 
     // TIL-I / TOLC
     "til-i, til i, til i syllabus, til exam syllabus, til-i exam, til-i polimi, politecnico di milano entrance, tolc preparation, tolc-e, tolc-i, tolc-f, tolc exam dates, tolc registration, tolc italy, " +
+    "tolc 2027, tolc exam dates 2027, tolc-i 2027, tolc-e 2027, til-i 2027, tolc 2026-27, " +
 
     // Universities in Italy
     "italian universities for international students, top italian universities for international students, " +
@@ -59,7 +62,8 @@ export const CORE_KEYWORDS =
     "top universities for ms in computer science in italy, top universities in italy for computer science in english, " +
 
     // Study in Italy
-    "study in italy, study in italy without ielts, study in italy without ielts 2026, " +
+    "study in italy, study in italy without ielts, study in italy 2027, study in italy without ielts 2027, study in italy 2026-27, " +
+    "study in italy without ielts 2026, " +
     "universities in italy without ielts requirement for international students 2026, masters in italy without ielts, " +
     "italy university without ielts, italy university admission without ielts, admission in italy university without ielts, " +
     "is ielts required for italy, do i need ielts to study in italy, is ielts mandatory for italy student visa, does italy require ielts, can i study in italy without ielts, without ielts study in italy, " +
@@ -90,7 +94,7 @@ export const CORE_KEYWORDS =
  * (blogs, resources — not homepage). Shorter to avoid tag bloat.
  */
 export const SECONDARY_KEYWORDS =
-    "italostudy, cent-s exam, cents exam, imat 2026, imat syllabus 2026, cent-s preparation, " +
+    "italostudy, cent-s exam, cents exam, imat 2027, imat syllabus 2027, imat 2026-27, cent-s 2027, cent-s preparation, " +
     "cent-s mock test, cent-s exam italy, imat exam italy, study in italy, study in italy without ielts, " +
     "italian universities for international students, moi accepted university italy, " +
     "imat registration 2026, imat exam date 2026, cent-s exam dates, cent-s exam preparation book, " +

@@ -24,8 +24,8 @@ const ImatForIndianStudents: React.FC = () => {
         <Layout variant="public">
         <div className="bg-gray-50 min-h-screen">
             <SEOHead 
-                title="IMAT 2026 for Indian Students: Eligibility, Visas, and Exam Centers | Italostudy"
-                description="The definitive 3500+ word guide for Indian students taking the IMAT 2026. Step-by-step timeline, CIMEA vs DoV explained, DSU scholarships, and exam centers in India."
+                title="IMAT 2027 for Indian Students: Eligibility, Visas, and Exam Centers | Italostudy"
+                description="The definitive 3500+ word guide for Indian students taking the IMAT 2027. Step-by-step timeline, CIMEA vs DoV explained, DSU scholarships, and exam centers in India."
                 keywords="imat for indian students, imat exam centers in india, imat eligibility for indian students, cimea for indian students, dov for italy from india, dsu scholarship italy"
             />
 
@@ -37,10 +37,10 @@ const ImatForIndianStudents: React.FC = () => {
                             <MapPin className="w-4 h-4" /> The Complete India-to-Italy Pipeline
                         </div>
                         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-6">
-                            IMAT 2026: The Ultimate Guide for Indian Students
+                            IMAT 2027: The Ultimate Guide for Indian Students
                         </h1>
                         <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                            Every year, hundreds of Indian students secure seats in prestigious Italian medical schools. However, navigating the bureaucracy—Universitaly, CIMEA, DOV, and DSU—is harder than the exam itself. Here is your step-by-step 2026 roadmap.
+                            Every year, hundreds of Indian students secure seats in prestigious Italian medical schools. However, navigating the bureaucracy—Universitaly, CIMEA, DOV, and DSU—is harder than the exam itself. Here is your step-by-step 2027 roadmap.
                         </p>
                     </div>
                 </div>
@@ -58,7 +58,7 @@ const ImatForIndianStudents: React.FC = () => {
                                 If you are an Indian student stressed by the hyper-competitive NEET environment and the exorbitant costs of private medical colleges in India, the International Medical Admissions Test (IMAT) is your golden ticket. Italy offers a 6-year MBBS equivalent degree taught entirely in English, valid across the EU, and heavily subsidized by the government.
                             </p>
                             <p>
-                                However, unlike applying to the US or UK, the Italian system is deeply bureaucratic. A single missed deadline for "Pre-enrollment" or a missing Apostille on your Class 12 certificate can disqualify you from the entire academic year, even if you score a perfect 90 on the IMAT. This 3500-word guide breaks down the exact timeline and requirements for the 2026 intake.
+                                However, unlike applying to the US or UK, the Italian system is deeply bureaucratic. A single missed deadline for "Pre-enrollment" or a missing Apostille on your Class 12 certificate can disqualify you from the entire academic year, even if you score a perfect 90 on the IMAT. This 3500-word guide breaks down the exact timeline and requirements for the 2027 intake.
                             </p>
 
                             <hr />
@@ -74,7 +74,7 @@ const ImatForIndianStudents: React.FC = () => {
                             <ul>
                                 <li><strong>Mandatory Subjects:</strong> You must have studied Physics, Chemistry, Biology, and English in Class 11 and 12.</li>
                                 <li><strong>Minimum Marks:</strong> Unlike some Eastern European countries, Italy does not have a strict minimum percentage requirement (like 50% in PCB) for eligibility to *write* the exam. Admission is purely based on your IMAT rank. However, you must pass your boards.</li>
-                                <li><strong>Age Limit:</strong> You must be at least 17 years old by December 31 of the enrollment year (2026). There is no upper age limit.</li>
+                                <li><strong>Age Limit:</strong> You must be at least 17 years old by December 31 of the enrollment year (2027). There is no upper age limit.</li>
                             </ul>
 
                             <div className="bg-red-50 border-l-4 border-red-500 p-4 my-6">
@@ -167,16 +167,16 @@ const ImatForIndianStudents: React.FC = () => {
 
                             <hr />
 
-                            <h2>6. The 2026 Master Timeline</h2>
-                            <p>If you are aiming for the IMAT in September 2026, print this timeline and stick it on your wall:</p>
+                            <h2>6. The 2027 Master Timeline</h2>
+                            <p>If you are aiming for the IMAT in September 2027, print this timeline and stick it on your wall:</p>
                             <ul>
-                                <li><strong>January - March 2026:</strong> Focus heavily on IMAT preparation. Transition from NEET physics/chemistry to IMAT logical reasoning and biology. Get your passport ready.</li>
-                                <li><strong>April - May 2026:</strong> Universitaly pre-enrollment opens. Apply immediately. Start the CIMEA or DoV process for your high school documents.</li>
-                                <li><strong>June - July 2026:</strong> Gather financial documents for the DSU scholarship and get them apostilled.</li>
-                                <li><strong>July 2026:</strong> IMAT registration opens. Book the New Delhi center within the first 24 hours. Pay the fee.</li>
-                                <li><strong>August 2026:</strong> Apply for the DSU scholarship online (deadlines vary by region). Book your visa appointment at VFS.</li>
-                                <li><strong>September 2026:</strong> Write the IMAT. </li>
-                                <li><strong>October 2026:</strong> Results are published. If admitted, finalize university enrollment and fly to Italy.</li>
+                                <li><strong>January - March 2027:</strong> Focus heavily on IMAT preparation. Transition from NEET physics/chemistry to IMAT logical reasoning and biology. Get your passport ready.</li>
+                                <li><strong>April - May 2027:</strong> Universitaly pre-enrollment opens. Apply immediately. Start the CIMEA or DoV process for your high school documents.</li>
+                                <li><strong>June - July 2027:</strong> Gather financial documents for the DSU scholarship and get them apostilled.</li>
+                                <li><strong>July 2027:</strong> IMAT registration opens. Book the New Delhi center within the first 24 hours. Pay the fee.</li>
+                                <li><strong>August 2027:</strong> Apply for the DSU scholarship online (deadlines vary by region). Book your visa appointment at VFS.</li>
+                                <li><strong>September 2027:</strong> Write the IMAT. </li>
+                                <li><strong>October 2027:</strong> Results are published. If admitted, finalize university enrollment and fly to Italy.</li>
                             </ul>
 
                             <hr />

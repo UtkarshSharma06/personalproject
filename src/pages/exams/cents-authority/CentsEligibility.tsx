@@ -86,9 +86,9 @@ export default function CentsEligibility() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Eligibility 2026: Academic & Legal Requirements"
-                    description="Official eligibility criteria for CENT-S 2026. High school requirements, 12-year schooling rule, English proficiency, and Non-EU visa regulations for Italian STEM degrees."
-                    keywords="cent-s eligibility 2026, study italy requirements, cisia entry criteria, stem italy visa requirements, 12 year schooling italy"
+                    title="CENT-S Eligibility 2027: Academic & Legal Requirements"
+                    description="Official eligibility criteria for CENT-S 2027. High school requirements, 12-year schooling rule, English proficiency, and Non-EU visa regulations for Italian STEM degrees."
+                    keywords="cent-s eligibility 2027, study italy requirements, cisia entry criteria, stem italy visa requirements, 12 year schooling italy"
                 />
 
                 <FAQSchema items={faqs} />
@@ -110,11 +110,11 @@ export default function CentsEligibility() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'CENT-S 2026 Eligibility Criteria')}
+                                        {getField('hero_headline', 'CENT-S 2027 Eligibility Criteria')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -126,7 +126,7 @@ export default function CentsEligibility() {
                                             { key: 'school', label: 'Schooling', value: '12 Years', icon: GraduationCap },
                                             { key: 'lang', label: 'Language', value: 'B2 English', icon: Globe },
                                             { key: 'visa', label: 'Visa Quota', value: 'Non-EU', icon: ShieldCheck },
-                                            { key: 'status', label: 'Status', value: 'Open 2026', icon: CheckCircle2 }
+                                            { key: 'status', label: 'Status', value: 'Open 2027', icon: CheckCircle2 }
                                         ].map((item, i) => (
                                             <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
                                                 <item.icon className="text-indigo-600 mb-3 group-hover:scale-110 transition-transform" size={24} />

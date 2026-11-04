@@ -13,7 +13,7 @@ interface CTASectionProps {
 }
 
 const CTASection = ({
-    title = "Ready to Ace the CENT-S 2026?",
+    title = "Ready to Ace the CENT-S 2027?",
     subtitle = "Practice with real exam-level questions and get instant performance insights.",
     buttonText = "Start Free Mock Test",
     fieldKeyPrefix = "cta"

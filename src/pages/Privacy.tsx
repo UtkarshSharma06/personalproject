@@ -179,7 +179,7 @@ export default function Privacy() {
                         <div className="bg-green-50 border border-green-100 rounded-xl p-4 mt-4">
                             <p className="font-bold text-green-800 text-[14px] uppercase tracking-wide mb-1">Account Deletion Requests</p>
                             <p className="text-green-900 text-[14px]">
-                                To request the deletion of your account and personal data, please email <strong className="font-bold">contact@italostudy.com</strong> from the email address associated with your account. For security reasons, we will verify your identity before processing the request. Please note that we may be legally required to retain certain transactional data (such as past billing records) for tax and compliance purposes.
+                                To request the deletion of your account and personal data, please email <strong className="font-bold">info@italostudy.com</strong> from the email address associated with your account. For security reasons, we will verify your identity before processing the request. Please note that we may be legally required to retain certain transactional data (such as past billing records) for tax and compliance purposes.
                             </p>
                         </div>
                     </section>
@@ -249,10 +249,10 @@ export default function Privacy() {
                             <p className="font-bold text-lg mb-1">ItaloStudy</p>
                             <p className="text-slate-400 text-[14px] mb-4">Independent educational technology platform</p>
                             <a
-                                href="mailto:contact@italostudy.com?subject=Privacy Enquiry"
+                                href="mailto:info@italostudy.com?subject=Privacy Enquiry"
                                 className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold text-[14px] px-5 py-2.5 rounded-lg hover:bg-slate-100 transition-colors"
                             >
-                                ✉ contact@italostudy.com
+                                ✉ info@italostudy.com
                             </a>
                             <div className="mt-5 pt-5 border-t border-slate-700 flex flex-wrap gap-4 text-[13px] text-slate-400">
                                 <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>

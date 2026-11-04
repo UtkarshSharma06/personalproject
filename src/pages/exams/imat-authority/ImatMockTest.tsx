@@ -91,9 +91,9 @@ export default function ImatMockTest() {
                 }
             >
                 <SEOHead
-                    title="Free IMAT Mock Test 2026 – 60 Questions, 100 Minutes, Instant Global Rank"
-                    description="Take the free IMAT mock test 2026 online. Full 60-question simulation with real -0.4 penalty marking, strict 100-minute timer, and instant global percentile ranking. The best free IMAT practice test and simulator available."
-                    keywords="imat mock test, imat mock test free, free imat mock test, imat mock exam, imat simulation 2026, imat test simulation, imat simulator, imat free mock test, imat practice test, imat mock 2026, imat test online, free imat simulation test, imat mock paper"
+                    title="Free IMAT Mock Test 2027 – 60 Questions, 100 Minutes, Instant Global Rank"
+                    description="Take the free IMAT mock test 2027 online. Full 60-question simulation with real -0.4 penalty marking, strict 100-minute timer, and instant global percentile ranking. The best free IMAT practice test and simulator available."
+                    keywords="imat mock test, imat mock test free, free imat mock test, imat mock exam, imat simulation 2027, imat test simulation, imat simulator, imat free mock test, imat practice test, imat mock 2027, imat test online, free imat simulation test, imat mock paper"
                 />
 
                 <FAQSchema items={faqs} />
@@ -115,11 +115,11 @@ export default function ImatMockTest() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'Free IMAT Mock Test 2026')}
+                                        {getField('hero_headline', 'Free IMAT Mock Test 2027')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">

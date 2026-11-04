@@ -23,9 +23,9 @@ const ImatLogicalReasoning: React.FC = () => {
         <Layout variant="public">
         <div className="bg-gray-50 min-h-screen">
             <SEOHead 
-                title="IMAT Logical Reasoning & English Comprehension Guide (2026 Format) | Italostudy"
-                description="Master the NEW 2026 IMAT Logical Reasoning format. A 3500+ word strategy guide on English comprehension, problem-solving, and why the old Cambridge TSA puzzles are dead."
-                keywords="imat logical reasoning, imat english comprehension, imat 2026 format, imat reading skills, imat problem solving"
+                title="IMAT Logical Reasoning & English Comprehension Guide (2027 Format) | Italostudy"
+                description="Master the NEW 2027 IMAT Logical Reasoning format. A 3500+ word strategy guide on English comprehension, problem-solving, and why the old Cambridge TSA puzzles are dead."
+                keywords="imat logical reasoning, imat english comprehension, imat 2027 format, imat reading skills, imat problem solving"
             />
 
             {/* Hero Section */}
@@ -33,7 +33,7 @@ const ImatLogicalReasoning: React.FC = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-sm font-medium mb-6">
-                            <Brain className="w-4 h-4" /> Updated for the MUR Era (2026)
+                            <Brain className="w-4 h-4" /> Updated for the MUR Era (2027)
                         </div>
                         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-6">
                             The Definitive Guide to IMAT Logical Reasoning & Comprehension
@@ -65,7 +65,7 @@ const ImatLogicalReasoning: React.FC = () => {
 
                             <hr />
 
-                            <h2>The New 2026 Structure: What to Expect</h2>
+                            <h2>The New 2027 Structure: What to Expect</h2>
                             <p>
                                 The current IMAT dedicates exactly <strong>9 questions</strong> (out of 60) to this non-science category. While 9 questions might seem small, at 1.5 points each, they account for <strong>13.5 points</strong>. In a highly competitive exam where the cutoff margin between acceptance and rejection is often 0.5 points, dominating these 9 questions is your absolute priority.
                             </p>

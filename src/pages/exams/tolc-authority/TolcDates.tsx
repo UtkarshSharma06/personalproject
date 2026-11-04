@@ -29,7 +29,7 @@ import PageNavigation from '@/components/exams/PageNavigation';
 const sections = [
     { id: 'overview', label: 'Dates Overview' },
     { id: 'home-vs-uni', label: 'TOLC@HOME vs @UNI' },
-    { id: 'timeline', label: 'Typical 2026 Timeline' },
+    { id: 'timeline', label: 'Typical 2027 Timeline' },
     { id: 'rules', label: 'Booking Rules & Limits' },
     { id: 'faqs', label: 'FAQs' }
 ];
@@ -79,13 +79,13 @@ export default function TolcDates() {
                 }
             >
                 <SEOHead
-                    title="TOLC Exam Dates 2026: Booking Calendar & Deadlines"
-                    description="Complete guide to TOLC 2026 exam dates, booking deadlines, TOLC@HOME vs TOLC@UNI differences, and CISIA attempt limits."
-                    keywords="TOLC exam dates, TOLC 2026 calendar, TOLC booking deadline, TOLC@HOME dates, CISIA attempt limit, book TOLC test"
+                    title="TOLC Exam Dates 2027: Booking Calendar & Deadlines"
+                    description="Complete guide to TOLC 2027 exam dates, booking deadlines, TOLC@HOME vs TOLC@UNI differences, and CISIA attempt limits."
+                    keywords="TOLC exam dates, TOLC 2027 calendar, TOLC booking deadline, TOLC@HOME dates, CISIA attempt limit, book TOLC test"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
-                        { name: 'TOLC Exam Dates 2026', item: '/tolc-exam-dates-2026' }
+                        { name: 'TOLC Exam Dates 2027', item: '/tolc-exam-dates-2026' }
                     ])]}
                     />
 
@@ -111,7 +111,7 @@ export default function TolcDates() {
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'TOLC Exam Dates & Deadlines 2026')}
+                                        {getField('hero_headline', 'TOLC Exam Dates & Deadlines 2027')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-xl md:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -216,7 +216,7 @@ export default function TolcDates() {
                                         <div className="relative z-10">
                                             <h2 className="text-4xl font-black mb-8 flex items-center gap-4">
                                                 <CalendarCheck className="text-emerald-400" />
-                                                Typical 2026 Timeline
+                                                Typical 2027 Timeline
                                             </h2>
                                             <p className="text-xl text-slate-300 leading-relaxed font-medium mb-12 max-w-3xl">
                                                 Universities structure their admissions in "Windows" (Finestre). Some accept TOLC scores early in the year for guaranteed admission, while others wait until late summer.

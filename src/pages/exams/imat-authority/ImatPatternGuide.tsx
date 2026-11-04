@@ -90,9 +90,9 @@ export default function ImatPatternGuide() {
                 }
             >
                 <SEOHead
-                    title="IMAT Exam Pattern 2026 – Question Breakdown & Weightage"
-                    description="Official 2026 IMAT exam pattern. Detailed breakdown of 60 questions across Biology, Chemistry, Physics, Math, and Critical Thinking sections."
-                    keywords="IMAT exam pattern 2026, IMAT question weightage, IMAT section breakdown, IMAT biology questions, IMAT logic section"
+                    title="IMAT Exam Pattern 2027 – Question Breakdown & Weightage"
+                    description="Official 2027 IMAT exam pattern. Detailed breakdown of 60 questions across Biology, Chemistry, Physics, Math, and Critical Thinking sections."
+                    keywords="IMAT exam pattern 2027, IMAT question weightage, IMAT section breakdown, IMAT biology questions, IMAT logic section"
                 />
 
                 <FAQSchema items={faqs} />
@@ -114,15 +114,15 @@ export default function ImatPatternGuide() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6">
-                                        {getField('hero_headline', 'IMAT 2026 Exam Pattern')}
+                                        {getField('hero_headline', 'IMAT 2027 Exam Pattern')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                        {getField('hero_desc', 'Strategy starts with understanding the battlefield. This expert analysis breaks down every section of the 60-question IMAT 2026 structure.')}
+                                        {getField('hero_desc', 'Strategy starts with understanding the battlefield. This expert analysis breaks down every section of the 60-question IMAT 2027 structure.')}
                                     </EditableText>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">

@@ -24,8 +24,8 @@ const ImatVsNeet: React.FC = () => {
         <Layout variant="public">
         <div className="bg-gray-50 min-h-screen">
             <SEOHead 
-                title="IMAT vs NEET 2026: The Ultimate Comparison for Indian Students | Italostudy"
-                description="Is IMAT easier than NEET? A massive 3500+ word breakdown of the syllabus, negative marking, difficulty, and why Italian medical schools are the best backup for Indian MBBS aspirants in 2026."
+                title="IMAT vs NEET 2027: The Ultimate Comparison for Indian Students | Italostudy"
+                description="Is IMAT easier than NEET? A massive 3500+ word breakdown of the syllabus, negative marking, difficulty, and why Italian medical schools are the best backup for Indian MBBS aspirants in 2027."
                 keywords="imat vs neet, imat for indian students, is imat easier than neet, imat syllabus vs neet syllabus, imat biology vs neet biology"
             />
 
@@ -34,10 +34,10 @@ const ImatVsNeet: React.FC = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium mb-6">
-                            <Globe className="w-4 h-4" /> Official 2026 Comparison Guide
+                            <Globe className="w-4 h-4" /> Official 2027 Comparison Guide
                         </div>
                         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-6">
-                            IMAT vs NEET 2026: The Definitive Guide for Indian Aspirants
+                            IMAT vs NEET 2027: The Definitive Guide for Indian Aspirants
                         </h1>
                         <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                             With over 2.4 million students competing for NEET and cutoffs skyrocketing, the IMAT offers a strategic, high-quality, and highly affordable gateway to an MBBS in Europe. Here is the most exhaustive comparison on the internet.

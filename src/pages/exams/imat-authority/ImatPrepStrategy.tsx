@@ -90,9 +90,9 @@ export default function ImatPrepStrategy() {
                 }
             >
                 <SEOHead
-                    title="IMAT Preparation Strategy 2026 – 6-Month Study Plan & Scoring Tactics"
-                    description="Expert preparation strategy for the IMAT 2026. Data-backed study roadmaps, mastering the logic section, and tactical guessing to maximize your medical entrance score."
-                    keywords="IMAT prep strategy 2026, IMAT study plan, IMAT guessing strategy, how to study for IMAT"
+                    title="IMAT Preparation Strategy 2027 – 6-Month Study Plan & Scoring Tactics"
+                    description="Expert preparation strategy for the IMAT 2027. Data-backed study roadmaps, mastering the logic section, and tactical guessing to maximize your medical entrance score."
+                    keywords="IMAT prep strategy 2027, IMAT study plan, IMAT guessing strategy, how to study for IMAT"
                 />
 
                 <FAQSchema items={faqs} />
@@ -114,11 +114,11 @@ export default function ImatPrepStrategy() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'IMAT 2026 Prep Strategy')}
+                                        {getField('hero_headline', 'IMAT 2027 Prep Strategy')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">

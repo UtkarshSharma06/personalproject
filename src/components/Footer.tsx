@@ -21,11 +21,11 @@ export default function Footer() {
             ]
         },
         {
-            title: 'CENT-S 2026',
+            title: 'CENT-S 2027',
             links: centsLinks.slice(0, 6)
         },
         {
-            title: 'IMAT 2026',
+            title: 'IMAT 2027',
             links: imatLinks.slice(0, 6)
         },
         {

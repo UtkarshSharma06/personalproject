@@ -50,12 +50,12 @@ const STATIC_BOOKS = [
 
 const faqs = [
     { question: 'Do I really need Italian manuals for the IMAT?', answer: 'While the exam is in English, Italian manuals like Alphatest or Editest are excellent for the "Italian flavor" of logic. However, for Biology and Chemistry, English resources like Pearson are often superior and more clear.' },
-    { question: 'Is the BMAT Guide useful for the 2026 IMAT?', answer: 'Yes, because the Logical Reasoning section of the IMAT was originally developed by Cambridge Assessment (who make the BMAT). The question styles remain very similar.' },
+    { question: 'Is the BMAT Guide useful for the 2027 IMAT?', answer: 'Yes, because the Logical Reasoning section of the IMAT was originally developed by Cambridge Assessment (who make the BMAT). The question styles remain very similar.' },
     { question: 'Should I buy the 7000 or 12000 question banks?', answer: 'Focus on quality over quantity. A 1200-question bank that is specifically calibrated to IMAT difficulty is much more useful than a 10000-question bank full of old or irrelevant chemistry trivia.' },
     { question: 'Can I use IB/A-Level textbooks for science prep?', answer: 'Absolutely. Pearson Biology and Chemistry (International A-Level) are among our top recommendations because the IMAT syllabus is heavily aligned with standard English-medium pre-university curricula.' },
     { question: 'What is the best resource for the General Knowledge section?', answer: 'The Cambridge AS Level General Paper is excellent for building the breadth of global awareness, history, and politics required for the modern IMAT GK section.' },
     { question: 'Are Kindle or e-book versions of study guides sufficient?', answer: 'Digital versions are great for reading theory. However, for practice tests and question banks, we strongly recommend paper or a tablet with a stylus to simulate the physical marking process of the real exam.' },
-    { question: 'Should I prioritize the official 2026 editions of prep books?', answer: 'If the Ministerial decree (Bando) introduces significant syllabus changes, prioritize 2026 editions. Otherwise, 2024 or 2025 editions of core science manuals remain 99% accurate.' },
+    { question: 'Should I prioritize the official 2027 editions of prep books?', answer: 'If the Ministerial decree (Bando) introduces significant syllabus changes, prioritize 2027 editions. Otherwise, 2024 or 2025 editions of core science manuals remain 99% accurate.' },
     { question: 'How many practice questions should I aim to solve before the exam?', answer: 'Successful candidates typically solve between 3,000 to 5,000 unique practice questions. Ensure at least 1,500 of these are solved under strict 100-minute timed conditions.' },
     { question: 'Is it worth buying separate books for Physics and Mathematics?', answer: 'Only if these are significant weak points. For most students, the science core of Biology and Chemistry takes priority, and standard A-Level or IB summary guides for Physics/Math are more than enough.' },
     { question: 'Where can I find worked solutions for these recommended books?', answer: 'Most international editions come with online resource portals. For IMAT-specific banks, we provide detailed derivations and logical explanations in our dedicated resource hubs.' }
@@ -109,9 +109,9 @@ function ImatBooksContent() {
             }
         >
             <SEOHead
-                title="Best Books for IMAT 2026 – Recommended Resources & Study Material"
-                description="Expert review of the best books for IMAT 2026. From Pearson Science to BMAT Logic guides, discover the only resources you need to rank high."
-                keywords="best books for IMAT 2026, IMAT study material, Pearson Biology IMAT, BMAT guide for IMAT, IMAT preparation books"
+                title="Best Books for IMAT 2027 – Recommended Resources & Study Material"
+                description="Expert review of the best books for IMAT 2027. From Pearson Science to BMAT Logic guides, discover the only resources you need to rank high."
+                keywords="best books for IMAT 2027, IMAT study material, Pearson Biology IMAT, BMAT guide for IMAT, IMAT preparation books"
             />
 
             <FAQSchema items={faqs} />
@@ -133,15 +133,15 @@ function ImatBooksContent() {
                             <section id="overview" className="scroll-mt-[120px]">
                                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                     <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                    Official 2026 Academic Roadmap
+                                    Official 2027 Academic Roadmap
                                 </div>
 
                                 <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                    {getField('hero_headline', 'Best Books for IMAT 2026')}
+                                    {getField('hero_headline', 'Best Books for IMAT 2027')}
                                 </EditableText>
 
                                 <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                    {getField('hero_desc', 'Stop the resource overload. We identify the specific scientific and logical manuals that match the 2026 IMAT difficulty and syllabus.')}
+                                    {getField('hero_desc', 'Stop the resource overload. We identify the specific scientific and logical manuals that match the 2027 IMAT difficulty and syllabus.')}
                                 </EditableText>
 
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
@@ -149,7 +149,7 @@ function ImatBooksContent() {
                                         { key: 'books', label: 'Essential Books', value: 'Top 4', icon: Book },
                                         { key: 'qs', label: 'Practice Questions', value: '5000+', icon: FileText },
                                         { key: 'logic', label: 'Logic Focus', value: 'Cambridge', icon: Zap },
-                                        { key: 'verify', label: 'Status', value: '2026 Verified', icon: ShieldCheck }
+                                        { key: 'verify', label: 'Status', value: '2027 Verified', icon: ShieldCheck }
                                     ].map((item, i) => (
                                         <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
                                             <item.icon className="text-indigo-600 mb-3 group-hover:scale-110 transition-transform" size={24} />
@@ -233,7 +233,7 @@ function ImatBooksContent() {
                                     <div className="relative z-10">
                                         <h2 className="text-4xl font-black mb-8 flex items-center gap-4 text-emerald-400">
                                             <Zap />
-                                            Study Strategy 2026
+                                            Study Strategy 2027
                                         </h2>
                                         <p className="text-xl text-slate-300 leading-relaxed font-medium mb-12 max-w-3xl">
                                             Don't just read. The IMAT is a test of <span className="text-white font-black underline decoration-emerald-500 italic">stamina and logic</span>. Use Pearson for your conceptual base, but spend 70% of your time on BMAT-style logical puzzles and high-speed mock exams.

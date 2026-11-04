@@ -88,7 +88,7 @@ export default function TiliUltimateGuide() {
             >
                 <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
                     <SEOHead
-                        title="TIL-I Exam Guide 2026 | PoliTo Engineering Entrance"
+                        title="TIL-I Exam Guide 2027 | PoliTo Engineering Entrance"
                         description="Complete guide to the TIL-I exam for admission to Politecnico di Torino (PoliTo) Engineering programs. Learn the syllabus, scoring, and best preparation strategies."
                         keywords="til-i exam, til-i syllabus, til-i preparation, til-i polimi, politecnico di torino, engineering entrance italy, study in italy"
                         faqs={faqs}
@@ -97,7 +97,7 @@ export default function TiliUltimateGuide() {
                             getBreadcrumbSchema([
                                 { name: 'Home', item: '/' },
                                 { name: 'Exams', item: '/exams' },
-                                { name: 'TIL-I Guide 2026', item: '/til-i-exam-guide-2026' }
+                                { name: 'TIL-I Guide 2027', item: '/til-i-exam-guide-2026' }
                             ])
                         ]}
                     />

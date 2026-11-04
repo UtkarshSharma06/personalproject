@@ -1,5 +1,5 @@
 /**
- * SEO Structured Data (JSON-LD) Schemas for Italostudy 2026
+ * SEO Structured Data (JSON-LD) Schemas for Italostudy 2027
  * These follow schema.org standards for Educational Organizations and Courses.
  */
 
@@ -50,10 +50,10 @@ export const getEducationalOrganizationSchema = () => ({
 
 export const getCourseSchema = (id: 'imat' | 'cents' | 'tolc' | 'tili', locale: string = 'en') => {
   const titles = {
-    imat: "IMAT 2026 Ultimate Preparation Course",
-    cents: "CEnT-S 2026 Ultimate Preparation Course",
-    tolc: "TOLC 2026 Ultimate Preparation Course",
-    tili: "TIL-I 2026 Ultimate Preparation Course"
+    imat: "IMAT 2027 Ultimate Preparation Course",
+    cents: "CEnT-S 2027 Ultimate Preparation Course",
+    tolc: "TOLC 2027 Ultimate Preparation Course",
+    tili: "TIL-I 2027 Ultimate Preparation Course"
   };
 
   const descriptions = {
@@ -140,5 +140,44 @@ export const getVideoObjectSchema = (title: string, description: string, thumbna
       "@type": "ImageObject",
       "url": "https://italostudy.com/logo.webp"
     }
+  }
+});
+
+
+export const getEventSchema = (
+  name: string,
+  description: string,
+  startDate: string,
+  endDate: string,
+  locationName: string = "Global Test Centers & Universitaly",
+  url: string = "https://italostudy.com/imat-exam-dates-2026"
+) => ({
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": name,
+  "description": description,
+  "startDate": startDate,
+  "endDate": endDate,
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "location": {
+    "@type": "Place",
+    "name": locationName,
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "IT"
+    }
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": "MUR (Ministero dell'Università e della Ricerca)",
+    "url": "https://www.universitaly.it"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "130",
+    "priceCurrency": "EUR",
+    "url": url,
+    "availability": "https://schema.org/InStock"
   }
 });

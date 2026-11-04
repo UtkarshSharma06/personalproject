@@ -89,13 +89,13 @@ export default function TolcDetailedSyllabus() {
                 }
             >
                 <SEOHead
-                    title="TOLC Detailed Syllabus 2026: Complete Section-by-Section Guide"
-                    description="The most comprehensive and detailed TOLC 2026 syllabus guide. Complete breakdown of TOLC-I, TOLC-E, TOLC-F, TOLC-MED, and TOLC-SU requirements for Italian university admissions."
-                    keywords="TOLC syllabus 2026, TOLC-I syllabus, TOLC-E topics, TOLC-MED biology, TOLC-F chemistry, TOLC logical reasoning, CISIA test topics"
+                    title="TOLC Detailed Syllabus 2027: Complete Section-by-Section Guide"
+                    description="The most comprehensive and detailed TOLC 2027 syllabus guide. Complete breakdown of TOLC-I, TOLC-E, TOLC-F, TOLC-MED, and TOLC-SU requirements for Italian university admissions."
+                    keywords="TOLC syllabus 2027, TOLC-I syllabus, TOLC-E topics, TOLC-MED biology, TOLC-F chemistry, TOLC logical reasoning, CISIA test topics"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
-                        { name: 'TOLC Syllabus 2026', item: '/tolc-syllabus-2026' }
+                        { name: 'TOLC Syllabus 2027', item: '/tolc-syllabus-2026' }
                     ])]}
                     />
 
@@ -118,15 +118,15 @@ export default function TolcDetailedSyllabus() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 CISIA Framework
+                                        Official 2027 CISIA Framework
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'TOLC 2026 Detailed Master Syllabus')}
+                                        {getField('hero_headline', 'TOLC 2027 Detailed Master Syllabus')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-xl md:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                        {getField('hero_desc', "The TOLC (Test OnLine CISIA) is not a single exam, but a diverse ecosystem of specialized university admission tests. Whether you are aiming for Engineering (TOLC-I), Economics (TOLC-E), Pharmacy (TOLC-F), Medicine (TOLC-MED), or Humanities (TOLC-SU), mastering the specific syllabus for your chosen track is the absolute prerequisite for success. This exhaustive guide breaks down every single topic, sub-topic, and competency tested across the major TOLC variants, providing you with a definitive roadmap for your 2026 preparation journey.")}
+                                        {getField('hero_desc', "The TOLC (Test OnLine CISIA) is not a single exam, but a diverse ecosystem of specialized university admission tests. Whether you are aiming for Engineering (TOLC-I), Economics (TOLC-E), Pharmacy (TOLC-F), Medicine (TOLC-MED), or Humanities (TOLC-SU), mastering the specific syllabus for your chosen track is the absolute prerequisite for success. This exhaustive guide breaks down every single topic, sub-topic, and competency tested across the major TOLC variants, providing you with a definitive roadmap for your 2027 preparation journey.")}
                                     </EditableText>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
@@ -134,7 +134,7 @@ export default function TolcDetailedSyllabus() {
                                             { key: 'variants', label: 'Exam Types', value: '10+ Variants', icon: BookOpen },
                                             { key: 'questions', label: 'Average Qs', value: '50 MCQ', icon: Target },
                                             { key: 'time', label: 'Avg Timing', value: '90-110 Min', icon: Zap },
-                                            { key: 'status', label: 'Curriculum', value: '2026 Updated', icon: Star }
+                                            { key: 'status', label: 'Curriculum', value: '2027 Updated', icon: Star }
                                         ].map((item, i) => (
                                             <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
                                                 <item.icon className="text-indigo-600 mb-3 group-hover:scale-110 transition-transform" size={24} />

@@ -1,5 +1,5 @@
 /**
- * SEO Link Registry for Italostudy 2026
+ * SEO Link Registry for Italostudy 2027
  * These clusters help search engines understand the relationship between 
  * authority guides and deep-dive technical pages.
  */
@@ -11,8 +11,8 @@ export interface SEOLink {
 }
 
 export const IMAT_CLUSTER: SEOLink[] = [
-  { title: "IMAT Syllabus 2026", href: "/imat-syllabus-2026", description: "Detailed topic breakdown for Biology, Chemistry, and Physics." },
-  { title: "Exam Dates & Deadlines", href: "/imat-exam-dates-2026", description: "Official Mur timeline for the 2026 intake." },
+  { title: "IMAT Syllabus 2027", href: "/imat-syllabus-2026", description: "Detailed topic breakdown for Biology, Chemistry, and Physics." },
+  { title: "Exam Dates & Deadlines", href: "/imat-exam-dates-2026", description: "Official Mur timeline for the 2027 intake." },
   { title: "Registration Guide", href: "/imat-registration-2026", description: "Step-by-step Universitaly application process." },
   { title: "Preparation Strategy", href: "/imat-preparation-strategy-2026", description: "How to score 50+ using the authority framework." },
   { title: "Cutoff Trends", href: "/imat-cutoff-trends-2026", description: "Historical scores for all 15+ public universities." },
@@ -34,7 +34,7 @@ export const CENTS_CLUSTER: SEOLink[] = [
 ];
 
 export const STUDY_IN_ITALY_CLUSTER: SEOLink[] = [
-  { title: "University Ranking 2026", href: "/study-in-italy/universities-2026" },
+  { title: "University Ranking 2027", href: "/study-in-italy/universities-2026" },
   { title: "Study Without IELTS", href: "/study-in-italy/without-ielts" },
   { title: "Tuition Fees & Scholarships", href: "/study-in-italy/tuition-fees-2026" },
   { title: "How to Apply (Full Cycle)", href: "/study-in-italy/how-to-apply" },

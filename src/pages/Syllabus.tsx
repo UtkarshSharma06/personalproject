@@ -29,7 +29,7 @@ const Syllabus = () => {
     return (
         <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
             <SEO
-                title="Official 2026 Exam Guides | ItaloStudy"
+                title="Official 2027 Exam Guides | ItaloStudy"
                 description="Your gateway to top universities in Italy. Official information and preparation resources for IMAT and CEnT-S."
             />
 
@@ -41,7 +41,7 @@ const Syllabus = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] items-center gap-8">
                         <div className="relative z-10">
                             <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-indigo-600 text-white text-[9px] font-black rounded uppercase tracking-widest mb-6">
-                                Official 2026 Exam Guides
+                                Official 2027 Exam Guides
                             </div>
                             <h1 className="text-3xl md:text-5xl lg:text-[52px] font-black tracking-tight text-slate-900 mb-4 leading-[1.1]">
                                 Your Gateway to <br className="hidden md:block" />
@@ -97,7 +97,7 @@ const Syllabus = () => {
                                                 <Microscope size={20} className="md:w-6 md:h-6" />
                                             </div>
                                             <div>
-                                                <h3 className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">IMAT 2026</h3>
+                                                <h3 className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">IMAT 2027</h3>
                                                 <div className="text-[8px] font-black text-indigo-600 uppercase tracking-[0.15em]">Medical Admissions Test</div>
                                             </div>
                                         </div>
@@ -150,7 +150,7 @@ const Syllabus = () => {
                                                 <Calculator size={20} className="md:w-6 md:h-6" />
                                             </div>
                                             <div>
-                                                <h3 className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">CEnT-S 2026</h3>
+                                                <h3 className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">CEnT-S 2027</h3>
                                                 <div className="text-[8px] font-black text-emerald-600 uppercase tracking-[0.15em]">Entrance Test for Science</div>
                                             </div>
                                         </div>
@@ -199,7 +199,7 @@ const Syllabus = () => {
                         <div className="flex-1">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-xl font-black text-slate-900 tracking-tight">The ItaloStudy Success Path</h3>
-                                <span className="text-[9px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">2026 Methodology</span>
+                                <span className="text-[9px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">2027 Methodology</span>
                             </div>
                             
                             <div className="bg-white border border-slate-100 rounded-[2rem] p-1 shadow-sm overflow-hidden">
@@ -289,7 +289,7 @@ const Syllabus = () => {
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-xl font-black text-slate-900 tracking-tight">Why ItaloStudy?</h3>
                                 <div className="px-2.5 py-1 bg-indigo-600 text-white text-[8px] font-black rounded-full uppercase tracking-widest flex items-center gap-1.5 shadow-lg shadow-indigo-100">
-                                    <ShieldCheck size={10} /> 2026 Official
+                                    <ShieldCheck size={10} /> 2027 Official
                                 </div>
                             </div>
                             
@@ -302,7 +302,7 @@ const Syllabus = () => {
                                         { 
                                             icon: <ShieldCheck className="text-indigo-600" size={18} />, 
                                             title: "Syllabus Authenticity", 
-                                            desc: "Directly aligned with the 2026 Ministry regulations for IMAT and CEnT-S, ensuring zero irrelevant content." 
+                                            desc: "Directly aligned with the 2027 Ministry regulations for IMAT and CEnT-S, ensuring zero irrelevant content." 
                                         },
                                         { 
                                             icon: <BookOpen className="text-indigo-600" size={18} />, 

@@ -78,7 +78,7 @@ export default function TolcPassingScore() {
                 }
             >
                 <SEOHead
-                    title="TOLC Passing Score & OFA Explained 2026 | Cutoff Analysis"
+                    title="TOLC Passing Score & OFA Explained 2027 | Cutoff Analysis"
                     description="What is a good TOLC score? Understand how CISIA calculates results, how universities rank students, and what an OFA (remedial obligation) means for you."
                     keywords="TOLC passing score, what is a good TOLC score, TOLC OFA meaning, TOLC-I average score, CISIA graduatoria, university admission Italy"
                     schemas={[getBreadcrumbSchema([

@@ -25,7 +25,7 @@ const StudyItalyClusterSection = () => {
             titleKey: 'landing.italy_cluster.pillar1_title',
             descKey: 'landing.italy_cluster.pillar1_desc',
             defaultTitle: 'Admissions Strategy',
-            defaultDesc: 'Master the UniversItaly portal and the mandatory DOV/CIMEA legalization process for 2026.',
+            defaultDesc: 'Master the UniversItaly portal and the mandatory DOV/CIMEA legalization process for 2027.',
             path: '/study-in-italy-guide-2026',
             color: 'text-blue-600',
             bg: 'bg-blue-50',
@@ -111,7 +111,7 @@ const StudyItalyClusterSection = () => {
                         >
                             <EditableText
                                 fieldKey="italy_cluster_desc"
-                                fallback={t('landing.italy_cluster.desc', 'The most precise, data-backed admission strategy for international students aiming for Italian excellence in 2026.')}
+                                fallback={t('landing.italy_cluster.desc', 'The most precise, data-backed admission strategy for international students aiming for Italian excellence in 2027.')}
                             />
                         </motion.p>
                     </div>

@@ -79,13 +79,13 @@ export default function TolcEligibility() {
                 }
             >
                 <SEOHead
-                    title="TOLC Exam Eligibility Criteria 2026 for EU & Non-EU Students"
-                    description="Find out if you are eligible to take the TOLC exam in 2026. Complete guide on academic requirements, 12-year schooling rules, DOV, and Non-EU regulations."
+                    title="TOLC Exam Eligibility Criteria 2027 for EU & Non-EU Students"
+                    description="Find out if you are eligible to take the TOLC exam in 2027. Complete guide on academic requirements, 12-year schooling rules, DOV, and Non-EU regulations."
                     keywords="TOLC eligibility, who can take TOLC, TOLC requirements non-EU, 12 years schooling Italy, DOV Italy, TOLC age limit"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
-                        { name: 'TOLC Eligibility 2026', item: '/tolc-eligibility-criteria-2026' }
+                        { name: 'TOLC Eligibility 2027', item: '/tolc-eligibility-criteria-2026' }
                     ])]}
                     />
 
@@ -111,7 +111,7 @@ export default function TolcEligibility() {
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'TOLC Eligibility & Requirements 2026')}
+                                        {getField('hero_headline', 'TOLC Eligibility & Requirements 2027')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-xl md:text-2xl text-slate-600 leading-relaxed font-medium mb-10">

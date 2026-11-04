@@ -1,10 +1,10 @@
 export const imatLinks = [
-    { key: 'ultimate', label: 'Ultimate Guide 2026', path: '/imat-exam-ultimate-guide-2026' },
-    { key: 'syllabus', label: 'Detailed Syllabus 2026', path: '/imat-syllabus-2026' },
+    { key: 'ultimate', label: 'Ultimate Guide 2027', path: '/imat-exam-ultimate-guide-2026' },
+    { key: 'syllabus', label: 'Detailed Syllabus 2027', path: '/imat-syllabus-2026' },
     { key: 'pattern', label: 'Exam Pattern & Scoring', path: '/imat-exam-pattern-2026' },
     { key: 'cutoff', label: 'Historical Cutoff Trends', path: '/imat-cutoff-trends-2026' },
     { key: 'prep', label: '90-Day Prep Strategy', path: '/imat-preparation-strategy-2026' },
-    { key: 'mock', label: 'Free Mock Test 2026', path: '/imat-mock-test-free-2026' },
+    { key: 'mock', label: 'Free Mock Test 2027', path: '/imat-mock-test-free-2026' },
     { key: 'papers', label: 'Past Papers (2011-2025)', path: '/imat-previous-year-papers-pdf' },
     { key: 'books', label: 'Best Books recommended', path: '/imat-best-books-2026' },
     { key: 'eligibility', label: 'Eligibility & Requirements', path: '/imat-eligibility-criteria-2026' },
@@ -13,7 +13,7 @@ export const imatLinks = [
     { key: 'difficulty', label: 'Difficulty Analysis', path: '/imat-difficulty-analysis-2026' },
     { key: 'passing', label: 'Passing Score Explained', path: '/imat-passing-score-explained-2026' },
     { key: 'vs', label: 'IMAT vs CENT-S', path: '/imat-vs-cents-2026' },
-    { key: 'vs_neet', label: 'IMAT vs NEET 2026', path: '/imat-vs-neet-2026' },
+    { key: 'vs_neet', label: 'IMAT vs NEET 2027', path: '/imat-vs-neet-2026' },
     { key: 'calculator', label: 'IMAT Score Calculator', path: '/imat-score-calculator' },
     { key: 'biology', label: 'Biology Syllabus Guide', path: '/imat-biology-syllabus-2026' },
     { key: 'logic', label: 'Logical Reasoning Guide', path: '/imat-logical-reasoning-guide-2026' },
@@ -22,8 +22,8 @@ export const imatLinks = [
 ];
 
 export const centsLinks = [
-    { key: 'ultimate', label: 'Ultimate Guide 2026', path: '/cent-s-exam-ultimate-guide' },
-    { key: 'syllabus', label: 'Detailed Syllabus 2026', path: '/cent-s-syllabus-2026' },
+    { key: 'ultimate', label: 'Ultimate Guide 2027', path: '/cent-s-exam-ultimate-guide' },
+    { key: 'syllabus', label: 'Detailed Syllabus 2027', path: '/cent-s-syllabus-2026' },
     { key: 'pattern', label: 'Exam Pattern & Scoring', path: '/cent-s-exam-pattern-2026' },
     { key: 'cutoff', label: 'Historical Cutoff Trends', path: '/cent-s-cutoff-2026' },
     { key: 'mock', label: 'Free Full-Length Mock', path: '/cent-s-mock-test-free-2026' },
@@ -40,21 +40,21 @@ export const centsLinks = [
 ];
 
 export const studyItalyLinks = [
-    { key: 'guide', label: 'Study in Italy Guide 2026', path: '/study-in-italy-guide-2026' },
+    { key: 'guide', label: 'Study in Italy Guide 2027', path: '/study-in-italy-guide-2026' },
     { key: 'universities', label: 'Top Universities List', path: '/study-in-italy/universities-2026' },
     { key: 'ielts', label: 'Study Without IELTS', path: '/study-in-italy/without-ielts' },
-    { key: 'tuition', label: 'Tuition Fees 2026', path: '/study-in-italy/tuition-fees-2026' },
+    { key: 'tuition', label: 'Tuition Fees 2027', path: '/study-in-italy/tuition-fees-2026' },
     { key: 'apply', label: 'How to Apply (Steps)', path: '/study-in-italy/how-to-apply' },
-    { key: 'imat', label: 'IMAT Exam Prep 2026', path: '/imat-exam-ultimate-guide-2026' },
-    { key: 'cents', label: 'CENT-S Exam Guide 2026', path: '/cent-s-exam-ultimate-guide' }
+    { key: 'imat', label: 'IMAT Exam Prep 2027', path: '/imat-exam-ultimate-guide-2026' },
+    { key: 'cents', label: 'CENT-S Exam Guide 2027', path: '/cent-s-exam-ultimate-guide' }
 ];
 export const tolcLinks = [
-    { key: 'ultimate', label: 'TOLC Ultimate Guide 2026', path: '/tolc-exam-ultimate-guide-2026' },
-    { key: 'syllabus', label: 'Detailed Syllabus 2026', path: '/tolc-syllabus-2026' },
+    { key: 'ultimate', label: 'TOLC Ultimate Guide 2027', path: '/tolc-exam-ultimate-guide-2026' },
+    { key: 'syllabus', label: 'Detailed Syllabus 2027', path: '/tolc-syllabus-2026' },
     { key: 'pattern', label: 'Exam Pattern & Scoring', path: '/tolc-exam-pattern-2026' },
     { key: 'cutoff', label: 'Historical Cutoff Trends', path: '/tolc-cutoff-trends-2026' },
     { key: 'prep', label: '90-Day Prep Strategy', path: '/tolc-preparation-strategy-2026' },
-    { key: 'mock', label: 'Free Mock Test 2026', path: '/tolc-mock-test-free-2026' },
+    { key: 'mock', label: 'Free Mock Test 2027', path: '/tolc-mock-test-free-2026' },
     { key: 'papers', label: 'Past Papers (Missing)', path: '/tolc-previous-year-papers-pdf' },
     { key: 'books', label: 'Best Books recommended', path: '/tolc-best-books-2026' },
     { key: 'eligibility', label: 'Eligibility & Requirements', path: '/tolc-eligibility-criteria-2026' },
@@ -65,5 +65,5 @@ export const tolcLinks = [
     { key: 'vs', label: 'TOLC vs IMAT', path: '/tolc-vs-imat-2026' },
     { key: 'tolc_e', label: 'TOLC-E (Economics) Guide', path: '/tolc-exam-ultimate-guide-2026#tolc-e' },
     { key: 'tolc_i', label: 'TOLC-I (Engineering) Guide', path: '/tolc-exam-ultimate-guide-2026#tolc-i' },
-    { key: 'tili', label: 'TIL-I PoliTo Guide 2026', path: '/til-i-exam-guide-2026' },
+    { key: 'tili', label: 'TIL-I PoliTo Guide 2027', path: '/til-i-exam-guide-2026' },
 ];

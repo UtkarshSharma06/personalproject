@@ -44,7 +44,7 @@ const faqs = [
     { question: 'Are the questions from past CISIA exams?', answer: 'CISIA rarely releases full past papers. However, our questions are meticulously reverse-engineered by our expert faculty based on the official syllabus, released sample questions, and post-exam student debriefs to match the exact difficulty level.' },
     { question: 'How many mock tests should I take before the real exam?', answer: 'We recommend taking a diagnostic mock at the start of your prep, followed by at least 1-2 mocks per week in the final month leading up to your exam date. Do not just take the mocks; spend time analyzing your mistakes.' },
     { question: 'Will I get explanations for the wrong answers?', answer: 'Yes. After submitting the mock, you get access to a detailed analytical report with step-by-step solutions for every single question, particularly for complex Math and Logic problems.' },
-    { question: 'Do the mocks cover the new 2026 syllabus changes?', answer: 'Yes, our content team continuously updates the question banks. If CISIA modifies the syllabus or section weighting (as they did with TOLC-MED recently), our mocks are updated immediately.' }
+    { question: 'Do the mocks cover the new 2027 syllabus changes?', answer: 'Yes, our content team continuously updates the question banks. If CISIA modifies the syllabus or section weighting (as they did with TOLC-MED recently), our mocks are updated immediately.' }
 ];
 
 export default function TolcMockTest() {
@@ -79,13 +79,13 @@ export default function TolcMockTest() {
                 }
             >
                 <SEOHead
-                    title="Free TOLC Mock Test 2026: CBT Simulator (TOLC-I, E, MED, F)"
+                    title="Free TOLC Mock Test 2027: CBT Simulator (TOLC-I, E, MED, F)"
                     description="Take a free, full-length TOLC mock test online. Experience the exact CISIA CBT interface, strict section timers, and negative marking. Get instant AI analytics."
                     keywords="TOLC mock test free, TOLC-I simulator, TOLC-MED practice test, online TOLC CBT, CISIA mock exam, TOLC English test"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
-                        { name: 'TOLC Mock Test 2026', item: '/tolc-mock-test-free-2026' }
+                        { name: 'TOLC Mock Test 2027', item: '/tolc-mock-test-free-2026' }
                     ])]}
                     />
 
@@ -111,7 +111,7 @@ export default function TolcMockTest() {
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'Free TOLC Mock Test Simulator 2026')}
+                                        {getField('hero_headline', 'Free TOLC Mock Test Simulator 2027')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-xl md:text-2xl text-slate-600 leading-relaxed font-medium mb-10">

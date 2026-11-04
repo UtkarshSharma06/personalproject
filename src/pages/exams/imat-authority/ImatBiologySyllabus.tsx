@@ -22,7 +22,7 @@ const ImatBiologySyllabus: React.FC = () => {
         <Layout variant="public">
         <div className="bg-gray-50 min-h-screen">
             <SEOHead 
-                title="IMAT Biology Syllabus 2026: The Definitive 23-Question Guide | Italostudy"
+                title="IMAT Biology Syllabus 2027: The Definitive 23-Question Guide | Italostudy"
                 description="Master the IMAT Biology section. A 3500+ word deep dive into every topic mandated by the Italian Ministry (MUR), from bioenergetics to human anatomy, with book recommendations."
                 keywords="imat biology syllabus, imat biology topics, imat biology books, imat human anatomy, imat genetics, imat bioenergetics"
             />
@@ -35,7 +35,7 @@ const ImatBiologySyllabus: React.FC = () => {
                             <Microscope className="w-4 h-4" /> The 23-Question Heavyweight
                         </div>
                         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-6">
-                            The Definitive IMAT Biology Syllabus (2026)
+                            The Definitive IMAT Biology Syllabus (2027)
                         </h1>
                         <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                             Biology makes up nearly 40% of the entire exam. If you fail Biology, you fail the IMAT. This is the most exhaustive, line-by-line breakdown of the official MUR Biology syllabus available on the internet.

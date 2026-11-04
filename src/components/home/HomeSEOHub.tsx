@@ -47,7 +47,7 @@ const HomeSEOHub = () => {
                         <h2 className="text-[28px] md:text-[34px] font-bold text-[#333333] leading-tight">
                             <EditableText
                                 fieldKey="seo_hub_title"
-                                fallback={t('landing.seo_hub.title', 'The Authority Hub: Ultimate Guides 2026')}
+                                fallback={t('landing.seo_hub.title', 'The Authority Hub: Ultimate Guides 2027')}
                             />
                         </h2>
 
@@ -72,7 +72,7 @@ const HomeSEOHub = () => {
                             <div className="w-1.5 h-10 bg-[#5a4bda] rounded-full" />
                             <div>
                                 <h3 className="text-[20px] font-bold text-[#333333]">
-                                    <EditableText fieldKey="cents_hub_title" fallback="CEnT-S 2026 Master Hub" />
+                                    <EditableText fieldKey="cents_hub_title" fallback="CEnT-S 2027 Master Hub" />
                                 </h3>
                                 <p className="text-[13px] text-[#555555] mt-1">Syllabus & Strategy Vault</p>
                             </div>
@@ -111,7 +111,7 @@ const HomeSEOHub = () => {
                             <div className="w-1.5 h-10 bg-[#5a4bda] rounded-full" />
                             <div>
                                 <h3 className="text-[20px] font-bold text-[#333333]">
-                                    <EditableText fieldKey="imat_hub_title" fallback="IMAT 2026 Authority Pillar" />
+                                    <EditableText fieldKey="imat_hub_title" fallback="IMAT 2027 Authority Pillar" />
                                 </h3>
                                 <p className="text-[13px] text-[#555555] mt-1">Official Test Blueprints</p>
                             </div>

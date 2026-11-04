@@ -41,7 +41,7 @@ const sections = [
 
 
 const faqs = [
-    { question: 'Can I study in Italy without IELTS in 2026?', answer: 'Yes. Many Italian universities waive the IELTS requirement if you provide a Medium of Instruction (MOI) certificate proving your previous degree was entirely taught in English.' },
+    { question: 'Can I study in Italy without IELTS in 2027?', answer: 'Yes. Many Italian universities waive the IELTS requirement if you provide a Medium of Instruction (MOI) certificate proving your previous degree was entirely taught in English.' },
     { question: 'Which universities in Italy accept MOI?', answer: 'Major universities like the University of Milan, University of Bologna, and University of Pavia often accept MOI certificates for programs taught in English. Always check the specific "Call for Applications" (Bando).' },
     { question: 'Is Duolingo accepted by Italian universities?', answer: 'Yes, an increasing number of Italian universities and consulates accept the Duolingo English Test (DET) as a faster, more affordable alternative to IELTS.' },
     { question: 'Can I get a student visa without IELTS?', answer: 'Yes. If the university has issued an admission letter based on an MOI or alternative test, the consulate will generally process the visa. Policies vary by country, so verify with your local Italian consulate.' },
@@ -91,9 +91,9 @@ export default function StudyItalyWithoutIelts() {
                 }
             >
                 <SEOHead
-                    title="Study in Italy Without IELTS 2026 – Requirements & Visa Guide"
-                    description="Can you study in Italy without IELTS? Yes! Discover how to get admission and a study visa in Italy using MOI certificates, Duolingo, or native speaker exemptions in 2026."
-                    keywords="study in italy without ielts 2026, italy study visa without ielts, study in italy without ielts, can i study in italy without ielts, study in italy for international students without ielts, italian universities without ielts, study in italy requirements 2026"
+                    title="Study in Italy Without IELTS 2027 – Requirements & Visa Guide"
+                    description="Can you study in Italy without IELTS? Yes! Discover how to get admission and a study visa in Italy using MOI certificates, Duolingo, or native speaker exemptions in 2027."
+                    keywords="study in italy without ielts 2027, study in italy without ielts 2026, moi accepted university in italy, moi accepted universities in italy, which italian university accept moi, italy student visa without ielts, cheap universities in italy for international students without ielts, study in italy without ielts, can i study in italy without ielts, italian universities without ielts, study in italy requirements 2027"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
@@ -119,7 +119,7 @@ export default function StudyItalyWithoutIelts() {
                                 <section id="overview" className="scroll-mt-40">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6 md:mb-8">
                                         {getField('hero_headline', 'Study in Italy Without IELTS')}
@@ -219,7 +219,7 @@ export default function StudyItalyWithoutIelts() {
                                 <section id="alternatives" className="p-8 md:p-12 bg-white rounded-[2.5rem] md:rounded-[3rem] border-2 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23_42,1)]">
                                     <h2 className="text-2xl md:text-4xl font-black text-slate-900 mb-8 flex items-center gap-4">
                                         <BookOpen className="text-blue-500" size={28} />
-                                        English Test Alternatives 2026
+                                        English Test Alternatives 2027
                                     </h2>
                                     <div className="space-y-6">
                                         {[

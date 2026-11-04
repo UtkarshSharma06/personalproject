@@ -81,13 +81,13 @@ export default function StudyItalyGuide() {
             >
                 <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
                     <SEOHead
-                        title="Study in Italy for International Students: 2026 Ultimate Guide"
+                        title="Study in Italy for International Students: 2027 Ultimate Guide"
                         description="The definitive guide for international students planning to study in Italy. Learn about admission, scholarships, visa processes, and university requirements."
-                        keywords="study in italy for international students, study in Italy 2026, Italian university admission, scholarships in Italy, Italy student visa"
+                        keywords="study in italy for international students, study in Italy 2027, Italian university admission, scholarships in Italy, Italy student visa"
                 schemas={[getBreadcrumbSchema([
                     { name: 'Home', item: '/' },
                     { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
-                    { name: 'Study in Italy Guide 2026', item: '/study-in-italy-guide-2026' }
+                    { name: 'Study in Italy Guide 2027', item: '/study-in-italy-guide-2026' }
                 ])]}
                 />
 
@@ -110,17 +110,17 @@ export default function StudyItalyGuide() {
                                         <div className="space-y-6">
                                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest shadow-sm">
                                                 <Sparkles size={12} className="animate-pulse" />
-                                                Official 2026 Academic Roadmap
+                                                Official 2027 Academic Roadmap
                                             </div>
 
                                             <EditableText fieldKey="hero_headline" as="h1" className="text-4xl md:text-7xl font-black text-slate-900 leading-[1.1]">
-                                                {getField('hero_headline', 'Study in Italy 2026')}
+                                                {getField('hero_headline', 'Study in Italy 2027')}
                                             </EditableText>
                                         </div>
                                     </div>
 
                                     <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-xl md:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                        {getField('hero_subheadline', 'The definitive, 3000+ word guide to studying in Italy as an international student in 2026. Covers everything from university selection to visa, scholarships, and cost of living.')}
+                                        {getField('hero_subheadline', 'The definitive, 3000+ word guide to studying in Italy as an international student in 2027. Covers everything from university selection to visa, scholarships, and cost of living.')}
                                     </EditableText>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
@@ -144,7 +144,7 @@ export default function StudyItalyGuide() {
 
                                     <div className="prose prose-lg prose-slate max-w-none text-slate-600 leading-loose">
                                         <EditableText fieldKey="overview_p1" multiline as="p" className="mb-4">
-                                            {getField('overview_p1', 'Italy has quietly become one of the world\'s most powerful destinations for international students. With over 90 universities, many ranked globally, and a cultural legacy unmatched anywhere on Earth, studying in Italy in 2026 is a decision that pays dividends far beyond the degree.')}
+                                            {getField('overview_p1', 'Italy has quietly become one of the world\'s most powerful destinations for international students. With over 90 universities, many ranked globally, and a cultural legacy unmatched anywhere on Earth, studying in Italy in 2027 is a decision that pays dividends far beyond the degree.')}
                                         </EditableText>
                                         <EditableText fieldKey="overview_p2" multiline as="p">
                                             {getField('overview_p2', 'This guide breaks down every aspect you need to know: from choosing between public and private universities, understanding the true cost of studying, navigating the visa process, to maximizing your scholarship potential through Italy\'s generous DSU system.')}
@@ -161,7 +161,7 @@ export default function StudyItalyGuide() {
                                         <div className="relative z-10">
                                             <EditableText fieldKey="why_title" as="h2" className="text-2xl md:text-4xl font-black mb-8 flex items-center gap-4">
                                                 <Globe className="text-indigo-400" size={28} />
-                                                {getField('why_title', 'Why Italy is the 2026 Smart Choice')}
+                                                {getField('why_title', 'Why Italy is the 2027 Smart Choice')}
                                             </EditableText>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                                                 <div className="space-y-4">
@@ -203,7 +203,7 @@ export default function StudyItalyGuide() {
                                         </div>
                                         <div>
                                             <EditableText fieldKey="req_title" as="h2" className="text-2xl md:text-4xl font-black text-slate-900 underline decoration-amber-400 underline-offset-8">
-                                                {getField('req_title', 'Admission Requirements 2026')}
+                                                {getField('req_title', 'Admission Requirements 2027')}
                                             </EditableText>
                                         </div>
                                     </div>
@@ -237,8 +237,8 @@ export default function StudyItalyGuide() {
                                         ))}
                                     </div>
                                     <div className="mt-8">
-                                        <Button variant="link" onClick={() => navigate('/imat-exam-ultimate-guide-2026')} className="text-indigo-600 font-black p-0 h-auto group text-lg">
-                                            <span>Prepare for the IMAT 2026 Entrance Exam</span>
+                                        <Button variant="link" onClick={() => navigate('/imat-exam-ultimate-guide-2027')} className="text-indigo-600 font-black p-0 h-auto group text-lg">
+                                            <span>Prepare for the IMAT 2027 Entrance Exam</span>
                                             <ArrowRight size={20} className="ml-2 group-hover:translate-x-2 transition-transform" />
                                         </Button>
                                     </div>
@@ -288,8 +288,8 @@ export default function StudyItalyGuide() {
                                                     </div>
                                                 ))}
                                             </div>
-                                            <Button onClick={() => navigate('/study-in-italy/tuition-fees-2026')} className="w-full mt-8 bg-slate-900 text-white hover:bg-slate-800">
-                                                Full Tuition Breakdown 2026
+                                            <Button onClick={() => navigate('/study-in-italy/tuition-fees-2027')} className="w-full mt-8 bg-slate-900 text-white hover:bg-slate-800">
+                                                Full Tuition Breakdown 2027
                                             </Button>
                                         </Card>
                                     </div>

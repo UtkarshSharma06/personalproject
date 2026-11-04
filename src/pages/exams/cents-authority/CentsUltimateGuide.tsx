@@ -125,8 +125,8 @@ export default function CentsUltimateGuide() {
                 }
             >
                 <SEOHead
-                    title="CEnT-S Exam 2026: The Ultimate Preparation Guide & Free Resources"
-                    description="The most complete CEnT-S 2026 preparation guide. Download free CEnT-S exam preparation book PDF, past papers, and syllabus. Access free full-length mock tests."
+                    title="CEnT-S Exam 2027: The Ultimate Preparation Guide & Free Resources"
+                    description="The most complete CEnT-S 2027 preparation guide. Download free CEnT-S exam preparation book PDF, past papers, and syllabus. Access free full-length mock tests."
                     keywords="cent-s exam preparation book pdf free download, cent-s exam preparation book pdf, cent-s exam questions pdf, cent s mock test, cents mock test, cent-s syllabus, cents prep, cent-s practice test, cent-s past papers, italostudy"
                     faqs={faqs}
                     schemas={[
@@ -134,7 +134,7 @@ export default function CentsUltimateGuide() {
                         getBreadcrumbSchema([
                             { name: 'Home', item: '/' },
                             { name: 'Guides', item: '/cent-s-exam-preparation-book-pdf' },
-                            { name: 'CEnT-S 2026', item: '/cent-s-exam-ultimate-guide' }
+                            { name: 'CEnT-S 2027', item: '/cent-s-exam-ultimate-guide' }
                         ])
                     ]}
                 />
@@ -156,11 +156,11 @@ export default function CentsUltimateGuide() {
                                 <section id="overview" className="scroll-mt-48">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-4xl md:text-7xl font-black text-slate-900 leading-[1.2] md:leading-[1.1] mb-8 mt-4 md:mt-0">
-                                        {getField('hero_headline', 'The Ultimate CENT-S 2026 Guide')}
+                                        {getField('hero_headline', 'The Ultimate CENT-S 2027 Guide')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -255,7 +255,7 @@ export default function CentsUltimateGuide() {
                                         </div>
                                         <div>
                                             <EditableText fieldKey="syllabus_summary_title" as="h2" className="text-4xl font-black text-slate-900 underline decoration-amber-400 underline-offset-8">
-                                                {getField('syllabus_summary_title', 'Syllabus Summary 2026')}
+                                                {getField('syllabus_summary_title', 'Syllabus Summary 2027')}
                                             </EditableText>
                                         </div>
                                     </div>
@@ -290,7 +290,7 @@ export default function CentsUltimateGuide() {
                                     </div>
 
                                     <div className="mt-8">
-                                        <Button variant="link" onClick={() => navigate('/cent-s-syllabus-2026')} className="text-indigo-600 font-black p-0 h-auto group text-lg">
+                                        <Button variant="link" onClick={() => navigate('/cent-s-syllabus-2027')} className="text-indigo-600 font-black p-0 h-auto group text-lg">
                                             <EditableText fieldKey="btn_syllabus" as="span">
                                                 {getField('btn_syllabus', 'See Detailed Topic-Wise Breakdown & Weightage Table')}
                                             </EditableText>
@@ -358,7 +358,7 @@ export default function CentsUltimateGuide() {
                                                 </div>
                                             </div>
                                             <Button
-                                                onClick={() => navigate('/cent-s-exam-pattern-2026')}
+                                                onClick={() => navigate('/cent-s-exam-pattern-2027')}
                                                 className="w-full mt-8 bg-slate-900 text-white hover:bg-slate-800"
                                             >
                                                 <EditableText fieldKey="btn_marking" as="span">
@@ -376,7 +376,7 @@ export default function CentsUltimateGuide() {
                                             {getField('lead_asset_badge', 'Free Asset')}
                                         </EditableText>
                                         <EditableText fieldKey="lead_asset_title" as="h3" className="text-3xl font-black mb-4">
-                                            {getField('lead_asset_title', 'CENT-S 2026 Quick Revision Notes')}
+                                            {getField('lead_asset_title', 'CENT-S 2027 Quick Revision Notes')}
                                         </EditableText>
                                         <EditableText fieldKey="lead_asset_desc" multiline as="p" className="text-indigo-100 mb-6 text-lg">
                                             {getField('lead_asset_desc', 'Includes a summary of the 5 key sections, normalization formulas, and our exclusive STEM preparation roadmap.')}
@@ -497,7 +497,7 @@ export default function CentsUltimateGuide() {
                                     <div className="space-y-8">
                                         <div className="prose prose-lg text-slate-600 max-w-none">
                                             <EditableText fieldKey="strategy_intro_desc" multiline as="p">
-                                                {getField('strategy_intro_desc', "Winning the CENT-S 2026 is 30% knowledge and 70% strategy. Most students fail because they study hard without studying right. Our 'Authority Framework' breaks your preparation into three non-negotiable phases.")}
+                                                {getField('strategy_intro_desc', "Winning the CENT-S 2027 is 30% knowledge and 70% strategy. Most students fail because they study hard without studying right. Our 'Authority Framework' breaks your preparation into three non-negotiable phases.")}
                                             </EditableText>
                                         </div>
 

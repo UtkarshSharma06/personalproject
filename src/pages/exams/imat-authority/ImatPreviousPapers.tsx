@@ -91,9 +91,9 @@ export default function ImatPreviousPapers() {
                 }
             >
                 <SEOHead
-                    title="IMAT Past Papers PDF (2011–2025) — Free Download + Answer Keys | ItaloStudy"
-                    description="Download all 14 official IMAT past papers from 2011 to 2025 completely free. Includes ministerial answer keys, worked solutions, and difficulty analysis. Best IMAT preparation resource."
-                    keywords="imat past papers pdf, imat previous year papers free download, imat 2024 paper pdf, imat question papers with answers, imat exam questions 2025, imat preparation materials pdf"
+                    title="IMAT Past Papers PDF (2011–2026) — Free Download + Official Answer Keys"
+                    description="Download all 15 official IMAT past papers from 2011 to 2026 in PDF with official ministerial answer keys, worked solutions, and question analysis. Free master download."
+                    keywords="imat past papers pdf, imat 2026 paper, imat 2026 question paper, imat 2026 pdf, test imat 2026 pdf, imat practice test pdf, imat previous year papers free download, imat 2026 answer key, imat mock test free, imat 2026 paper pdf, imat 2026 exam paper, imat 2026 past papers"
                 />
 
                 <FAQSchema items={faqs} />
@@ -115,11 +115,11 @@ export default function ImatPreviousPapers() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'IMAT Past Papers (2011-2025)')}
+                                        {getField('hero_headline', 'IMAT Past Papers (2011-2026)')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -128,8 +128,8 @@ export default function ImatPreviousPapers() {
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                                         {[
-                                            { key: 'years', label: 'History', value: '14 Years', icon: History },
-                                            { key: 'papers', label: 'Papers', value: '14 Official', icon: FileText },
+                                            { key: 'years', label: 'History', value: '15 Years', icon: History },
+                                            { key: 'papers', label: 'Papers', value: '15 Official', icon: FileText },
                                             { key: 'soluble', label: 'Solved', value: '100% Keys', icon: Shield },
                                             { key: 'update', label: 'Updates', value: 'Yearly', icon: Activity }
                                         ].map((item, i) => (
@@ -156,6 +156,7 @@ export default function ImatPreviousPapers() {
                                     </div>
                                     <div className="space-y-4">
                                         {[
+                                            { year: '2026', status: 'Latest MUR Session (Sept 2026)', delta: 'Focus: Modern Molecular Biology & Data Interpretation', icon: Activity },
                                             { year: '2024-2025', status: 'Ministerial (MUR) Format', delta: 'Focus: Chemistry/Bio Depth', icon: Activity },
                                             { year: '2014-2023', status: 'Cambridge Assessment Era', delta: 'Focus: Critical Logic (BMAT Style)', icon: BookOpen },
                                             { year: '2011-2013', status: 'Pilot & Early Cycles', delta: 'Focus: General Foundations', icon: GraduationCap }
@@ -189,9 +190,9 @@ export default function ImatPreviousPapers() {
                                                     <Download size={48} />
                                                 </div>
                                                 <div className="flex-1 text-center md:text-left">
-                                                    <h3 className="text-3xl font-black text-slate-900 mb-3">Master PDF Bundle (2011-2025)</h3>
+                                                    <h3 className="text-3xl font-black text-slate-900 mb-3">Master PDF Bundle (2011-2026)</h3>
                                                     <p className="text-slate-500 font-medium text-lg leading-relaxed mb-8 max-w-lg">
-                                                        A single 45MB optimized ZIP file containing all official question booklets, answer keys, and score distribution reports.
+                                                        A single 48MB optimized ZIP file containing all 15 official question booklets (including the September 2026 paper), official answer keys, and score distribution reports.
                                                     </p>
                                                     <EditableFile fieldKey="papers_zip_url" currentUrl={papersZipUrl} accept=".pdf,.zip">
                                                         <Button
@@ -231,7 +232,7 @@ export default function ImatPreviousPapers() {
                                                 <div className="p-8 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
                                                     <Activity size={32} className="text-indigo-400 mb-4" />
                                                     <h4 className="text-xl font-black mb-2">Score Calibration</h4>
-                                                    <p className="text-sm text-slate-400 leading-relaxed">Calculate your "Weighted Average" across different eras to find your realistic 2026 percentile.</p>
+                                                    <p className="text-sm text-slate-400 leading-relaxed">Calculate your "Weighted Average" across different eras to find your realistic 2027 percentile.</p>
                                                 </div>
                                             </div>
                                         </div>

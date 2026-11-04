@@ -99,7 +99,7 @@ const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) =
                 <div className="relative z-10">
                     <h4 className="text-base font-black text-indigo-900 mb-2">Ready to see your real score?</h4>
                     <p className="text-[11px] text-indigo-700/80 font-medium leading-relaxed mb-4">
-                        Free full-length 2026 mock exam. Find your weak spots before test day.
+                        Free full-length 2027 mock exam. Find your weak spots before test day.
                     </p>
                     {renderLink(
                         examType === 'cents' ? '/cent-s-mock' : examType === 'tolc' ? '/tolc-mock-test-free-2026' : '/imat-mock',

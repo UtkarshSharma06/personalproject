@@ -110,8 +110,8 @@ export default function TolcUltimateGuide() {
                 }
             >
                 <SEOHead
-                    title="TOLC Exam Ultimate Guide 2026 | CISIA English & Italian Tests"
-                    description="The complete 2026 guide to the CISIA TOLC exams (TOLC-I, TOLC-E, TOLC-MED). Learn about syllabus, scoring, negative marking, OFA, and how to register for Italian universities."
+                    title="TOLC Exam Ultimate Guide 2027 | CISIA English & Italian Tests"
+                    description="The complete 2027 guide to the CISIA TOLC exams (TOLC-I, TOLC-E, TOLC-MED). Learn about syllabus, scoring, negative marking, OFA, and how to register for Italian universities."
                     keywords="TOLC exam, CISIA TOLC, TOLC-I, TOLC-E, TOLC-MED, English TOLC, study in Italy, TOLC preparation, what is TOLC, TOLC OFA"
                     faqs={faqs}
                     schemas={[
@@ -119,7 +119,7 @@ export default function TolcUltimateGuide() {
                         getBreadcrumbSchema([
                             { name: 'Home', item: '/' },
                             { name: 'Exams', item: '/exams' },
-                            { name: 'TOLC Guide 2026', item: '/tolc-exam-ultimate-guide-2026' }
+                            { name: 'TOLC Guide 2027', item: '/tolc-exam-ultimate-guide-2026' }
                         ])
                     ]}
                 />
@@ -142,11 +142,11 @@ export default function TolcUltimateGuide() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official CISIA 2026 Guide
+                                        Official CISIA 2027 Guide
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'The Ultimate TOLC Exam Guide 2026')}
+                                        {getField('hero_headline', 'The Ultimate TOLC Exam Guide 2027')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-xl md:text-2xl text-slate-600 leading-relaxed font-medium mb-10">

@@ -28,7 +28,7 @@ const HomeAboutCENTS = () => {
                     <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-10 leading-tight">
                         <EditableText
                             fieldKey="about_cents_title"
-                            fallback={t('landing.about_cents.title', 'Ultimate Guide to the CENT-S Exam 2026')}
+                            fallback={t('landing.about_cents.title', 'Ultimate Guide to the CENT-S Exam 2027')}
                         />
                     </h2>
 
@@ -36,7 +36,7 @@ const HomeAboutCENTS = () => {
                         <p>
                             <EditableText
                                 fieldKey="about_cents_p1"
-                                fallback={t('landing.about_cents.p1', "Navigating the landscape of medical entrance preparation Europe can be daunting, but for students aiming for Italian public universities, the CENT-S exam 2026 stands as the most critical milestone. Organized by CISIA, the CENT-S (CEnT-S) is the standard entrance qualification for international medical programs taught in English across Italy's most prestigious institutions, including Sapienza University of Rome and the University of Milan.")}
+                                fallback={t('landing.about_cents.p1', "Navigating the landscape of medical entrance preparation Europe can be daunting, but for students aiming for Italian public universities, the CENT-S exam 2027 stands as the most critical milestone. Organized by CISIA, the CENT-S (CEnT-S) is the standard entrance qualification for international medical programs taught in English across Italy's most prestigious institutions, including Sapienza University of Rome and the University of Milan.")}
                                 multiline
                             />
                         </p>
@@ -52,7 +52,7 @@ const HomeAboutCENTS = () => {
                             <p className="mb-6">
                                 <EditableText
                                     fieldKey="about_cents_struct_p1"
-                                    fallback={t('landing.about_cents.struct_p1', 'The 2026 session of the CEnT-S follows a rigorous 90-minute format containing 60 multiple-choice questions. Understanding the weight of each section is key to your IMAT practice test strategy:')}
+                                    fallback={t('landing.about_cents.struct_p1', 'The 2027 session of the CEnT-S follows a rigorous 90-minute format containing 60 multiple-choice questions. Understanding the weight of each section is key to your IMAT practice test strategy:')}
                                     multiline
                                 />
                             </p>
@@ -90,7 +90,7 @@ const HomeAboutCENTS = () => {
                         <p>
                             <EditableText
                                 fieldKey="about_cents_p2"
-                                fallback={t('landing.about_cents.p2', 'At ItaloStudy, we provide a free mock exams suite specifically calibrated to the 2026 difficulty level. Unlike generic resources, our test engine mirrors the exact pressure and cognitive load of the official CISIA environment. Our database of over 10,000 practice questions ensures that no topic—from molecular biology to complex reasoning on texts—is left untouched.')}
+                                fallback={t('landing.about_cents.p2', 'At ItaloStudy, we provide a free mock exams suite specifically calibrated to the 2027 difficulty level. Unlike generic resources, our test engine mirrors the exact pressure and cognitive load of the official CISIA environment. Our database of over 10,000 practice questions ensures that no topic—from molecular biology to complex reasoning on texts—is left untouched.')}
                                 multiline
                             />
                         </p>
@@ -98,7 +98,7 @@ const HomeAboutCENTS = () => {
                         <p>
                             <EditableText
                                 fieldKey="about_cents_p3"
-                                fallback={t('landing.about_cents.p3', "Preparing for the CENT-S exam 2026 requires more than just memorization; it demands strategic speed and precise accuracy. Our simulator's internal data shows that the 'Reasoning on Texts and Data' section remains the primary bottleneck for 85% of candidates. By integrating detailed analytics and adaptive difficulty, we help you master the nuances of the CISIA curriculum before you even walk into the test center.")}
+                                fallback={t('landing.about_cents.p3', "Preparing for the CENT-S exam 2027 requires more than just memorization; it demands strategic speed and precise accuracy. Our simulator's internal data shows that the 'Reasoning on Texts and Data' section remains the primary bottleneck for 85% of candidates. By integrating detailed analytics and adaptive difficulty, we help you master the nuances of the CISIA curriculum before you even walk into the test center.")}
                                 multiline
                             />
                         </p>
@@ -164,7 +164,7 @@ const HomeAboutCENTS = () => {
                         <p>
                             <EditableText
                                 fieldKey="about_cents_fail_p1"
-                                fallback={t('landing.about_cents.fail_p1', "Statistically, failure on the CENT-S exam 2026 is rarely due to a lack of scientific knowledge. Our analytics from 45,000+ mock attempts show that 68% of lost points come from 'Blind Guessing' and 'Time Fatigue.' Students often spend too long on a single logic puzzle, leaving them with less than 30 seconds for critical biology questions at the end of the paper.")}
+                                fallback={t('landing.about_cents.fail_p1', "Statistically, failure on the CENT-S exam 2027 is rarely due to a lack of scientific knowledge. Our analytics from 45,000+ mock attempts show that 68% of lost points come from 'Blind Guessing' and 'Time Fatigue.' Students often spend too long on a single logic puzzle, leaving them with less than 30 seconds for critical biology questions at the end of the paper.")}
                                 multiline
                             />
                         </p>
@@ -195,7 +195,7 @@ const HomeAboutCENTS = () => {
                         <p>
                             <EditableText
                                 fieldKey="about_cents_comp_p1"
-                                fallback={t('landing.about_cents.comp_p1', "Many candidates ask: Is the CENT-S harder than the IMAT? While the syllabus is nearly identical, the CEnT-S (CISIA) format places a higher emphasis on Reasoning on Texts and Data. The IMAT traditionally featured more complex General Knowledge questions, whereas the 2026 CEnT-S focuses on the application of scientific principles in a time-sensitive environment.")}
+                                fallback={t('landing.about_cents.comp_p1', "Many candidates ask: Is the CENT-S harder than the IMAT? While the syllabus is nearly identical, the CEnT-S (CISIA) format places a higher emphasis on Reasoning on Texts and Data. The IMAT traditionally featured more complex General Knowledge questions, whereas the 2027 CEnT-S focuses on the application of scientific principles in a time-sensitive environment.")}
                                 multiline
                             />
                         </p>
@@ -204,7 +204,7 @@ const HomeAboutCENTS = () => {
                             <Link to="/syllabus" className="group flex items-center gap-3 text-emerald-600 font-black uppercase tracking-widest text-sm">
                                 <EditableText
                                     fieldKey="about_cents_cta1"
-                                    fallback={t('landing.about_cents.cta1', 'Explore the 2026 Syllabus')}
+                                    fallback={t('landing.about_cents.cta1', 'Explore the 2027 Syllabus')}
                                 />
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Link>

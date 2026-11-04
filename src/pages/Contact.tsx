@@ -84,7 +84,7 @@ export default function Contact() {
                             className="lg:col-span-2 space-y-6"
                         >
                             <a 
-                                href="mailto:contact@italostudy.com"
+                                href="mailto:info@italostudy.com"
                                 className="group flex items-start gap-4 p-6 bg-white rounded-2xl border border-slate-200 hover:border-[#5A4BDA] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
                             >
                                 <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0 group-hover:bg-[#5A4BDA] transition-colors">
@@ -93,7 +93,7 @@ export default function Contact() {
                                 <div>
                                     <h3 className="text-lg font-bold text-slate-900 mb-1">Email Us</h3>
                                     <p className="text-slate-600 mb-2">Our friendly team is here to help.</p>
-                                    <span className="text-[#5A4BDA] font-medium">contact@italostudy.com</span>
+                                    <span className="text-[#5A4BDA] font-medium">info@italostudy.com</span>
                                 </div>
                             </a>
 

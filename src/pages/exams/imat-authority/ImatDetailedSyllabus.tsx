@@ -94,9 +94,9 @@ export default function ImatDetailedSyllabus() {
                 }
             >
                 <SEOHead
-                    title="IMAT Syllabus 2026 – Official PDF: Biology, Chemistry, Physics & Math Topics"
-                    description="Download the complete IMAT 2026 official syllabus PDF. Full topic breakdown: Biology (23Q), Chemistry (15Q), Physics & Math (13Q), Logical Reasoning (9Q). Free guide updated for the 2026 academic intake."
-                    keywords="imat syllabus 2026, imat syllabus 2026 pdf, imat syllabus 2026 pdf free download, imat 2026 syllabus, imat 2026 syllabus official, imat syllabus pdf free download, imat biology syllabus 2026, imat chemistry topics, imat topics 2026, imat syllabus official, syllabus imat 2026"
+                    title="IMAT Syllabus 2027 – Official PDF: Biology, Chemistry, Physics & Math Topics"
+                    description="Download the complete IMAT 2027 official syllabus PDF. Full topic breakdown: Biology (23Q), Chemistry (15Q), Physics & Math (13Q), Logical Reasoning (9Q). Free guide updated for the 2027 academic intake."
+                    keywords="imat syllabus 2027, imat syllabus 2027 pdf, imat syllabus 2027 pdf free download, imat 2027 syllabus, imat 2027 syllabus official, imat syllabus pdf free download, imat biology syllabus 2027, imat chemistry topics, imat topics 2027, imat syllabus official, syllabus imat 2027"
                 />
 
                 <FAQSchema items={faqs} />
@@ -118,11 +118,11 @@ export default function ImatDetailedSyllabus() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'IMAT 2026 Detailed Syllabus')}
+                                        {getField('hero_headline', 'IMAT 2027 Detailed Syllabus')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -133,7 +133,7 @@ export default function ImatDetailedSyllabus() {
                                     <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1">Official Document</p>
-                                            <h3 className="font-black text-indigo-900 text-base">Download IMAT 2026 Official Syllabus PDF</h3>
+                                            <h3 className="font-black text-indigo-900 text-base">Download IMAT 2027 Official Syllabus PDF</h3>
                                             <p className="text-sm text-indigo-600 mt-0.5">Published by MUR (Ministry of University & Research) — Free</p>
                                         </div>
                                         <a
@@ -151,7 +151,7 @@ export default function ImatDetailedSyllabus() {
                                             { key: 'subjects', label: 'Subjects', value: '4 Major', icon: BookOpen },
                                             { key: 'questions', label: 'Questions', value: '60 MCQ', icon: Target },
                                             { key: 'time', label: 'Timing', value: '100 Min', icon: Zap },
-                                            { key: 'status', label: 'Updated', value: '2026 Ready', icon: Star }
+                                            { key: 'status', label: 'Updated', value: '2027 Ready', icon: Star }
                                         ].map((item, i) => (
                                             <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
                                                 <item.icon className="text-indigo-600 mb-3 group-hover:scale-110 transition-transform" size={24} />

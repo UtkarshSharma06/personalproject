@@ -79,13 +79,13 @@ export default function TolcRegistration() {
                 }
             >
                 <SEOHead
-                    title="How to Register for TOLC 2026: Step-by-Step Guide"
+                    title="How to Register for TOLC 2027: Step-by-Step Guide"
                     description="A complete step-by-step walkthrough on how to register for the TOLC exam on the CISIA portal, pay the €30 fee, upload photos, and book your session."
                     keywords="TOLC registration, how to book TOLC, CISIA reserved area, TOLC payment, TOLC Codice Fiscale, book TOLC@HOME"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
-                        { name: 'TOLC Registration 2026', item: '/tolc-registration-2026' }
+                        { name: 'TOLC Registration 2027', item: '/tolc-registration-2026' }
                     ])]}
                     />
 
@@ -111,7 +111,7 @@ export default function TolcRegistration() {
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'TOLC Registration Process 2026')}
+                                        {getField('hero_headline', 'TOLC Registration Process 2027')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-xl md:text-2xl text-slate-600 leading-relaxed font-medium mb-10">

@@ -94,9 +94,9 @@ export default function ImatDifficultyAnalysis() {
                 }
             >
                 <SEOHead
-                    title="IMAT Difficulty Analysis 2026: Success Rates & Trend Data"
-                    description="How hard is the IMAT 2026? Professional analysis of exam difficulty, historical scoring trends, section-by-section challenges, and competitive success rates."
-                    keywords="IMAT difficulty level, is IMAT hard, IMAT success rate 2026, IMAT vs NEET difficulty, IMAT exam challenge analysis"
+                    title="IMAT Difficulty Analysis 2027: Success Rates & Trend Data"
+                    description="How hard is the IMAT 2027? Professional analysis of exam difficulty, historical scoring trends, section-by-section challenges, and competitive success rates."
+                    keywords="IMAT difficulty level, is IMAT hard, IMAT success rate 2027, IMAT vs NEET difficulty, IMAT exam challenge analysis"
                 />
 
                 <FAQSchema items={faqs} />
@@ -118,11 +118,11 @@ export default function ImatDifficultyAnalysis() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'IMAT 2026 Difficulty Analysis')}
+                                        {getField('hero_headline', 'IMAT 2027 Difficulty Analysis')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">

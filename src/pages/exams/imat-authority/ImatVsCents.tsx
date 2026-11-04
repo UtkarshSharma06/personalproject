@@ -95,9 +95,9 @@ export default function ImatVsCents() {
                 }
             >
                 <SEOHead
-                    title="IMAT vs CEnT-S vs NEET 2026: Which is Easier? Full Comparison & Differences"
-                    description="IMAT vs NEET vs CEnT-S compared: difficulty level, syllabus, passing scores, and strategy. Which Italian medical entrance exam should you take in 2026? Honest expert analysis."
-                    keywords="imat vs neet, is imat easier than neet, is imat difficult than neet, imat vs cents 2026, imat vs cents exam, imat compared to neet, imat vs neet difficulty, imat vs neet syllabus, cent-s vs imat, which exam for italy medicine 2026"
+                    title="IMAT vs CEnT-S vs NEET 2027: Which is Easier? Full Comparison & Differences"
+                    description="IMAT vs NEET vs CEnT-S compared: difficulty level, syllabus, passing scores, and strategy. Which Italian medical entrance exam should you take in 2027? Honest expert analysis."
+                    keywords="imat vs neet, is imat easier than neet, is imat difficult than neet, imat vs cents 2027, imat vs cents exam, imat compared to neet, imat vs neet difficulty, imat vs neet syllabus, cent-s vs imat, which exam for italy medicine 2027"
                 />
 
                 <FAQSchema items={faqs} />
@@ -119,7 +119,7 @@ export default function ImatVsCents() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
@@ -127,7 +127,7 @@ export default function ImatVsCents() {
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                        {getField('hero_desc', "Choosing the right entrance exam determines your university placement. We break down the structural and tactical differences for 2026.")}
+                                        {getField('hero_desc', "Choosing the right entrance exam determines your university placement. We break down the structural and tactical differences for 2027.")}
                                     </EditableText>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
@@ -156,7 +156,7 @@ export default function ImatVsCents() {
                                         <div className="bg-indigo-100 p-3 rounded-2xl">
                                             <Scale className="text-indigo-600" size={28} />
                                         </div>
-                                        <h2 className="text-3xl font-black text-slate-900">Key Differences for 2026</h2>
+                                        <h2 className="text-3xl font-black text-slate-900">Key Differences for 2027</h2>
                                     </div>
                                     <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
                                         <div className="overflow-x-auto">
@@ -238,7 +238,7 @@ export default function ImatVsCents() {
                                             <div className="p-8 bg-indigo-50 rounded-3xl border border-indigo-100">
                                                 <h4 className="text-xl font-black text-indigo-900 mb-4 flex items-center gap-2">
                                                     <Sparkles className="text-indigo-600" size={20} />
-                                                    New for 2026: Health Modules
+                                                    New for 2027: Health Modules
                                                 </h4>
                                                 <p className="text-slate-600 text-sm leading-relaxed font-medium">
                                                     The IMAT remains focused on pure pre-medical sciences. Conversely, the CENT-S has integrated sections on **Health Citizenship**, testing your understanding of social responsibility in scientific contexts.

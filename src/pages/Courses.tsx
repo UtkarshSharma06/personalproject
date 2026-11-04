@@ -290,7 +290,7 @@ export default function CoursesMarketplace() {
             <SEO
                 title="Online Courses for IMAT & CEnT-S | ItaloStudy"
                 description="Expert-led online courses for IMAT Biology, Chemistry, Physics and CEnT-S. One-time payment, lifetime access. Italy's highest-rated Italian medical entrance exam prep."
-                keywords="IMAT biology course, IMAT chemistry course, CEnT-S biology online course, Italian medical entrance exam preparation, IMAT online classes, best IMAT course 2026, CEnT-S preparation course"
+                keywords="IMAT biology course, IMAT chemistry course, CEnT-S biology online course, Italian medical entrance exam preparation, IMAT online classes, best IMAT course 2027, best IMAT course 2026-27, CEnT-S preparation course"
                 schema={{
                     "@context": "https://schema.org",
                     "@type": "ItemList",

@@ -42,9 +42,9 @@ const ImatScoreCalculator: React.FC = () => {
         <Layout variant="public">
         <div className="bg-gray-50 min-h-screen">
             <SEOHead 
-                title="IMAT Score Calculator 2026: Calculate Your Ranking | Italostudy"
+                title="IMAT Score Calculator 2027: Calculate Your Ranking | Italostudy"
                 description="Calculate your IMAT score instantly with our interactive tool. Learn the +1.5/-0.4 scoring formula, negative marking strategies, and historical cutoffs for all Italian medical universities."
-                keywords="imat score calculator, imat scoring system, imat negative marking, imat 2026 cutoff, imat total marks, how is imat scored"
+                keywords="imat score calculator, imat scoring system, imat negative marking, imat 2027 cutoff, imat total marks, how is imat scored"
             />
 
             {/* Hero Section */}

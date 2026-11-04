@@ -77,13 +77,13 @@ export default function TolcVsImat() {
                 }
             >
                 <SEOHead
-                    title="TOLC vs IMAT 2026: Which Exam Should You Take?"
+                    title="TOLC vs IMAT 2027: Which Exam Should You Take?"
                     description="A detailed comparison between the CISIA TOLC (TOLC-MED, TOLC-I) and the IMAT. Understand differences in syllabus, English vs Italian degrees, and scoring."
                     keywords="TOLC vs IMAT, TOLC-MED vs IMAT, difference between TOLC and IMAT, study medicine in Italy exam, IMAT alternative"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'TOLC Guide', item: '/tolc-exam-ultimate-guide-2026' },
-                        { name: 'TOLC vs IMAT 2026', item: '/tolc-vs-imat-2026' }
+                        { name: 'TOLC vs IMAT 2027', item: '/tolc-vs-imat-2026' }
                     ])]}
                     />
 

@@ -87,9 +87,9 @@ export default function CentsPassingScore() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Passing Score 2026: Official Scoring & Cutoff Analysis"
-                    description="What is the passing score for CENT-S 2026? Analysis of raw vs normalized scores, safety thresholds for top Italian universities, and ranking logic."
-                    keywords="cent-s passing score 2026, cent-s cutoffs, cent-s scoring system, cisia normalization, study italy stem scores"
+                    title="CENT-S Passing Score 2027: Official Scoring & Cutoff Analysis"
+                    description="What is the passing score for CENT-S 2027? Analysis of raw vs normalized scores, safety thresholds for top Italian universities, and ranking logic."
+                    keywords="cent-s passing score 2027, cent-s cutoffs, cent-s scoring system, cisia normalization, study italy stem scores"
                 />
 
                 <FAQSchema items={faqs} />
@@ -111,11 +111,11 @@ export default function CentsPassingScore() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'CENT-S 2026 Passing Score Analysis')}
+                                        {getField('hero_headline', 'CENT-S 2027 Passing Score Analysis')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -127,7 +127,7 @@ export default function CentsPassingScore() {
                                             { key: 'max', label: 'Max Raw', value: '55.0 pts', icon: Target },
                                             { key: 'safe', label: 'Safe Score', value: '42.0 pts', icon: Award },
                                             { key: 'penalty', label: 'Penalty', value: '-0.25', icon: Zap },
-                                            { key: 'status', label: 'Status', value: '2026 Ver', icon: CheckCircle2 }
+                                            { key: 'status', label: 'Status', value: '2027 Ver', icon: CheckCircle2 }
                                         ].map((item, i) => (
                                             <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
                                                 <item.icon className="text-indigo-600 mb-3 group-hover:scale-110 transition-transform" size={24} />

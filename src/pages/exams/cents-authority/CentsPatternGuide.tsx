@@ -79,13 +79,13 @@ export default function CentsPatternGuide() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Exam Pattern 2026 – Scoring, Timing & Section Details"
-                    description="Master the CENT-S (CISIA English Test – Science) 2026 exam pattern. Detailed analysis of 55 questions, 110-minute timing, and +1/-0.25 scoring system."
-                    keywords="CENT-S exam pattern 2026, CISIA English Test Science, CENT-S marks distribution, CENT-S negative marking, CENT-S timing"
+                    title="CENT-S Exam Pattern 2027 – Scoring, Timing & Section Details"
+                    description="Master the CENT-S (CISIA English Test – Science) 2027 exam pattern. Detailed analysis of 55 questions, 110-minute timing, and +1/-0.25 scoring system."
+                    keywords="CENT-S exam pattern 2027, CISIA English Test Science, CENT-S marks distribution, CENT-S negative marking, CENT-S timing"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
-                        { name: 'CEnT-S Exam Pattern 2026', item: '/cent-s-exam-pattern-2026' }
+                        { name: 'CEnT-S Exam Pattern 2027', item: '/cent-s-exam-pattern-2026' }
                     ])]}
                 />
 
@@ -108,11 +108,11 @@ export default function CentsPatternGuide() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6">
-                                        {getField('hero_headline', 'CEnT-S 2026 Exam Pattern & Structure')}
+                                        {getField('hero_headline', 'CEnT-S 2027 Exam Pattern & Structure')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-medium mb-10">

@@ -20,7 +20,7 @@ export default function VideoReviewSection() {
                         </h2>
                         
                         <p className="text-[16px] text-[#555555] mb-10">
-                            {t('landing.video_review.subtitle', 'Real results from our 2026 students')}
+                            {t('landing.video_review.subtitle', 'Real results from our 2027 students')}
                         </p>
 
                         <div className="relative p-8 bg-white rounded-[8px] border border-[#eaeaea] mb-10 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300">

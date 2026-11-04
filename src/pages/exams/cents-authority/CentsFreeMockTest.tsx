@@ -90,9 +90,9 @@ export default function CentsFreeMockTest() {
                 }
             >
                 <SEOHead
-                    title="Free CENT-S Mock Test 2026: Full 110-Min Simulation"
-                    description="Take our free full-length CENT-S 2026 mock test. Real exam timing, negative marking, and detailed score analysis for Italian STEM entrance preparation."
-                    keywords="free cent-s mock test, cent-s simulation 2026, cisia practice test, stem italy entrance prep, free tolc-s mock"
+                    title="Free CENT-S Mock Test 2027: Full 110-Min Simulation"
+                    description="Take our free full-length CENT-S 2027 mock test. Real exam timing, negative marking, and detailed score analysis for Italian STEM entrance preparation."
+                    keywords="free cent-s mock test, cent-s simulation 2027, cisia practice test, stem italy entrance prep, free tolc-s mock"
                 />
 
                 <FAQSchema items={faqs} />
@@ -114,7 +114,7 @@ export default function CentsFreeMockTest() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
@@ -122,7 +122,7 @@ export default function CentsFreeMockTest() {
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                        {getField('hero_desc', "Test your skills against the 2026 difficulty standard. Our simulator provides a high-fidelity experience of the actual CENT-S environment.")}
+                                        {getField('hero_desc', "Test your skills against the 2027 difficulty standard. Our simulator provides a high-fidelity experience of the actual CENT-S environment.")}
                                     </EditableText>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
@@ -155,7 +155,7 @@ export default function CentsFreeMockTest() {
                                     </div>
                                     <div className="grid md:grid-cols-3 gap-6">
                                         {[
-                                            { title: 'Real Difficulty', desc: 'Questions are calibrated by our academic team to match the 2026 CISIA difficulty curve.', icon: Target },
+                                            { title: 'Real Difficulty', desc: 'Questions are calibrated by our academic team to match the 2027 CISIA difficulty curve.', icon: Target },
                                             { title: 'Time Stress', desc: 'The section-lock and overall timer mirror the pressure of the live test center environment.', icon: Timer },
                                             { title: 'Gap Analysis', desc: 'Get a granular breakdown of your performance across all 12 scientific sub-topics.', icon: BarChart }
                                         ].map((feat, i) => (

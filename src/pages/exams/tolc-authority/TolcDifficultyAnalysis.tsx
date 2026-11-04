@@ -76,7 +76,7 @@ export default function TolcDifficultyAnalysis() {
                 }
             >
                 <SEOHead
-                    title="TOLC Exam Difficulty Level 2026: Is it Harder than IMAT?"
+                    title="TOLC Exam Difficulty Level 2027: Is it Harder than IMAT?"
                     description="A deep dive into the difficulty level of the TOLC exam (TOLC-I, TOLC-MED). Analysis of time pressure, logic trick questions, and the -0.25 negative marking penalty."
                     keywords="TOLC difficulty, is TOLC hard, TOLC vs IMAT difficulty, TOLC-I math difficulty, TOLC negative marking, how hard is TOLC"
                     schemas={[getBreadcrumbSchema([

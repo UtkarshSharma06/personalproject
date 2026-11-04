@@ -86,15 +86,15 @@ export default function CentsDates() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Exam Dates 2026: Official Calendar & Deadlines"
-                    description="When is the CENT-S 2026? Official calendar for Spring and Summer macro-periods, registration windows, and university application deadlines for Italian STEM degrees."
-                    keywords="cent-s dates 2026, cent-s calendar, cent-s registration deadline, cisia exam dates, study italy stem deadlines"
+                    title="CENT-S Exam Dates 2027: CISIA Calendar, Available Sessions & Deadlines"
+                    description="When is the CENT-S 2027? Official CISIA calendar for Spring (Feb-May) and Summer (July-Aug) macro-periods, monthly registration deadlines, and university bando submission dates."
+                    keywords="cent-s exam dates 2027, cents exam dates 2027, cent-s dates 2027, cent-s calendar, cisia cent-s, cent exam date 2026, cent exam date 2027, cent s exam dates, cent-s registration deadline, cisia exam dates, study italy stem deadlines"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
-                        { name: 'CEnT-S Exam Dates 2026', item: '/cent-s-important-dates-2026' }
+                        { name: 'CEnT-S Exam Dates 2027', item: '/cent-s-important-dates-2026' }
                     ])]}
-                    />
+                />
 
                 <FAQSchema items={faqs} />
 
@@ -115,11 +115,11 @@ export default function CentsDates() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'CENT-S 2026 Official Calendar')}
+                                        {getField('hero_headline', 'CENT-S 2027 Official Calendar')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -144,6 +144,51 @@ export default function CentsDates() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Quick Summary Table for Snippet */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                                                <Calendar className="text-indigo-600" size={20} />
+                                                CENT-S 2027 Macro-Period Calendar & Booking Slots
+                                            </h3>
+                                            <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                                                CISIA 2027 Format
+                                            </span>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-sm">
+                                                <thead>
+                                                    <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                        <th className="py-3 px-4">Session</th>
+                                                        <th className="py-3 px-4">Test Window</th>
+                                                        <th className="py-3 px-4">Registration Opens</th>
+                                                        <th className="py-3 px-4">Best For</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Macro-Period 1 (Spring)</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-bold">February – May 2027</td>
+                                                        <td className="py-3 px-4">January 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md">Early-bird & Scholarships</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Macro-Period 2 (Summer)</td>
+                                                        <td className="py-3 px-4 text-emerald-600 font-bold">July – August 2027</td>
+                                                        <td className="py-3 px-4">June 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">Main Intake & 2nd Attempt</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Autumn Retake Session</td>
+                                                        <td className="py-3 px-4 text-amber-600 font-bold">September 2027</td>
+                                                        <td className="py-3 px-4">August 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">Remaining Seat Allocations</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </section>
 
                                 {/* Macro-Periods */}
@@ -152,7 +197,7 @@ export default function CentsDates() {
                                         <div className="bg-indigo-100 p-3 rounded-2xl">
                                             <Calendar className="text-indigo-600" size={28} />
                                         </div>
-                                        <h2 className="text-3xl font-black text-slate-900">The 2026 Macro-Period System</h2>
+                                        <h2 className="text-3xl font-black text-slate-900">The 2027 Macro-Period System</h2>
                                     </div>
                                     <div className="grid md:grid-cols-2 gap-8">
                                         <Card className="p-8 border-slate-100 shadow-sm hover:border-indigo-600 transition-all group">
@@ -167,7 +212,7 @@ export default function CentsDates() {
                                                 Primary window for early-bird applications and scholarship considerations at major technical universities.
                                             </p>
                                             <div className="text-indigo-600 font-black flex items-center gap-2">
-                                                Feb – May 2026 <ArrowRight size={16} />
+                                                Feb – May 2027 <ArrowRight size={16} />
                                             </div>
                                         </Card>
                                         <Card className="p-8 border-slate-100 shadow-sm hover:border-indigo-600 transition-all group">
@@ -179,10 +224,10 @@ export default function CentsDates() {
                                             </div>
                                             <h3 className="text-xl font-black text-slate-900 mb-2">Summer Session</h3>
                                             <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6">
-                                                The final window for the main 2026 intake. Ideal for students who need more prep time or a second attempt.
+                                                The final window for the main 2027 intake. Ideal for students who need more prep time or a second attempt.
                                             </p>
                                             <div className="text-emerald-600 font-black flex items-center gap-2">
-                                                July – Aug 2026 <ArrowRight size={16} />
+                                                July – Aug 2027 <ArrowRight size={16} />
                                             </div>
                                         </Card>
                                     </div>
@@ -283,6 +328,51 @@ export default function CentsDates() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Quick Summary Table for Snippet */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                                                <Calendar className="text-indigo-600" size={20} />
+                                                CENT-S 2027 Macro-Period Calendar & Booking Slots
+                                            </h3>
+                                            <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                                                CISIA 2027 Format
+                                            </span>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-sm">
+                                                <thead>
+                                                    <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                        <th className="py-3 px-4">Session</th>
+                                                        <th className="py-3 px-4">Test Window</th>
+                                                        <th className="py-3 px-4">Registration Opens</th>
+                                                        <th className="py-3 px-4">Best For</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Macro-Period 1 (Spring)</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-bold">February – May 2027</td>
+                                                        <td className="py-3 px-4">January 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md">Early-bird & Scholarships</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Macro-Period 2 (Summer)</td>
+                                                        <td className="py-3 px-4 text-emerald-600 font-bold">July – August 2027</td>
+                                                        <td className="py-3 px-4">June 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">Main Intake & 2nd Attempt</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Autumn Retake Session</td>
+                                                        <td className="py-3 px-4 text-amber-600 font-bold">September 2027</td>
+                                                        <td className="py-3 px-4">August 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">Remaining Seat Allocations</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </section>
 
                                 <section className="pt-12 border-t border-slate-200">
@@ -294,6 +384,51 @@ export default function CentsDates() {
                                                 <ChevronRight className="text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" size={18} />
                                             </Link>
                                         ))}
+                                    </div>
+
+                                    {/* Quick Summary Table for Snippet */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                                                <Calendar className="text-indigo-600" size={20} />
+                                                CENT-S 2027 Macro-Period Calendar & Booking Slots
+                                            </h3>
+                                            <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                                                CISIA 2027 Format
+                                            </span>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-sm">
+                                                <thead>
+                                                    <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                        <th className="py-3 px-4">Session</th>
+                                                        <th className="py-3 px-4">Test Window</th>
+                                                        <th className="py-3 px-4">Registration Opens</th>
+                                                        <th className="py-3 px-4">Best For</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Macro-Period 1 (Spring)</td>
+                                                        <td className="py-3 px-4 text-indigo-600 font-bold">February – May 2027</td>
+                                                        <td className="py-3 px-4">January 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md">Early-bird & Scholarships</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Macro-Period 2 (Summer)</td>
+                                                        <td className="py-3 px-4 text-emerald-600 font-bold">July – August 2027</td>
+                                                        <td className="py-3 px-4">June 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">Main Intake & 2nd Attempt</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 px-4 font-bold text-slate-900">Autumn Retake Session</td>
+                                                        <td className="py-3 px-4 text-amber-600 font-bold">September 2027</td>
+                                                        <td className="py-3 px-4">August 2027</td>
+                                                        <td className="py-3 px-4"><span className="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">Remaining Seat Allocations</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </section>
 

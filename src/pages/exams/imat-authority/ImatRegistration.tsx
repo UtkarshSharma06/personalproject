@@ -41,7 +41,7 @@ const sections = [
 ];
 
 const faqs = [
-    { question: 'When does IMAT registration usually open?', answer: 'Registration typically opens in early to mid-September, just 3-4 weeks before the exam date. The window is short, usually lasting about 10-14 days.' },
+    { question: 'When does IMAT registration usually open?', answer: 'Official IMAT test registration opens in early July (running for ~21 days) on Universitaly.it. However, Non-EU pre-enrollment on Universitaly opens earlier in Spring (March–April).' },
     { question: 'Where do I register for the IMAT?', answer: 'Official registration must be completed on the Universitaly.it portal. You must create an account and follow the ministerial procedures.' },
     { question: 'What is the registration fee for IMAT?', answer: 'The fee is approximately €130-€150 (approx. $140-$165), depending on ministerial updates. This is paid directly via the Universitaly portal during registration.' },
     { question: 'Can I choose my exam center?', answer: 'Yes, you can choose from various international test centers (London, New York, Dubai, etc.) or centers within Italy. Seats are first-come, first-served.' },
@@ -86,9 +86,9 @@ export default function ImatRegistration() {
                 }
             >
                 <SEOHead
-                    title="IMAT Registration 2026: How to Register on Universitaly (Step-by-Step)"
-                    description="Complete IMAT 2026 registration guide. Step-by-step walkthrough of the Universitaly portal, exam fee payment (€130), preference selection, and common mistakes to avoid."
-                    keywords="IMAT registration 2026, how to register for IMAT, Universitaly portal guide, IMAT exam fees 2026, IMAT university preferences, IMAT 2026 registration process"
+                    title="IMAT Registration 2027 & Universitaly Pre-Enrollment Guide"
+                    description="Step-by-step IMAT 2027 registration guide: Universitaly portal walkthrough, pre-enrollment deadlines for Non-EU students, exam fees (€130), test center selection, and university preferences."
+                    keywords="imat registration 2027, universitaly pre enrollment 2026/2027, universitaly pre enrollment 2026, universitaly pre enrollment 2027, how to register for imat 2027, imat pre enrollment deadline, universitaly imat registration 2026, universitaly imat registration, imat application 2027, imat registration date 2027"
                 />
 
                 <FAQSchema items={faqs} />
@@ -110,11 +110,11 @@ export default function ImatRegistration() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
-                                        {getField('hero_headline', 'IMAT 2026 Registration Process')}
+                                        {getField('hero_headline', 'IMAT 2027 Registration Process')}
                                     </EditableText>
 
                                     <EditableText fieldKey="hero_desc" multiline as="p" className="text-2xl text-slate-600 leading-relaxed font-medium mb-10">
@@ -125,7 +125,7 @@ export default function ImatRegistration() {
                                         {[
                                             { key: 'portal', label: 'Platform', value: 'Universitaly', icon: Globe },
                                             { key: 'fee', label: 'Exam Fee', value: '€130 approx', icon: CreditCard },
-                                            { key: 'deadline', label: 'Window', value: 'July 2026', icon: Activity },
+                                            { key: 'deadline', label: 'Window', value: 'July 2027', icon: Activity },
                                             { key: 'verified', label: 'Status', value: 'Verified', icon: ShieldCheck }
                                         ].map((item, i) => (
                                             <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
@@ -138,6 +138,32 @@ export default function ImatRegistration() {
                                                 </EditableText>
                                             </div>
                                         ))}
+                                    </div>
+
+                                    {/* Pre-Enrollment vs IMAT Registration Comparison */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
+                                                <ClipboardCheck size={22} />
+                                            </div>
+                                            <h3 className="text-xl font-black text-slate-900">
+                                                Two-Step Registration Process for 2027
+                                            </h3>
+                                        </div>
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 1 • Visa Track</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">Universitaly Pre-Enrollment</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Mandatory government procedure for Non-EU students requiring a student visa (Type D). Starts in Spring (March–July 2027).</p>
+                                                <span className="text-xs font-bold text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200">Required before Visa appointment</span>
+                                            </div>
+                                            <div className="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 2 • Exam Booking</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">IMAT 2027 Test Registration</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Official test booking on Universitaly. Opens in early July for ~21 days. Here you pay the test fee (~€130) and select test centers.</p>
+                                                <span className="text-xs font-bold text-indigo-700 bg-white px-2.5 py-1 rounded-md border border-indigo-200">Strict Ministerial Deadline</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </section>
 
@@ -154,7 +180,7 @@ export default function ImatRegistration() {
                                             <div className="space-y-6">
                                                 <h3 className="text-xl font-black text-slate-900 leading-tight">Navigating the "International Students" Area</h3>
                                                 <p className="text-slate-600 font-medium leading-relaxed">
-                                                    Universitaly is the central hub for all Italian higher education. During the July window, a specific "IMAT 2026" banner appears. You must register for an account using your legal name exactly as it appears on your passport.
+                                                    Universitaly is the central hub for all Italian higher education. During the July window, a specific "IMAT 2027" banner appears. You must register for an account using your legal name exactly as it appears on your passport.
                                                 </p>
                                                 <div className="space-y-4 pt-4">
                                                     {[
@@ -254,6 +280,32 @@ export default function ImatRegistration() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Pre-Enrollment vs IMAT Registration Comparison */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
+                                                <ClipboardCheck size={22} />
+                                            </div>
+                                            <h3 className="text-xl font-black text-slate-900">
+                                                Two-Step Registration Process for 2027
+                                            </h3>
+                                        </div>
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 1 • Visa Track</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">Universitaly Pre-Enrollment</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Mandatory government procedure for Non-EU students requiring a student visa (Type D). Starts in Spring (March–July 2027).</p>
+                                                <span className="text-xs font-bold text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200">Required before Visa appointment</span>
+                                            </div>
+                                            <div className="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 2 • Exam Booking</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">IMAT 2027 Test Registration</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Official test booking on Universitaly. Opens in early July for ~21 days. Here you pay the test fee (~€130) and select test centers.</p>
+                                                <span className="text-xs font-bold text-indigo-700 bg-white px-2.5 py-1 rounded-md border border-indigo-200">Strict Ministerial Deadline</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </section>
 
                                 {/* Detailed Sections */}
@@ -310,6 +362,32 @@ export default function ImatRegistration() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Pre-Enrollment vs IMAT Registration Comparison */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
+                                                <ClipboardCheck size={22} />
+                                            </div>
+                                            <h3 className="text-xl font-black text-slate-900">
+                                                Two-Step Registration Process for 2027
+                                            </h3>
+                                        </div>
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 1 • Visa Track</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">Universitaly Pre-Enrollment</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Mandatory government procedure for Non-EU students requiring a student visa (Type D). Starts in Spring (March–July 2027).</p>
+                                                <span className="text-xs font-bold text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200">Required before Visa appointment</span>
+                                            </div>
+                                            <div className="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 2 • Exam Booking</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">IMAT 2027 Test Registration</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Official test booking on Universitaly. Opens in early July for ~21 days. Here you pay the test fee (~€130) and select test centers.</p>
+                                                <span className="text-xs font-bold text-indigo-700 bg-white px-2.5 py-1 rounded-md border border-indigo-200">Strict Ministerial Deadline</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </section>
 
                                 {/* FAQs */}
@@ -337,6 +415,32 @@ export default function ImatRegistration() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Pre-Enrollment vs IMAT Registration Comparison */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
+                                                <ClipboardCheck size={22} />
+                                            </div>
+                                            <h3 className="text-xl font-black text-slate-900">
+                                                Two-Step Registration Process for 2027
+                                            </h3>
+                                        </div>
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 1 • Visa Track</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">Universitaly Pre-Enrollment</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Mandatory government procedure for Non-EU students requiring a student visa (Type D). Starts in Spring (March–July 2027).</p>
+                                                <span className="text-xs font-bold text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200">Required before Visa appointment</span>
+                                            </div>
+                                            <div className="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 2 • Exam Booking</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">IMAT 2027 Test Registration</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Official test booking on Universitaly. Opens in early July for ~21 days. Here you pay the test fee (~€130) and select test centers.</p>
+                                                <span className="text-xs font-bold text-indigo-700 bg-white px-2.5 py-1 rounded-md border border-indigo-200">Strict Ministerial Deadline</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </section>
 
                                 {/* Bottom Grid */}
@@ -349,6 +453,32 @@ export default function ImatRegistration() {
                                                 <ChevronRight className="text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
                                             </Link>
                                         ))}
+                                    </div>
+
+                                    {/* Pre-Enrollment vs IMAT Registration Comparison */}
+                                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 mb-6">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
+                                                <ClipboardCheck size={22} />
+                                            </div>
+                                            <h3 className="text-xl font-black text-slate-900">
+                                                Two-Step Registration Process for 2027
+                                            </h3>
+                                        </div>
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 1 • Visa Track</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">Universitaly Pre-Enrollment</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Mandatory government procedure for Non-EU students requiring a student visa (Type D). Starts in Spring (March–July 2027).</p>
+                                                <span className="text-xs font-bold text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200">Required before Visa appointment</span>
+                                            </div>
+                                            <div className="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                                                <div className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-1">Step 2 • Exam Booking</div>
+                                                <h4 className="text-lg font-black text-slate-900 mb-2">IMAT 2027 Test Registration</h4>
+                                                <p className="text-sm text-slate-600 mb-3">Official test booking on Universitaly. Opens in early July for ~21 days. Here you pay the test fee (~€130) and select test centers.</p>
+                                                <span className="text-xs font-bold text-indigo-700 bg-white px-2.5 py-1 rounded-md border border-indigo-200">Strict Ministerial Deadline</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </section>
 

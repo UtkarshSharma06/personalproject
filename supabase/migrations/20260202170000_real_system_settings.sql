@@ -36,5 +36,5 @@ USING (key = 'maintenance_mode');
 INSERT INTO public.system_settings (key, value) VALUES 
 ('maintenance_mode', 'false'::jsonb),
 ('allow_registrations', 'true'::jsonb),
-('site_config', '{"site_name": "ItaloStudy", "support_email": "contact@italostudy.com"}'::jsonb)
+('site_config', '{"site_name": "ItaloStudy", "support_email": "info@italostudy.com"}'::jsonb)
 ON CONFLICT (key) DO NOTHING;

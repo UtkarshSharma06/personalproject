@@ -51,9 +51,17 @@ const faqs = [
 
 const recommendedBooks = [
     {
+        title: "CENT-S Exam Preparation Book: 600+ Expert Selected Questions & 2 Mock Tests (PDF)",
+        publisher: "ItaloStudy",
+        type: "Complete English Guide & PDF",
+        description: "The definitive English-language guide for Mathematics, Reasoning, Biology, Chemistry & Physics. Includes 600+ expert-curated practice questions, 2 full mock exams with detailed explanations, formula sheets, and instant digital download.",
+        price: "FREE / Premium",
+        rating: 4.9
+    },
+    {
         title: "AlphaTest CENT-S Kit",
         publisher: "AlphaTest",
-        type: "Complete Bundle",
+        type: "Complete Italian Bundle",
         description: "The gold standard in Italy. Includes Manuale di Teoria, Esercizi Commentati, and Prove di Verifica updated for the new CISIA standard.",
         price: "€70 - €90",
         rating: 4.8
@@ -65,14 +73,6 @@ const recommendedBooks = [
         description: "Detailed scientific explanations with a heavy focus on Mathematics and Physics. Excellent for students needing a strong theoretical foundation.",
         price: "€45 - €55",
         rating: 4.6
-    },
-    {
-        title: "ItaloStudy English Authority Guide",
-        publisher: "ItaloStudy",
-        type: "English Digital PDF",
-        description: "The only comprehensive English-language guide for CENT-S. Includes strategy, syllabus breakdown, and bilingual scientific vocabulary.",
-        price: "FREE / Premium",
-        rating: 4.9
     }
 ];
 
@@ -109,9 +109,9 @@ export default function CentsBooks() {
                 }
             >
                 <SEOHead
-                    title="Best CENT-S Preparation Books 2026 – English & Italian Guides"
-                    description="Curated list of the best books for CENT-S (CISIA English Test – Science). Comparison of AlphaTest, Editest, and English-language scientific resources."
-                    keywords="CENT-S books, best CENT-S prep books, AlphaTest CENT-S, Editest TOLC-I, CENT-S study material English"
+                    title="Best CENT-S Preparation Books 2027: 600+ Questions, Mock Tests & PDF Guides"
+                    description="Top CENT-S exam preparation books for 2027. Download the CENT-S 600+ question preparation book with 2 mock tests (PDF), AlphaTest, Editest & English prep materials."
+                    keywords="cent-s exam preparation book pdf, cent-s exam preparation book pdf free download, cent-s exam preparation book 600+ expert selected questions 2 mock tests pdf, cent-s book, best cent-s prep books, cents exam book, cisia cent-s preparation book, flcs cent s book, flcs cent s book pdf, cent s book, cent s preparation book"
                 />
 
                 <FAQSchema items={faqs} />
@@ -133,7 +133,7 @@ export default function CentsBooks() {
                                 <section id="overview" className="scroll-mt-[120px]">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="text-indigo-600 animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
 
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-6">

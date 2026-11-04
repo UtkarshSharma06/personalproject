@@ -89,13 +89,13 @@ export default function StudyItalyTuition() {
                 }
             >
                 <SEOHead
-                    title="Study in Italy Cost & Tuition Fees 2026: Public vs Private"
-                    description="Detailed breakdown of the cost to study in Italy for international students. Compare public and private university tuition fees and living expenses for 2026."
-                    keywords="study in italy cost, Italy university tuition fees 2026, cost of studying in Italy, cheap universities in Italy, DSU Italy"
+                    title="Study in Italy Cost & Tuition Fees 2027: Public vs Private"
+                    description="Detailed breakdown of the cost to study in Italy for international students. Compare public and private university tuition fees and living expenses for 2027."
+                    keywords="study in italy cost, Italy university tuition fees 2027, cost of studying in Italy, cheap universities in Italy, DSU Italy"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
-                        { name: 'Italy Tuition Fees 2026', item: '/study-in-italy/tuition-fees-2026' }
+                        { name: 'Italy Tuition Fees 2027', item: '/study-in-italy/tuition-fees-2026' }
                     ])]}
                     />
                 <FAQSchema items={faqs} />
@@ -117,10 +117,10 @@ export default function StudyItalyTuition() {
                                 <section id="overview" className="scroll-mt-40">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="animate-pulse" />
-                                        Official 2026 Academic Roadmap
+                                        Official 2027 Academic Roadmap
                                     </div>
                                     <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6">
-                                        {getField('hero_headline', 'Tuition Fees in Italy 2026')}
+                                        {getField('hero_headline', 'Tuition Fees in Italy 2027')}
                                     </EditableText>
                                     <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
                                         {getField('hero_subheadline', 'Italy is among the most affordable study destinations in Western Europe. This guide breaks down the real cost of studying — from minimum public fees to scholarship coverage — so you know exactly what to budget.')}
@@ -158,7 +158,7 @@ export default function StudyItalyTuition() {
                                         <h2 className="text-2xl md:text-4xl font-black text-slate-900 underline decoration-indigo-400 underline-offset-8">Public University Fee Structure</h2>
                                     </div>
                                     <div className="prose prose-lg text-slate-600 mb-8 max-w-none">
-                                        <p>Italian public universities use an income-based (ISEE) sliding scale for fees. Here are the typical brackets for 2026:</p>
+                                        <p>Italian public universities use an income-based (ISEE) sliding scale for fees. Here are the typical brackets for 2027:</p>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {[

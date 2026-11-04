@@ -14,7 +14,7 @@ const ExamCountdown = () => {
     });
 
     // Dynamic target date from CMS
-    const targetDateStr = getField('exam_countdown_date', '2026-04-15T09:00:00');
+    const targetDateStr = getField('exam_countdown_date', '2027-04-15T09:00:00');
     const TARGET_DATE = new Date(targetDateStr).getTime();
 
     useEffect(() => {
