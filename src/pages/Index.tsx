@@ -129,6 +129,10 @@ export default function Index() {
                     const langPref = localStorage.getItem('italo_lang_preference');
                     if (langPref) return;
 
+                    // NEVER redirect search engine crawlers away from the canonical root homepage!
+                    const isCrawler = typeof navigator !== 'undefined' && /bot|googlebot|bingbot|crawler|spider|slurp/i.test(navigator.userAgent);
+                    if (isCrawler) return;
+
                     if (code === 'TR') {
                         i18n.changeLanguage('tr');
                         navigate('/tr', { replace: true });
@@ -193,8 +197,8 @@ export default function Index() {
     const userLangPref = localStorage.getItem('italo_lang_preference');
     const effectiveCountry = userLangPref ? null : activeCountry;
 
-    // Show localized versions based on PATH first, then COUNTRY
-    if (pathname === '/tr' || effectiveCountry === 'TR') {
+    // Show localized versions strictly based on PATH (so / remains canonical global English)
+    if (pathname === '/tr') {
         return (
             <Suspense fallback={null}>
                 <IndexTurkey />
@@ -202,7 +206,7 @@ export default function Index() {
         );
     }
 
-    if (pathname === '/it' || (effectiveCountry === 'IT' || effectiveCountry === 'CH' || effectiveCountry === 'SM' || effectiveCountry === 'VA')) {
+    if (pathname === '/it') {
         return (
             <Suspense fallback={null}>
                 <IndexItaly />
@@ -215,8 +219,8 @@ export default function Index() {
     return (
         <div className="min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden relative bg-white">
             <SEO
-                title={getField('seo_title', t('landing.seo.title', 'ItaloStudy | Free CEnT-S & IMAT Prep 2027: Unlimited Mocks & Lectures'))}
-                description={getField('seo_description', t('landing.seo.description', 'Experience the world\'s most advanced study simulator for IMAT, SAT, CEnT-S and IELTS preparation. Europe\'s choice for admissions success.'))}
+                title={getField('seo_title', t('landing.seo.title', 'ItaloStudy | Free CEnT-S, IMAT, TOLC & Italian University Prep'))}
+                description={getField('seo_description', t('landing.seo.description', 'Free preparation for CEnT-S, IMAT, TOLC, TIL-I, SAT & IELTS. Unlimited simulated mock tests, past papers with solutions, cutoff score analyzers & direct admission support for Italian universities.'))}
                 keywords={getField('seo_keywords', t('landing.seo.keywords', 'italostudy, IMAT preparation, CEnT-S exam guide, European admissions, global study prep'))}
                 locale={currentLocale}
                 schema={getEducationalOrganizationSchema()}
@@ -229,7 +233,7 @@ export default function Index() {
 
 
             {/* H1 — required for SEO; visually hidden since hero uses banner images */}
-            <h1 className="sr-only">ItaloStudy — Free Prep for CEnT-S, IMAT, SAT &amp; IELTS</h1>
+            <h1 className="sr-only">ItaloStudy — Europe&apos;s Trusted Platform for Italian University Admissions &amp; Exam Prep</h1>
 
             <PWNavbar />
 

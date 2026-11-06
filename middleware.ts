@@ -1,9 +1,15 @@
 export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const userAgent = request.headers.get('user-agent')?.toLowerCase() || '';
-  const isBot = /bot|whatsapp|facebookexternalhit|twitterbot|linkedinbot|telegrambot|slackbot|discordbot|googlebot/i.test(userAgent);
 
-  if (!isBot) {
+  // Only intercept SOCIAL SHARE preview crawlers that need fast Open Graph cards
+  // (WhatsApp, Facebook, Twitter/X, LinkedIn, Telegram, Discord, Slack, Pinterest).
+  // Search engines (Googlebot, Bingbot, etc.) MUST pass through to api/static-seo-router
+  // to receive full SSR HTML, JSON-LD schemas, and the complete application bundle!
+  const isSocialBot = /whatsapp|facebookexternalhit|twitterbot|linkedinbot|telegrambot|slackbot|discordbot|pinterest/i.test(userAgent);
+  const isSearchBot = /googlebot|bingbot|duckduckbot|yandex|baiduspider|slurp|crawler|spider/i.test(userAgent);
+
+  if (!isSocialBot || isSearchBot) {
     return new Response(null, {
       headers: { 'x-middleware-next': '1' },
     });
@@ -58,14 +64,14 @@ export default async function middleware(request: Request) {
     'study-in-italy/tuition-fees-2026': { title: 'Tuition Fees & Scholarships in Italy 2026', description: 'A complete breakdown of university fees and DSU scholarships in Italy.' },
     'study-in-italy/how-to-apply': { title: 'How to Apply to Italian Universities', description: 'Step-by-step application guide, pre-enrollment, and visa process for Italy.' },
     
-    '': { title: 'ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified', description: 'Accelerate your medical and academic journey with ItaloStudy. Free CEnT-S, IMAT, SAT, and IELTS preparation with unlimited free mocks and direct university admission support.' },
-    'it': { title: 'ItaloStudy | Preparazione Gratuita per CEnT-S, IMAT, SAT e IELTS', description: 'Inizia il tuo percorso accademico in Italia con ItaloStudy. Preparazione gratuita con simulazioni illimitate.' },
-    'tr': { title: 'ItaloStudy | CEnT-S, IMAT, SAT ve IELTS İçin Ücretsiz Hazırlık', description: 'ItaloStudy ile İtalya\'daki üniversite giriş sınavlarına ücretsiz hazırlanın ve deneme sınavlarını çözün.' }
+    '': { title: 'ItaloStudy | Free CEnT-S, IMAT, TOLC & Italian University Prep Platform', description: 'Free preparation for CEnT-S, IMAT, TOLC, TIL-I, SAT & IELTS. Unlimited simulated mock tests, past papers with solutions, cutoff score analyzers & direct admission support for Italian universities.' },
+    'it': { title: 'ItaloStudy | Preparazione Gratuita per CEnT-S, IMAT, SAT e IELTS', description: 'Inizia il tuo percorso accademico in Italia con ItaloStudy. Preparazione gratuita con simulazioni illimitate, test ufficiali e supporto all\'ammissione universitaria.' },
+    'tr': { title: 'ItaloStudy | CEnT-S, IMAT, SAT ve IELTS İçin Ücretsiz Hazırlık', description: 'ItaloStudy ile İtalya\'daki üniversite giriş sınavlarına ücretsiz hazırlanın ve deneme sınavlarını çözün. CEnT-S, IMAT ve TOLC hazırlık rehberi.' }
   };
 
   try {
-    let title = 'ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified';
-    let description = 'Accelerate your medical and academic journey with ItaloStudy. Free CEnT-S, IMAT, SAT, and IELTS preparation with unlimited free mocks and direct university admission support.';
+    let title = 'ItaloStudy | Free CEnT-S, IMAT, TOLC & Italian University Prep Platform';
+    let description = 'Free preparation for CEnT-S, IMAT, TOLC, TIL-I, SAT & IELTS. Unlimited simulated mock tests, past papers with solutions, cutoff score analyzers & direct admission support for Italian universities.';
     let image = 'https://italostudy.com/square.png';
     let ogType = 'website';
     let canonicalUrl = url.origin + url.pathname; // always clean URL without query params
@@ -150,9 +156,21 @@ export default async function middleware(request: Request) {
   <meta name="robots" content="index, follow">
 </head>
 <body>
-  <h1>${safeTitle}</h1>
-  <p>${safeDescription}</p>
-  <p><a href="${safeCanonical}">Visit ItaloStudy</a></p>
+  <header>
+    <a href="https://italostudy.com/">ItaloStudy</a>
+    <nav>
+      <a href="https://italostudy.com/cent-s-exam-ultimate-guide">CEnT-S Guide</a>
+      <a href="https://italostudy.com/imat-exam-ultimate-guide-2026">IMAT Guide</a>
+      <a href="https://italostudy.com/tolc-exam-ultimate-guide-2026">TOLC Guide</a>
+      <a href="https://italostudy.com/courses">Courses</a>
+      <a href="https://italostudy.com/resources">Free Resources</a>
+    </nav>
+  </header>
+  <main>
+    <h1>${safeTitle}</h1>
+    <p>${safeDescription}</p>
+    <p><a href="${safeCanonical}">Explore ${safeTitle} on ItaloStudy</a></p>
+  </main>
 </body>
 </html>
     `;
@@ -160,7 +178,7 @@ export default async function middleware(request: Request) {
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html',
-        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=43200',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
       },
     });
   } catch (error) {

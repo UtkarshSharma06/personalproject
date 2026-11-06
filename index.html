@@ -68,8 +68,8 @@
   <meta name="google-adsense-account" content="ca-pub-7472926437419938">
 
   <!-- Website Title and Branding -->
-  <title>ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified</title>
-  <meta name="description" content="Free prep for CEnT-S, IMAT, SAT & IELTS. Unlimited mock tests, AI-powered tools & direct admission support for Italian universities." />
+  <title>ItaloStudy | Free CEnT-S, IMAT, TOLC &amp; Italian University Prep</title>
+  <meta name="description" content="Free preparation for CEnT-S, IMAT, TOLC, TIL-I, SAT &amp; IELTS. Unlimited simulated mock tests, past papers with solutions, cutoff score analyzers &amp; direct admission support for Italian universities." />
   <meta name="author" content="ItaloStudy" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://italostudy.com/" />
@@ -82,16 +82,18 @@
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ItaloStudy" />
   <meta property="og:url" content="https://italostudy.com/" />
-  <meta property="og:title" content="ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified" />
-  <meta property="og:description" content="Free prep for CEnT-S, IMAT, SAT & IELTS. Unlimited mock tests, AI-powered tools & direct admission support for Italian universities." />
+  <meta property="og:title" content="ItaloStudy | Free CEnT-S, IMAT, TOLC &amp; Italian University Prep" />
+  <meta property="og:description" content="Free preparation for CEnT-S, IMAT, TOLC, TIL-I, SAT &amp; IELTS. Unlimited simulated mock tests, past papers with solutions, cutoff score analyzers &amp; direct admission support for Italian universities." />
   <meta property="og:image" content="https://italostudy.com/square.png" />
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:site" content="@italostudy" />
   <meta property="twitter:url" content="https://italostudy.com/" />
-  <meta property="twitter:title" content="ItaloStudy | Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified" />
-  <meta property="twitter:description" content="Free prep for CEnT-S, IMAT, SAT & IELTS. Unlimited mock tests, AI-powered tools & direct admission support for Italian universities." />
+  <meta property="twitter:title" content="ItaloStudy | Free CEnT-S, IMAT, TOLC &amp; Italian University Prep" />
+  <meta property="twitter:description" content="Free preparation for CEnT-S, IMAT, TOLC, TIL-I, SAT &amp; IELTS. Unlimited simulated mock tests, past papers with solutions, cutoff score analyzers &amp; direct admission support for Italian universities." />
   <meta name="twitter:image" content="https://italostudy.com/square.png" />
 
   <!-- Favicons and Brand Identity -->
@@ -194,24 +196,87 @@
       background-size: 400px 100%;
       animation: sk-shimmer 1.4s ease-in-out infinite;
     }
+    .ssr-page-shell {
+      max-width: 960px;
+      margin: 80px auto 40px;
+      padding: 24px;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .ssr-page-shell h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 16px;
+    }
+    .ssr-page-shell p {
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+    .ssr-page-shell ul {
+      margin: 16px 0 24px 20px;
+      list-style-type: disc;
+    }
+    .ssr-page-shell li {
+      margin-bottom: 8px;
+    }
+    .ssr-page-shell a {
+      color: #4f46e5;
+      text-decoration: underline;
+    }
+
     /* Hide skeleton once React mounts */
     #sk-shell { display: block; }
   </style>
 
-  <!-- SEO Schema for Brand Recognition -->
+  <!-- SEO Schema for Brand Recognition & Google Site Names -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
+      "@type": "WebSite",
       "name": "ItaloStudy",
-      "alternateName": ["italostudy", "italo study"],
-      "url": "https://italostudy.com",
+      "alternateName": ["italostudy", "Italo Study", "italostudy.com", "ItaloStudy App"],
+      "url": "https://italostudy.com/",
+      "description": "Europe's trusted and affordable educational platform for Italian university entrance exams: CEnT-S, IMAT, TOLC, TIL-I, SAT & IELTS.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://italostudy.com/resources?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": ["EducationalOrganization", "OnlineBusiness"],
+      "name": "ItaloStudy",
+      "alternateName": ["italostudy", "Italo Study"],
+      "url": "https://italostudy.com/",
       "logo": "https://italostudy.com/logo.webp",
-      "description": "Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified. The ultimate platform for university entrance exam preparation.",
+      "image": "https://italostudy.com/square.png",
+      "description": "Free Prep for CEnT-S, IMAT, SAT & IELTS, Simplified. The ultimate platform for university entrance exam preparation with 100+ simulated mocks and 50,000+ practice questions.",
       "sameAs": [
         "https://www.instagram.com/italostudycom",
-        "https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz"
-      ]
+        "https://chat.whatsapp.com/JZxQCS4A4ZO8k7bOEMYtTz",
+        "https://www.facebook.com/italostudy",
+        "https://www.linkedin.com/company/italostudy",
+        "https://www.youtube.com/@italostudy",
+        "https://x.com/italostudy"
+      ],
+      "teaches": ["CEnT-S", "IMAT", "TOLC", "TIL-I", "SAT", "IELTS"],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "5000",
+        "bestRating": "5"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IT"
+      }
     }
   </script>
 </head>

@@ -9,6 +9,75 @@ import path from 'path';
 // Each entry: title, description, h1, intro (shown in raw HTML for bots),
 // and keyPoints (bullet list shown in raw HTML — boosts content signals).
 const PAGE_SEO = {
+  // ─── Homepage & Localization ──────────────────────────────────────
+  '': {
+    title: 'ItaloStudy | Free CEnT-S, IMAT, TOLC & Italian University Prep Platform',
+    description: 'Free preparation for CEnT-S, IMAT, TOLC, TIL-I, SAT & IELTS. Unlimited simulated mock tests, past papers with solutions, cutoff score analyzers & direct admission support for Italian universities.',
+    canonical: 'https://italostudy.com/',
+    h1: 'ItaloStudy — Europe\'s Trusted Platform for Italian University Admissions & Exam Prep',
+    intro: 'ItaloStudy is the official, comprehensive study platform trusted by over 5,000+ international and Italian students preparing for Italian university entrance exams, including CEnT-S, IMAT, TOLC, and TIL-I. Practice with 100+ full-length simulated mocks, over 50,000+ solved questions, past papers, syllabus breakdowns, and cutoff calculators.',
+    relatedLinks: [
+      { href: '/cent-s-exam-ultimate-guide', label: 'CEnT-S Exam Ultimate Guide' },
+      { href: '/cent-s-mock-test-free-2026', label: 'Free CEnT-S Mock Test Simulator' },
+      { href: '/cent-s-syllabus-2026', label: 'CEnT-S Syllabus Breakdown' },
+      { href: '/imat-exam-ultimate-guide-2026', label: 'IMAT Exam Ultimate Guide' },
+      { href: '/imat-mock-test-free-2026', label: 'Free IMAT Mock Exam Simulator' },
+      { href: '/imat-previous-year-papers-pdf', label: 'IMAT Past Papers with Answers' },
+      { href: '/imat-cutoff-trends-2026', label: 'IMAT Cutoff Trends & Analysis' },
+      { href: '/tolc-exam-ultimate-guide-2026', label: 'TOLC Exam Ultimate Guide' },
+      { href: '/til-i-exam-guide-2026', label: 'Politecnico di Torino TIL-I Guide' },
+      { href: '/courses', label: 'ItaloStudy Live & Video Prep Courses' },
+      { href: '/study-in-italy-guide-2026', label: 'Study in Italy Complete Guide' },
+      { href: '/study-in-italy/universities-2026', label: 'Top Italian Universities for International Students' },
+      { href: '/study-in-italy/tuition-fees-2026', label: 'Tuition Fees & DSU Scholarships in Italy' },
+      { href: '/resources', label: 'Free Study Materials & Exam Resources' },
+      { href: '/pricing', label: 'ItaloStudy Platform Pricing & Free Tier' },
+      { href: '/blog', label: 'ItaloStudy Admissions & Preparation Blog' },
+    ],
+    keyPoints: [
+      'Comprehensive exam coverage: CEnT-S, IMAT, TOLC (TOLC-E, TOLC-I, TOLC-F, TOLC-MED), TIL-I, SAT, and IELTS',
+      'Realistic computer-based testing (CBT) simulator with authentic CISIA and MUR timing and negative marking',
+      '100+ simulated mock tests and question bank with 50,000+ verified questions and step-by-step solutions',
+      'Historical cutoff score database covering Bologna, Milan, Sapienza, Pavia, Padua, and Tor Vergata',
+      'Over 5,000+ enrolled students worldwide with a 98% satisfaction rating',
+      'Step-by-step guidance for Universitaly pre-enrollment, CIMEA comparability, and Italian student visas',
+    ],
+  },
+  'it': {
+    title: 'ItaloStudy | Preparazione Gratuita per CEnT-S, IMAT, SAT e IELTS',
+    description: 'Inizia il tuo percorso accademico in Italia con ItaloStudy. Preparazione gratuita con simulazioni illimitate, test ufficiali e supporto all\'ammissione universitaria.',
+    canonical: 'https://italostudy.com/it',
+    h1: 'ItaloStudy — La Piattaforma Leader per l\'Ammissione Universitaria in Italia',
+    intro: 'ItaloStudy aiuta migliaia di studenti a superare con successo i test di ammissione universitari come CEnT-S, IMAT e TOLC. Accedi a simulazioni realistiche, graduatorie storiche e corsi dedicati.',
+    relatedLinks: [
+      { href: '/cent-s-exam-ultimate-guide', label: 'Guida Completa Esame CEnT-S' },
+      { href: '/imat-exam-ultimate-guide-2026', label: 'Guida Completa Esame IMAT' },
+      { href: '/courses', label: 'Corsi di Preparazione' },
+      { href: '/pricing', label: 'Piani e Tariffe' },
+    ],
+    keyPoints: [
+      'Simulatore d\'esame fedele al software ufficiale CISIA e MUR',
+      'Oltre 50.000 domande risolte con spiegazioni dettagliate passo-passo',
+      'Analisi punteggi minimi e soglie di ammissione per tutte le università italiane',
+    ],
+  },
+  'tr': {
+    title: 'ItaloStudy | CEnT-S, IMAT, SAT ve IELTS İçin Ücretsiz Hazırlık',
+    description: 'ItaloStudy ile İtalya\'daki üniversite giriş sınavlarına ücretsiz hazırlanın ve deneme sınavlarını çözün. CEnT-S, IMAT ve TOLC hazırlık rehberi.',
+    canonical: 'https://italostudy.com/tr',
+    h1: 'ItaloStudy — İtalya Üniversite Giriş Sınavları Hazırlık Platformu',
+    intro: 'ItaloStudy, İtalya\'da tıp, mühendislik ve fen bilimleri okumak isteyen öğrenciler için CEnT-S, IMAT ve TOLC sınavlarına eksiksiz hazırlık sunar.',
+    relatedLinks: [
+      { href: '/imat-exam-ultimate-guide-2026', label: 'IMAT Sınavı Kapsamlı Rehberi' },
+      { href: '/cent-s-exam-ultimate-guide', label: 'CEnT-S Sınavı Kapsamlı Rehberi' },
+      { href: '/study-in-italy-guide-2026', label: 'İtalya\'da Üniversite Eğitimi Rehberi' },
+    ],
+    keyPoints: [
+      'CISIA ve MUR formatında gerçek zamanlı online deneme sınavları',
+      'İtalya üniversite taban puanları ve kontenjan analizleri',
+      'Universitaly ön kayıt ve burs başvuru rehberliği',
+    ],
+  },
   // ─── CEnT-S Cluster ───────────────────────────────────────────────
   'cent-s-exam-ultimate-guide': {
     title: 'CEnT-S Exam 2026 Ultimate Guide | ItaloStudy',
@@ -1066,13 +1135,13 @@ export default async function handler(req, res) {
         : '';
 
       const ssrContent = `<div id="root">
-  <div id="ssr-page-content" style="position:absolute;opacity:0;height:0;overflow:hidden;pointer-events:none;" aria-hidden="true">
+  <article id="ssr-page-content" class="ssr-page-shell">
     <h1>${safeH1}</h1>
     <p>${safeIntro}</p>
     ${keyPointsHtml}
     ${relatedLinksHtml}
-    <p><a href="${safeCanonical}">Learn more on ItaloStudy</a></p>
-  </div>
+    <p><a href="${safeCanonical}">Explore ${safeTitle} on ItaloStudy</a></p>
+  </article>
 </div>`;
 
       html = html.replace('<div id="root"></div>', ssrContent);
