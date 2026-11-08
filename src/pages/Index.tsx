@@ -197,8 +197,9 @@ export default function Index() {
     const userLangPref = localStorage.getItem('italo_lang_preference');
     const effectiveCountry = userLangPref ? null : activeCountry;
 
-    // Show localized versions strictly based on PATH (so / remains canonical global English)
-    if (pathname === '/tr') {
+    // Show localized versions based on PATH first, then COUNTRY
+    // Country-based redirect ensures Turkish/Italian users get localized experience → better engagement
+    if (pathname === '/tr' || effectiveCountry === 'TR') {
         return (
             <Suspense fallback={null}>
                 <IndexTurkey />
@@ -206,7 +207,7 @@ export default function Index() {
         );
     }
 
-    if (pathname === '/it') {
+    if (pathname === '/it' || (effectiveCountry === 'IT' || effectiveCountry === 'CH' || effectiveCountry === 'SM' || effectiveCountry === 'VA')) {
         return (
             <Suspense fallback={null}>
                 <IndexItaly />

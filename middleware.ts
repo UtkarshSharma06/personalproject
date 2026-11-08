@@ -9,7 +9,10 @@ export default async function middleware(request: Request) {
   const isSocialBot = /whatsapp|facebookexternalhit|twitterbot|linkedinbot|telegrambot|slackbot|discordbot|pinterest/i.test(userAgent);
   const isSearchBot = /googlebot|bingbot|duckduckbot|yandex|baiduspider|slurp|crawler|spider/i.test(userAgent);
 
-  if (!isSocialBot || isSearchBot) {
+  // Pass through all non-social-bot requests (regular users AND search engines).
+  // Search engines are handled by api/static-seo-router via vercel.json rewrites.
+  // This middleware ONLY serves OG/Twitter card HTML for social preview crawlers.
+  if (!isSocialBot) {
     return new Response(null, {
       headers: { 'x-middleware-next': '1' },
     });
@@ -178,7 +181,7 @@ export default async function middleware(request: Request) {
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html',
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=43200',
       },
     });
   } catch (error) {
