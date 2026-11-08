@@ -29,9 +29,10 @@
   <link rel="dns-prefetch" href="https://store.italostudy.com">
   <link rel="dns-prefetch" href="https://app.italostudy.com">
 
-  <!-- Preload Critical Assets (only things that actually exist) -->
+  <!-- Preload Critical LCP Assets (Hero Banners & Logo) -->
   <link rel="preload" href="/logo.webp" as="image" type="image/webp" fetchpriority="high">
-  <link rel="preload" href="/pwtrust.webp" as="image" type="image/webp" fetchpriority="low">
+  <link rel="preload" as="image" href="/mobile-1-cutoffs.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high">
+  <link rel="preload" as="image" href="/desktop-1-cutoffs.webp" type="image/webp" media="(min-width: 768px)" fetchpriority="high">
 
   <!-- Outfit — Primary Brand Font (Non-blocking) -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">

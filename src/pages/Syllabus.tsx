@@ -12,7 +12,7 @@ import {
     Globe,
     Users,
     ShieldCheck,
-    Infinity,
+    Infinity as InfinityIcon,
     CheckCircle2,
     Calculator,
     Microscope,
@@ -315,7 +315,7 @@ const Syllabus = () => {
                                             desc: "Identify your weak points instantly with deep-dive analytics that compare your performance against global candidates." 
                                         },
                                         { 
-                                            icon: <Infinity className="text-indigo-600" size={18} />, 
+                                            icon: <InfinityIcon className="text-indigo-600" size={18} />, 
                                             title: "Global Accessibility", 
                                             desc: "We believe in equal opportunity. Our premium-tier exam resources are provided 100% free to students worldwide." 
                                         }

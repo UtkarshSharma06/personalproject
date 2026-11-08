@@ -74,7 +74,7 @@ export default async function middleware(request: Request) {
     let description = 'Free preparation for CEnT-S, IMAT, TOLC, TIL-I, SAT & IELTS. Unlimited simulated mock tests, past papers with solutions, cutoff score analyzers & direct admission support for Italian universities.';
     let image = 'https://italostudy.com/square.png';
     let ogType = 'website';
-    let canonicalUrl = url.origin + url.pathname; // always clean URL without query params
+    const canonicalUrl = url.origin + url.pathname; // always clean URL without query params
     let shouldRenderSeo = false;
 
     if (staticSeoMap[pathKey] !== undefined) {

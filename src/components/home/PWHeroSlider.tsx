@@ -97,8 +97,11 @@ export default function PWHeroSlider() {
                                     <source media="(max-width: 767px)" srcSet={banner.imageMobile} />
                                     <img 
                                         src={banner.imageDesktop} 
+                                        width="2560"
+                                        height="483"
                                         className="w-full h-auto object-contain block"
                                         fetchPriority={banner.id === 1 ? "high" : "auto"}
+                                        loading={banner.id === 1 ? "eager" : "lazy"}
                                         alt={banner.title} 
                                     />
                                 </picture>
