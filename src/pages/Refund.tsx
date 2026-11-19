@@ -78,7 +78,7 @@ export default function Refund() {
                 {/* Intro */}
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 mb-10 text-[15px] leading-[1.8] text-slate-600">
                     <p>
-                        ItaloStudy provides <strong className="text-slate-900">digital educational services</strong> — including subscription-based platform access and downloadable book PDFs. Because these products are delivered instantly upon purchase and consumed digitally, our refund policy is strict by nature.
+                        ItaloStudy (operated by <strong className="text-slate-900">ITALOSTUDY PRIVATE LIMITED</strong>) provides <strong className="text-slate-900">digital educational services</strong> — including subscription-based platform access and downloadable book PDFs. Because these products are delivered instantly upon purchase and consumed digitally, our refund policy is strict by nature.
                     </p>
                     <p className="mt-3">
                         We do not offer discretionary refunds. Refunds are only issued when a specific, verifiable technical or billing failure has occurred on <strong className="text-slate-900">our end</strong>. We have listed every valid reason below, clearly and honestly.
@@ -376,8 +376,8 @@ export default function Refund() {
                         >
                             ✉ info@italostudy.com
                         </a>
-                        <p className="mt-5 text-slate-500 text-[12px]">
-                            ItaloStudy is an independent educational technology platform.
+                        <p className="mt-5 text-slate-400 text-[12px]">
+                            ItaloStudy is an educational technology platform owned and operated by <strong className="text-white">ITALOSTUDY PRIVATE LIMITED</strong>.
                         </p>
                     </div>
 

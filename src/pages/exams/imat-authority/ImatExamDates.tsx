@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -95,20 +95,20 @@ export default function ImatExamDates() {
                 }
             >
                 <SEOHead
-                    title="IMAT 2027 Exam Date & Universitaly Deadline Calendar (Confirmed Dates)"
-                    description="Official IMAT 2027 calendar: Confirmed exam dates (mid-September 2027), Universitaly registration window (July 2027), pre-enrollment deadlines, and results."
-                    keywords="imat exam date 2027, imat exam date 2026, when is the imat exam 2027, when is the imat exam 2026, when is imat 2026, imat 2026 date, imat 2026 exam date, imat registration 2027 dates, imat results date 2027, imat calendar 2027, universitaly registration window, universitaly pre enrollment 2026/2027 deadline, mur imat 2027"
+                    title="IMAT Exam Dates 2026–2027: Official Schedule, Deadlines & Test Centres | ItaloStudy"
+                    description="Official IMAT 2026–2027 exam dates released by MUR. Registration schedule on Universitaly, global test center locations, results announcement & enrollment timeline."
+                    keywords="imat dates 2026, imat dates, imat exam date 2026, imat exam date 2027, when is the imat exam 2026, imat 2026 date, imat registration dates, universitaly registration window, mur imat"
                     schemas={[
                         getBreadcrumbSchema([
                             { name: 'Home', item: '/' },
                             { name: 'IMAT Guide', item: '/imat' },
-                            { name: 'IMAT Exam Dates 2027', item: '/imat-exam-dates-2026' }
+                            { name: 'IMAT Exam Dates', item: '/imat-exam-dates-2026' }
                         ]),
                         getEventSchema(
-                            "IMAT 2027 Entrance Examination",
+                            "IMAT 2026-2027 Entrance Examination",
                             "Official Italian Ministry (MUR) International Medical Admissions Test for English-taught Medicine and Surgery programs in Italy.",
-                            "2027-09-16T12:00:00+02:00",
-                            "2027-09-16T13:40:00+02:00",
+                            "2026-09-17T12:00:00+02:00",
+                            "2026-09-17T13:40:00+02:00",
                             "Global Test Centers & Universitaly",
                             "https://italostudy.com/imat-exam-dates-2026"
                         )

@@ -25,6 +25,7 @@ import FAQSection from '@/components/home/FAQSection';
 
 const AnnouncementBar = lazy(() => import('@/components/AnnouncementBar'));
 const UniversityMarquee = lazy(() => import('@/components/home/UniversityMarquee'));
+const DoubtsterPartnershipSection = lazy(() => import('@/components/home/DoubtsterPartnershipSection'));
 const HomeSEOHub = lazy(() => import('@/components/home/HomeSEOHub'));
 const HomeInsights = lazy(() => import('@/components/home/HomeInsights'));
 const HomeHowItWorks = lazy(() => import('@/components/home/HomeHowItWorks'));
@@ -132,6 +133,11 @@ export default function IndexTurkey() {
                 {/* University Branding - Global Presence */}
                 <Suspense fallback={null}>
                     <UniversityMarquee />
+                </Suspense>
+
+                {/* Marquee Strategic Partnership: ItaloStudy x Doubtster */}
+                <Suspense fallback={null}>
+                    <DoubtsterPartnershipSection />
                 </Suspense>
 
                 {/* Study Resources */}

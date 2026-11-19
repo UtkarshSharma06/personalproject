@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MessageCircle, MapPin, Send, Loader2 } from 'lucide-react';
+import { Mail, MessageCircle, MapPin, Send, Loader2, Building2 } from 'lucide-react';
 import PWNavbar from '@/components/home/PWNavbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -114,13 +114,14 @@ export default function Contact() {
                             </a>
 
                             <div className="flex items-start gap-4 p-6 bg-white rounded-2xl border border-slate-200">
-                                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0">
-                                    <MapPin className="w-6 h-6 text-slate-400" />
+                                <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                                    <Building2 className="w-6 h-6 text-indigo-600" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-slate-900 mb-1">Location</h3>
-                                    <p className="text-slate-600">
-                                        Proudly supporting students globally, with expert guidance for Italian universities.
+                                    <h3 className="text-lg font-bold text-slate-900 mb-1">Corporate Entity</h3>
+                                    <p className="text-sm font-bold text-slate-800">ITALOSTUDY PRIVATE LIMITED</p>
+                                    <p className="text-xs text-slate-500 mt-1">
+                                        Registered educational technology company supporting students globally with expert admissions and preparation.
                                     </p>
                                 </div>
                             </div>

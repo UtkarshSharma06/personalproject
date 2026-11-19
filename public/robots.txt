@@ -20,9 +20,14 @@ Disallow: /learning
 Disallow: /answers
 Disallow: /answers/
 
-# Block all query-parameter variants — canonical clean URLs are indexed instead
+# Block noisy query parameters while allowing clean pagination, discovery, and tracking
+Disallow: /*?*search=*
+Disallow: /*?*q=*
+Disallow: /*?*sort=*
+Disallow: /*?*filter=*
+Disallow: /*?*session=*
+Disallow: /*?*token=*
 Disallow: /*?country=*
-Disallow: /*?*
 
 User-agent: Googlebot
 Allow: /
@@ -32,7 +37,13 @@ Disallow: /dashboard
 Disallow: /auth
 Disallow: /learning
 Disallow: /answers
-Disallow: /*?*
+Disallow: /*?*search=*
+Disallow: /*?*q=*
+Disallow: /*?*sort=*
+Disallow: /*?*filter=*
+Disallow: /*?*session=*
+Disallow: /*?*token=*
+Disallow: /*?country=*
 
 User-agent: Bingbot
 Allow: /

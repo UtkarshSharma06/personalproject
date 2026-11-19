@@ -333,17 +333,60 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                 </div>
 
                 {/* Right Side Actions */}
-                <div className="flex items-center gap-2 lg:gap-4">
-                    {/* Language Switcher Desktop */}
+                <div className="flex items-center gap-1.5 sm:gap-2.5 xl:gap-4 shrink-0">
+                    {/* Doubtster Animated Logo Link — Apple-Grade Minimal Capsule */}
+                    <Link
+                        to="/doubtster-ai-video-explanations"
+                        title="Doubtster — AI Video Explanations"
+                        className="group relative inline-flex items-center justify-center gap-1.5 h-8.5 sm:h-9 px-2 sm:pl-2 sm:pr-3 rounded-full bg-slate-900/[0.03] hover:bg-slate-900/[0.06] active:bg-slate-900/[0.09] border border-slate-900/10 hover:border-slate-900/20 transition-all duration-200 cursor-pointer overflow-hidden shrink-0 select-none whitespace-nowrap"
+                    >
+                        {/* Apple-style specular sheen glide on hover */}
+                        <span
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/60 to-transparent"
+                        />
+
+                        {/* Real Doubtster Icon with periodic Apple-grade sapphire light glint */}
+                        <div className="relative shrink-0 flex items-center justify-center">
+                            <div className="relative w-5 h-5 rounded-[5px] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.08)] ring-1 ring-black/5">
+                                <img
+                                    src="/doubtster-icon.svg"
+                                    alt="Doubtster"
+                                    className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-105"
+                                />
+                                <motion.span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/50 to-transparent"
+                                    animate={{ x: ['-100%', '200%'] }}
+                                    transition={{
+                                        repeat: Infinity,
+                                        repeatDelay: 4.5,
+                                        duration: 1.1,
+                                        ease: "easeInOut"
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Brand Typography (Hidden on mobile screens < sm to prevent overlapping) */}
+                        <span className="hidden sm:inline text-[13px] font-semibold text-[#1d1d1f] tracking-tight group-hover:text-black transition-colors">
+                            Doubtster
+                        </span>
+
+                        {/* Apple hairline micro-arrow */}
+                        <ChevronRight className="hidden sm:block w-3.5 h-3.5 text-slate-400 group-hover:text-slate-800 group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
+                    </Link>
+
+                    {/* Language Switcher */}
                     <div className="block relative" ref={langDropdownRef}>
                         <button
                             onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                            className="flex items-center gap-2 text-slate-600 hover:text-[#5a4bda] transition-colors py-2 px-2"
+                            className="flex items-center gap-1 sm:gap-2 text-slate-600 hover:text-[#5a4bda] transition-colors py-1.5 px-1 sm:px-2"
                         >
-                            {currentLang === 'EN' ? <FlagUK className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" /> : 
-                             currentLang === 'IT' ? <FlagIT className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" /> : 
-                             <FlagTR className="w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" />}
-                            <ChevronDown className={cn("w-4 h-4 lg:w-5 lg:h-5 transition-transform opacity-70", isLangDropdownOpen && "rotate-180")} />
+                            {currentLang === 'EN' ? <FlagUK className="w-5 sm:w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" /> : 
+                             currentLang === 'IT' ? <FlagIT className="w-5 sm:w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" /> : 
+                             <FlagTR className="w-5 sm:w-6 lg:w-7 h-auto rounded-[2px] shadow-sm" />}
+                            <ChevronDown className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 transition-transform opacity-70", isLangDropdownOpen && "rotate-180")} />
                         </button>
                         
                         {isLangDropdownOpen && (
@@ -367,17 +410,19 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                     {user ? (
                         <button
                             onClick={() => window.location.href = 'https://app.italostudy.com/'}
-                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-bold rounded-lg px-3 lg:px-6 h-9 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[13px] lg:text-[15px] whitespace-nowrap"
+                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-bold rounded-lg px-2.5 sm:px-4 xl:px-6 h-8.5 sm:h-9 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[12px] sm:text-[13px] lg:text-[15px] whitespace-nowrap"
                         >
-                            <LayoutDashboard className="w-4 h-4 mr-2" />
-                            {t('nav.dashboard', 'Dashboard')}
+                            <LayoutDashboard className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                            <span className="sm:hidden">{t('nav.app', 'App')}</span>
+                            <span className="hidden sm:inline">{t('nav.dashboard', 'Dashboard')}</span>
                         </button>
                     ) : (
                         <button
                             onClick={() => window.location.href = 'https://app.italostudy.com/auth'}
-                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-bold rounded-lg px-3 lg:px-4 xl:px-5 h-9 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[13px] lg:text-[14px] whitespace-nowrap"
+                            className="bg-gradient-to-r from-[#5a4bda] to-indigo-600 hover:from-[#4a3eb3] hover:to-indigo-700 text-white font-bold rounded-lg px-2.5 sm:px-4 xl:px-5 h-8.5 sm:h-9 md:h-[42px] flex items-center justify-center shadow-[0_4px_14px_0_rgba(90,75,218,0.39)] hover:shadow-[0_6px_20px_rgba(90,75,218,0.23)] hover:-translate-y-0.5 transition-all duration-200 text-[12px] sm:text-[13px] lg:text-[14px] whitespace-nowrap"
                         >
-                            {t('nav.login_register', 'Login / Register')}
+                            <span className="sm:hidden">{t('nav.login', 'Login')}</span>
+                            <span className="hidden sm:inline">{t('nav.login_register', 'Login / Register')}</span>
                         </button>
                     )}
                 </div>
@@ -418,6 +463,39 @@ export default function PWNavbar({ subNavigation }: { subNavigation?: React.Reac
                                         <span className="font-bold text-[#333333] text-[16px]">{t('nav.exams', 'All Exams')}</span>
                                         <ChevronRight className="w-5 h-5 text-[#333333]" />
                                     </button>
+
+                                    {/* Doubtster AI Link — Apple Style */}
+                                    <Link
+                                        to="/doubtster-ai-video-explanations"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-between p-4 border-b border-[#eaeaea] hover:bg-slate-50 transition-colors group"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="relative shrink-0 w-8 h-8 rounded-[7px] overflow-hidden shadow-xs ring-1 ring-black/5">
+                                                <img
+                                                    src="/doubtster-icon.svg"
+                                                    alt="Doubtster"
+                                                    className="w-full h-full object-contain"
+                                                />
+                                                <motion.span
+                                                    aria-hidden="true"
+                                                    className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/50 to-transparent"
+                                                    animate={{ x: ['-100%', '200%'] }}
+                                                    transition={{
+                                                        repeat: Infinity,
+                                                        repeatDelay: 5,
+                                                        duration: 1.1,
+                                                        ease: "easeInOut"
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col text-left">
+                                                <span className="font-semibold text-[#1d1d1f] text-[15px]">Doubtster</span>
+                                                <span className="text-[12px] text-slate-500 font-normal">Video explanations for every exam doubt</span>
+                                            </div>
+                                        </div>
+                                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
+                                    </Link>
                                     
                                     {[
                                         { name: 'IMAT Mocks', path: "/imat-mock" },

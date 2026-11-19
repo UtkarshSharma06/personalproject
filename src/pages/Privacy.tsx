@@ -95,7 +95,7 @@ export default function Privacy() {
 
                     {/* Intro */}
                     <p>
-                        At ItaloStudy, we respect your privacy and believe in total transparency regarding your data. This Privacy Policy explains what information we collect, why we collect it, and the strict boundaries we set on how it is used.
+                        At ItaloStudy (operated by <strong className="text-slate-900">ITALOSTUDY PRIVATE LIMITED</strong>), we respect your privacy and believe in total transparency regarding your data. This Privacy Policy explains what information we collect, why we collect it, and the strict boundaries we set on how it is used. For the purposes of applicable data protection laws (including GDPR and Indian DPDP Act), <strong className="text-slate-900">ITALOSTUDY PRIVATE LIMITED</strong> is the official Data Controller.
                     </p>
 
                     <hr className="border-slate-100" />
@@ -246,8 +246,9 @@ export default function Privacy() {
                             If you have questions about your privacy, wish to exercise your data rights, or want to report a security concern, please contact us:
                         </p>
                         <div className="bg-slate-900 rounded-2xl p-7 text-white">
-                            <p className="font-bold text-lg mb-1">ItaloStudy</p>
-                            <p className="text-slate-400 text-[14px] mb-4">Independent educational technology platform</p>
+                            <p className="font-bold text-lg mb-0.5">ITALOSTUDY PRIVATE LIMITED</p>
+                            <p className="text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-2">Platform: ItaloStudy</p>
+                            <p className="text-slate-400 text-[14px] mb-4">Official Data Controller · Educational Technology Company</p>
                             <a
                                 href="mailto:info@italostudy.com?subject=Privacy Enquiry"
                                 className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold text-[14px] px-5 py-2.5 rounded-lg hover:bg-slate-100 transition-colors"

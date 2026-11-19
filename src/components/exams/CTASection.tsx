@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import EditableText from "@/components/cms/EditableText";
 import { usePageContent } from "@/hooks/usePageContent";
 
@@ -10,19 +10,50 @@ interface CTASectionProps {
     subtitle?: string;
     buttonText?: string;
     fieldKeyPrefix?: string;
+    targetUrl?: string;
 }
 
 const CTASection = ({
     title = "Ready to Ace the CENT-S 2027?",
     subtitle = "Practice with real exam-level questions and get instant performance insights.",
     buttonText = "Start Free Mock Test",
-    fieldKeyPrefix = "cta"
+    fieldKeyPrefix = "cta",
+    targetUrl
 }: CTASectionProps) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { getField } = usePageContent();
 
+    const handleCTAClick = () => {
+        if (targetUrl) {
+            if (targetUrl.startsWith('http')) {
+                window.location.href = targetUrl;
+            } else {
+                navigate(targetUrl);
+            }
+            return;
+        }
+
+        const path = (location.pathname || '').toLowerCase();
+        if (path.includes('imat')) {
+            navigate('/imat-mock');
+            return;
+        }
+        if (path.includes('tolc')) {
+            navigate('/tolc-mock-test-free-2026');
+            return;
+        }
+        if (path.includes('cent-s') || path.includes('cents')) {
+            navigate('/cent-s-mock');
+            return;
+        }
+
+        // Default: Seamless signup flow with intent and UTM parameters preserved
+        window.location.href = "https://app.italostudy.com/auth?redirect=/mock-exams&utm_source=seo&utm_medium=cta_section&utm_campaign=mock_test";
+    };
+
     return (
-        <Card className="p-8 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none shadow-xl my-12 overflow-hidden relative">
+        <Card className="p-8 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none shadow-xl my-12 overflow-hidden relative rounded-3xl">
             <div className="absolute top-0 right-0 p-4 opacity-10">
                 <Sparkles size={120} />
             </div>
@@ -36,7 +67,7 @@ const CTASection = ({
                     </EditableText>
                 </div>
                 <Button
-                    onClick={() => navigate("/mock-exams")}
+                    onClick={handleCTAClick}
                     size="lg"
                     className="bg-white text-indigo-600 hover:bg-indigo-50 font-bold text-lg px-8 py-6 h-auto shadow-lg group transition-all duration-300 transform hover:scale-105"
                 >

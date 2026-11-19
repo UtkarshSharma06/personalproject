@@ -136,8 +136,11 @@ export default function Footer() {
 
                 <div className="pt-8 border-t border-[#eaeaea] flex flex-col lg:flex-row justify-between items-center gap-8">
                     <div className="flex flex-col items-center lg:items-start gap-1">
-                        <p className="text-[13px] text-[#888888]">
-                            © {new Date().getFullYear()} ITALOSTUDY EDUCATION TECHNOLOGIES. ALL RIGHTS RESERVED.
+                        <p className="text-[13px] text-[#888888] font-medium">
+                            © {new Date().getFullYear()} ITALOSTUDY PRIVATE LIMITED. ALL RIGHTS RESERVED.
+                        </p>
+                        <p className="text-[11px] text-[#999999]">
+                            ItaloStudy is owned and operated by ITALOSTUDY PRIVATE LIMITED.
                         </p>
                         <div className="flex flex-wrap justify-center lg:justify-start gap-6 mt-2">
                             <Link to="/privacy" className="text-[13px] text-[#888888] hover:text-[#5a4bda] transition-colors">Privacy</Link>

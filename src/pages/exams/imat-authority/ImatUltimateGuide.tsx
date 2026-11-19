@@ -94,16 +94,16 @@ export default function ImatUltimateGuide() {
             >
                 <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
                     <SEOHead
-                        title="IMAT 2027 – Complete Guide: Registration, Syllabus, Dates & Cutoff | ItalStudy"
-                        description="The complete IMAT 2027 guide. Exam dates, Universitaly registration process, official syllabus breakdown, cutoff scores for all Italian universities, and preparation strategy for EU & Non-EU students."
-                        keywords="imat 2027, imat exam 2027, imat exam, what is imat, imat 2027 registration, imat 2027 exam date, imat preparation, imat eligibility, imat non eu seats, study medicine italy english, imat guide 2027, italostudy imat"
+                        title="IMAT Exam 2026–2027: Complete Medical Entrance Guide, Dates & Free Mocks | ItaloStudy"
+                        description="Ace the Italian IMAT exam 2026–2027. Official MUR syllabus, past papers with solutions (2011–2025), university cutoffs, and free full-length simulated mocks."
+                        keywords="imat exam, imat, imat 2026, imat 2027, imat past papers, imat exam date, imat cutoff, study medicine in italy in english, universitaly imat, italostudy"
                         faqs={faqs}
                         schemas={[
                             getCourseSchema('imat'),
                             getBreadcrumbSchema([
                                 { name: 'Home', item: '/' },
                                 { name: 'Guides', item: '/resources' },
-                                { name: 'IMAT 2027', item: '/imat-exam-ultimate-guide-2026' }
+                                { name: 'IMAT Guide', item: '/imat' }
                             ])
                         ]}
                     />

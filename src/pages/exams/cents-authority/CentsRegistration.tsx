@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -39,9 +39,9 @@ const sections = [
 ];
 
 const faqs = [
-    { question: 'How do I register for the CENT-S?', answer: 'Registration is done through the official CISIA portal. You must create an account, select the CENT-S module, choose a date/test center, and pay the €30 fee.' },
+    { question: 'How do I register for the CENT-S?', answer: 'Registration is done through the official CISIA portal (cisia.eu). You must create an account, select the CENT-S module, choose a date/test center (@HOME or @UNI), and pay the official €35 exam fee.' },
     { question: 'Is the CENT-S registration different from University application?', answer: "Yes. Registering for the CENT-S only books the exam. You must also apply to your specific university's 'Bando' (Call for Admission) separately." },
-    { question: 'What is the registration fee for CENT-S?', answer: 'The standardized fee is €30 per attempt. This must be paid via credit card or bank transfer on the CISIA portal.' },
+    { question: 'What is the registration fee for CENT-S?', answer: 'The standardized official fee is €35 per attempt for both EU and Non-EU candidates. This is paid securely via international credit card (Visa/Mastercard) or PagoPA on the CISIA portal.' },
     { question: 'Can I register for multiple dates at once?', answer: 'No. You can only have one active CENT-S registration at a time. After sitting the exam, you can register for a new date in the following macro-period.' },
     { question: 'Do I need my passport to register?', answer: 'Yes. You will need your passport number (or EU identity card) to create your CISIA profile.' },
     { question: 'What is a "Codice Fiscale"?', answer: 'It is an Italian tax code. International students can often generate a temporary one on the CISIA portal during registration.' },
@@ -90,9 +90,9 @@ export default function CentsRegistration() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Registration 2027: Step-by-Step CISIA Guide"
-                    description="How to register for the CENT-S 2027. Step-by-step guide to the CISIA portal, registration fees, deadlines, and Italian university application links."
-                    keywords="cent-s registration 2027, cisia portal registration, cent-s fee payment, study italy registration guide, tolc-s registration"
+                    title="CEnT-S Registration & Exam Fee 2026–2027: €35 Fee, CISIA Portal & Dates"
+                    description="Official CEnT-S exam fee is €35 per test. Complete step-by-step registration guide on the CISIA portal, payment methods (Credit Card / PagoPA), and deadlines."
+                    keywords="cents exam fee, cent-s fee, cent-s exam cost, cent-s registration 2026, cent-s registration 2027, cisia portal registration, cent-s fee payment, study italy registration guide, tolc-s registration"
                 />
 
                 <FAQSchema items={faqs} />
@@ -215,27 +215,48 @@ export default function CentsRegistration() {
 
                                 {/* Fees */}
                                 <section id="fees" className="scroll-mt-[120px]">
-                                    <div className="bg-slate-900 text-white rounded-[3rem] p-12 relative overflow-hidden">
-                                        <div className="absolute top-0 right-0 p-8 opacity-5"><CreditCard size={200} /></div>
+                                    <div className="bg-slate-900 text-white rounded-3xl p-8 md:p-12 relative overflow-hidden border border-slate-800 shadow-xl">
                                         <div className="relative z-10">
-                                            <h2 className="text-4xl font-black mb-8 flex items-center gap-4">
-                                                <Zap className="text-indigo-400" />
-                                                Fees & Payment Mode
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
+                                                <Zap size={14} className="text-indigo-400" /> Official CISIA Fee Standard
+                                            </div>
+                                            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 flex items-center gap-3">
+                                                Exam Fees & Payment Modes
                                             </h2>
-                                            <p className="text-xl text-slate-300 leading-relaxed font-medium mb-12 max-w-3xl">
-                                                The registration fee is standardized at **€30.00**. This must be paid for each attempt you make. Payments are processed securely via the PagoPA system or major international credit cards.
+                                            <p className="text-lg text-slate-300 leading-relaxed font-normal mb-8 max-w-3xl">
+                                                The standardized registration fee for the CEnT-S is <strong className="text-white font-semibold">€35.00 per attempt</strong> for both EU and international candidates. Payments are processed securely via the official CISIA portal using PagoPA or international credit/debit cards.
                                             </p>
-                                            <div className="grid md:grid-cols-2 gap-8">
-                                                <div className="p-8 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
-                                                    <h4 className="text-indigo-400 font-black text-xl mb-3">No Refunds</h4>
+
+                                            {/* Apple-grade Fee Overview Card */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                                                <div className="p-6 bg-white/[0.04] rounded-2xl border border-white/10 backdrop-blur-md">
+                                                    <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">Standardized Fee</div>
+                                                    <div className="text-3xl font-extrabold text-white mb-1">€35.00</div>
+                                                    <div className="text-xs text-slate-400">Per exam session attempt</div>
+                                                </div>
+                                                <div className="p-6 bg-white/[0.04] rounded-2xl border border-white/10 backdrop-blur-md">
+                                                    <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">Accepted Payment</div>
+                                                    <div className="text-xl font-bold text-white mb-1">Visa / MC / PagoPA</div>
+                                                    <div className="text-xs text-slate-400">Instant digital checkout</div>
+                                                </div>
+                                                <div className="p-6 bg-white/[0.04] rounded-2xl border border-white/10 backdrop-blur-md">
+                                                    <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">Score Validity</div>
+                                                    <div className="text-xl font-bold text-emerald-400 mb-1">Best Score Counted</div>
+                                                    <div className="text-xs text-slate-400">1 session per macro-period</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div className="p-6 bg-white/[0.03] rounded-2xl border border-white/10">
+                                                    <h4 className="text-indigo-300 font-semibold text-lg mb-2">No Refund Policy</h4>
                                                     <p className="text-slate-300 text-sm leading-relaxed">
-                                                        CISIA does not typically offer refunds for missed or cancelled sessions. Double-check your availability before confirming the payment.
+                                                        CISIA does not issue refunds for missed or cancelled bookings. Verify your time zone, target test date, and modality (@HOME vs @UNI) before confirming payment.
                                                     </p>
                                                 </div>
-                                                <div className="p-8 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
-                                                    <h4 className="text-emerald-400 font-black text-xl mb-3">Payment Receipt</h4>
+                                                <div className="p-6 bg-white/[0.03] rounded-2xl border border-white/10">
+                                                    <h4 className="text-emerald-300 font-semibold text-lg mb-2">Payment Receipt ("Ricevuta")</h4>
                                                     <p className="text-slate-300 text-sm leading-relaxed">
-                                                        Always download and print your "Ricevuta di Pagamento" from the portal. You may need to show this at the test center.
+                                                        Immediately download and print your official payment receipt from the CISIA dashboard. You must present this receipt along with your valid passport on test day.
                                                     </p>
                                                 </div>
                                             </div>

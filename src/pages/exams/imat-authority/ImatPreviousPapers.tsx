@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -91,9 +91,9 @@ export default function ImatPreviousPapers() {
                 }
             >
                 <SEOHead
-                    title="IMAT Past Papers PDF (2011–2026) — Free Download + Official Answer Keys"
-                    description="Download all 15 official IMAT past papers from 2011 to 2026 in PDF with official ministerial answer keys, worked solutions, and question analysis. Free master download."
-                    keywords="imat past papers pdf, imat 2026 paper, imat 2026 question paper, imat 2026 pdf, test imat 2026 pdf, imat practice test pdf, imat previous year papers free download, imat 2026 answer key, imat mock test free, imat 2026 paper pdf, imat 2026 exam paper, imat 2026 past papers"
+                    title="IMAT Past Papers PDF (2011–2025) with Worked Solutions & Answer Keys | Free Download"
+                    description="Download official IMAT past papers (2011–2025) in PDF with verified answer keys and step-by-step worked solutions. 100% free master download & online mock simulator."
+                    keywords="imat past papers, imat past papers pdf, imat previous year papers, imat question paper pdf, imat worked solutions, imat 2024 paper pdf, imat answer key, free imat papers, italostudy"
                 />
 
                 <FAQSchema items={faqs} />

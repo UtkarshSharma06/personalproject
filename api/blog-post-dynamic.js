@@ -102,14 +102,26 @@ export default async function handler(req, res) {
   const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_LZduUlJ96GYtgyo0l-iTzw_P-8Glk_v';
   const supabase = createClient(supabaseUrl, supabaseKey);
 
+  // Timeout helper — Supabase must respond within 5 s or we serve a fallback
+  const withTimeout = (promise, ms) =>
+    Promise.race([
+      promise,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`Supabase timeout after ${ms}ms`)), ms)
+      ),
+    ]);
+
   try {
-    // 3. Fetch Post Data from Supabase
-    const { data: post, error } = await supabase
-      .from('blog_posts')
-      .select('*, blog_categories(name)')
-      .eq('slug', slug)
-      .eq('status', 'published')
-      .single();
+    // 3. Fetch Post Data from Supabase (5 s deadline so Googlebot never gets empty HTML)
+    const { data: post, error } = await withTimeout(
+      supabase
+        .from('blog_posts')
+        .select('*, blog_categories(name)')
+        .eq('slug', slug)
+        .eq('status', 'published')
+        .single(),
+      5000
+    );
 
     if (error || !post) {
       console.error('Post not found:', slug, error);
@@ -235,11 +247,28 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Blog SSR error:', err);
-    // Fallback: serve plain index.html so React still loads for users
+    // Fallback: serve a minimal but SEO-friendly shell so Googlebot gets something
+    // meaningful even if Supabase is unavailable. React will hydrate on the client.
     try {
-      const fallback = fs.readFileSync(path.join(process.cwd(), 'dist', 'index.html'), 'utf8');
+      let fallback = fs.readFileSync(path.join(process.cwd(), 'dist', 'index.html'), 'utf8');
+      const safeSlug = (slug || '').replace(/[^a-z0-9-]/gi, '-');
+      const fallbackTitle = safeSlug
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+      // Inject a minimal canonical + title so Googlebot at least sees the right URL
+      fallback = fallback.replace(
+        /<title>.*?<\/title>/,
+        `<title>${fallbackTitle} | ItaloStudy Blog</title>`
+      );
+      fallback = fallback.replace(
+        /<link rel="canonical" href=".*?"\s*\/>/,
+        `<link rel="canonical" href="https://italostudy.com/blog/${safeSlug}" />`
+      );
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(fallback);
+      // 503 tells Google to retry soon instead of treating this as a 200 empty page
+      res.setHeader('Retry-After', '30');
+      return res.status(503).send(fallback);
     } catch {
       return res.status(500).send('Internal Server Error');
     }

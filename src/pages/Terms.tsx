@@ -13,24 +13,24 @@ interface Section {
 }
 
 const sections: Section[] = [
-    { number: 1,  color: 'text-indigo-600',  bg: 'bg-indigo-100',  title: 'Acceptance of Terms' },
-    { number: 2,  color: 'text-blue-600',    bg: 'bg-blue-100',    title: 'About ItaloStudy' },
-    { number: 3,  color: 'text-violet-600',  bg: 'bg-violet-100',  title: 'Eligibility & Account Registration' },
-    { number: 4,  color: 'text-green-600',   bg: 'bg-green-100',   title: 'Services Provided' },
-    { number: 5,  color: 'text-amber-600',   bg: 'bg-amber-100',   title: 'Subscriptions & Billing' },
-    { number: 6,  color: 'text-orange-600',  bg: 'bg-orange-100',  title: 'Courses & Digital Products' },
-    { number: 7,  color: 'text-fuchsia-600', bg: 'bg-fuchsia-100', title: 'ItaloStudy Store' },
-    { number: 8,  color: 'text-rose-600',    bg: 'bg-rose-100',    title: 'Free / Explorer Plan' },
-    { number: 9,  color: 'text-teal-600',    bg: 'bg-teal-100',    title: 'AI & Machine Learning Features' },
-    { number: 10, color: 'text-cyan-600',    bg: 'bg-cyan-100',    title: 'Academic Integrity' },
-    { number: 11, color: 'text-slate-600',   bg: 'bg-slate-100',   title: 'Intellectual Property' },
-    { number: 12, color: 'text-red-600',     bg: 'bg-red-100',     title: 'Prohibited Conduct' },
-    { number: 13, color: 'text-purple-600',  bg: 'bg-purple-100',  title: 'Account Suspension & Termination' },
-    { number: 14, color: 'text-lime-600',    bg: 'bg-lime-100',    title: 'Disclaimer of Warranties' },
-    { number: 15, color: 'text-pink-600',    bg: 'bg-pink-100',    title: 'Limitation of Liability' },
-    { number: 16, color: 'text-sky-600',     bg: 'bg-sky-100',     title: 'Governing Law & Disputes' },
+    { number: 1, color: 'text-indigo-600', bg: 'bg-indigo-100', title: 'Acceptance of Terms' },
+    { number: 2, color: 'text-blue-600', bg: 'bg-blue-100', title: 'About ItaloStudy' },
+    { number: 3, color: 'text-violet-600', bg: 'bg-violet-100', title: 'Eligibility & Account Registration' },
+    { number: 4, color: 'text-green-600', bg: 'bg-green-100', title: 'Services Provided' },
+    { number: 5, color: 'text-amber-600', bg: 'bg-amber-100', title: 'Subscriptions & Billing' },
+    { number: 6, color: 'text-orange-600', bg: 'bg-orange-100', title: 'Courses & Digital Products' },
+    { number: 7, color: 'text-fuchsia-600', bg: 'bg-fuchsia-100', title: 'ItaloStudy Store' },
+    { number: 8, color: 'text-rose-600', bg: 'bg-rose-100', title: 'Free / Explorer Plan' },
+    { number: 9, color: 'text-teal-600', bg: 'bg-teal-100', title: 'AI & Machine Learning Features' },
+    { number: 10, color: 'text-cyan-600', bg: 'bg-cyan-100', title: 'Academic Integrity' },
+    { number: 11, color: 'text-slate-600', bg: 'bg-slate-100', title: 'Intellectual Property' },
+    { number: 12, color: 'text-red-600', bg: 'bg-red-100', title: 'Prohibited Conduct' },
+    { number: 13, color: 'text-purple-600', bg: 'bg-purple-100', title: 'Account Suspension & Termination' },
+    { number: 14, color: 'text-lime-600', bg: 'bg-lime-100', title: 'Disclaimer of Warranties' },
+    { number: 15, color: 'text-pink-600', bg: 'bg-pink-100', title: 'Limitation of Liability' },
+    { number: 16, color: 'text-sky-600', bg: 'bg-sky-100', title: 'Governing Law & Disputes' },
     { number: 17, color: 'text-emerald-600', bg: 'bg-emerald-100', title: 'Changes to These Terms' },
-    { number: 18, color: 'text-gray-600',    bg: 'bg-gray-100',    title: 'Contact Us' },
+    { number: 18, color: 'text-gray-600', bg: 'bg-gray-100', title: 'Contact Us' },
 ];
 
 function SectionBadge({ s }: { s: Section }) {
@@ -105,7 +105,7 @@ export default function Terms() {
                     <section id="section-1">
                         <SectionBadge s={sections[0]} />
                         <p className="mb-3">
-                            By accessing or using ItaloStudy — including the web application at <strong className="text-slate-900">app.italostudy.com</strong>, the public website at <strong className="text-slate-900">italostudy.com</strong>, or any associated mobile or desktop interface — you confirm that you have read, understood, and agree to be legally bound by these Terms of Service ("Terms").
+                            By accessing or using ItaloStudy — including the web application at <strong className="text-slate-900">app.italostudy.com</strong>, the public website at <strong className="text-slate-900">italostudy.com</strong>, or any associated mobile or desktop interface operated by <strong className="text-slate-900">ITALOSTUDY PRIVATE LIMITED</strong> ("ItaloStudy", "Company", "we", "us", or "our") — you confirm that you have read, understood, and agree to be legally bound by these Terms of Service ("Terms").
                         </p>
                         <p>
                             If you do not agree to these Terms in their entirety, you must immediately discontinue use of the platform. Continued use constitutes ongoing acceptance.
@@ -118,7 +118,7 @@ export default function Terms() {
                     <section id="section-2">
                         <SectionBadge s={sections[1]} />
                         <p className="mb-3">
-                            ItaloStudy is an independent educational technology platform. We provide exam preparation services for internationally recognised academic entrance exams, including <strong>IMAT, CEnT-S, SAT, and IELTS</strong>.
+                            ItaloStudy is an independent educational technology platform owned and operated by <strong className="text-slate-900">ITALOSTUDY PRIVATE LIMITED</strong>. We provide exam preparation services for internationally recognised academic entrance exams, including <strong>IMAT, CEnT-S, SAT, and IELTS</strong>.
                         </p>
                         <p>Our platform includes:</p>
                         <Ul items={[
@@ -447,8 +447,9 @@ export default function Terms() {
                             If you have any questions, concerns, or legal enquiries regarding these Terms, please contact us:
                         </p>
                         <div className="bg-slate-900 rounded-2xl p-7 text-white">
-                            <p className="font-bold text-lg mb-1">ItaloStudy</p>
-                            <p className="text-slate-400 text-[14px] mb-4">Independent educational technology platform</p>
+                            <p className="font-bold text-lg mb-0.5">ITALOSTUDY PRIVATE LIMITED</p>
+                            <p className="text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-2">Platform: ItaloStudy</p>
+                            <p className="text-slate-400 text-[14px] mb-4">Registered Educational Technology Company</p>
                             <a
                                 href="mailto:info@italostudy.com"
                                 className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold text-[14px] px-5 py-2.5 rounded-lg hover:bg-slate-100 transition-colors"

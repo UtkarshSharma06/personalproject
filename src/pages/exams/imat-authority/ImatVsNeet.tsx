@@ -24,9 +24,9 @@ const ImatVsNeet: React.FC = () => {
         <Layout variant="public">
         <div className="bg-gray-50 min-h-screen">
             <SEOHead 
-                title="IMAT vs NEET 2027: The Ultimate Comparison for Indian Students | Italostudy"
-                description="Is IMAT easier than NEET? A massive 3500+ word breakdown of the syllabus, negative marking, difficulty, and why Italian medical schools are the best backup for Indian MBBS aspirants in 2027."
-                keywords="imat vs neet, imat for indian students, is imat easier than neet, imat syllabus vs neet syllabus, imat biology vs neet biology"
+                title="IMAT vs NEET 2026–2027: Difficulty, Fees, Syllabus & MBBS in Italy Compared"
+                description="Is IMAT easier than NEET? Comprehensive comparison of difficulty, syllabus, negative marking, tuition fees (€150–€3,000/yr), and European medical degree validity."
+                keywords="imat vs neet, imat for indian students, is imat easier than neet, imat syllabus vs neet syllabus, imat biology vs neet biology, mbbs in italy vs neet, study medicine in italy"
             />
 
             {/* Hero Section */}

@@ -13,45 +13,52 @@ export default function PWHeroSlider() {
     const banners = [
         {
             id: 1,
-            title: "IMAT Cut-offs Analysis - Milan 74.9, Cagliari 65.1",
-            imageMobile: "/mobile-1-cutoffs.webp",
-            imageDesktop: "/desktop-1-cutoffs.webp",
-            link: "/imat-cutoff-trends-2026"
+            title: "ItaloStudy × Doubtster - Every Doubt Answered Right Where You Study",
+            imageMobile: "/italostudy-doubtster-slider-mobile.png",
+            imageDesktop: "/italostudy-doubtster-slider-desktop.png",
+            link: "https://doubtster.com/"
         },
         {
             id: 2,
+            title: "IMAT Cut-offs Analysis - Milan 74.9, Cagliari 65.1",
+            imageMobile: "/mobile-1-cutoffs.webp",
+            imageDesktop: "/desktop-1-cutoffs.webp",
+            link: "https://italostudy.com/blog/imat-2026-cut-off-scores-expected-final-by-university"
+        },
+        {
+            id: 3,
             title: "TIL-I Prep Now Live - Politecnico di Torino",
             imageMobile: "/mobile-2-til-i.webp",
             imageDesktop: "/desktop-2-til-i.webp",
             link: "/til-i-exam-guide-2026"
         },
         {
-            id: 3,
+            id: 4,
             title: "CEnT-S 2027 Reasoning on Texts & Data Course",
             imageMobile: "/mobile-3-rtd-course.webp",
             imageDesktop: "/desktop-3-rtd-course.webp",
-            link: "/courses"
+            link: "https://italostudy.com/courses/cent-s-2026-video-course"
         },
         {
-            id: 4,
+            id: 5,
             title: "CEnT-S 2027 Preparation - All in One Place",
             imageMobile: "/mobile-4-cent-s-prep.webp",
             imageDesktop: "/desktop-4-cent-s-prep.webp",
             link: "https://app.italostudy.com/auth"
         },
         {
-            id: 5,
+            id: 6,
             title: "Reasoning on Texts & Data Full Course - Save €5",
             imageMobile: "/mobile-5-rtd-price.webp",
             imageDesktop: "/desktop-5-rtd-price.webp",
-            link: "/courses"
+            link: "https://italostudy.com/courses/cent-s-2026-video-course"
         },
         {
-            id: 6,
+            id: 7,
             title: "Study in Italy - Costs & Scholarships from €156",
             imageMobile: "/mobile-6-costs.webp",
             imageDesktop: "/desktop-6-costs.webp",
-            link: "/study-in-italy/tuition-fees-2026"
+            link: "https://italostudy.com/blog/italy-vs-eastern-europe-medicine-cost-comparison"
         }
     ];
 
@@ -89,19 +96,21 @@ export default function PWHeroSlider() {
             {/* The carousel container */}
             <div className="overflow-hidden w-full relative group" ref={emblaRef}>
                 <div className="flex touch-pan-y">
-                    {banners.map((banner) => {
-                        const isExternal = banner.link.startsWith('http');
+                    {banners.map((banner, index) => {
+                        const isAnchor = banner.link.startsWith('#');
+                        const isExternal = banner.link.startsWith('http') && !banner.link.includes('italostudy.com');
+                        const routerPath = banner.link.replace(/^https?:\/\/(www\.)?italostudy\.com/, '');
                         const content = (
-                            <div className="w-full bg-slate-100 flex items-center justify-center">
+                            <div className="w-full bg-slate-100 flex items-center justify-center cursor-pointer select-none">
                                 <picture className="w-full">
                                     <source media="(max-width: 767px)" srcSet={banner.imageMobile} />
                                     <img 
                                         src={banner.imageDesktop} 
                                         width="2560"
                                         height="483"
-                                        className="w-full h-auto object-contain block"
-                                        fetchPriority={banner.id === 1 ? "high" : "auto"}
-                                        loading={banner.id === 1 ? "eager" : "lazy"}
+                                        className="w-full h-auto object-contain block transition-transform duration-300 group-hover:scale-[1.002]"
+                                        fetchPriority={index === 0 ? "high" : "auto"}
+                                        loading={index === 0 ? "eager" : "lazy"}
                                         alt={banner.title} 
                                     />
                                 </picture>
@@ -110,12 +119,32 @@ export default function PWHeroSlider() {
 
                         return (
                             <div key={banner.id} className="flex-[0_0_100%] min-w-0 relative">
-                                {isExternal ? (
-                                    <a href={banner.link} className="block w-full">
+                                {isAnchor ? (
+                                    <a 
+                                        href={banner.link} 
+                                        className="block w-full cursor-pointer"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            const targetId = banner.link.substring(1);
+                                            const el = document.getElementById(targetId);
+                                            if (el) {
+                                                el.scrollIntoView({ behavior: 'smooth' });
+                                            }
+                                        }}
+                                    >
+                                        {content}
+                                    </a>
+                                ) : isExternal ? (
+                                    <a 
+                                        href={banner.link} 
+                                        className="block w-full cursor-pointer"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
                                         {content}
                                     </a>
                                 ) : (
-                                    <Link to={banner.link} className="block w-full">
+                                    <Link to={routerPath} className="block w-full cursor-pointer">
                                         {content}
                                     </Link>
                                 )}

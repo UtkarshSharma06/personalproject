@@ -28,6 +28,7 @@ import { getEducationalOrganizationSchema } from '@/utils/seo-schemas';
 
 // Non-critical components — lazy loaded
 const Footer = lazy(() => import('@/components/Footer'));
+const DoubtsterPartnershipSection = lazy(() => import('@/components/home/DoubtsterPartnershipSection'));
 const TrustpilotSection = lazy(() => import('@/components/TrustpilotSection'));
 const UniversityMarquee = lazy(() => import('@/components/home/UniversityMarquee'));
 const GlobalChallenge = lazy(() => import('@/components/home/GlobalChallenge'));
@@ -256,6 +257,11 @@ export default function Index() {
             {/* University Branding - Global Presence */}
             <Suspense fallback={null}>
                 <UniversityMarquee />
+            </Suspense>
+
+            {/* Marquee Strategic Partnership: ItaloStudy x Doubtster (Apple x ChatGPT Style) */}
+            <Suspense fallback={null}>
+                <DoubtsterPartnershipSection />
             </Suspense>
 
             {/* Study Resources */}

@@ -28,6 +28,7 @@ export default async function middleware(request: Request) {
 
   // Static SEO Dictionary for Cluster Pages
   const staticSeoMap: Record<string, { title: string, description: string }> = {
+    'doubtster-ai-video-explanations': { title: 'ItaloStudy x Doubtster: Watch Any Doubt Explained, Free with Global', description: 'ItaloStudy now includes Doubtster. Ask any question, get a clear answer, and turn it into a short explanation video. Global plan members get 10 free Doubtster credits.' },
     'cent-s-exam-ultimate-guide': { title: 'CEnT-S Exam 2026 Ultimate Guide', description: 'Everything you need to know about the CEnT-S exam for studying in Italy.' },
     'cent-s-syllabus-2026': { title: 'CEnT-S Syllabus 2026 | Full Breakdown', description: 'Detailed breakdown of the CEnT-S 2026 exam syllabus.' },
     'cent-s-exam-pattern-2026': { title: 'CEnT-S Exam Pattern 2026', description: 'Understand the CEnT-S exam structure, scoring, and format.' },

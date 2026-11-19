@@ -88,13 +88,13 @@ export default function CentsDetailedSyllabus() {
                 }
             >
                 <SEOHead
-                    title="CENT-S Detailed Syllabus 2027: Section-by-Section Breakdown"
-                    description="Complete CENT-S 2027 syllabus guide. Detailed breakdown of Math, Logical Reasoning, Sciences, and Reading Comprehension requirements for Italian STEM degrees."
-                    keywords="cent-s syllabus 2027, cent-s math topics, cent-s science requirements, cisia syllabus, study italy engineering syllabus"
+                    title="CEnT-S Syllabus 2026–2027: Official CISIA Subject Breakdown & PDF Download"
+                    description="Official CEnT-S exam syllabus 2026–2027 by CISIA. Subject-wise topic breakdown for Math (15 Qs), Text & Data Reasoning (15 Qs), Biology, Chemistry & Physics + Free PDF."
+                    keywords="cent s syllabus, cent s exam syllabus, cent-s syllabus 2026, cent-s syllabus 2027, cent-s math topics, cent-s science requirements, cisia syllabus, cisia english test science syllabus"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'CEnT-S Guide', item: '/cent-s-exam-ultimate-guide' },
-                        { name: 'CEnT-S Syllabus 2027', item: '/cent-s-syllabus-2026' }
+                        { name: 'CEnT-S Syllabus', item: '/cent-s-syllabus-2026' }
                     ])]}
                 />
 

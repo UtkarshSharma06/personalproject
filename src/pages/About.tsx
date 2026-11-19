@@ -52,7 +52,7 @@ export default function About() {
                     </div>
 
                     <p className="text-[15px] md:text-[18px] font-medium text-white/90 mt-6 lg:mx-32 max-w-4xl leading-relaxed">
-                        {t('about.pw_hero_desc', "ItaloStudy serves as the premier academic bridge for international students aspiring to enter the European Higher Education Area. With a dedicated focus on Italian excellence, we provide world-class, accessible preparation to help ambitious students secure their place at Italy's most prestigious universities.")}
+                        {t('about.pw_hero_desc', "ItaloStudy, operated by ITALOSTUDY PRIVATE LIMITED, serves as the premier academic bridge for international students aspiring to enter the European Higher Education Area. With a dedicated focus on Italian excellence, we provide world-class, accessible preparation to help ambitious students secure their place at Italy's most prestigious universities.")}
                     </p>
                 </div>
 

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -92,13 +92,13 @@ export default function StudyItalyApply() {
                 }
             >
                 <SEOHead
-                    title="How to Apply & Italy Study Visa Requirements 2027"
-                    description="A complete step-by-step guide on how international students can apply to Italian universities in 2027, from document preparation to Italy study visa requirements."
-                    keywords="italy study visa requirements 2027, how to apply to Italian university, Italian university application process 2027, Italy student visa"
+                    title="Universitaly Pre-Enrollment 2026–2027: Step-by-Step Guide, Documents & Deadlines"
+                    description="Complete official Universitaly pre-enrollment guide for 2026–2027. Step-by-step tutorial: portal registration, CIMEA comparability, summary A/B form, visa & deadlines."
+                    keywords="universitaly pre enrollment 2026, universitaly pre enrollment, universitaly guide, universitaly portal registration, cimea statement of comparability, italy study visa requirements, how to apply to Italian university, Italian university application process 2026, Italy student visa"
                     schemas={[getBreadcrumbSchema([
                         { name: 'Home', item: '/' },
                         { name: 'Study in Italy Guide', item: '/study-in-italy-guide-2026' },
-                        { name: 'How to Apply in Italy', item: '/study-in-italy/how-to-apply' }
+                        { name: 'Universitaly Pre-Enrollment', item: '/study-in-italy/how-to-apply' }
                     ])]}
                     />
                 <FAQSchema items={faqs} />
@@ -120,13 +120,13 @@ export default function StudyItalyApply() {
                                 <section id="overview" className="scroll-mt-40">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-indigo-100 rounded-full text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
                                         <Sparkles size={12} className="animate-pulse" />
-                                        Official 2027 Academic Roadmap
+                                        Official 2026–2027 Pre-Enrollment Roadmap
                                     </div>
-                                    <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6">
-                                        {getField('hero_headline', 'How to Apply to Italian Universities')}
+                                    <EditableText fieldKey="hero_headline" as="h1" className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.15] mb-6">
+                                        {getField('hero_headline', 'Universitaly Pre-Enrollment & How to Apply to Italian Universities (2026–2027)')}
                                     </EditableText>
-                                    <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-medium mb-10">
-                                        {getField('hero_subheadline', 'The exact application process for international students in 2027 — from choosing your program to landing your student visa. Each step is documented and explained.')}
+                                    <EditableText fieldKey="hero_subheadline" multiline as="p" className="text-lg md:text-xl text-slate-600 leading-relaxed font-normal mb-10 max-w-3xl">
+                                        {getField('hero_subheadline', 'The complete official pre-enrollment and visa roadmap for international students. Step-by-step guidance on Universitaly.it registration, CIMEA comparability, Summary Form A/B, and embassy visa approval.')}
                                     </EditableText>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                                         {[
@@ -135,7 +135,7 @@ export default function StudyItalyApply() {
                                             { label: 'App Fee', value: '€30 – €80', icon: Euro },
                                             { label: 'Intake Window', value: 'Feb – May', icon: Globe }
                                         ].map((item, i) => (
-                                            <div key={i} className="bg-white p-4 md:p-6 rounded-2xl border-2 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23_42,1)] flex flex-col items-center text-center group hover:border-indigo-200 transition-colors">
+                                            <div key={i} className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex flex-col items-center text-center group hover:border-slate-300 hover:shadow-md transition-all">
                                                 <item.icon className="text-indigo-600 mb-2 md:mb-3 group-hover:scale-110 transition-transform" size={20} />
                                                 <div className="text-lg md:text-2xl font-black text-slate-900">{item.value}</div>
                                                 <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">{item.label}</div>

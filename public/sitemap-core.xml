@@ -2,59 +2,131 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://italostudy.com/</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>daily</changefreq>
-    <priority>1</priority>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Doubtster AI Video Explanations -->
+  <url>
+    <loc>https://italostudy.com/doubtster-ai-video-explanations</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <!-- CEnT-S Hub — Priority cluster targeting top GSC queries -->
   <url>
+    <loc>https://italostudy.com/cent-s</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
     <loc>https://italostudy.com/cent-s-exam-ultimate-guide</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>1</priority>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://italostudy.com/cent-s-mock</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>1</priority>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://italostudy.com/cent-s-syllabus-2026</loc>
-    <lastmod>2026-05-29</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://italostudy.com/cent-s-exam-pattern-2026</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://italostudy.com/cent-s-cutoff-2026</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://italostudy.com/cents-exam-fee</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- IMAT Hub -->
   <url>
+    <loc>https://italostudy.com/imat</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
     <loc>https://italostudy.com/imat-exam-ultimate-guide-2026</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>1</priority>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://italostudy.com/imat-mock</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>1</priority>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://italostudy.com/imat-previous-year-papers-pdf</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://italostudy.com/imat-syllabus-2026</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://italostudy.com/imat-vs-neet-2026</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- TOLC Hub -->
+  <url>
+    <loc>https://italostudy.com/tolc</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://italostudy.com/tolc-exam-ultimate-guide-2026</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Study in Italy / Universitaly -->
+  <url>
+    <loc>https://italostudy.com/universitaly-pre-enrollment-2026</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://italostudy.com/study-in-italy/how-to-apply</loc>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://italostudy.com/study-in-italy/tuition-fees-2026</loc>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -62,63 +134,63 @@
   <!-- Resources (highest traffic page) -->
   <url>
     <loc>https://italostudy.com/resources</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>daily</changefreq>
-    <priority>1</priority>
+    <priority>1.0</priority>
   </url>
 
   <!-- Supporting navigation pages -->
   <url>
     <loc>https://italostudy.com/blog</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://italostudy.com/exams</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://italostudy.com/pricing</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://italostudy.com/method</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://italostudy.com/contact</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://italostudy.com/about</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://italostudy.com/privacy</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://italostudy.com/terms</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://italostudy.com/refund</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

@@ -152,7 +152,10 @@ const PublicRouter = () => (
     <Route path="/blog" element={<Blog />} />
     <Route path="/blog/:slug" element={<BlogPost />} />
     
+    {/* Authority Clusters */}
+    <Route path="/cent-s" element={<CentsUltimateGuide />} />
     <Route path="/cent-s-exam-ultimate-guide" element={<CentsUltimateGuide />} />
+    <Route path="/cent-s-syllabus" element={<CentsDetailedSyllabus />} />
     <Route path="/cent-s-syllabus-2026" element={<CentsDetailedSyllabus />} />
     <Route path="/cent-s-exam-pattern-2026" element={<CentsPatternGuide />} />
     <Route path="/cent-s-cutoff-2026" element={<CentsCutoffTrends />} />
@@ -162,29 +165,36 @@ const PublicRouter = () => (
     <Route path="/best-books-for-cent-s-2026" element={<CentsBooks />} />
     <Route path="/cent-s-eligibility-criteria" element={<CentsEligibility />} />
     <Route path="/cent-s-registration-process-2026" element={<CentsRegistration />} />
+    <Route path="/cent-s-exam-fee" element={<CentsRegistration />} />
+    <Route path="/cents-exam-fee" element={<CentsRegistration />} />
     <Route path="/cent-s-important-dates-2026" element={<CentsDates />} />
     <Route path="/cent-s-difficulty-level-analysis" element={<CentsDifficultyAnalysis />} />
     <Route path="/cent-s-passing-score-explained" element={<CentsPassingScore />} />
     <Route path="/cent-s-mock-landing" element={<CentsMockLanding />} />
+
+    <Route path="/imat" element={<ImatUltimateGuide />} />
     <Route path="/imat-exam-ultimate-guide-2026" element={<ImatUltimateGuide />} />
     <Route path="/imat-syllabus-2026" element={<ImatDetailedSyllabus />} />
+    <Route path="/imat-dates" element={<ImatExamDates />} />
+    <Route path="/imat-dates-2026" element={<ImatExamDates />} />
     <Route path="/imat-exam-dates-2026" element={<ImatExamDates />} />
     <Route path="/imat-registration-2026" element={<ImatRegistration />} />
     <Route path="/imat-exam-pattern-2026" element={<ImatPatternGuide />} />
     <Route path="/imat-cutoff-trends-2026" element={<ImatCutoffTrends />} />
     <Route path="/imat-mock-test-free-2026" element={<ImatMockTest />} />
-    <Route path="/imat-previous-year-papers-pdf" element={<ImatPreviousPapers />} />
+        <Route path="/imat-previous-year-papers-pdf" element={<ImatPreviousPapers />} />
     <Route path="/imat-preparation-strategy-2026" element={<ImatPrepStrategy />} />
     <Route path="/imat-best-books-2026" element={<ImatBooks />} />
     <Route path="/imat-eligibility-criteria-2026" element={<ImatEligibility />} />
     <Route path="/imat-passing-score-explained-2026" element={<ImatPassingScore />} />
     <Route path="/imat-difficulty-analysis-2026" element={<ImatDifficultyAnalysis />} />
     <Route path="/imat-vs-cents-2026" element={<ImatVsCents />} />
-    <Route path="/imat-vs-neet-2026" element={<ImatVsNeet />} />
-    <Route path="/imat-score-calculator" element={<ImatScoreCalculator />} />
-    <Route path="/imat-biology-syllabus-2026" element={<ImatBiologySyllabus />} />
+        <Route path="/imat-vs-neet-2026" element={<ImatVsNeet />} />
+        <Route path="/imat-biology-syllabus-2026" element={<ImatBiologySyllabus />} />
     <Route path="/imat-logical-reasoning-guide-2026" element={<ImatLogicalReasoning />} />
     <Route path="/imat-exam-for-indian-students" element={<ImatForIndianStudents />} />
+
+    <Route path="/tolc" element={<TolcUltimateGuide />} />
     <Route path="/tolc-exam-ultimate-guide-2026" element={<TolcUltimateGuide />} />
     <Route path="/tolc-syllabus-2026" element={<TolcDetailedSyllabus />} />
     <Route path="/tolc-best-books-2026" element={<TolcBooks />} />
@@ -200,16 +210,34 @@ const PublicRouter = () => (
     <Route path="/tolc-preparation-strategy-2026" element={<TolcPrepStrategy />} />
     <Route path="/tolc-vs-imat-2026" element={<TolcVsImat />} />
     <Route path="/til-i-exam-guide-2026" element={<TiliUltimateGuide />} />
+
     <Route path="/study-in-italy-guide-2026" element={<StudyItalyGuide />} />
     <Route path="/study-in-italy/universities-2026" element={<StudyItalyUniversities />} />
     <Route path="/study-in-italy/without-ielts" element={<StudyItalyWithoutIelts />} />
     <Route path="/study-in-italy/tuition-fees-2026" element={<StudyItalyTuition />} />
     <Route path="/study-in-italy/how-to-apply" element={<StudyItalyApply />} />
-    <Route path="/resources/:slug" element={<ResourceDetail />} />
+    <Route path="/universitaly-pre-enrollment-2026" element={<StudyItalyApply />} />
+        <Route path="/resources/:slug" element={<ResourceDetail />} />
 
-    {/* Canonical redirects — short slugs 301→ long authority slugs to prevent duplicate content */}
-    <Route path="/imat" element={<Navigate to="/imat-exam-ultimate-guide-2026" replace />} />
-    <Route path="/cent-s" element={<Navigate to="/cent-s-exam-ultimate-guide" replace />} />
+        {/* 16 Static HTML Authority Routes - Served directly by Vercel */}
+    <Route path="/imat-past-papers" element={<StaticRedirect />} />
+    <Route path="/imat-vs-neet" element={<StaticRedirect />} />
+    <Route path="/universitaly-pre-enrollment-guide" element={<StaticRedirect />} />
+    <Route path="/cent-s-exam-fees" element={<StaticRedirect />} />
+    <Route path="/imat-preparation-books" element={<StaticRedirect />} />
+    <Route path="/imat-question-bank" element={<StaticRedirect />} />
+    <Route path="/imat-scoring-system" element={<StaticRedirect />} />
+    <Route path="/tolc-med-vs-imat" element={<StaticRedirect />} />
+    <Route path="/imat-from-india" element={<StaticRedirect />} />
+    <Route path="/study-medicine-italy-from-pakistan" element={<StaticRedirect />} />
+    <Route path="/cent-s-for-turkish-students" element={<StaticRedirect />} />
+    <Route path="/study-medicine-italy-from-bangladesh" element={<StaticRedirect />} />
+    <Route path="/imat-score-calculator" element={<StaticRedirect />} />
+    <Route path="/imat-cutoff-estimator" element={<StaticRedirect />} />
+    <Route path="/imat-free-practice-test" element={<StaticRedirect />} />
+    <Route path="/cent-s-free-practice-test" element={<StaticRedirect />} />
+
+    {/* Canonical redirects & Static pages */}
     <Route path="/resources" element={<StaticRedirect />} />
     <Route path="/cent-s-mock" element={<StaticRedirect />} />
     <Route path="/imat-mock" element={<StaticRedirect />} />
@@ -218,6 +246,8 @@ const PublicRouter = () => (
     <Route path="/method" element={<StaticRedirect />} />
     <Route path="/roadmap" element={<StaticRedirect />} />
     <Route path="/updates" element={<StaticRedirect />} />
+    <Route path="/doubtster-ai-video-explanations" element={<StaticRedirect />} />
+    <Route path="/italostudy-doubtster-collaboration" element={<Navigate to="/doubtster-ai-video-explanations" replace />} />
 
     <Route path="/store" element={<ExternalRedirect to="https://store.italostudy.com" />} />
     <Route path="/store/*" element={<ExternalRedirect to="https://store.italostudy.com" />} />

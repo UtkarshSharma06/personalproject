@@ -7,6 +7,7 @@ export const getEducationalOrganizationSchema = () => ({
   "@context": "https://schema.org",
   "@type": ["EducationalOrganization", "OnlineBusiness"],
   "name": "ItaloStudy",
+  "legalName": "ITALOSTUDY PRIVATE LIMITED",
   "url": "https://italostudy.com",
   "logo": "https://italostudy.com/logo.webp",
   "description": "Italy's most advanced study simulator for CEnT-S, IMAT, SAT and IELTS entrance exam preparation. Join 5,000+ students with a 98% pass rate.",
@@ -107,6 +108,7 @@ export const getWebApplicationSchema = () => ({
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "ItaloStudy",
+  "legalName": "ITALOSTUDY PRIVATE LIMITED",
   "url": "https://italostudy.com",
   "applicationCategory": "EducationalApplication",
   "operatingSystem": "Web",
@@ -136,6 +138,7 @@ export const getVideoObjectSchema = (title: string, description: string, thumbna
   "publisher": {
     "@type": "Organization",
     "name": "ItaloStudy",
+    "legalName": "ITALOSTUDY PRIVATE LIMITED",
     "logo": {
       "@type": "ImageObject",
       "url": "https://italostudy.com/logo.webp"

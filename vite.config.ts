@@ -44,7 +44,8 @@ export default defineConfig(({ mode }) => ({
             '/resources': 'resources.html',
             '/cent-s-exam-preparation-book-pdf-free-download': 'cent-s-exam-preparation-book-pdf-free-download.html',
             '/cent-s-mock': 'cent-s-mock.html',
-            '/imat-mock': 'imat-mock.html'
+            '/imat-mock': 'imat-mock.html',
+            '/doubtster-ai-video-explanations': 'doubtster-ai-video-explanations.html'
           };
           
           let targetFile = rewrites[url];
@@ -91,7 +92,22 @@ export default defineConfig(({ mode }) => ({
           next();
         });
       }
-    }
+    },
+    {
+      name: 'copy-public-html-to-dist',
+      closeBundle() {
+        const publicDir = path.resolve(__dirname, 'public');
+        const distDir = path.resolve(__dirname, 'dist');
+        if (fs.existsSync(publicDir) && fs.existsSync(distDir)) {
+          const files = fs.readdirSync(publicDir);
+          for (const file of files) {
+            if (file.endsWith('.html')) {
+              fs.copyFileSync(path.join(publicDir, file), path.join(distDir, file));
+            }
+          }
+        }
+      }
+    },
   ].filter(Boolean),
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },

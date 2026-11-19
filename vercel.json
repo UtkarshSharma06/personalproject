@@ -76,6 +76,16 @@
             "source": "/answers/:path*",
             "destination": "/",
             "permanent": false
+        },
+        {
+            "source": "/italostudy-doubtster-collaboration",
+            "destination": "/doubtster-ai-video-explanations",
+            "permanent": true
+        },
+        {
+            "source": "/blog/italostudy-doubtster-collaboration",
+            "destination": "/doubtster-ai-video-explanations",
+            "permanent": true
         }
     ],
     "rewrites": [
@@ -112,8 +122,76 @@
             "destination": "/api/cent-s-resources-ssr"
         },
         {
+            "source": "/doubtster-ai-video-explanations",
+            "destination": "/doubtster-ai-video-explanations.html"
+        },
+        {
             "source": "/blog/:slug",
             "destination": "/api/blog-post-dynamic?slug=:slug"
+        },
+        {
+            "source": "/imat-past-papers",
+            "destination": "/imat-past-papers.html"
+        },
+        {
+            "source": "/imat-vs-neet",
+            "destination": "/imat-vs-neet.html"
+        },
+        {
+            "source": "/universitaly-pre-enrollment-guide",
+            "destination": "/universitaly-pre-enrollment-guide.html"
+        },
+        {
+            "source": "/cent-s-exam-fees",
+            "destination": "/cent-s-exam-fees.html"
+        },
+        {
+            "source": "/imat-preparation-books",
+            "destination": "/imat-preparation-books.html"
+        },
+        {
+            "source": "/imat-question-bank",
+            "destination": "/imat-question-bank.html"
+        },
+        {
+            "source": "/imat-scoring-system",
+            "destination": "/imat-scoring-system.html"
+        },
+        {
+            "source": "/tolc-med-vs-imat",
+            "destination": "/tolc-med-vs-imat.html"
+        },
+        {
+            "source": "/imat-from-india",
+            "destination": "/imat-from-india.html"
+        },
+        {
+            "source": "/study-medicine-italy-from-pakistan",
+            "destination": "/study-medicine-italy-from-pakistan.html"
+        },
+        {
+            "source": "/cent-s-for-turkish-students",
+            "destination": "/cent-s-for-turkish-students.html"
+        },
+        {
+            "source": "/study-medicine-italy-from-bangladesh",
+            "destination": "/study-medicine-italy-from-bangladesh.html"
+        },
+        {
+            "source": "/imat-score-calculator",
+            "destination": "/imat-score-calculator.html"
+        },
+        {
+            "source": "/imat-cutoff-estimator",
+            "destination": "/imat-cutoff-estimator.html"
+        },
+        {
+            "source": "/imat-free-practice-test",
+            "destination": "/imat-free-practice-test.html"
+        },
+        {
+            "source": "/cent-s-free-practice-test",
+            "destination": "/cent-s-free-practice-test.html"
         },
         {
             "source": "/",
@@ -136,7 +214,15 @@
             "destination": "/api/static-seo-router"
         },
         {
-            "source": "/(syllabus/.*|imat.*|study-in-italy.*|tolc.*|til-i.*|pricing|about|institutional|exams|cent-s.*|best-books-for-cent-s.*|courses.*|blog$|contact$|privacy$|terms$|refund$|method$|status$|roadmap$|updates$|cent-s-exam-preparation-book-pdf.*)",
+            "source": "/imat",
+            "destination": "/api/static-seo-router"
+        },
+        {
+            "source": "/tolc",
+            "destination": "/api/static-seo-router"
+        },
+        {
+            "source": "/(syllabus/.*|imat.*|study-in-italy.*|tolc.*|til-i.*|pricing|about|institutional|exams|cent-s.*|cents-.*|universitaly.*|best-books-for-cent-s.*|courses.*|blog$|contact$|privacy$|terms$|refund$|method$|status$|roadmap$|updates$|cent-s-exam-preparation-book-pdf.*)",
             "destination": "/api/static-seo-router"
         },
         {

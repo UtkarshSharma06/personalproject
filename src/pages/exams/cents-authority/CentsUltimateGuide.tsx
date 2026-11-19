@@ -125,16 +125,16 @@ export default function CentsUltimateGuide() {
                 }
             >
                 <SEOHead
-                    title="CEnT-S Exam 2027: The Ultimate Preparation Guide & Free Resources"
-                    description="The most complete CEnT-S 2027 preparation guide. Download free CEnT-S exam preparation book PDF, past papers, and syllabus. Access free full-length mock tests."
-                    keywords="cent-s exam preparation book pdf free download, cent-s exam preparation book pdf, cent-s exam questions pdf, cent s mock test, cents mock test, cent-s syllabus, cents prep, cent-s practice test, cent-s past papers, italostudy"
+                    title="CEnT-S Exam 2026–2027: Syllabus, Exam Dates, Fees (€35) & Free Mocks | ItaloStudy"
+                    description="Master the Italian CEnT-S 2026–2027 entrance exam. Download official CISIA syllabus, check registration dates, exam fee (€35), and take free full-length simulated mocks."
+                    keywords="cent-s exam, cents exam 2026, cent-s syllabus, cents exam fee, cent-s registration, cisia english test science, cent-s mock test, cent-s past papers, italostudy"
                     faqs={faqs}
                     schemas={[
                         getCourseSchema('cents'),
                         getBreadcrumbSchema([
                             { name: 'Home', item: '/' },
                             { name: 'Guides', item: '/cent-s-exam-preparation-book-pdf' },
-                            { name: 'CEnT-S 2027', item: '/cent-s-exam-ultimate-guide' }
+                            { name: 'CEnT-S 2026–2027', item: '/cent-s-exam-ultimate-guide' }
                         ])
                     ]}
                 />

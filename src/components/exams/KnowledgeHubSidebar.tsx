@@ -49,13 +49,53 @@ const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) =
     }
 
     const isStaticPath = (path: string) => {
-        return ['/method', '/exams', '/imat', '/cent-s', '/contact'].includes(path) || 
+        return ['/method', '/exams', '/imat', '/cent-s', '/contact', '/tolc'].includes(path) || 
                path.startsWith('/cent-s-') || 
+               path.startsWith('/cents-') || 
                path.startsWith('/best-books-for-cent-s-') ||
                path.startsWith('/imat-') ||
                path.startsWith('/tolc-') ||
                path.startsWith('/til-i-') ||
-               path.startsWith('/study-in-italy');
+               path.startsWith('/study-in-italy') ||
+               path.startsWith('/study-medicine-') ||
+               path.startsWith('/universitaly-');
+    };
+
+    const getCrossClusterLinks = () => {
+        if (examType === 'imat') {
+            return [
+                { path: '/universitaly-pre-enrollment-2026', label: 'Universitaly Pre-Enrollment Guide' },
+                { path: '/study-in-italy/tuition-fees-2026', label: 'Tuition Fees & DSU Scholarships' },
+                { path: '/imat-vs-neet-2026', label: 'IMAT vs NEET Comparison Guide' },
+                { path: '/study-in-italy/universities-2026', label: 'Top Italian Medical Universities' },
+                { path: '/cent-s-exam-ultimate-guide', label: 'CEnT-S English STEM Entrance' },
+            ];
+        }
+        if (examType === 'cents') {
+            return [
+                { path: '/universitaly-pre-enrollment-2026', label: 'Universitaly Pre-Enrollment Guide' },
+                { path: '/study-in-italy/tuition-fees-2026', label: 'Tuition Fees & DSU Scholarships' },
+                { path: '/cents-exam-fee', label: 'CEnT-S Exam Fee (€35) & CISIA Guide' },
+                { path: '/study-in-italy-guide-2026', label: 'Study Engineering & STEM in Italy' },
+                { path: '/imat-vs-cents-2026', label: 'IMAT vs CEnT-S Comparison' },
+            ];
+        }
+        if (examType === 'tolc') {
+            return [
+                { path: '/universitaly-pre-enrollment-2026', label: 'Universitaly Pre-Enrollment Guide' },
+                { path: '/study-in-italy/without-ielts', label: 'Study in Italy Without IELTS' },
+                { path: '/til-i-exam-guide-2026', label: 'Politecnico di Torino TIL-I' },
+                { path: '/tolc-vs-imat-2026', label: 'TOLC vs IMAT Comparison' },
+                { path: '/cent-s-exam-ultimate-guide', label: 'CEnT-S Science & STEM Guide' },
+            ];
+        }
+        return [
+            { path: '/imat', label: 'IMAT Medicine Entrance Guide' },
+            { path: '/cent-s', label: 'CEnT-S Science Entrance Guide' },
+            { path: '/tolc', label: 'TOLC Engineering & Economics' },
+            { path: '/universitaly-pre-enrollment-2026', label: 'Universitaly Pre-Enrollment 2026–2027' },
+            { path: '/study-in-italy/tuition-fees-2026', label: 'DSU Scholarships (€8,000/yr)' },
+        ];
     };
 
     const renderLink = (path: string, label: React.ReactNode, className: string, key?: any) => {
@@ -77,7 +117,7 @@ const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) =
     return (
         <div className="space-y-6">
             {/* Main Knowledge Hub Links */}
-            <Card className="p-6 border-slate-900 border-2 bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] rounded-3xl">
+            <Card className="p-6 border border-slate-200/80 bg-white shadow-sm rounded-3xl">
                 <h4 className="text-sm font-black mb-4 flex items-center gap-2 uppercase tracking-widest text-slate-900">
                     <Grid className="text-indigo-600" size={16} />
                     {title}
@@ -94,12 +134,33 @@ const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) =
                 </div>
             </Card>
 
+            {/* Cross-Cluster Authority Links */}
+            <Card className="p-6 border border-slate-200/80 shadow-sm bg-white rounded-3xl">
+                <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2 uppercase tracking-wider">
+                    <Globe className="text-indigo-600" size={16} />
+                    Admissions & Visa Guides
+                </h4>
+                <div className="space-y-1">
+                    {getCrossClusterLinks().map((link, i) => (
+                        renderLink(
+                            link.path,
+                            <span className="flex items-center justify-between w-full py-1.5 px-2 rounded-xl hover:bg-indigo-50/50 text-slate-600 hover:text-indigo-600 text-xs font-medium transition-colors group">
+                                <span className="truncate">{link.label}</span>
+                                <ChevronRight size={13} className="text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+                            </span>,
+                            "block",
+                            i
+                        )
+                    ))}
+                </div>
+            </Card>
+
             {/* Free Mock Test Card */}
             <Card className="p-6 border-indigo-600 border-2 bg-indigo-50/50 rounded-3xl relative overflow-hidden group">
                 <div className="relative z-10">
                     <h4 className="text-base font-black text-indigo-900 mb-2">Ready to see your real score?</h4>
                     <p className="text-[11px] text-indigo-700/80 font-medium leading-relaxed mb-4">
-                        Free full-length 2027 mock exam. Find your weak spots before test day.
+                        Free full-length 2026–2027 mock exam. Find your weak spots before test day.
                     </p>
                     {renderLink(
                         examType === 'cents' ? '/cent-s-mock' : examType === 'tolc' ? '/tolc-mock-test-free-2026' : '/imat-mock',
@@ -116,7 +177,7 @@ const KnowledgeHubSidebar: React.FC<KnowledgeHubSidebarProps> = ({ examType }) =
             <Card className="p-6 border-slate-100 shadow-sm bg-white rounded-3xl">
                 <h4 className="text-sm font-black text-slate-900 mb-2">Expert Study Picks</h4>
                 <p className="text-[11px] text-slate-500 font-medium leading-relaxed mb-4">
-                    Vetted study materials for the 2026 cycle.
+                    Vetted study materials for the 2026–2027 cycle.
                 </p>
                 {renderLink(
                     examType === 'cents' ? '/best-books-for-cent-s-2026' : examType === 'tolc' ? '/tolc-best-books-2026' : '/imat-best-books-2026',
